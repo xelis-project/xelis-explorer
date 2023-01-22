@@ -1,0 +1,61 @@
+:root {
+  --header-nav-color: var(--muted-color);
+  --header-nav-active-color: var(--text-color);
+  --header-logo-color: var(--text-color);
+}
+
+.header {
+  padding: 1.5em 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  background-color: var(--header-logo-color);
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+}
+
+.header-logo::after {
+  content: 'XE';
+  color: var(--bg-color);
+  font-weight: bold;
+  font-size: 1.5em;
+  margin-left: 5px;
+  margin-top: 6px;
+  display: block;
+}
+
+.header-nav {
+  display: flex;
+  gap: 1.2em;
+  align-items: center;
+}
+
+.header-nav-item {
+  text-decoration: none;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: var(--header-nav-color);
+}
+
+.header-nav-item:hover {
+  color: var(--header-nav-active-color);
+}
+
+.header-nav-item-active {
+  color: var(--header-nav-active-color);
+}
+
+.header-nav-item-active::after {
+  content: '';
+  background-color: var(--header-nav-active-color);
+  width: 30px;
+  height: 4px;
+  display: block;
+  margin: .3em 0;
+  border-radius: 15px;
+  position: absolute;
+}

@@ -1,0 +1,26 @@
+:root {
+  --scrollbar-width: 8px;
+  --scrollbar-height: 8px;
+  --scrollbar-track-bg: inherit;
+  --scrollbar-thumb-bg: #727272;
+  --scrollbar-thumb-border-radius: 15px;
+  --scrollbar-thumb-bg-hover: #525252;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-height);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: var(--scrollbar-thumb-border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-bg-hover);
+}

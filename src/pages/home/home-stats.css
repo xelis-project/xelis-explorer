@@ -1,0 +1,34 @@
+.home-stats-title {
+  margin-bottom: 1em;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.home-stats-items {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.home-stats-item {
+  padding: 1em;
+  border: thin solid var(--border-color);
+  border-radius: 5px;
+  flex: 1 0 30%;
+}
+
+@media (max-width: 800px) {
+  .home-stats-item {
+    flex: 1 0 100%;
+  }
+}
+
+.home-stats-item-title {
+  margin-bottom: .4em;
+}
+
+.home-stats-item-value {
+  font-weight: bold;
+  font-size: 1.4em;
+  color: var(--muted-color);
+}

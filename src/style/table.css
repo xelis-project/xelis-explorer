@@ -1,0 +1,22 @@
+.table-responsive {
+  overflow: auto;
+  padding-bottom: .5em;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table th {
+  font-weight: bold;
+  border: thin solid var(--border-color);
+  padding: .6em;
+  text-align: left;
+}
+
+table td {
+  border: thin solid var(--border-color);
+  padding: .6em;
+  color: var(--muted-color);
+}

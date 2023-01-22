@@ -1,0 +1,53 @@
+@import url(css.gg/icons/all.css);
+@import url(reset-css);
+@import url(./scrollbar.css);
+@import url(./table.css);
+
+:root, [data-theme="dark"] {
+  --bg-color: #101010;
+  --text-color: #f1f1f1;
+  --border-color: var(--text-color);
+  --muted-color: rgba(255, 255, 255, .6);
+  --error-color: red;
+  --success-color: green;
+  --link-color: #1870cb;
+}
+
+[data-theme="light"] {
+  --bg-color: #f1f1f1;
+  --text-color: #101010;
+  --border-color: var(--text-color);
+  --muted-color: rgba(0, 0, 0, .6);
+  --error-color: red;
+  --success-color: green;
+  --link-color: #1870cb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: sans-serif;
+  overflow-y: scroll;
+}
+
+.layout {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 1em 5em 1em;
+}
+
+button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: var(--link-color);
+  font-weight: bold;
+}
