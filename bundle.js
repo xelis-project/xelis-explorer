@@ -4,6 +4,7 @@ import fs from 'fs'
 import { promisify } from 'util'
 
 const readFile = promisify(fs.readFile)
+const delFolder = promisify(fs.rm)
 
 const argv = yargs(process.argv)
   .option(`watch`, {
@@ -28,6 +29,10 @@ const argv = yargs(process.argv)
 
 
 const main = async () => {
+  const outdir = `./public/dist`
+
+  await delFolder(outdir, { recursive: true, force: true })
+
   const envData = await readFile(`${argv.env}.json`, { encoding: `utf-8` })
   const env = JSON.parse(envData)
 
@@ -40,7 +45,7 @@ const main = async () => {
       '.woff2': 'text'
     },
     jsx: `automatic`,
-    outdir: `public/dist`,
+    outdir,
     minify: argv.minify,
     sourcemap: `inline`,//argv.sourcemap,
     define: env,

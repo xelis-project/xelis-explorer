@@ -6,7 +6,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import DotLoading from '../../components/dotLoading'
 import bytes from 'bytes'
 import Age from '../../components/age'
-import { formatXelis, shiftNumber } from '../../utils'
+import { formatXelis } from '../../utils'
 
 import './explorer-search.css'
 import './home-stats.css'

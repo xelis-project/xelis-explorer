@@ -6,7 +6,8 @@
     "start": "concurrently \"npm run build-dev\" \"npm run serve\"",
     "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",
     "build-dev": "node bundle.js --env=env.dev --watch --sourcemap",
-    "build-prod": "node bundle.js --env=env.prod --minify"
+    "build-testnet": "node bundle.js --env=env.testnet --sourcemap",
+    "build-mainnet": "node bundle.js --env=env.mainnet --minify"
   },
   "dependencies": {
     "bytes": "^3.1.2",
