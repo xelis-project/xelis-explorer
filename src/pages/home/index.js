@@ -6,7 +6,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import DotLoading from '../../components/dotLoading'
 import bytes from 'bytes'
 import Age from '../../components/age'
-import { shiftNumber } from '../../utils'
+import { formatXelis, shiftNumber } from '../../utils'
 
 import './explorer-search.css'
 import './home-stats.css'
@@ -57,14 +57,6 @@ function NodeConnection() {
 }
 
 function RecentBlocks() {
-  /*const blocks = [
-    { height: 4, value: `10 txs | 1 mb` },
-    { height: 3, value: `5 txs | 50 kb` },
-    { height: 2, value: `35 txs | 2 mb` },
-    { height: 1, value: `1 txs | 100 kb` },
-    { height: 0, value: `23 txs | 4 mb` },
-  ]*/
-
   const { newBlocks } = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
@@ -119,7 +111,9 @@ function RecentBlocks() {
           <div className={`recent-blocks-item-status ${statusClassName}`} />
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
-          <div className="recent-blocks-item-time"><Age timestamp={item.timestamp} /></div>
+          <div className="recent-blocks-item-time">
+            <Age timestamp={item.timestamp} update format={{ compact: false }} />
+          </div>
         </Link>
       })}
     </div>
@@ -158,7 +152,7 @@ function Stats() {
       { title: `Total txs`, value: `?` },
       { title: `TPS`, value: `?` },
       { title: `Difficulty`, value: info.difficulty },
-      { title: `Total supply`, value: `${shiftNumber(info.native_supply, 5)} XELIS` },
+      { title: `Total supply`, value: formatXelis(info.native_supply) },
       { title: `Tx pool`, value: `${info.mempool_size} tx` },
       { title: `Avg block size`, value: `?` },
       { title: `Avg block time`, value: `?` },

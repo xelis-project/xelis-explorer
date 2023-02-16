@@ -1,22 +1,23 @@
-import { useMemo } from 'react'
-import { reduceText } from '../../utils'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { formatXelis, reduceText } from '../../utils'
 import { Link } from 'react-router-dom'
+import useNodeRPC from '../../hooks/useNodeRPC'
+import bytes from 'bytes'
+import Age from '../../components/age'
 
 function Blocks() {
-  const blocks = useMemo(() => {
-    const items = []
-    for (let i = 0; i < 20; i++) {
-      items.push({
-        height: i,
-        age: '5s',
-        size: `4 kb`,
-        hash: `e5faf4e26d6e3f176cb11895aaaf69ae2edeecd7cdade62705336bc69c6e68d3`,
-        fees: `0.5`,
-        miner: `xelis345239458gh23`
-      })
-    }
-    return items.reverse()
+  const nodeRPC = useNodeRPC()
+  const [blocks, setBlocks] = useState([])
+
+  const loadBlocks = useCallback(async () => {
+    const block = await nodeRPC.getTopBlock()
+    const data = await nodeRPC.getBlocks(block.topoheight-19, block.topoheight)
+    setBlocks(data.reverse())
   }, [])
+
+  useEffect(() => {
+    loadBlocks()
+  }, [loadBlocks])
 
   return <div>
     <h1>Blocks</h1>
@@ -24,25 +25,30 @@ function Blocks() {
       <table>
         <thead>
           <tr>
-            <th>Height</th>
+            <th>Topo Height</th>
             <th>Age</th>
             <th>Size</th>
             <th>Hash</th>
             <th>Fees</th>
             <th>Miner</th>
+            <th>Reward</th>
           </tr>
         </thead>
         <tbody>
           {blocks.map((item) => {
-            return <tr key={item.height}>
+            const size = bytes.format(item.total_size_in_bytes)
+            return <tr key={item.topoheight}>
               <td>
-                <Link to={`/blocks/${item.height}`}>{item.height}</Link>
+                <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
-              <td>{item.age}</td>
-              <td>{item.size}</td>
+              <td>{item.age}
+                <Age timestamp={item.timestamp} />
+              </td>
+              <td>{size}</td>
               <td>{reduceText(item.hash)}</td>
-              <td>{item.fees}</td>
-              <td>{item.miner}</td>
+              <td>{item.total_fees}</td>
+              <td>{reduceText(item.miner)}</td>
+              <td>{formatXelis(item.reward)}</td>
             </tr>
           })}
         </tbody>

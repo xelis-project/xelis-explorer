@@ -2,26 +2,26 @@ import { useEffect, useState } from 'react'
 import prettyMs from 'pretty-ms'
 
 function Age(props) {
-  const { timestamp, ms = 3000, formatParams = { compact: false } } = props
+  const { timestamp, ms = 3000, format = { compact: true }, update = false } = props
 
   const [age, setAge] = useState(0)
   useEffect(() => {
     let timeoutId = null
-    const update = () => {
+    const updateTime = () => {
       const age = new Date().getTime() - timestamp
       setAge(age)
 
-      timeoutId = setTimeout(update, ms)
+      if (update) timeoutId = setTimeout(updateTime, ms)
     }
 
-    update()
+    updateTime()
 
     return () => {
-      clearTimeout(timeoutId)
+      if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [])
+  }, [update])
 
-  return prettyMs(age, formatParams)
+  return prettyMs(age, format)
 }
 
 export default Age

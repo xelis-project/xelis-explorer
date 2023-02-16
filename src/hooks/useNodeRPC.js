@@ -72,11 +72,18 @@ const useNodeRPC = () => {
     return rpcFetch(`get_info`)
   }, [])
 
+  const getBlocks = useCallback((start, end) => {
+    return rpcFetch(`get_blocks`, {
+      start_topoheight: start,
+      end_topoheight: end
+    })
+  }, [])
+
   return {
     getTopBlock, getHeight, getTopoHeight, getBlockTemplate,
     getBlockAtTopoHeight, getBlockByHash, getBlocksAtHeight,
     getNonce, getBalance, getAssets, countTransactions,
-    getTips, p2pStatus, getInfo
+    getTips, p2pStatus, getInfo, getBlocks
   }
 }
 

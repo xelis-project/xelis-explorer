@@ -10,3 +10,7 @@ export const reduceText = (text, maxLeft = 7, maxRight = 7) => {
 export const shiftNumber = (value, decimals) => {
   return value / Math.pow(10, decimals)
 }
+
+export const formatXelis = (value) => {
+  return `${shiftNumber(value, 5)} XELIS`
+}

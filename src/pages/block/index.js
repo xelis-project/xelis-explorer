@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { reduceText, shiftNumber } from '../../utils'
+import { formatXelis, reduceText } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
 
@@ -12,16 +12,9 @@ function Block() {
 
   const nodeRPC = useNodeRPC()
 
-  /*const block = {
-    'timestamp': `10/10/2023`,
-    'confirmations': 2,
-    'miner': `xelis452305gi3450`,
-    'reward': `1.5 XELIS`
-  }*/
-
   const [loading, setLoading] = useState(true)
   const [block, setBlock] = useState()
-  const [height, setHeight] = useState()
+  const [topoheight, setTopoheight] = useState()
 
   const loadBlock = useCallback(async () => {
     const height = parseInt(id)
@@ -29,15 +22,15 @@ function Block() {
     setBlock(block)
   }, [id])
 
-  const loadHeight = useCallback(async () => {
-    const height = await nodeRPC.getHeight()
-    setHeight(height)
+  const loadTopoHeight = useCallback(async () => {
+    const height = await nodeRPC.getTopoHeight()
+    setTopoheight(height)
   }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
     await loadBlock()
-    await loadHeight()
+    await loadTopoHeight()
     setLoading(false)
   }, [])
 
@@ -51,11 +44,11 @@ function Block() {
     return {
       date: new Date(block.timestamp).toLocaleString(),
       miner: reduceText(block.miner),
-      reward: `${shiftNumber(block.reward, 5)} XELIS`,
-      confirmations: height - block.height,
+      reward: formatXelis(block.reward),
+      confirmations: topoheight - block.topoheight,
       size: bytes.format(block.total_size_in_bytes)
     }
-  }, [block, height])
+  }, [block, topoheight])
 
   if (loading) return null
   if (!block) return <NotFound />
@@ -86,12 +79,12 @@ function Block() {
             <td>{formatBlock.confirmations}</td>
           </tr>
           <tr>
-            <th>Height</th>
-            <td>{block.height}</td>
-          </tr>
-          <tr>
             <th>Topoheight</th>
             <td>{block.topoheight}</td>
+          </tr>
+          <tr>
+            <th>Height</th>
+            <td>{block.height}</td>
           </tr>
           <tr>
             <th>Miner</th>
