@@ -1,6 +1,6 @@
 # Xelis Explorer
 
-Official explorer for Xelis Blockhain.  
+Official Explorer for Xelis Blockhain.  
 Realtime statistics with web sockets.  
 List all blocks of the entire blockchain.  
 
@@ -12,6 +12,7 @@ List all blocks of the entire blockchain.
 Use this for development.  
 Run http server, watch and build files automatically.  
 
-`npm run build`  
+`npm run build-dev`  
 Build js, css files to `/public/dist` with esbuild.  
-Use `npm run build-prod` to remove sourcemaps and minify code for production.  
+Use `npm run build-testnet` for cf testnet branch (keeps sourcemap).  
+Use `npm run build-mainnet` for cf mainnet branch (remove sourcemaps and minify code).  

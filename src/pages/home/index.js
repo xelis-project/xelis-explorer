@@ -38,13 +38,14 @@ function ExplorerSearch() {
   </form>
 }
 
-function NodeConnection() {
+function NodeConnection(props) {
+  const { info } = props
   const { connected, loading, err } = useNodeSocket()
 
   return <div className="node-connection">
     {connected && <>
       <div className="node-connection-status alive" />
-      <div>Connected to remote node</div>
+      <div>Connected to remote node (version: {info.version})</div>
     </>}
     {loading && <>
       <div className="node-connection-status loading" />
@@ -57,16 +58,19 @@ function NodeConnection() {
   </div>
 }
 
-function RecentBlocks() {
+function RecentBlocks(props) {
+  const { info } = props
   const { newBlocks } = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
   const [lastBlocks, setLastBlocks] = useState([])
 
   const loadBlocks = useCallback(async () => {
-    const data = await nodeRPC.getTopBlock()
-    if (data) setLastBlocks([data])
-  }, [])
+    if (!info) return
+    const data = await nodeRPC.getBlocks(info.topoheight - 10, info.topoheight)
+    if (!data) return
+    setLastBlocks(data.reverse())
+  }, [info])
 
   useEffect(() => {
     loadBlocks()
@@ -121,7 +125,8 @@ function RecentBlocks() {
   </div>
 }
 
-function Stats() {
+function Stats(props) {
+  const { info } = props
   /*const stats = [
     { title: `Hash rate`, value: `100 MH/s` },
     { title: `Total txs`, value: `34.44 M` },
@@ -133,19 +138,6 @@ function Stats() {
     { title: `Avg block time`, value: `18s` },
     { title: `Blockchain size`, value: `1.5 GB` },
   ]*/
-
-  const nodeRPC = useNodeRPC()
-  const [info, setInfo] = useState({})
-
-  const loadInfo = useCallback(async () => {
-    const info = await nodeRPC.getInfo()
-    setInfo(info)
-    console.log(info)
-  }, [])
-
-  useEffect(() => {
-    loadInfo()
-  }, [loadInfo])
 
   const stats = useMemo(() => {
     return [
@@ -175,14 +167,27 @@ function Stats() {
 }
 
 function Home() {
+  const nodeRPC = useNodeRPC()
+  const [info, setInfo] = useState({})
+
+  const loadInfo = useCallback(async () => {
+    const info = await nodeRPC.getInfo()
+    setInfo(info)
+    console.log(info)
+  }, [])
+
+  useEffect(() => {
+    loadInfo()
+  }, [loadInfo])
+
   return <div>
     <Helmet>
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <NodeConnection />
-    <RecentBlocks />
-    <Stats />
+    <NodeConnection info={info} />
+    <RecentBlocks info={info} />
+    <Stats info={info} />
   </div>
 }
 
