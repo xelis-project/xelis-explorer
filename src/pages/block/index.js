@@ -4,6 +4,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import { formatXelis, reduceText } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
+import { Helmet } from 'react-helmet'
 
 import './card.css'
 
@@ -52,8 +53,11 @@ function Block() {
 
   if (loading) return null
   if (!block) return <NotFound />
-  console.log(block)
+
   return <div>
+    <Helmet>
+      <title>Block {id}</title>
+    </Helmet>
     <h1>Block {id}</h1>
     <div className="card">
       This block was mined on {formatBlock.date} by {formatBlock.miner}. It currently has {formatBlock.confirmations} confirmations.

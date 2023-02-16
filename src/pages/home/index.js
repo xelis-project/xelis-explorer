@@ -12,6 +12,7 @@ import './explorer-search.css'
 import './home-stats.css'
 import './recent-blocks.css'
 import './node-connection.css'
+import { Helmet } from 'react-helmet'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ function ExplorerSearch() {
     <div className="explorer-search">
       <div className="explorer-search-title">Xelis Explorer</div>
       <div className="explorer-search-form">
-        <input type="text" name="search" placeholder="Search block, transaction or address" />
+        <input type="text" name="search" placeholder="Search block, transaction or address" autoComplete="off" autoCapitalize="off" />
         <Button type="submit" icon="chevron-right-r" iconLocation="right">Search</Button>
       </div>
     </div>
@@ -175,6 +176,9 @@ function Stats() {
 
 function Home() {
   return <div>
+    <Helmet>
+      <title>Home</title>
+    </Helmet>
     <ExplorerSearch />
     <NodeConnection />
     <RecentBlocks />

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import bytes from 'bytes'
 import Age from '../../components/age'
+import { Helmet } from 'react-helmet'
 
 function Blocks() {
   const nodeRPC = useNodeRPC()
@@ -11,7 +12,7 @@ function Blocks() {
 
   const loadBlocks = useCallback(async () => {
     const block = await nodeRPC.getTopBlock()
-    const data = await nodeRPC.getBlocks(block.topoheight-19, block.topoheight)
+    const data = await nodeRPC.getBlocks(block.topoheight - 19, block.topoheight)
     setBlocks(data.reverse())
   }, [])
 
@@ -20,6 +21,9 @@ function Blocks() {
   }, [loadBlocks])
 
   return <div>
+    <Helmet>
+      <title>Blocks</title>
+    </Helmet>
     <h1>Blocks</h1>
     <div className="table-responsive">
       <table>

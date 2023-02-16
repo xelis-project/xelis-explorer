@@ -31,6 +31,6 @@
   cursor: pointer;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  background-color: var(--text-color);
-  color: var(--bg-color);
+  background-color: var(--link-color);
+  color: var(--text-color);
 }

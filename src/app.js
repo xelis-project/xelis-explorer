@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/useTheme'
 import { NodeSocketProvider } from './context/useNodeSocket'
 import { SettingsProvider } from './context/useSettings'
 import TxPool from './pages/txPool'
+import { Helmet } from 'react-helmet'
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
 
 function App() {
   return <ThemeProvider>
+    <Helmet titleTemplate="%s · Xelis Explorer" />
     <SettingsProvider>
       <NodeSocketProvider>
         <RouterProvider router={router} />

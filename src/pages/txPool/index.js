@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet'
 
 function TxPool() {
   const txs = [{
@@ -10,6 +11,9 @@ function TxPool() {
   }]
 
   return <div>
+    <Helmet>
+      <title>Transaction Pool</title>
+    </Helmet>
     <h1>Transaction Pool</h1>
     <div className="table-responsive">
       <table>
