@@ -2,8 +2,10 @@
 @import url(reset-css);
 @import url(./scrollbar.css);
 @import url(./table.css);
+@import url(./typo.css);
 
 :root, [data-theme="dark"] {
+  --card-color: black;
   --bg-color: #101010;
   --text-color: #f1f1f1;
   --border-color: var(--text-color);
@@ -11,9 +13,11 @@
   --error-color: red;
   --success-color: green;
   --link-color: #1870cb;
+  --warning-color: #dfde32;
 }
 
 [data-theme="light"] {
+  --card-color: white;
   --bg-color: #f1f1f1;
   --text-color: #101010;
   --border-color: var(--text-color);
@@ -21,6 +25,7 @@
   --error-color: red;
   --success-color: green;
   --link-color: #1870cb;
+  --warning-color: #dfde32;
 }
 
 * {

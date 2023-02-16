@@ -17,15 +17,15 @@
   min-width: 100px;
   border: thin solid var(--border-color);
   position: relative;
-  cursor: pointer;
   flex-shrink: 0;
   text-decoration: none;
   display: block;
   transition: .25s transform;
 }
 
-.recent-blocks-item:hover {
+.recent-blocks-item.scale:hover {
   transform: scale(.95);
+  cursor: pointer;
 }
 
 .recent-blocks-item-status {
@@ -37,7 +37,11 @@
   background-color: var(--muted-color);
 }
 
-.recent-blocks-item-status.confirm {
+.recent-blocks-item-status.mined {
+  background-color: var(--warning-color);
+}
+
+.recent-blocks-item-status.stable {
   background-color: var(--success-color);
 }
 
@@ -51,4 +55,10 @@
   color: var(--muted-color);
   font-weight: bold;
   font-size: .9em;
+}
+
+.recent-blocks-item-time {
+  font-weight: bold;
+  font-size: .9em;
+  margin-top: .2em;
 }

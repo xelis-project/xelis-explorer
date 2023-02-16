@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 function Blocks() {
   const blocks = useMemo(() => {
     const items = []
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 20; i++) {
       items.push({
         height: i,
         age: '5s',
@@ -18,33 +18,36 @@ function Blocks() {
     return items.reverse()
   }, [])
 
-  return <div className="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Height</th>
-          <th>Age</th>
-          <th>Size</th>
-          <th>Hash</th>
-          <th>Fees</th>
-          <th>Miner</th>
-        </tr>
-      </thead>
-      <tbody>
-        {blocks.map((item) => {
-          return <tr key={item.height}>
-            <td>
-              <Link to={`/blocks/${item.height}`}>{item.height}</Link>
-            </td>
-            <td>{item.age}</td>
-            <td>{item.size}</td>
-            <td>{reduceText(item.hash)}</td>
-            <td>{item.fees}</td>
-            <td>{item.miner}</td>
+  return <div>
+    <h1>Blocks</h1>
+    <div className="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Height</th>
+            <th>Age</th>
+            <th>Size</th>
+            <th>Hash</th>
+            <th>Fees</th>
+            <th>Miner</th>
           </tr>
-        })}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {blocks.map((item) => {
+            return <tr key={item.height}>
+              <td>
+                <Link to={`/blocks/${item.height}`}>{item.height}</Link>
+              </td>
+              <td>{item.age}</td>
+              <td>{item.size}</td>
+              <td>{reduceText(item.hash)}</td>
+              <td>{item.fees}</td>
+              <td>{item.miner}</td>
+            </tr>
+          })}
+        </tbody>
+      </table>
+    </div>
   </div>
 }
 

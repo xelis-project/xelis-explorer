@@ -1,23 +1,27 @@
 {
   "name": "xelis-explorer",
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "start": "concurrently \"npm run build -- --watch --sourcemap=inline\" \"npm run serve\"",
-    "serve": "live-server ./public --port=3000 --entry-file=index.html",
-    "build": "esbuild ./src/index --loader:.js=jsx --loader:.woff=text --loader:.woff2=text --jsx=automatic --bundle --outdir=public/dist",
-    "build-prod": "npm run build -- --minify"
+    "start": "concurrently \"npm run build-dev\" \"npm run serve\"",
+    "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",
+    "build-dev": "node bundle.js --env=env.dev --watch --sourcemap",
+    "build-prod": "node bundle.js --env=env.prod --minify"
   },
   "dependencies": {
+    "bytes": "^3.1.2",
     "classnames": "^2.3.2",
     "concurrently": "^7.6.0",
     "css.gg": "^2.0.0",
     "esbuild": "^0.17.3",
+    "pretty-ms": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.7.0",
     "react-router-dom": "^6.7.0",
     "reset-css": "^5.0.1",
     "serve": "^14.1.2",
-    "store2": "^2.14.2"
+    "store2": "^2.14.2",
+    "yargs": "^17.6.2"
   }
 }

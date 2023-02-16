@@ -3,6 +3,7 @@
   padding: .5em;
   margin-bottom: 2em;
   display: flex;
+  border-radius: 5px;
   gap: .5em;
   align-items: center;
   color: gray;
@@ -18,6 +19,10 @@
   background-color: var(--success-color);
 }
 
-.node-connection-status.dead {
+.node-connection-status.loading {
+  background-color: var(--muted-color);
+}
+
+.node-connection-status.error {
   background-color: var(--error-color);
 }

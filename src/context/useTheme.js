@@ -3,17 +3,17 @@ import store from 'store2'
 
 const Context = createContext()
 
-const themeStore = store.namespace(`theme`)
+const storeTheme = store.namespace(`theme`)
 
 export const ThemeProvider = (props) => {
-  const { children, defaultTheme } = props
+  const { children, defaultTheme = `dark` } = props
 
   const [theme, _setTheme] = useState(() => {
-    return themeStore.get(`current`, defaultTheme)
+    return storeTheme.get(`current`, defaultTheme)
   })
 
   const setTheme = useCallback((value) => {
-    themeStore.set(`current`, value)
+    storeTheme.set(`current`, value)
     _setTheme(value)
   }, [])
 

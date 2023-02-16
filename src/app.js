@@ -6,6 +6,8 @@ import Layout from './layout'
 import NotFound from './pages/notFound'
 import { ThemeProvider } from './context/useTheme'
 import { NodeSocketProvider } from './context/useNodeSocket'
+import { SettingsProvider } from './context/useSettings'
+import TxPool from './pages/txPool'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,10 @@ const router = createBrowserRouter([
         element: <Block />
       },
       {
+        path: '/txpool',
+        element: <TxPool />
+      },
+      {
         path: '*',
         element: <NotFound />
       }
@@ -32,10 +38,12 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-  return <ThemeProvider defaultTheme="dark">
-    <NodeSocketProvider>
-      <RouterProvider router={router} />
-    </NodeSocketProvider>
+  return <ThemeProvider>
+    <SettingsProvider>
+      <NodeSocketProvider>
+        <RouterProvider router={router} />
+      </NodeSocketProvider>
+    </SettingsProvider>
   </ThemeProvider>
 }
 
