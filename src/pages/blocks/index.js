@@ -5,15 +5,31 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import bytes from 'bytes'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet'
+import TableBody from '../../components/tableBody'
+import to from 'await-to-js'
 
 function Blocks() {
   const nodeRPC = useNodeRPC()
+
+  const [err, setErr] = useState()
+  const [loading, setLoading] = useState(true)
   const [blocks, setBlocks] = useState([])
 
   const loadBlocks = useCallback(async () => {
-    const block = await nodeRPC.getTopBlock()
-    const data = await nodeRPC.getBlocks(block.topoheight - 19, block.topoheight)
-    setBlocks(data.reverse())
+    const resErr = (err) => {
+      setErr(err)
+      setLoading(false)
+    }
+
+    setLoading(true)
+    const [err1, topBlock] = await to(nodeRPC.getTopBlock())
+    if (err1) return resErr(err1)
+
+    const [err2, blocks] = await to(nodeRPC.getBlocks(topBlock.topoheight - 19, topBlock.topoheight))
+    if (err2) return resErr(err2)
+    setLoading(false)
+
+    setBlocks(blocks.reverse())
   }, [])
 
   useEffect(() => {
@@ -38,7 +54,7 @@ function Blocks() {
             <th>Reward</th>
           </tr>
         </thead>
-        <tbody>
+        <TableBody err={err} loading={loading} colSpan={7}>
           {blocks.map((item) => {
             const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
@@ -55,7 +71,7 @@ function Blocks() {
               <td>{formatXelis(item.reward)}</td>
             </tr>
           })}
-        </tbody>
+        </TableBody>
       </table>
     </div>
   </div>

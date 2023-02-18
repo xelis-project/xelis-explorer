@@ -31,11 +31,13 @@ const useWebSocket = (endpoint) => {
       }
 
       const onError = (err) => {
+        console.log(err)
         setLoading(false)
         setErr(new Error(`WebSocket failed.`))
       }
 
       const onMessage = (obj) => {
+        console.log(obj)
         setLastMessage(obj.data)
       }
 

@@ -5,6 +5,7 @@ import { formatXelis, reduceText } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
 import { Helmet } from 'react-helmet'
+import to from 'await-to-js'
 
 import './card.css'
 
@@ -13,27 +14,30 @@ function Block() {
 
   const nodeRPC = useNodeRPC()
 
+  const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
   const [block, setBlock] = useState()
   const [topoheight, setTopoheight] = useState()
 
-  const loadBlock = useCallback(async () => {
-    const height = parseInt(id)
-    const block = await nodeRPC.getBlockAtTopoHeight(height)
-    setBlock(block)
-  }, [id])
-
-  const loadTopoHeight = useCallback(async () => {
-    const height = await nodeRPC.getTopoHeight()
-    setTopoheight(height)
-  }, [])
-
   const load = useCallback(async () => {
     setLoading(true)
-    await loadBlock()
-    await loadTopoHeight()
+    const resErr = (err) => {
+      setErr(err)
+      setLoading(false)
+    }
+
+    const topoheight = parseInt(id)
+    const [err1, block] = await to(nodeRPC.getBlockAtTopoHeight(topoheight))
+    if (err1) return resErr(err1)
+
+    const [err2, topTopoHeight] = await to(nodeRPC.getTopoHeight())
+    if (err2) return resErr(err2)
+
+    setTopoheight(topTopoHeight)
+    setBlock(block)
+
     setLoading(false)
-  }, [])
+  }, [id])
 
   useEffect(() => {
     load()
@@ -52,6 +56,7 @@ function Block() {
   }, [block, topoheight])
 
   if (loading) return null
+  if (err) return <div>{err.message}</div>
   if (!block) return <NotFound />
 
   return <div>

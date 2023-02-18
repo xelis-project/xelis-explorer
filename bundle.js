@@ -33,8 +33,12 @@ const main = async () => {
 
   await delFolder(outdir, { recursive: true, force: true })
 
-  const envData = await readFile(`${argv.env}.json`, { encoding: `utf-8` })
+  const envData = await readFile(`./env/${argv.env}.json`, { encoding: `utf-8` })
   const env = JSON.parse(envData)
+  Object.keys(env).forEach((key) => {
+    const value = env[key]
+    if (typeof value === 'string') env[key] = `"${value}"`
+  })
 
   const options = {
     entryPoints: [`./src/index`],

@@ -16,6 +16,7 @@
   width: 35px;
   height: 35px;
   border-radius: 10px;
+  text-decoration: none;
 }
 
 .header-logo::after {

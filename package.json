@@ -3,18 +3,19 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "concurrently \"npm run build-dev\" \"npm run serve\"",
+    "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
     "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",
-    "build-dev": "node bundle.js --env=env.dev --watch --sourcemap",
-    "build-testnet": "node bundle.js --env=env.testnet --sourcemap",
-    "build-mainnet": "node bundle.js --env=env.mainnet --minify"
+    "build:local_dev": "node bundle.js --env=local_dev --watch --sourcemap",
+    "build:dev": "node bundle.js --env=dev --sourcemap",
+    "build:testnet": "node bundle.js --env=testnet --sourcemap",
+    "build:mainnet": "node bundle.js --env=mainnet --minify"
   },
   "dependencies": {
+    "await-to-js": "^3.0.0",
     "bytes": "^3.1.2",
     "classnames": "^2.3.2",
     "concurrently": "^7.6.0",
     "css.gg": "^2.0.0",
-    "esbuild": "^0.17.3",
     "pretty-ms": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,8 +23,11 @@
     "react-router": "^6.7.0",
     "react-router-dom": "^6.7.0",
     "reset-css": "^5.0.1",
-    "serve": "^14.1.2",
-    "store2": "^2.14.2",
-    "yargs": "^17.6.2"
+    "store2": "^2.14.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.8",
+    "serve": "^14.2.0",
+    "yargs": "^17.7.0"
   }
 }

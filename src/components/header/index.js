@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import useTheme from '../../context/useTheme'
 import Button from '../button'
+import { Link } from 'react-router-dom'
 
 import './header.css'
 
@@ -43,7 +44,7 @@ function Header() {
   const links = useMenuLinks()
 
   return <div className="header">
-    <div className="header-logo" />
+    <Link to="/" className="header-logo" />
     <div className="header-nav">
       {links.map((item) => {
         return <NavLink key={item.path} to={item.path}

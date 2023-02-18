@@ -7,12 +7,13 @@ import DotLoading from '../../components/dotLoading'
 import bytes from 'bytes'
 import Age from '../../components/age'
 import { formatXelis } from '../../utils'
-
-import './explorer-search.css'
-import './home-stats.css'
-import './recent-blocks.css'
-import './node-connection.css'
 import { Helmet } from 'react-helmet'
+import to from 'await-to-js'
+
+import './explorer_search.css'
+import './home_stats.css'
+import './recent_blocks.css'
+import './node_connection.css'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -61,15 +62,18 @@ function NodeConnection(props) {
 function RecentBlocks(props) {
   const { info } = props
   const { newBlocks } = useNodeSocket()
+  console.log(newBlocks)
   const nodeRPC = useNodeRPC()
 
   const [lastBlocks, setLastBlocks] = useState([])
 
   const loadBlocks = useCallback(async () => {
     if (!info) return
-    const data = await nodeRPC.getBlocks(info.topoheight - 10, info.topoheight)
-    if (!data) return
-    setLastBlocks(data.reverse())
+
+    const [err1, blocks] = await to(nodeRPC.getBlocks(info.topoheight - 10, info.topoheight))
+    if (err1) return console.log(err1)
+
+    setLastBlocks(blocks.reverse())
   }, [info])
 
   useEffect(() => {
@@ -168,12 +172,13 @@ function Stats(props) {
 
 function Home() {
   const nodeRPC = useNodeRPC()
-  const [info, setInfo] = useState({})
+  const [info, setInfo] = useState()
 
+  const [err, setErr] = useState()
   const loadInfo = useCallback(async () => {
-    const info = await nodeRPC.getInfo()
+    const [err1, info] = await to(nodeRPC.getInfo())
+    if (err1) return setErr(err)
     setInfo(info)
-    console.log(info)
   }, [])
 
   useEffect(() => {
@@ -185,9 +190,11 @@ function Home() {
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <NodeConnection info={info} />
-    <RecentBlocks info={info} />
-    <Stats info={info} />
+    <NodeConnection info={info || {}} />
+    {info && <>
+      <RecentBlocks info={info} />
+      <Stats info={info} />
+    </>}
   </div>
 }
 

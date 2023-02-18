@@ -1,79 +1,87 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback } from 'react'
 
 const useNodeRPC = () => {
-  const rpcFetch = useCallback(async (method, params) => {
-    const res = await fetch(NODE_RPC_ENDPOINT, {
-      method: `POST`,
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: method,
-        id: 1,
-        params,
+  const rpcPost = useCallback(async (method, params) => {
+    try {
+      const res = await fetch(NODE_RPC_ENDPOINT, {
+        method: `POST`,
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: method,
+          id: 1,
+          params,
+        })
       })
-    })
 
-    const data = await res.json()
-    return data.result
+      if (res.ok) {
+        const data = await res.json()
+        return Promise.resolve(data.result)
+      } else {
+        return Promise.reject(new Error(`${res.status} - ${res.statusText}`))
+      }
+    } catch (err) {
+      return Promise.reject(err)
+    }
   }, [])
 
   const getHeight = useCallback(() => {
-    return rpcFetch(`get_height`)
+    return rpcPost(`get_height`)
   }, [])
 
   const getTopoHeight = useCallback(() => {
-    return rpcFetch(`get_topoheight`)
+    return rpcPost(`get_topoheight`)
   }, [])
 
   const getBlockTemplate = useCallback((address) => {
-    return rpcFetch(`get_block_template`, { address })
+    return rpcPost(`get_block_template`, { address })
   }, [])
 
   const getBlockAtTopoHeight = useCallback((topoheight) => {
-    return rpcFetch(`get_block_at_topoheight`, { topoheight })
+    return rpcPost(`get_block_at_topoheight`, { topoheight })
   }, [])
 
   const getBlocksAtHeight = useCallback((height) => {
-    return rpcFetch(`get_blocks_at_height`, { height })
+    return rpcPost(`get_blocks_at_height`, { height })
   }, [])
 
   const getBlockByHash = useCallback((hash) => {
-    return rpcFetch(`get_block_by_hash`, { hash })
+    return rpcPost(`get_block_by_hash`, { hash })
   }, [])
 
   const getTopBlock = useCallback(() => {
-    return rpcFetch(`get_top_block`, { include_txs: false })
+    return rpcPost(`get_top_block`, { include_txs: false })
   }, [])
 
   const getNonce = useCallback((address) => {
-    return rpcFetch(`get_nonce`, { address })
+    return rpcPost(`get_nonce`, { address })
   }, [])
 
   const getBalance = useCallback((address, asset) => {
-    return rpcFetch(`get_balance`, { address, asset })
+    return rpcPost(`get_balance`, { address, asset })
   }, [])
 
   const getAssets = useCallback(() => {
-    return rpcFetch(`get_assets`)
+    return rpcPost(`get_assets`)
   }, [])
 
   const countTransactions = useCallback(() => {
-    return rpcFetch(`count_transactions`)
+    return rpcPost(`count_transactions`)
   }, [])
 
   const getTips = useCallback(() => {
-    return rpcFetch(`get_tips`)
+    return rpcPost(`get_tips`)
   }, [])
 
   const p2pStatus = useCallback(() => {
-    return rpcFetch(`p2p_status`)
+    return rpcPost(`p2p_status`)
   }, [])
 
   const getInfo = useCallback(() => {
-    return rpcFetch(`get_info`)
+    return rpcPost(`get_info`)
   }, [])
 
   const getBlocks = useCallback((start, end) => {
-    return rpcFetch(`get_blocks`, {
+    return rpcPost(`get_blocks`, {
       start_topoheight: start,
       end_topoheight: end
     })
