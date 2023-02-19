@@ -58,7 +58,7 @@ const useWebSocket = (endpoint) => {
     }
   }, [endpoint])
 
-  return { loading, err, connected, send, lastMessage }
+  return { loading, err, connected, send, lastMessage, socketRef }
 }
 
 export default useWebSocket

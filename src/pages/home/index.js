@@ -62,10 +62,11 @@ function NodeConnection(props) {
 
 function RecentBlocks(props) {
   const { info } = props
-  const { newBlocks } = useNodeSocket()
 
+  const { subscribe } = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
+  const [newBlocks, setNewBlocks] = useState([])
   const [lastBlocks, setLastBlocks] = useState([])
 
   const loadBlocks = useCallback(async () => {
@@ -79,6 +80,14 @@ function RecentBlocks(props) {
 
   useEffect(() => {
     loadBlocks()
+
+    const unsubscribe = subscribe(`NewBlock`, (block) => {
+      setNewBlocks((blocks) => [block, ...blocks])
+    })
+
+    return () => {
+      unsubscribe()
+    }
   }, [loadBlocks])
 
   const blocks = useMemo(() => {
@@ -122,7 +131,7 @@ function RecentBlocks(props) {
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
           <div className="recent-blocks-item-time">
-            <Age timestamp={item.timestamp} update format={{ compact: false }} />
+            <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
           </div>
         </Link>
       })}

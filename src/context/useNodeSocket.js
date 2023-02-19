@@ -1,42 +1,69 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useRef } from 'react'
 import useWebSocket from '../hooks/useWebSocket'
 
 const Context = createContext(null)
 
 export const NodeSocketProvider = (props) => {
-  const { children } = props
+  const { children, sendMethodTimeout = 3000 } = props
 
-  const { lastMessage, connected, loading, err, send } = useWebSocket(NODE_WS_ENDPOINT)
-  const [newBlocks, setNewBlocks] = useState([])
+  const { connected, loading, err, send, socketRef } = useWebSocket(NODE_WS_ENDPOINT)
+  const subscriptions = useRef({})
 
-  useEffect(() => {
-    try {
-      const block = JSON.parse(lastMessage)
-      if (Object.keys(block).length > 0) {
-        setNewBlocks((blocks) => {
-          if (blocks.length >= 10) blocks.pop()
-          return [block, ...blocks]
-        })
-      }
-    } catch { }
-  }, [lastMessage])
+  const sendMethod = useCallback((method, params) => {
+    return new Promise((resolve, reject) => {
+      const id = Date.now() + Math.round((Math.random() * 9999))
+      const data = { jsonrpc: `2.0`, id, method }
+      if (params) data[`params`] = params
 
-  useEffect(() => {
-    if (connected) {
-      const subscribeToBlock = JSON.stringify({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "subscribe",
-        "params": {
-          "notify": "NewBlock"
+      let timeoutId = null
+      const onMessage = (message) => {
+        const data = JSON.parse(message)
+        if (data.id === id) {
+          clearTimeout(timeoutId)
+          resolve(data.result)
         }
-      })
+      }
 
-      send(subscribeToBlock)
+      timeoutId = setTimeout(() => {
+        socketRef.current.removeEventListener(`message`, onMessage)
+        reject(`timeout`)
+      }, sendMethodTimeout)
+
+      socketRef.current.addEventListener(`message`, onMessage)
+      send(JSON.stringify(data))
+    })
+  }, [send, sendMethodTimeout])
+
+  const subscribe = useCallback((event, onData) => {
+    const onMessage = (message) => {
+      const data = JSON.parse(message.data)
+      if (data.id === 1 && data.result.event === event) {
+        onData(data.result)
+      }
     }
-  }, [connected])
 
-  return <Context.Provider value={{ connected, loading, newBlocks, err }}>
+    socketRef.current.addEventListener(`message`, onMessage)
+
+    if (subscriptions.current[event]) {
+      subscriptions.current[event] += 1
+    } else {
+      subscriptions.current[event] = 1
+      const data = { jsonrpc: `2.0`, id: 1, method: `subscribe`, params: { notify: event } }
+      send(JSON.stringify(data))
+    }
+
+    return () => {
+      if (subscriptions.current[event] === 1) {
+        const data = { jsonrpc: `2.0`, id: 1, method: `unsubscribe`, params: { notify: event } }
+        send(JSON.stringify(data))
+      }
+
+      subscriptions.current[event] -= 1
+      socketRef.current.removeEventListener(`message`, onMessage)
+    }
+  }, [send])
+
+  return <Context.Provider value={{ sendMethod, subscribe, connected, loading, err }}>
     {children}
   </Context.Provider>
 }
