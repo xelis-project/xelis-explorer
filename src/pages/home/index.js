@@ -22,6 +22,7 @@ function ExplorerSearch() {
     e.preventDefault()
     const formData = new FormData(e.target)
     const searchValue = formData.get(`search`)
+    if (searchValue === ``) return
 
     const height = parseInt(searchValue)
     if (!isNaN(height)) navigate(`/blocks/${height}`)
@@ -62,7 +63,7 @@ function NodeConnection(props) {
 function RecentBlocks(props) {
   const { info } = props
   const { newBlocks } = useNodeSocket()
-  console.log(newBlocks)
+
   const nodeRPC = useNodeRPC()
 
   const [lastBlocks, setLastBlocks] = useState([])
@@ -109,7 +110,7 @@ function RecentBlocks(props) {
       {recentBlock && <div className="recent-blocks-item">
         <div className="recent-blocks-item-status" />
         <div className="recent-blocks-item-title">Block {recentBlock.height + 1}</div>
-        <div className="recent-blocks-item-value">Mining<DotLoading /></div>
+        <div className="recent-blocks-item-value">Waiting<DotLoading /></div>
       </div>}
       {blocks.map((item) => {
         const txCount = item.txs_hashes.length

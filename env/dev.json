@@ -1,5 +1,5 @@
 {
-  "NODE_WS_ENDPOINT": "",
-  "NODE_RPC_ENDPOINT": "",
+  "NODE_WS_ENDPOINT": "wss://dev-node.xelis.io/ws",
+  "NODE_RPC_ENDPOINT": "https://dev-node.xelis.io/json_rpc",
   "ENV": "dev"
 }
