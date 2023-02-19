@@ -27,8 +27,6 @@ const argv = yargs(process.argv)
 const main = async () => {
   const outdir = `./public/dist`
 
-  fs.rmSync(outdir, { recursive: true, force: true })
-
   const envData = fs.readFileSync(`./env/${argv.env}.json`, { encoding: `utf-8` })
   const env = JSON.parse(envData)
   Object.keys(env).forEach((key) => {
