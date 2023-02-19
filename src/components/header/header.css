@@ -29,34 +29,107 @@
   display: block;
 }
 
-.header-nav {
-  display: flex;
-  gap: 1.2em;
-  align-items: center;
+/* phone */
+@media screen and (max-width: 768px) {
+  .header-dropdown {
+    position: relative;
+  }
+
+  .header-menu-button {
+    cursor: pointer;
+    border: thin solid var(--text-color);
+    padding: .5em;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 1.2em;
+    display: flex;
+    gap: .5em;
+    align-items: center;
+  }
+
+  .header-nav {
+    position: absolute;
+    right: 0;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    border: thin solid var(--text-color);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    margin-top: .5em;
+    gap: .7em;
+    min-width: 150px;
+    z-index: 1;
+    font-size: 1.2em;
+  }
+
+  .header-nav.closed {
+    display: none;
+  }
+
+  .header-nav-item {
+    text-decoration: none;
+    color: var(--header-nav-color);
+  }
+
+  .header-nav-item:hover {
+    color: var(--header-nav-active-color);
+  }
+
+  .header-nav-item-active {
+    color: var(--header-nav-active-color);
+  }
+
+  .header-nav-icons {
+    display: flex;
+    align-items: center;
+    gap: .25em;
+  }
+
+  .header-nav-item-active::after {}
 }
 
-.header-nav-item {
-  text-decoration: none;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: var(--header-nav-color);
-}
+/* desktop */
+@media screen and (min-width: 769px) {
+  .header-menu-button {
+    display: none;
+  }
 
-.header-nav-item:hover {
-  color: var(--header-nav-active-color);
-}
+  .header-nav {
+    display: flex;
+    gap: 1.2em;
+    align-items: center;
+  }
 
-.header-nav-item-active {
-  color: var(--header-nav-active-color);
-}
+  .header-nav-item {
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--header-nav-color);
+  }
 
-.header-nav-item-active::after {
-  content: '';
-  background-color: var(--header-nav-active-color);
-  width: 30px;
-  height: 4px;
-  display: block;
-  margin: .3em 0;
-  border-radius: 15px;
-  position: absolute;
+  .header-nav-item:hover {
+    color: var(--header-nav-active-color);
+  }
+
+  .header-nav-item-active {
+    color: var(--header-nav-active-color);
+  }
+
+  .header-nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .header-nav-item-active::after {
+    content: '';
+    background-color: var(--header-nav-active-color);
+    width: 30px;
+    height: 4px;
+    display: block;
+    margin: .3em 0;
+    border-radius: 15px;
+    position: absolute;
+  }
 }
