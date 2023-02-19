@@ -1,7 +1,6 @@
 {
   "name": "xelis-explorer",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
     "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
     "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",

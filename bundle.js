@@ -1,6 +1,6 @@
-import * as esbuild from 'esbuild'
-import yargs from 'yargs'
-import fs from 'fs'
+const esbuild = require(`esbuild`)
+const yargs = require(`yargs`)
+const fs = require('fs')
 
 const argv = yargs(process.argv)
   .option(`watch`, {
