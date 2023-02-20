@@ -95,7 +95,7 @@ function RecentBlocks(props) {
     return () => {
       unsubscribe()
     }
-  }, [nodeSocket])
+  }, [nodeSocket.connected])
 
   const blocks = useMemo(() => {
     const blocks = [...newBlocks, ...lastBlocks]
@@ -128,7 +128,7 @@ function RecentBlocks(props) {
         <div className="recent-blocks-item-title">Block {recentBlock.height + 1}</div>
         <div className="recent-blocks-item-value">Waiting<DotLoading /></div>
       </div>}
-      {blocks.map((item) => {
+      {blocks.map((item, index) => {
         const txCount = item.txs_hashes.length
         const size = bytes.format(item.total_size_in_bytes || 0)
         const stableHeight = blocks[0].height
@@ -138,7 +138,8 @@ function RecentBlocks(props) {
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
           <div className="recent-blocks-item-time">
-            <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+            {index === 0 && <>Latest block</>}
+            {index > 0 && <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />}
           </div>
         </Link>
       })}
