@@ -32,3 +32,10 @@
   font-size: 1.6em;
   color: var(--muted-color);
 }
+
+.home-stats-chart {
+  height: 75px;
+  border-radius: 5px;
+  padding: 0.5em;
+  margin-top: 0.5em;
+}

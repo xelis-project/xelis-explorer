@@ -25,9 +25,14 @@ function ExplorerSearch() {
     const searchValue = formData.get(`search`)
     if (searchValue === ``) return
 
+    if (searchValue.length === 64) {
+      return navigate(`/txs/${searchValue}`)
+    }
+
     const height = parseInt(searchValue)
-    if (!isNaN(height)) navigate(`/blocks/${height}`)
-    else navigate(`/txs/${searchValue}`)
+    if (!isNaN(height)) {
+      return navigate(`/blocks/${height}`)
+    }
   }, [])
 
   return <form onSubmit={search}>
@@ -88,7 +93,7 @@ function RecentBlocks(props) {
   useEffect(() => {
     if (!nodeSocket.connected) return
 
-    const unsubscribe = nodeSocket.subscribe(`NewBlock`, (block) => {
+    const unsubscribe = nodeSocket.onNewBlock((block) => {
       setBlocks((blocks) => [block, ...blocks])
     })
 
@@ -146,17 +151,23 @@ function RecentBlocks(props) {
   </div>
 }
 
-function MiniChart(props) {
+function HomeMiniChart(props) {
   const { labels, datasets } = props
 
   const data = useMemo(() => {
+    let rnd = []
+    for (let i=0;i<6;i++) {
+      rnd.push(Math.random())
+    }
+
     return {
       labels: ['January', 'February', 'March', 'April', 'May', 'June'],
       datasets: [{
         label: 'Units',
-        data: [10, 50, 5, 40, 10, 90],
+        data: rnd,
         borderColor: '#1870cb',
-        borderWidth: 3
+        borderWidth: 4,
+        tension: .3
       }]
     }
   }, [])
@@ -190,7 +201,7 @@ function MiniChart(props) {
     }
   }, [])
 
-  return <Chart chart={chart} height={75} />
+  return <Chart chart={chart} className="home-stats-chart" />
 }
 
 function Stats(props) {
@@ -228,7 +239,7 @@ function Stats(props) {
         return <div key={item.title} className="home-stats-item">
           <div className="home-stats-item-title">{item.title}</div>
           <div className="home-stats-item-value">{item.value}</div>
-          <MiniChart />
+          <HomeMiniChart />
         </div>
       })}
     </div>

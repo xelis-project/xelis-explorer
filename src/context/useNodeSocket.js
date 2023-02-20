@@ -64,7 +64,16 @@ export const NodeSocketProvider = (props) => {
     }
   }, [send])
 
-  return <Context.Provider value={{ sendMethod, subscribe, connected, loading, err }}>
+  const onNewBlock = useCallback((onData) => subscribe(`NewBlock`, onData), [])
+  const onTransactionAddedInMempool = useCallback((onData) => subscribe(`TransactionAddedInMempool`, onData), [])
+  const onTransactionExecuted = useCallback((onData) => subscribe(`TransactionExecuted`, onData), [])
+
+  const values = {
+    connected, loading, err,
+    sendMethod, onNewBlock, onTransactionAddedInMempool, onTransactionExecuted
+  }
+
+  return <Context.Provider value={values}>
     {children}
   </Context.Provider>
 }

@@ -21,7 +21,7 @@
   text-decoration: none;
   display: block;
   transition: .25s transform;
-
+  user-select: none;
 }
 
 .recent-blocks-item:nth-child(2) {

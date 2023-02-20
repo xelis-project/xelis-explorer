@@ -49,13 +49,13 @@ function Blocks() {
             <th>Age</th>
             <th>Size</th>
             <th>Hash</th>
-            <th>Fees</th>
+            <th>Total Fees</th>
             <th>Miner</th>
             <th>Reward</th>
           </tr>
         </thead>
-        <TableBody err={err} loading={loading} colSpan={7}>
-          {blocks.map((item) => {
+        <TableBody list={blocks} err={err} loading={loading} colSpan={7} emptyText="No blocks"
+          onItem={(item) => {
             const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
@@ -66,12 +66,12 @@ function Blocks() {
               </td>
               <td>{size}</td>
               <td>{reduceText(item.hash)}</td>
-              <td>{item.total_fees}</td>
+              <td>{formatXelis(item.total_fees)}</td>
               <td>{reduceText(item.miner)}</td>
               <td>{formatXelis(item.reward)}</td>
             </tr>
-          })}
-        </TableBody>
+          }}
+        />
       </table>
     </div>
   </div>

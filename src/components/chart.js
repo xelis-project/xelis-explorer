@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Chart } from 'chart.js/auto'
 
 function ReactChart(props) {
-  const { chart, ...restProps } = props
+  const { chart, style, ...restProps } = props
 
   const chartRef = useRef()
 
@@ -13,8 +13,8 @@ function ReactChart(props) {
 
   }, [])
 
-  return <div style={{ position: `relative`, ...restProps }}>
-    <canvas ref={chartRef} style={{ maxWidth: `100%`}} />
+  return <div style={{ position: `relative`, ...style }} {...restProps}>
+    <canvas ref={chartRef} style={{ maxWidth: `100%` }} />
   </div>
 }
 

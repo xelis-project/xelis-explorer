@@ -87,11 +87,24 @@ const useNodeRPC = () => {
     })
   }, [])
 
+  const getMemPool = useCallback(() => {
+    return rpcPost(`get_mempool`)
+  }, [])
+
+  const getTransaction = useCallback((hash) => {
+    return rpcPost(`get_transaction`, { hash })
+  }, [])
+
+  const getTransactions = useCallback((hashes) => {
+    return rpcPost(`get_transactions`, { tx_hashes: hashes })
+  }, [])
+
   return {
     getTopBlock, getHeight, getTopoHeight, getBlockTemplate,
     getBlockAtTopoHeight, getBlockByHash, getBlocksAtHeight,
     getNonce, getBalance, getAssets, countTransactions,
-    getTips, p2pStatus, getInfo, getBlocks
+    getTips, p2pStatus, getInfo, getBlocks, getMemPool,
+    getTransaction, getTransactions
   }
 }
 

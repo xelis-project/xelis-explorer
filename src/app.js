@@ -9,6 +9,7 @@ import { NodeSocketProvider } from './context/useNodeSocket'
 import { SettingsProvider } from './context/useSettings'
 import TxPool from './pages/txPool'
 import { Helmet } from 'react-helmet'
+import Transaction from './pages/transaction'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: '/txpool',
         element: <TxPool />
+      },
+      {
+        path: `/txs/:hash`,
+        element: <Transaction />
       },
       {
         path: '*',

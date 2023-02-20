@@ -4,7 +4,7 @@ import './footer.css'
 
 function Footer() {
   return <div className="footer">
-    v{packageJSON.version} - Official Xelis Explorer by g45t345rt
+    v{packageJSON.version} - Xelis Explorer by g45t345rt
   </div>
 }
 
