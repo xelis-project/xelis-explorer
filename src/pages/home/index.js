@@ -33,8 +33,11 @@ function ExplorerSearch() {
     <div className="explorer-search">
       <div className="explorer-search-title">Xelis Explorer</div>
       <div className="explorer-search-form">
-        <input type="text" name="search" placeholder="Search block, transaction or address" autoComplete="off" autoCapitalize="off" />
-        <Button type="submit" icon="chevron-right-r" iconLocation="right">Search</Button>
+        <input type="text" name="search" placeholder="Search block, transaction or address"
+          autoComplete="off" autoCapitalize="off" />
+        <Button type="submit" icon="search" iconLocation="right" iconProps={{ style: { rotate: `90deg` } }}>
+          Search
+        </Button>
       </div>
     </div>
   </form>
@@ -183,17 +186,22 @@ function Stats(props) {
 function Home() {
   const nodeRPC = useNodeRPC()
   const [info, setInfo] = useState()
+  const [peerStatus, setPeerStatus] = useState()
 
   const [err, setErr] = useState()
-  const loadInfo = useCallback(async () => {
+  const load = useCallback(async () => {
     const [err1, info] = await to(nodeRPC.getInfo())
     if (err1) return setErr(err)
     setInfo(info)
+
+    const [err2, p2pStatus] = await to(nodeRPC.p2pStatus())
+    if (err2) return setErr(err2)
+    setPeerStatus(p2pStatus)
   }, [])
 
   useEffect(() => {
-    loadInfo()
-  }, [loadInfo])
+    load()
+  }, [load])
 
   return <div>
     <Helmet>

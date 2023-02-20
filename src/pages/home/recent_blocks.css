@@ -21,6 +21,12 @@
   text-decoration: none;
   display: block;
   transition: .25s transform;
+
+}
+
+.recent-blocks-item:nth-child(2) {
+  animation: bounce;
+  animation-duration: 1s;
 }
 
 .recent-blocks-item.scale:hover {

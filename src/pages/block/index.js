@@ -6,8 +6,28 @@ import NotFound from '../notFound'
 import bytes from 'bytes'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
+import PageLoading from '../../components/pageLoading'
+import Button from '../../components/button'
 
 import './card.css'
+
+const emptyBlock = {
+  block_type: ``,
+  hash: ``,
+  timestamp: 0,
+  confirmations: 0,
+  topoheight: 0,
+  height: 0,
+  miner: ``,
+  total_fees: 0,
+  reward: 0,
+  difficulty: 0,
+  cumulative_difficulty: 0,
+  total_size_in_bytes: 0,
+  nonce: 0,
+  extra_nonce: ``,
+  txs_hashes: []
+}
 
 function Block() {
   const { id } = useParams()
@@ -16,7 +36,7 @@ function Block() {
 
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
-  const [block, setBlock] = useState()
+  const [block, setBlock] = useState(emptyBlock)
   const [topoheight, setTopoheight] = useState()
 
   const load = useCallback(async () => {
@@ -30,10 +50,10 @@ function Block() {
     const [err1, block] = await to(nodeRPC.getBlockAtTopoHeight(topoheight))
     if (err1) return resErr(err1)
 
-    const [err2, topTopoHeight] = await to(nodeRPC.getTopoHeight())
+    const [err2, currentTopoheight] = await to(nodeRPC.getTopoHeight())
     if (err2) return resErr(err2)
 
-    setTopoheight(topTopoHeight)
+    setTopoheight(currentTopoheight)
     setBlock(block)
 
     setLoading(false)
@@ -44,29 +64,38 @@ function Block() {
   }, [load])
 
   const formatBlock = useMemo(() => {
-    if (!block) return {}
-
+    let _topoheight = topoheight || 0
     return {
       date: new Date(block.timestamp).toLocaleString(),
       miner: reduceText(block.miner),
       reward: formatXelis(block.reward),
-      confirmations: topoheight - block.topoheight,
-      size: bytes.format(block.total_size_in_bytes)
+      confirmations: _topoheight - block.topoheight,
+      size: bytes.format(block.total_size_in_bytes),
+      hasPreviousBlock: block.topoheight > 0,
+      hasNextBlock: block.topoheight < _topoheight
     }
   }, [block, topoheight])
 
-  if (loading) return null
   if (err) return <div>{err.message}</div>
-  if (!block) return <NotFound />
+  if (!loading && !block) return <NotFound />
 
   return <div>
     <Helmet>
       <title>Block {id}</title>
     </Helmet>
+    <PageLoading loading={loading} />
     <h1>Block {id}</h1>
     <div className="card">
       This block was mined on {formatBlock.date} by {formatBlock.miner}. It currently has {formatBlock.confirmations} confirmations.
       The miner of this block earned {formatBlock.reward}.
+    </div>
+    <div className="left-right-buttons">
+      {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="chevron-left-r">
+        Previous Block ({block.topoheight - 1})
+      </Button>}
+      {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="chevron-right-r" iconLocation="right">
+        Next Block ({block.topoheight + 1})
+      </Button>}
     </div>
     <div className="table-responsive">
       <table>

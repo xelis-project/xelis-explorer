@@ -61,6 +61,8 @@
     min-width: 150px;
     z-index: 1;
     font-size: 1.2em;
+    animation: slideInRight;
+    animation-duration: .25s;
   }
 
   .header-nav.closed {
@@ -131,5 +133,7 @@
     margin: .3em 0;
     border-radius: 15px;
     position: absolute;
+    animation: fadeIn;
+    animation-duration: .5s;
   }
 }
