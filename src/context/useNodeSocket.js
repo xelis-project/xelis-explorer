@@ -20,6 +20,7 @@ export const NodeSocketProvider = (props) => {
         const data = JSON.parse(message)
         if (data.id === id) {
           clearTimeout(timeoutId)
+          socketRef.current.removeEventListener(`message`, onMessage)
           resolve(data.result)
         }
       }

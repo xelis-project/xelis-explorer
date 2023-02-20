@@ -66,7 +66,7 @@ function NodeConnection(props) {
 function RecentBlocks(props) {
   const { info } = props
 
-  const { subscribe } = useNodeSocket()
+  const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
   const [newBlocks, setNewBlocks] = useState([])
@@ -83,15 +83,19 @@ function RecentBlocks(props) {
 
   useEffect(() => {
     loadBlocks()
+  }, [loadBlocks])
 
-    const unsubscribe = subscribe(`NewBlock`, (block) => {
+  useEffect(() => {
+    if (!nodeSocket.connected) return
+
+    const unsubscribe = nodeSocket.subscribe(`NewBlock`, (block) => {
       setNewBlocks((blocks) => [block, ...blocks])
     })
 
     return () => {
       unsubscribe()
     }
-  }, [loadBlocks])
+  }, [nodeSocket])
 
   const blocks = useMemo(() => {
     const blocks = [...newBlocks, ...lastBlocks]
