@@ -9,6 +9,7 @@ import Age from '../../components/age'
 import { formatXelis } from '../../utils'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
+import Chart from '../../components/chart'
 
 import './explorer_search.css'
 import './home_stats.css'
@@ -69,27 +70,26 @@ function RecentBlocks(props) {
   const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
-  const [newBlocks, setNewBlocks] = useState([])
-  const [lastBlocks, setLastBlocks] = useState([])
+  const [blocks, setBlocks] = useState([])
 
-  const loadBlocks = useCallback(async () => {
+  const loadRecenBlocks = useCallback(async () => {
     if (!info) return
 
     const [err1, blocks] = await to(nodeRPC.getBlocks(info.topoheight - 10, info.topoheight))
     if (err1) return console.log(err1)
 
-    setLastBlocks(blocks.reverse())
+    setBlocks(blocks.reverse())
   }, [info])
 
   useEffect(() => {
-    loadBlocks()
-  }, [loadBlocks])
+    loadRecenBlocks()
+  }, [loadRecenBlocks])
 
   useEffect(() => {
     if (!nodeSocket.connected) return
 
     const unsubscribe = nodeSocket.subscribe(`NewBlock`, (block) => {
-      setNewBlocks((blocks) => [block, ...blocks])
+      setBlocks((blocks) => [block, ...blocks])
     })
 
     return () => {
@@ -97,6 +97,7 @@ function RecentBlocks(props) {
     }
   }, [nodeSocket.connected])
 
+  /*
   const blocks = useMemo(() => {
     const blocks = [...newBlocks, ...lastBlocks]
     // TEMP FIX - remove duplicate blocks (blockDAG can have block at same height)
@@ -105,14 +106,12 @@ function RecentBlocks(props) {
         return o.height === item.height
       })
     })
-  }, [newBlocks, lastBlocks])
+  }, [newBlocks, lastBlocks])*/
 
   useEffect(() => {
     if (blocks.length >= 10) {
-      setLastBlocks((lastBlocks) => {
-        lastBlocks.pop()
-        return lastBlocks
-      })
+      blocks.pop()
+      setBlocks(blocks)
     }
   }, [blocks])
 
@@ -131,8 +130,8 @@ function RecentBlocks(props) {
       {blocks.map((item, index) => {
         const txCount = item.txs_hashes.length
         const size = bytes.format(item.total_size_in_bytes || 0)
-        const stableHeight = blocks[0].height
-        const statusClassName = (stableHeight - item.height) >= 8 ? `stable` : `mined`
+        const stableHeight = blocks[0].height - 8
+        const statusClassName = item.height <= stableHeight ? `stable` : `mined`
         return <Link to={`/blocks/${item.height}`} key={item.height} className="recent-blocks-item scale">
           <div className={`recent-blocks-item-status ${statusClassName}`} />
           <div className="recent-blocks-item-title">Block {item.height}</div>
@@ -145,6 +144,53 @@ function RecentBlocks(props) {
       })}
     </div>
   </div>
+}
+
+function MiniChart(props) {
+  const { labels, datasets } = props
+
+  const data = useMemo(() => {
+    return {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+      datasets: [{
+        label: 'Units',
+        data: [10, 50, 5, 40, 10, 90],
+        borderColor: '#1870cb',
+        borderWidth: 3
+      }]
+    }
+  }, [])
+
+  const chart = useMemo(() => {
+    return {
+      type: 'line',
+      data: data,
+      options: {
+        maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+        },
+        scales: {
+          y: {
+            display: false,
+            beginAtZero: false
+          },
+          x: {
+            display: false
+          }
+        }
+      }
+    }
+  }, [])
+
+  return <Chart chart={chart} height={75} />
 }
 
 function Stats(props) {
@@ -182,6 +228,7 @@ function Stats(props) {
         return <div key={item.title} className="home-stats-item">
           <div className="home-stats-item-title">{item.title}</div>
           <div className="home-stats-item-value">{item.value}</div>
+          <MiniChart />
         </div>
       })}
     </div>

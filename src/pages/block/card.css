@@ -23,6 +23,7 @@
   padding: .5em;
   border-radius: 5px;
   text-decoration: none;
+  user-select: none;
 }
 
 .left-right-buttons a:hover {

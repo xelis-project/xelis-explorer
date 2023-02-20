@@ -35,6 +35,7 @@
   justify-content: center;
   background-color: var(--link-color);
   color: var(--text-color);
+  user-select: none;
 }
 
 .explorer-search-form button:hover {

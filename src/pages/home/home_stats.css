@@ -24,11 +24,11 @@
 }
 
 .home-stats-item-title {
-  margin-bottom: .4em;
+  margin-bottom: .5em;
 }
 
 .home-stats-item-value {
   font-weight: bold;
-  font-size: 1.4em;
+  font-size: 1.6em;
   color: var(--muted-color);
 }

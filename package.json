@@ -13,6 +13,7 @@
     "animate.css": "^4.1.1",
     "await-to-js": "^3.0.0",
     "bytes": "^3.1.2",
+    "chart.js": "^4.2.1",
     "classnames": "^2.3.2",
     "concurrently": "^7.6.0",
     "css.gg": "^2.0.0",
