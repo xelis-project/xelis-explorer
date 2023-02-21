@@ -1,0 +1,27 @@
+.pagination {
+  padding: .5em;
+  border-radius: 5px;
+  border: thin solid var(--text-color);
+  display: flex;
+  gap: .5em;
+  align-items: center;
+}
+
+.pagination button {
+  background-color: var(--text-color);
+  color: var(--bg-color);
+  border-radius: 5px;
+  padding: .25em .5em;
+}
+
+.pagination button:disabled {
+  opacity: .5;
+  user-select: none;
+  animation: none !important;
+  cursor: default;
+}
+
+.pagination button:hover {
+  animation: pulse;
+  animation-duration: .25s;
+}

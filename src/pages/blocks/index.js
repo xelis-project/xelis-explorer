@@ -7,6 +7,7 @@ import Age from '../../components/age'
 import { Helmet } from 'react-helmet'
 import TableBody from '../../components/tableBody'
 import to from 'await-to-js'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 
 function Blocks() {
   const nodeRPC = useNodeRPC()
@@ -14,23 +15,40 @@ function Blocks() {
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
   const [blocks, setBlocks] = useState([])
+  const [topoheight, setTopoheight] = useState()
+  const [pageState, setPageState] = useState({ page: 1, size: 20 })
+
+  const loadTopoheight = useCallback(async () => {
+    const [err, currentTopoheight] = await to(nodeRPC.getTopoHeight())
+    if (err) return console.log(err)
+
+    setTopoheight(currentTopoheight)
+  }, [])
 
   const loadBlocks = useCallback(async () => {
+    if (!topoheight) return
+
     const resErr = (err) => {
       setErr(err)
       setLoading(false)
     }
 
     setLoading(true)
-    const [err1, topBlock] = await to(nodeRPC.getTopBlock())
-    if (err1) return resErr(err1)
+    let pagination = getPaginationRange(pageState)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocks(topBlock.topoheight - 19, topBlock.topoheight))
-    if (err2) return resErr(err2)
+    let start = topoheight - pagination.end
+    if (start < 0) start = 0
+    let end = topoheight - pagination.start
+    const [err, blocks] = await to(nodeRPC.getBlocks(start, end))
+    if (err) return resErr(err)
     setLoading(false)
 
     setBlocks(blocks.reverse())
-  }, [])
+  }, [pageState, topoheight])
+
+  useEffect(() => {
+    loadTopoheight()
+  }, [loadTopoheight])
 
   useEffect(() => {
     loadBlocks()
@@ -41,11 +59,14 @@ function Blocks() {
       <title>Blocks</title>
     </Helmet>
     <h1>Blocks</h1>
+    <Pagination state={pageState} setState={setPageState}
+      countText="blocks" count={topoheight} style={{ marginBottom: `1em` }} />
     <div className="table-responsive">
       <table>
         <thead>
           <tr>
             <th>Topo Height</th>
+            <th>Txs</th>
             <th>Age</th>
             <th>Size</th>
             <th>Hash</th>
@@ -54,15 +75,18 @@ function Blocks() {
             <th>Reward</th>
           </tr>
         </thead>
-        <TableBody list={blocks} err={err} loading={loading} colSpan={7} emptyText="No blocks"
+        <TableBody list={blocks} err={err} loading={loading} colSpan={8} emptyText="No blocks"
           onItem={(item) => {
             const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
                 <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
-              <td>{item.age}
-                <Age timestamp={item.timestamp} />
+              <td>
+                {item.txs_hashes.length}
+              </td>
+              <td>
+                <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
               </td>
               <td>{size}</td>
               <td>{reduceText(item.hash)}</td>
@@ -74,6 +98,8 @@ function Blocks() {
         />
       </table>
     </div>
+    <Pagination state={pageState} setState={setPageState}
+      countText="blocks" count={topoheight} style={{ marginTop: `.5em` }} />
   </div>
 }
 

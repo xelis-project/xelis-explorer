@@ -13,73 +13,6 @@ import TableBody from '../../components/tableBody'
 
 import './card.css'
 
-const emptyBlock = {
-  block_type: ``,
-  hash: ``,
-  timestamp: 0,
-  confirmations: 0,
-  topoheight: 0,
-  height: 0,
-  miner: ``,
-  total_fees: 0,
-  reward: 0,
-  difficulty: 0,
-  cumulative_difficulty: 0,
-  total_size_in_bytes: 0,
-  nonce: 0,
-  extra_nonce: ``,
-  txs_hashes: []
-}
-
-function Transactions(props) {
-  const { block } = props
-
-  const nodeRPC = useNodeRPC()
-
-  const [loading, setLoading] = useState(false)
-  const [err, setErr] = useState()
-  const [transactions, setTransactions] = useState([])
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    const [err, txs] = await to(nodeRPC.getTransactions(block.txs_hashes))
-    if (err) return console.log(err)
-
-    setTransactions(txs)
-    setLoading(false)
-  }, [block])
-
-  useEffect(() => {
-    if (block) load()
-  }, [block, load])
-
-  return <div>
-    <h2>Transactions</h2>
-    <div className="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Hash</th>
-            <th>Signer</th>
-            <th>Fees</th>
-          </tr>
-        </thead>
-        <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={5}
-          onItem={(item, index) => {
-            const hash = block.txs_hashes[index]
-            console.log(hash)
-            return <tr key={hash}>
-              <td><Link to={`/txs/${hash}`}>{hash}</Link></td>
-              <td>{reduceText(item.owner)}</td>
-              <td>{item.fee}</td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
-  </div>
-}
-
 function Block() {
   const { id } = useParams()
 
@@ -211,6 +144,53 @@ function Block() {
         </table>
       </div>
       <Transactions block={block} />
+    </div>
+  </div>
+}
+
+function Transactions(props) {
+  const { block } = props
+
+  const nodeRPC = useNodeRPC()
+
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState()
+  const [transactions, setTransactions] = useState([])
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const [err, txs] = await to(nodeRPC.getTransactions(block.txs_hashes))
+    if (err) return console.log(err)
+
+    setTransactions(txs)
+    setLoading(false)
+  }, [block])
+
+  useEffect(() => {
+    if (block) load()
+  }, [block, load])
+
+  return <div>
+    <h2>Transactions</h2>
+    <div className="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Hash</th>
+            <th>Signer</th>
+            <th>Fees</th>
+          </tr>
+        </thead>
+        <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={5}
+          onItem={(item) => {
+            return <tr key={item.hash}>
+              <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
+              <td>{reduceText(item.owner)}</td>
+              <td>{formatXelis(item.fee)}</td>
+            </tr>
+          }}
+        />
+      </table>
     </div>
   </div>
 }

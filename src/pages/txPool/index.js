@@ -5,17 +5,9 @@ import TableBody from '../../components/tableBody'
 import useNodeSocket from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import to from 'await-to-js'
+import { formatXelis, reduceText } from '../../utils'
 
 function TxPool() {
-  const txs = [{
-    height: 344,
-    size: `5 KB`,
-    signer: `?`,
-    age: `10m`,
-    fee: `0.5`,
-    hash: `2ae2bf36d5ee1b62608582df131f4ed8808aaf223d60e0ce5a9522f961a6db6f`
-  }]
-
   const [memPool, setMemPool] = useState([])
   const [executed, setExecuted] = useState([])
   const nodeSocket = useNodeSocket()
@@ -86,26 +78,24 @@ function TxPool() {
       <table>
         <thead>
           <tr>
-            <th>Height Built</th>
             <th>Hash</th>
+            <th>Transfers</th>
             <th>Signer</th>
-            <th>Age</th>
             <th>Fees</th>
-            <th>Size</th>
           </tr>
         </thead>
-        <tbody>
-          {txs.map((item) => {
+        <TableBody list={memPool} colSpan={5} emptyText="No transactions"
+          onItem={(item) => {
             return <tr key={item.hash}>
-              <td>{item.height}</td>
-              <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
-              <td>{item.signer}</td>
-              <td>{item.age}</td>
-              <td>{item.fee}</td>
-              <td>{item.size}</td>
+              <td>
+                <Link to={`/txs/${item.hash}`}>{item.hash}</Link>
+              </td>
+              <td>{item.data.Transfer.length}</td>
+              <td>{reduceText(item.owner)}</td>
+              <td>{formatXelis(item.fee)}</td>
             </tr>
-          })}
-        </tbody>
+          }}
+        />
       </table>
     </div>
     <h2>Executed</h2>
@@ -124,7 +114,9 @@ function TxPool() {
           onItem={(item) => {
             return <tr key={item.hash}>
               <td>{item.height}</td>
-              <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
+              <td>
+                <Link to={`/txs/${item.hash}`}>{item.hash}</Link>
+              </td>
               <td>{item.age}</td>
               <td>{item.fee}</td>
               <td>{item.size}</td>

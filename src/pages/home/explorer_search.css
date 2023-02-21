@@ -34,7 +34,7 @@
   margin-top: .5em;
   justify-content: center;
   background-color: var(--link-color);
-  color: var(--text-color);
+  color: white;
   user-select: none;
 }
 
