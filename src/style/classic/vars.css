@@ -1,0 +1,23 @@
+[data-theme="dark"] {
+  --card-color: black;
+  --bg-color: #101010;
+  --text-color: #f1f1f1;
+  --border-color: var(--text-color);
+  --muted-color: rgba(255, 255, 255, .6);
+  --error-color: red;
+  --success-color: green;
+  --link-color: #1870cb;
+  --warning-color: #dfde32;
+}
+
+[data-theme="light"] {
+  --card-color: white;
+  --bg-color: #fafafa;
+  --text-color: #101010;
+  --border-color: var(--text-color);
+  --muted-color: rgba(0, 0, 0, .6);
+  --error-color: red;
+  --success-color: green;
+  --link-color: #1870cb;
+  --warning-color: #dfde32;
+}

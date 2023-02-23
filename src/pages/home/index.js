@@ -11,11 +11,6 @@ import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
 
-import './explorer_search.css'
-import './home_stats.css'
-import './recent_blocks.css'
-import './node_connection.css'
-
 function ExplorerSearch() {
   const navigate = useNavigate()
 

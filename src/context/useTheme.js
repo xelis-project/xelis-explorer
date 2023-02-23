@@ -18,7 +18,8 @@ export const ThemeProvider = (props) => {
   }, [])
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-style', `classic`)
+    document.body.setAttribute('data-theme', theme)
   }, [theme])
 
   return <Context.Provider value={{ theme, setTheme }}>

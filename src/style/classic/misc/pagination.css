@@ -4,6 +4,7 @@
   border: thin solid var(--text-color);
   display: flex;
   gap: .5em;
+  flex-wrap: wrap;
   align-items: center;
 }
 

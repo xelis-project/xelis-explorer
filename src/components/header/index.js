@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom'
 import useTheme from '../../context/useTheme'
 import Button from '../button'
 import { Link } from 'react-router-dom'
-
-import './header.css'
 import Icon from '../icon'
 
 function useMenuLinks() {

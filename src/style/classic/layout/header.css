@@ -1,4 +1,4 @@
-:root {
+[data-theme="dark"], [data-theme="light"] {
   --header-nav-color: var(--muted-color);
   --header-nav-active-color: var(--text-color);
   --header-logo-color: var(--text-color);

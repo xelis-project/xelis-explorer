@@ -1,10 +1,19 @@
-:root {
+[data-theme="dark"] {
   --scrollbar-width: 8px;
   --scrollbar-height: 8px;
   --scrollbar-track-bg: inherit;
   --scrollbar-thumb-bg: #727272;
   --scrollbar-thumb-border-radius: 15px;
   --scrollbar-thumb-bg-hover: #525252;
+}
+
+[data-theme="light"] {
+  --scrollbar-width: 8px;
+  --scrollbar-height: 8px;
+  --scrollbar-track-bg: inherit;
+  --scrollbar-thumb-bg: black;
+  --scrollbar-thumb-border-radius: 15px;
+  --scrollbar-thumb-bg-hover: black;
 }
 
 ::-webkit-scrollbar {

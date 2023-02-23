@@ -27,7 +27,12 @@
     "store2": "^2.14.2"
   },
   "devDependencies": {
-    "esbuild": "^0.17.8",
+    "autoprefixer": "^10.4.13",
+    "esbuild": "^0.17.10",
+    "esbuild-style-plugin": "^1.6.1",
+    "postcss": "^8.4.21",
+    "postcss-import": "^15.1.0",
+    "postcss-prefix-selector": "^1.16.0",
     "serve": "^14.2.0",
     "yargs": "^17.7.0"
   }

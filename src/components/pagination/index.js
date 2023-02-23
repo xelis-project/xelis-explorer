@@ -1,7 +1,5 @@
 import { useCallback, useMemo } from 'react'
 
-import './pagination.css'
-
 export function getPaginationRange(pageState) {
   const { page, size } = pageState
   const start = page * size - size
@@ -51,7 +49,7 @@ function Pagination(props) {
     </select>
     <button onClick={setFirstPage} disabled={!canFirstPage}>First</button>
     <button onClick={setPreviousPage} disabled={!canPreviousPage}>Previous</button>
-    <div>Page {state.page} of {pageCount}</div>
+    <div>Page {state.page} of {count > 0 ? pageCount : `?`}</div>
     <button onClick={setNextPage} disabled={!canNextPage}>Next</button>
     <button onClick={setLastPage} disabled={!canLastPage}>Last</button>
     <div>({count} {countText})</div>

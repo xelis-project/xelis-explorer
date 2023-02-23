@@ -1,6 +1,10 @@
 const esbuild = require(`esbuild`)
 const yargs = require(`yargs`)
 const fs = require('fs')
+const stylePlugin = require('esbuild-style-plugin')
+const autoprefixer = require('autoprefixer')
+const prefixer = require('postcss-prefix-selector')
+const path = require('path')
 
 const argv = yargs(process.argv)
   .option(`watch`, {
@@ -23,7 +27,6 @@ const argv = yargs(process.argv)
     type: `string`
   }).parse()
 
-
 const main = async () => {
   const outdir = `./public/dist`
 
@@ -33,6 +36,8 @@ const main = async () => {
     const value = env[key]
     if (typeof value === 'string') env[key] = `"${value}"`
   })
+
+  const sourcemap = argv.sourcemap ? `inline` : false
 
   const options = {
     entryPoints: [`./src/index`],
@@ -45,24 +50,52 @@ const main = async () => {
     jsx: `automatic`,
     outdir,
     minify: argv.minify,
-    sourcemap: `inline`,//argv.sourcemap,
+    sourcemap,
     define: env,
-    plugins: [{
-      name: 'log-rebuild',
-      setup(build) {
-        build.onEnd(() => {
-          console.log(`Rebuild - ${new Date().toLocaleString()}`)
-        })
-      },
-    }]
-  }
+    plugins: [
+      stylePlugin({
+        postcss: {
+          plugins: [
+            autoprefixer(),
+            prefixer({
+              // add style prefix to css
+              transform: function (prefix, selector, prefixedSelector, filePath, rule) {
+                if (filePath.indexOf(`\\style\\classic`) !== -1) {
+                  return `[data-style=classic] ${selector}`
+                }
 
+                if (filePath.indexOf(`\\style\\xelis`) !== -1) {
+                  return `[data-style=xelis] ${selector}`
+                }
+
+                return selector
+              }
+            })
+          ]
+        }
+      }),
+      {
+        name: 'log-rebuild',
+        setup(build) {
+          build.onEnd(() => {
+            console.log(`Rebuild - ${new Date().toLocaleString()}`)
+          })
+        },
+      }
+    ]
+  }
 
   if (argv.watch) {
     const ctx = await esbuild.context(options)
     await ctx.watch()
   } else {
-    await esbuild.build(options)
+    const result = await esbuild.build({
+      ...options,
+      metafile: true
+    })
+
+    // save bundle to analyze here https://esbuild.github.io/analyze/
+    fs.writeFileSync(path.join(outdir, 'meta.json'), JSON.stringify(result.metafile))
   }
 }
 

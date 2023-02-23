@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import DotLoading from '../dotLoading'
 import Icon from '../icon'
 
-import './pageLoading.css'
-
 function PageLoading(props) {
   const { loading, visibleAfter = 250 } = props
 

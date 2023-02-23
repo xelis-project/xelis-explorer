@@ -11,8 +11,6 @@ import Button from '../../components/button'
 import { Link } from 'react-router-dom'
 import TableBody from '../../components/tableBody'
 
-import './card.css'
-
 function Block() {
   const { id } = useParams()
 

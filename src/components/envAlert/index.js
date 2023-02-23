@@ -1,7 +1,5 @@
 import packageJSON from '../../../package.json'
 
-import './alert.css'
-
 function EnvAlert() {
   if (ENV === `mainnet`) return null
 
