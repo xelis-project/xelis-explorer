@@ -24,12 +24,17 @@
   user-select: none;
 }
 
-.recent-blocks-item:nth-child(2) {
-  animation: bounce;
+.recent-blocks-group:first-child {
+  animation: backInDown;
   animation-duration: 1s;
 }
 
-.recent-blocks-item.scale:hover {
+.recent-blocks-group:not(:first-child) {
+  animation: slideInLeft;
+  animation-duration: 1s;
+}
+
+.recent-blocks-item:hover {
   transform: scale(.95);
   cursor: pointer;
 }
@@ -67,4 +72,21 @@
   font-weight: bold;
   font-size: .9em;
   margin-top: .2em;
+}
+
+.recent-blocks-group {
+  flex-shrink: 0;
+  border: thin solid var(--text-color);
+}
+
+.recent-blocks-group-title {
+  color: var(--muted-color);
+  text-align: center;
+  font-size: .8em;
+  padding: .7em;
+  font-weight: bold;
+}
+
+.recent-blocks-group-items {
+  display: flex;
 }

@@ -34,3 +34,17 @@ export const formatAssetName = (asset) => {
       return value
   }
 }
+
+export const groupBy = (list, getKey) => {
+  const map = new Map()
+
+  list.forEach((item) => {
+    const key = getKey(item)
+    if (map.has(key)) {
+      map.set(key, [...map.get(key), item])
+    } else {
+      map.set(key, [item])
+    }
+  })
+  return map
+}

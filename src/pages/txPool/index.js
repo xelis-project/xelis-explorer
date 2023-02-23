@@ -16,7 +16,6 @@ function TxPool() {
   const loadMemPool = useCallback(async () => {
     const [err, data] = await to(nodeRPC.getMemPool())
     if (err) return console.log(err)
-    console.log(data)
     setMemPool(data)
   }, [])
 
@@ -103,23 +102,21 @@ function TxPool() {
       <table>
         <thead>
           <tr>
-            <th>Block Height</th>
             <th>Hash</th>
-            <th>Age</th>
+            <th>Transfers</th>
+            <th>Signer</th>
             <th>Fees</th>
-            <th>Size</th>
           </tr>
         </thead>
         <TableBody colSpan={5}
           onItem={(item) => {
             return <tr key={item.hash}>
-              <td>{item.height}</td>
               <td>
                 <Link to={`/txs/${item.hash}`}>{item.hash}</Link>
               </td>
-              <td>{item.age}</td>
-              <td>{item.fee}</td>
-              <td>{item.size}</td>
+              <td>{item.data.Transfer.length}</td>
+              <td>{reduceText(item.owner)}</td>
+              <td>{formatXelis(item.fee)}</td>
             </tr>
           }}
         />

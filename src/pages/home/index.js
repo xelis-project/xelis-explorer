@@ -6,7 +6,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import DotLoading from '../../components/dotLoading'
 import bytes from 'bytes'
 import Age from '../../components/age'
-import { formatXelis } from '../../utils'
+import { formatXelis, groupBy } from '../../utils'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
@@ -120,24 +120,17 @@ function RecentBlocks(props) {
     }
   }, [blocks])
 
-  const recentBlock = useMemo(() => {
-    return blocks.length > 0 ? blocks[0] : null
-  }, [blocks])
-
   return <div className="recent-blocks">
     <div className="recent-blocks-title">Recent Blocks</div>
-    <div className="recent-blocks-items">
-      {recentBlock && <div className="recent-blocks-item">
-        <div className="recent-blocks-item-status" />
-        <div className="recent-blocks-item-title">Block {recentBlock.height + 1}</div>
-        <div className="recent-blocks-item-value">Waiting<DotLoading /></div>
-      </div>}
+    {/*<div className="recent-blocks-items">
       {blocks.map((item, index) => {
         const txCount = item.txs_hashes.length
         const size = bytes.format(item.total_size_in_bytes || 0)
         const stableHeight = blocks[0].height - 8
         const statusClassName = item.height <= stableHeight ? `stable` : `mined`
-        return <Link to={`/blocks/${item.height}`} key={item.height} className="recent-blocks-item scale">
+        const key = index + Math.random() // random key to force re-render and repeat animation
+
+        return <Link to={`/blocks/${item.height}`} key={key} className={`recent-blocks-item`}>
           <div className={`recent-blocks-item-status ${statusClassName}`} />
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
@@ -145,7 +138,40 @@ function RecentBlocks(props) {
             {index === 0 && <>Latest block</>}
             {index > 0 && <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />}
           </div>
+          <div>{item.topoheight}</div>
         </Link>
+      })}
+    </div>*/}
+
+    <div className="recent-blocks-items">
+      {[...groupBy(blocks, (b) => b.height).entries()].map((entry, index) => {
+        const [height, groupBlocks] = entry
+        const key = index + Math.random() // random key to force re-render and repeat animation
+
+        return <div className="recent-blocks-group" key={key}>
+          <div className="recent-blocks-group-items">
+            {groupBlocks.map((block) => {
+              const txCount = block.txs_hashes.length
+              const size = bytes.format(block.total_size_in_bytes || 0)
+              const stableHeight = blocks[0].height - 8
+              //const statusClassName = block.height <= stableHeight ? `stable` : `mined`
+              const statusClassName = block.block_type === `Sync` ? `stable` : `mined`
+
+              return <Link to={`/blocks/${block.topoheight}`} key={block.topoheight} className={`recent-blocks-item`}>
+                <div className={`recent-blocks-item-status ${statusClassName}`} />
+                <div className="recent-blocks-item-title">Block {block.topoheight}</div>
+                <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
+                <div className="recent-blocks-item-time">
+                  {index === 0 && <>Latest block</>}
+                  {index > 0 && <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />}
+                </div>
+              </Link>
+            })}
+          </div>
+          <div className="recent-blocks-group-title">
+            DAG Height: {height}
+          </div>
+        </div>
       })}
     </div>
   </div>
@@ -156,7 +182,7 @@ function HomeMiniChart(props) {
 
   const data = useMemo(() => {
     let rnd = []
-    for (let i=0;i<6;i++) {
+    for (let i = 0; i < 6; i++) {
       rnd.push(Math.random())
     }
 

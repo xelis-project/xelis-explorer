@@ -140,6 +140,10 @@ function Block() {
               <th>Nonce</th>
               <td>{block.nonce} ({block.extra_nonce})</td>
             </tr>
+            <tr>
+              <th>Tips</th>
+              <td>{JSON.stringify(block.tips)}</td>
+            </tr>
           </tbody>
         </table>
       </div>
