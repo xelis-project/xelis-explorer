@@ -10,6 +10,7 @@ import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import { Link } from 'react-router-dom'
 import TableBody from '../../components/tableBody'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 
 function Block() {
   const { id } = useParams()
@@ -155,18 +156,32 @@ function Transactions(props) {
 
   const nodeRPC = useNodeRPC()
 
+  const count = useMemo(() => {
+    return block.txs_hashes.length
+  }, [block])
+  
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [transactions, setTransactions] = useState([])
+  const [pageState, setPageState] = useState({ page: 1, size: 5 })
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [err, txs] = await to(nodeRPC.getTransactions(block.txs_hashes))
-    if (err) return console.log(err)
 
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
+
+    const { start, end } = getPaginationRange(pageState)
+    const txHashes = block.txs_hashes.slice(start, end + 1)
+    const [err, txs] = await to(nodeRPC.getTransactions(txHashes))
+    if (err) return resErr(err)
+
+    console.log(txs)
     setTransactions(txs)
     setLoading(false)
-  }, [block])
+  }, [block, pageState])
 
   useEffect(() => {
     if (block) load()
@@ -174,11 +189,14 @@ function Transactions(props) {
 
   return <div>
     <h2>Transactions</h2>
+    <Pagination state={pageState} setState={setPageState}
+      countText="txs" count={count} style={{ marginBottom: `1em` }} />
     <div className="table-responsive">
       <table>
         <thead>
           <tr>
             <th>Hash</th>
+            <th>Transfers</th>
             <th>Signer</th>
             <th>Fees</th>
           </tr>
@@ -187,6 +205,7 @@ function Transactions(props) {
           onItem={(item) => {
             return <tr key={item.hash}>
               <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
+              <td>{item.data.Transfer.length}</td>
               <td>{reduceText(item.owner)}</td>
               <td>{formatXelis(item.fee)}</td>
             </tr>
@@ -194,6 +213,8 @@ function Transactions(props) {
         />
       </table>
     </div>
+    <Pagination state={pageState} setState={setPageState}
+      countText="txs" count={count} style={{ marginTop: `.5em` }} />
   </div>
 }
 
