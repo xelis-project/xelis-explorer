@@ -6,7 +6,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import DotLoading from '../../components/dotLoading'
 import bytes from 'bytes'
 import Age from '../../components/age'
-import { formatXelis, groupBy } from '../../utils'
+import { formatXelis, groupBy, reduceText } from '../../utils'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
@@ -49,17 +49,21 @@ function NodeConnection(props) {
   const { connected, loading, err } = useNodeSocket()
 
   return <div className="node-connection">
-    {connected && <>
-      <div className="node-connection-status alive" />
-      <div>Connected to remote node (version: {info.version})</div>
-    </>}
     {loading && <>
       <div className="node-connection-status loading" />
       <div>Connecting to remote node<DotLoading /></div>
     </>}
+    {connected && <>
+      <div className="node-connection-status alive" />
+      <div>Connected to remote node (version: {info.version})</div>
+    </>}
     {err && <>
       <div className="node-connection-status error" />
       <div>Remote node connection: {err.message}</div>
+    </>}
+    {!loading && !connected && !err && <>
+      <div className="node-connection-status error" />
+      <div>Disconnected from remote node</div>
     </>}
   </div>
 }
@@ -95,7 +99,7 @@ function RecentBlocks(props) {
     return () => {
       unsubscribe()
     }
-  }, [nodeSocket.connected])
+  }, [nodeSocket.connected, nodeSocket.onNewBlock])
 
   /*
   const blocks = useMemo(() => {
@@ -148,14 +152,13 @@ function RecentBlocks(props) {
             {groupBlocks.map((block) => {
               const txCount = block.txs_hashes.length
               const size = bytes.format(block.total_size_in_bytes || 0)
-              const stableHeight = blocks[0].height - 8
-              //const statusClassName = block.height <= stableHeight ? `stable` : `mined`
               const statusClassName = block.block_type === `Sync` ? `stable` : `mined`
 
               return <Link to={`/blocks/${block.topoheight}`} key={block.topoheight} className={`recent-blocks-item`}>
                 <div className={`recent-blocks-item-status ${statusClassName}`} />
                 <div className="recent-blocks-item-title">Block {block.topoheight}</div>
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
+                <div className="recent-blocks-item-miner">{reduceText(block.miner)}</div>
                 <div className="recent-blocks-item-time">
                   {index === 0 && <>Latest block</>}
                   {index > 0 && <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />}

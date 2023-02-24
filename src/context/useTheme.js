@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useLayoutEffect, useState } from 'react'
 import store from 'store2'
 
 const Context = createContext()
@@ -17,7 +17,7 @@ export const ThemeProvider = (props) => {
     _setTheme(value)
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.setAttribute('data-style', `classic`)
     document.body.setAttribute('data-theme', theme)
   }, [theme])

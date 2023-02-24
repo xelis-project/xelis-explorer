@@ -8,8 +8,8 @@ const useWebSocket = (endpoint) => {
   const [lastMessage, setLastMessage] = useState(``)
 
   const send = useCallback((data) => {
-    socketRef.current.send(data)
-  })
+    if (connected) socketRef.current.send(data)
+  }, [connected])
 
   useEffect(() => {
     try {
@@ -27,6 +27,7 @@ const useWebSocket = (endpoint) => {
 
       const onClose = (event) => {
         setConnected(false)
+        setLoading(false)
         console.log(event)
       }
 

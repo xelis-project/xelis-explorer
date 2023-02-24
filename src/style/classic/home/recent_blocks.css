@@ -68,10 +68,18 @@
   font-size: .9em;
 }
 
+.recent-blocks-item-miner {
+  font-size: .9em;
+  margin-top: .2em;
+  color: var(--muted-color);
+  opacity: .6;
+  font-style: italic;
+}
+
 .recent-blocks-item-time {
   font-weight: bold;
   font-size: .9em;
-  margin-top: .2em;
+  margin-top: .4em;
 }
 
 .recent-blocks-group {

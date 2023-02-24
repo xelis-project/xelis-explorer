@@ -64,9 +64,9 @@ export const NodeSocketProvider = (props) => {
     }
   }, [send])
 
-  const onNewBlock = useCallback((onData) => subscribe(`NewBlock`, onData), [])
-  const onTransactionAddedInMempool = useCallback((onData) => subscribe(`TransactionAddedInMempool`, onData), [])
-  const onTransactionExecuted = useCallback((onData) => subscribe(`TransactionExecuted`, onData), [])
+  const onNewBlock = useCallback((onData) => subscribe(`NewBlock`, onData), [subscribe])
+  const onTransactionAddedInMempool = useCallback((onData) => subscribe(`TransactionAddedInMempool`, onData), [subscribe])
+  const onTransactionExecuted = useCallback((onData) => subscribe(`TransactionExecuted`, onData), [subscribe])
 
   const values = {
     connected, loading, err,
