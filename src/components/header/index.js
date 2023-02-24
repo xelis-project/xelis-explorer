@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import useTheme from '../../context/useTheme'
 import Button from '../button'
@@ -41,16 +41,31 @@ function ToggleThemeButton(props) {
 
 function Header() {
   const links = useMenuLinks()
+  const headerMenuRef = useRef()
 
   const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const clickOutside = (e) => {
+      if (!headerMenuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+
+    window.addEventListener(`click`, clickOutside)
+
+    return () => {
+      window.removeEventListener(`click`, clickOutside)
+    }
+  }, [menuOpen])
 
   return <div className="header">
     <Link to="/" className="header-logo" />
     <div className="header-dropdown">
-      <div className="header-menu-button" onClick={() => setMenuOpen(!menuOpen)}>
+      <div ref={headerMenuRef} className="header-menu-button" onClick={() => setMenuOpen(!menuOpen)}>
         <Icon name="menu" />Menu
       </div>
-      <div className={`header-nav ${!menuOpen && `closed`}`}>
+      <div className={`header-nav ${menuOpen ? `` : `closed`}`}>
         {links.map((item) => {
           return <NavLink key={item.path} to={item.path}
             className={item.className}>

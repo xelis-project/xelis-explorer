@@ -48,9 +48,14 @@
     user-select: none;
   }
 
+  .header-menu-button:hover {
+    animation: pulse;
+    animation-duration: .5s;
+  }
+
   .header-nav {
     position: absolute;
-    right: 0;
+    right: 0px;
     padding: 1em;
     display: flex;
     flex-direction: column;
@@ -62,12 +67,15 @@
     min-width: 150px;
     z-index: 1;
     font-size: 1.2em;
-    animation: slideInRight;
-    animation-duration: .25s;
+    transition: all .25s;
+    transform: translateX(0);
+    opacity: 1;
   }
 
   .header-nav.closed {
-    display: none;
+    position: fixed; /* avoid overflow */
+    opacity: 0;
+    transform: translateX(120%);
   }
 
   .header-nav-item {
