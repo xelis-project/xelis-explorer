@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { formatXelis, reduceText } from '../../utils'
+import { formatAsset, formatXelis, reduceText } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
 import { Helmet } from 'react-helmet'
@@ -11,6 +11,7 @@ import Button from '../../components/button'
 import { Link } from 'react-router-dom'
 import TableBody from '../../components/tableBody'
 import Pagination, { getPaginationRange } from '../../components/pagination'
+import Icon from '../../components/icon'
 
 function Block() {
   const { id } = useParams()
@@ -159,7 +160,7 @@ function Transactions(props) {
   const count = useMemo(() => {
     return block.txs_hashes.length
   }, [block])
-  
+
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [transactions, setTransactions] = useState([])
@@ -178,7 +179,6 @@ function Transactions(props) {
     const [err, txs] = await to(nodeRPC.getTransactions(txHashes))
     if (err) return resErr(err)
 
-    console.log(txs)
     setTransactions(txs)
     setLoading(false)
   }, [block, pageState])
@@ -203,12 +203,23 @@ function Transactions(props) {
         </thead>
         <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={5}
           onItem={(item) => {
-            return <tr key={item.hash}>
-              <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
-              <td>{item.data.Transfer.length}</td>
-              <td>{reduceText(item.owner)}</td>
-              <td>{formatXelis(item.fee)}</td>
-            </tr>
+            return <React.Fragment key={item.hash}>
+              <tr>
+                <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
+                <td>{item.data.Transfer.length}</td>
+                <td>{reduceText(item.owner)}</td>
+                <td>{formatXelis(item.fee)}</td>
+              </tr>
+              <tr>
+                <td colSpan={4}>
+                  {item.data.Transfer.map((transfer, index) => {
+                    return <div key={index}>
+                      {index}. Sent {formatAsset(transfer.amount, transfer.asset)} to {transfer.to}
+                    </div>
+                  })}
+                </td>
+              </tr>
+            </React.Fragment>
           }}
         />
       </table>
