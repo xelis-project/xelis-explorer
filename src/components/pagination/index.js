@@ -8,11 +8,11 @@ export function getPaginationRange(pageState) {
 }
 
 function Pagination(props) {
-  const { count = 0, state = { page: 1, size: 20 }, setState, sizes = [5, 10, 20],
+  const { count, state = { page: 1, size: 20 }, setState, sizes = [5, 10, 20],
     countText = `items`, className = ``, ...restProps } = props
 
   const pageCount = useMemo(() => {
-    const pages = Math.ceil(count / state.size)
+    const pages = Math.ceil((count || 0) / state.size)
     if (pages > 1) return pages
     return 1
   }, [state, count])
@@ -49,7 +49,7 @@ function Pagination(props) {
     </select>
     <button onClick={setFirstPage} disabled={!canFirstPage}>First</button>
     <button onClick={setPreviousPage} disabled={!canPreviousPage}>Previous</button>
-    <div>Page {state.page} of {count > 0 ? pageCount : `?`}</div>
+    <div>Page {state.page} of {pageCount}</div>
     <button onClick={setNextPage} disabled={!canNextPage}>Next</button>
     <button onClick={setLastPage} disabled={!canLastPage}>Last</button>
     <div>({count} {countText})</div>
