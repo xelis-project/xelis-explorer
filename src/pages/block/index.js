@@ -214,7 +214,7 @@ function Transactions(props) {
                 <td colSpan={4}>
                   {item.data.Transfer.map((transfer, index) => {
                     return <div key={index}>
-                      {index}. Sent {formatAsset(transfer.amount, transfer.asset)} to {transfer.to}
+                      {index + 1}. Sent {formatAsset(transfer.amount, transfer.asset)} to {transfer.to}
                     </div>
                   })}
                 </td>

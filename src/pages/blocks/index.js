@@ -18,6 +18,11 @@ function Blocks() {
   const [topoheight, setTopoheight] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
 
+  const count = useMemo(() => {
+    if (!topoheight) return 0
+    return topoheight + 1 // include genesis block is 0
+  }, [topoheight])
+
   const loadTopoheight = useCallback(async () => {
     const [err, currentTopoheight] = await to(nodeRPC.getTopoHeight())
     if (err) return console.log(err)
@@ -26,7 +31,7 @@ function Blocks() {
   }, [])
 
   const loadBlocks = useCallback(async () => {
-    if (!topoheight) return
+    if (count === 0) return
 
     const resErr = (err) => {
       setErr(err)
@@ -36,15 +41,17 @@ function Blocks() {
     setLoading(true)
     let pagination = getPaginationRange(pageState)
 
-    let start = topoheight - pagination.end
+    // reverse pager range
+    let start = count - pagination.end - 1
     if (start < 0) start = 0
-    let end = topoheight - pagination.start
+    let end = count - pagination.start - 1
+
     const [err, blocks] = await to(nodeRPC.getBlocks(start, end))
     if (err) return resErr(err)
     setLoading(false)
 
     setBlocks(blocks.reverse())
-  }, [pageState, topoheight])
+  }, [pageState, count])
 
   useEffect(() => {
     loadTopoheight()
@@ -60,7 +67,7 @@ function Blocks() {
     </Helmet>
     <h1>Blocks</h1>
     <Pagination state={pageState} setState={setPageState}
-      countText="blocks" count={topoheight} style={{ marginBottom: `1em` }} />
+      countText="blocks" count={count} style={{ marginBottom: `1em` }} />
     <div className="table-responsive">
       <table>
         <thead>
@@ -99,7 +106,7 @@ function Blocks() {
       </table>
     </div>
     <Pagination state={pageState} setState={setPageState}
-      countText="blocks" count={topoheight} style={{ marginTop: `.5em` }} />
+      countText="blocks" count={count} style={{ marginTop: `.5em` }} />
   </div>
 }
 
