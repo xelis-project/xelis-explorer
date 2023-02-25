@@ -11,7 +11,6 @@ import Button from '../../components/button'
 import { Link } from 'react-router-dom'
 import TableBody from '../../components/tableBody'
 import Pagination, { getPaginationRange } from '../../components/pagination'
-import Icon from '../../components/icon'
 
 function Block() {
   const { id } = useParams()
