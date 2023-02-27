@@ -15,47 +15,36 @@ function Blocks() {
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
   const [blocks, setBlocks] = useState([])
-  const [topoheight, setTopoheight] = useState()
+  const [count, setCount] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
 
-  const count = useMemo(() => {
-    if (!topoheight) return 0
-    return topoheight + 1 // include genesis block is 0
-  }, [topoheight])
-
-  const loadTopoheight = useCallback(async () => {
-    const [err, currentTopoheight] = await to(nodeRPC.getTopoHeight())
-    if (err) return console.log(err)
-
-    setTopoheight(currentTopoheight)
-  }, [])
-
   const loadBlocks = useCallback(async () => {
-    if (count === 0) return
+    setErr(null)
+    setLoading(true)
 
     const resErr = (err) => {
       setErr(err)
       setLoading(false)
     }
 
-    setLoading(true)
     let pagination = getPaginationRange(pageState)
 
+    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
+    if (err1) return resErr(err1)
+
+    const count = topoheight + 1
     // reverse pager range
     let start = count - pagination.end - 1
     if (start < 0) start = 0
     let end = count - pagination.start - 1
 
-    const [err, blocks] = await to(nodeRPC.getBlocks(start, end))
-    if (err) return resErr(err)
+    const [err2, blocks] = await to(nodeRPC.getBlocks(start, end))
+    if (err2) return resErr(err2)
+
+    setCount(count)
     setLoading(false)
-
     setBlocks(blocks.reverse())
-  }, [pageState, count])
-
-  useEffect(() => {
-    loadTopoheight()
-  }, [loadTopoheight])
+  }, [pageState])
 
   useEffect(() => {
     loadBlocks()

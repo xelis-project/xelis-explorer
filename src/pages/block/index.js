@@ -11,6 +11,7 @@ import Button from '../../components/button'
 import { Link } from 'react-router-dom'
 import TableBody from '../../components/tableBody'
 import Pagination, { getPaginationRange } from '../../components/pagination'
+import DotLoading from '../../components/dotLoading'
 
 function Block() {
   const { id } = useParams()
@@ -23,7 +24,9 @@ function Block() {
   const [topoheight, setTopoheight] = useState()
 
   const load = useCallback(async () => {
+    setErr(null)
     setLoading(true)
+
     const resErr = (err) => {
       setErr(err)
       setLoading(false)
@@ -62,6 +65,7 @@ function Block() {
   }, [block, topoheight])
 
   if (err) return <div>{err.message}</div>
+  if (!block && loading) return <div>Loading<DotLoading /></div>
   if (!loading && !block) return <NotFound />
   if (!block) return null
 
@@ -166,6 +170,7 @@ function Transactions(props) {
   const [pageState, setPageState] = useState({ page: 1, size: 5 })
 
   const load = useCallback(async () => {
+    setErr(null)
     setLoading(true)
 
     const resErr = (err) => {

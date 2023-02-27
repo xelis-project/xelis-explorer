@@ -134,8 +134,7 @@ function RecentBlocks(props) {
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
           <div className="recent-blocks-item-time">
-            {index === 0 && <>Latest block</>}
-            {index > 0 && <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />}
+            <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
           </div>
           <div>{item.topoheight}</div>
         </Link>
@@ -160,8 +159,7 @@ function RecentBlocks(props) {
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
                 <div className="recent-blocks-item-miner">{reduceText(block.miner)}</div>
                 <div className="recent-blocks-item-time">
-                  {index === 0 && <>Latest block</>}
-                  {index > 0 && <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />}
+                  <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
                 </div>
               </Link>
             })}

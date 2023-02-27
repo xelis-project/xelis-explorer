@@ -6,42 +6,35 @@ import useNodeSocket from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import to from 'await-to-js'
 import { formatXelis, reduceText } from '../../utils'
+import Age from '../../components/age'
 
 function TxPool() {
   const [memPool, setMemPool] = useState([])
-  const [executed, setExecuted] = useState([])
   const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState()
 
   const loadMemPool = useCallback(async () => {
+    setErr(null)
+    setLoading(true)
+
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
+
     const [err, data] = await to(nodeRPC.getMemPool())
-    if (err) return console.log(err)
+    if (err) return resErr(err)
     setMemPool(data)
-  }, [])
-
-  const loadTransactions = useCallback(async () => {
-    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
-    if (err1) return console.log(err1)
-
-    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 19, topoheight))
-    if (err2) return console.log(err2)
-
-    blocks.reverse()
-
-    let txs_hashes = []
-    blocks.forEach(block => {
-      txs_hashes = [...block.txs_hashes, ...txs_hashes]
-    })
-
-    txs_hashes = txs_hashes.slice(0, 20)
-    console.log(txs_hashes)
+    setLoading(false)
   }, [])
 
   useEffect(() => {
     if (!nodeSocket.connected) return
 
     const unsubscribe = nodeSocket.onTransactionAddedInMempool((data) => {
-      console.log(data)
+      data.timestamp = new Date().getTime()
       setMemPool((pool) => [data, ...pool])
     })
 
@@ -51,22 +44,8 @@ function TxPool() {
   }, [nodeSocket.connected])
 
   useEffect(() => {
-    if (!nodeSocket.connected) return
-
-    const unsubscribe = nodeSocket.onTransactionExecuted((data) => {
-      console.log(data)
-      setExecuted((executed) => [data, ...executed])
-    })
-
-    return () => {
-      unsubscribe()
-    }
-  }, [nodeSocket.connected])
-
-  useEffect(() => {
     loadMemPool()
-    //loadTransactions()
-  }, [loadMemPool, loadTransactions])
+  }, [loadMemPool])
 
   return <div>
     <Helmet>
@@ -81,9 +60,10 @@ function TxPool() {
             <th>Transfers</th>
             <th>Signer</th>
             <th>Fees</th>
+            <th>Age</th>
           </tr>
         </thead>
-        <TableBody list={memPool} colSpan={5} emptyText="No transactions"
+        <TableBody list={memPool} loading={loading} err={err} colSpan={5} emptyText="No transactions"
           onItem={(item) => {
             return <tr key={item.hash}>
               <td>
@@ -92,31 +72,146 @@ function TxPool() {
               <td>{item.data.Transfer.length}</td>
               <td>{reduceText(item.owner)}</td>
               <td>{formatXelis(item.fee)}</td>
+              <td>
+                {item.timestamp ? <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} /> : `?`}
+              </td>
             </tr>
           }}
         />
       </table>
     </div>
-    <h2>Executed</h2>
+    <TxExecuted setMemPool={setMemPool} />
+  </div>
+}
+
+function TxExecuted(props) {
+  const { setMemPool } = props
+
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState()
+  const [executedTxs, setExecutedTxs] = useState([])
+  const nodeSocket = useNodeSocket()
+  const nodeRPC = useNodeRPC()
+
+  const loadExecutedTxs = useCallback(async () => {
+    setLoading(true)
+    setErr(null)
+
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
+
+    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
+    if (err1) return resErr(err1)
+
+    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 19, topoheight))
+    if (err2) return resErr(err2)
+
+    blocks.reverse()
+    const txBlockMap = new Map()
+    blocks.forEach(block => {
+      block.txs_hashes.forEach(txId => {
+        txBlockMap.set(txId, block)
+      })
+    })
+
+    const recentExecuted = []
+    for (let i = 0; i < txBlockMap.size; i += 20) {
+      const txIds = Array.from(txBlockMap.keys())
+      const [err3, txs] = await to(nodeRPC.getTransactions(txIds.slice(i, 20)))
+      if (err3) return resErr(err3)
+
+      txs.forEach((tx) => {
+        const block = txBlockMap.get(tx.hash)
+        recentExecuted.push({ tx, block })
+      })
+    }
+
+    setLoading(false)
+    setExecutedTxs(recentExecuted)
+  }, [])
+
+  useEffect(() => {
+    if (!nodeSocket.connected) return
+
+    const unsubscribe = nodeSocket.onTransactionExecuted((data) => {
+      // remove from mempool and add tx to data
+      setMemPool((pool) => {
+        let filteredPool = []
+        pool.forEach(async tx => {
+          if (tx.hash === data.tx_hash) {
+            const [err, block] = await to(nodeRPC.getBlockAtTopoHeight(data.topoheight))
+            if (err) return console.log(err)
+
+            setExecutedTxs((executedTxs) => [{ tx, block }, ...executedTxs])
+          } else {
+            filteredPool.push(tx)
+          }
+        })
+
+        return filteredPool
+      })
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [nodeSocket.connected])
+
+  useEffect(() => {
+    loadExecutedTxs()
+  }, [loadExecutedTxs])
+
+  useEffect(() => {
+    // remove txs with blocks lower than the first tx block
+    const filterExecutedTxs = async () => {
+      const [err, topoheight] = await to(nodeRPC.getTopoHeight())
+      if (err) return console.log(err)
+
+      setExecutedTxs((items) => items.filter((item) => {
+        return item.block.topoheight > topoheight - 20
+      }))
+    }
+
+    let intervalId = setInterval(filterExecutedTxs, 5000)
+    return () => {
+      clearTimeout(intervalId)
+    }
+  }, [])
+
+  return <div>
+    <h2>Executed Transactions</h2>
+    <div>Last 20 blocks</div>
     <div className="table-responsive">
       <table>
         <thead>
           <tr>
+            <th>Topo Height</th>
             <th>Hash</th>
             <th>Transfers</th>
             <th>Signer</th>
             <th>Fees</th>
+            <th>Age</th>
           </tr>
         </thead>
-        <TableBody colSpan={5}
+        <TableBody list={executedTxs} loading={loading} err={err} colSpan={6}
+          emptyText="No tx executed from last 20 blocks."
           onItem={(item) => {
-            return <tr key={item.hash}>
+            const { tx, block } = item
+            return <tr key={tx.hash}>
               <td>
-                <Link to={`/txs/${item.hash}`}>{item.hash}</Link>
+                <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
               </td>
-              <td>{item.data.Transfer.length}</td>
-              <td>{reduceText(item.owner)}</td>
-              <td>{formatXelis(item.fee)}</td>
+              <td>
+                <Link to={`/txs/${tx.hash}`}>{tx.hash}</Link>
+              </td>
+              <td>{tx.data.Transfer.length}</td>
+              <td>{reduceText(tx.owner)}</td>
+              <td>{formatXelis(tx.fee)}</td>
+              <td>
+                <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+              </td>
             </tr>
           }}
         />

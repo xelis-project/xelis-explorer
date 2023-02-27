@@ -8,6 +8,7 @@ import TableBody from '../../components/tableBody'
 import { formatXelis, formatAsset, formatAssetName, reduceText } from '../../utils'
 import { Link } from 'react-router-dom'
 import bytes from 'bytes'
+import DotLoading from '../../components/dotLoading'
 
 function Transaction() {
   const { hash } = useParams()
@@ -17,15 +18,16 @@ function Transaction() {
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
   const [tx, setTx] = useState()
-  const [blocks, setBlocks] = useState([])
 
   const loadTx = useCallback(async () => {
+    setErr(null)
+    setLoading(true)
+
     const resErr = (err) => {
       setErr(err)
       setLoading(false)
     }
 
-    setLoading(true)
     const [err, data] = await to(nodeRPC.getTransaction(hash))
     if (err) return resErr(err)
 
@@ -33,31 +35,12 @@ function Transaction() {
     setLoading(false)
   }, [hash])
 
-  const loadTxBlocks = useCallback(async () => {
-    if (!tx) return
-
-    const blocks = []
-    for (let i = 0; i < tx.blocks.length; i++) {
-      const hash = tx.blocks[i]
-      const [err, data] = await to(nodeRPC.getBlockByHash(hash))
-      if (err) return console.log(err)
-      blocks.push(data)
-    }
-
-    console.log(blocks)
-    setBlocks(blocks)
-  }, [tx])
-
   useEffect(() => {
     loadTx()
   }, [loadTx])
 
-
-  useEffect(() => {
-    loadTxBlocks()
-  }, [loadTxBlocks])
-
-  if (loading) return null
+  if (err) return <div>{err.message}</div>
+  if (loading) return <div>Loading<DotLoading /></div>
   if (!loading && !tx) return <NotFound />
 
   const transfers = tx.data.Transfer
@@ -95,7 +78,7 @@ function Transaction() {
         </table>
       </div>
       <Transfers transfers={transfers} />
-      <Blocks blocks={blocks} />
+      <Blocks tx={tx} />
       <h2>Extra Data</h2>
       <div>
         {!tx.extra_data && `No extra data`}
@@ -133,7 +116,36 @@ function Transfers(props) {
 }
 
 function Blocks(props) {
-  const { blocks } = props
+  const { tx } = props
+
+  const [err, setErr] = useState()
+  const [loading, setLoading] = useState(true)
+  const [blocks, setBlocks] = useState([])
+
+  const loadTxBlocks = useCallback(async () => {
+    setLoading(true)
+    setErr(null)
+
+    const resErr = () => {
+      setLoading(false)
+      setErr(err)
+    }
+
+    const blocks = []
+    for (let i = 0; i < tx.blocks.length; i++) {
+      const hash = tx.blocks[i]
+      const [err, data] = await to(nodeRPC.getBlockByHash(hash))
+      if (err) return resErr(err)
+      blocks.push(data)
+    }
+
+    setLoading(false)
+    setBlocks(blocks)
+  }, [tx])
+
+  useEffect(() => {
+    loadTxBlocks()
+  }, [loadTxBlocks])
 
   return <div>
     <h2>Blocks</h2>
@@ -149,7 +161,7 @@ function Blocks(props) {
             <th>Txs</th>
           </tr>
         </thead>
-        <TableBody list={blocks} emptyText="No blocks" colSpan={6}
+        <TableBody list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={6}
           onItem={(item, index) => {
             const size = bytes.format(item.total_size_in_bytes)
             const time = new Date(item.timestamp).toLocaleString()
