@@ -118,6 +118,7 @@ function Transfers(props) {
 function Blocks(props) {
   const { tx } = props
 
+  const nodeRPC = useNodeRPC()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
   const [blocks, setBlocks] = useState([])

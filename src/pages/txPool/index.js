@@ -66,9 +66,7 @@ function TxPool() {
         <TableBody list={memPool} loading={loading} err={err} colSpan={5} emptyText="No transactions"
           onItem={(item) => {
             return <tr key={item.hash}>
-              <td>
-                <Link to={`/txs/${item.hash}`}>{item.hash}</Link>
-              </td>
+              <td>{item.hash}</td> {/* Don't need <Link /> here because tx still does not exists and it will redirect to not found */}
               <td>{item.data.Transfer.length}</td>
               <td>{reduceText(item.owner)}</td>
               <td>{formatXelis(item.fee)}</td>
@@ -92,6 +90,7 @@ function TxExecuted(props) {
   const [executedTxs, setExecutedTxs] = useState([])
   const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
+  const [topoheight, setTopoheight] = useState()
 
   const loadExecutedTxs = useCallback(async () => {
     setLoading(true)
@@ -104,6 +103,7 @@ function TxExecuted(props) {
 
     const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
     if (err1) return resErr(err1)
+    setTopoheight(topoheight)
 
     const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 19, topoheight))
     if (err2) return resErr(err2)
@@ -169,6 +169,7 @@ function TxExecuted(props) {
       const [err, topoheight] = await to(nodeRPC.getTopoHeight())
       if (err) return console.log(err)
 
+      setTopoheight(topoheight)
       setExecutedTxs((items) => items.filter((item) => {
         return item.block.topoheight > topoheight - 20
       }))
@@ -202,6 +203,7 @@ function TxExecuted(props) {
             return <tr key={tx.hash}>
               <td>
                 <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
+                &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
               </td>
               <td>
                 <Link to={`/txs/${tx.hash}`}>{tx.hash}</Link>
