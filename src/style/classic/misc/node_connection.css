@@ -1,12 +1,7 @@
 .node-connection {
-  border: thin dashed var(--border-color);
-  padding: .5em;
-  margin-bottom: 2em;
   display: flex;
-  border-radius: 5px;
   gap: .5em;
   align-items: center;
-  color: gray;
 }
 
 .node-connection-status {

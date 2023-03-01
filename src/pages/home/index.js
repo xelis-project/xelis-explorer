@@ -1,6 +1,6 @@
 import Button from '../../components/button'
 import { Link, useNavigate } from 'react-router-dom'
-import useNodeSocket from '../../context/useNodeSocket'
+import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import DotLoading from '../../components/dotLoading'
@@ -44,64 +44,34 @@ function ExplorerSearch() {
   </form>
 }
 
-function NodeConnection(props) {
-  const { info = {} } = props
-  const { connected, loading, err } = useNodeSocket()
-
-  return <div className="node-connection">
-    {loading && <>
-      <div className="node-connection-status loading" />
-      <div>Connecting to remote node<DotLoading /></div>
-    </>}
-    {connected && <>
-      <div className="node-connection-status alive" />
-      <div>Connected to remote node (version: {info.version})</div>
-    </>}
-    {err && <>
-      <div className="node-connection-status error" />
-      <div>Remote node connection: {err.message}</div>
-    </>}
-    {!loading && !connected && !err && <>
-      <div className="node-connection-status error" />
-      <div>Disconnected from remote node</div>
-    </>}
-  </div>
-}
-
 function RecentBlocks(props) {
-  const { info } = props
-
   const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
 
   const [blocks, setBlocks] = useState([])
   const [animateBlocks, setAnimateBlocks] = useState(false) // make sure to not animate on pageload and only when we get a new block
 
-  const loadRecenBlocks = useCallback(async () => {
-    if (!info) return
-
-    const [err1, blocks] = await to(nodeRPC.getBlocks(info.topoheight - 10, info.topoheight))
+  const loadRecentBlocks = useCallback(async () => {
+    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
     if (err1) return console.log(err1)
 
+    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 10, topoheight))
+    if (err2) return console.log(err2)
+
     setBlocks(blocks.reverse())
-  }, [info])
+  }, [])
 
   useEffect(() => {
-    loadRecenBlocks()
-  }, [loadRecenBlocks])
+    loadRecentBlocks()
+  }, [loadRecentBlocks])
 
-  useEffect(() => {
-    if (!nodeSocket.connected) return
-
-    const unsubscribe = nodeSocket.onNewBlock((block) => {
+  useNodeSocketSubscribe({
+    event: `NewBlock`,
+    onData: (block) => {
       setBlocks((blocks) => [block, ...blocks])
       setAnimateBlocks(true)
-    })
-
-    return () => {
-      unsubscribe()
     }
-  }, [nodeSocket.connected, nodeSocket.onNewBlock])
+  })
 
   /*
   const blocks = useMemo(() => {
@@ -148,13 +118,19 @@ function RecentBlocks(props) {
         const [height, groupBlocks] = entry
         const key = index + Math.random() // random key to force re-render and repeat animation
 
-        
+
         return <div className={`recent-blocks-group ${animateBlocks ? `animate` : ``}`} key={key}>
           <div className="recent-blocks-group-items">
             {groupBlocks.map((block) => {
               const txCount = block.txs_hashes.length
               const size = bytes.format(block.total_size_in_bytes || 0)
-              const statusClassName = block.block_type === `Sync` ? `stable` : `mined`
+
+              let statusClassName = `mined`
+              switch (block.block_type) {
+                case 'Sync':
+                case 'Side':
+                  statusClassName = `stable`
+              }
 
               return <Link to={`/blocks/${block.topoheight}`} key={block.topoheight} className={`recent-blocks-item`}>
                 <div className={`recent-blocks-item-status ${statusClassName}`} />
@@ -168,7 +144,7 @@ function RecentBlocks(props) {
             })}
           </div>
           <div className="recent-blocks-group-title">
-            DAG Height: {height}
+            Height {height}
           </div>
         </div>
       })}
@@ -229,31 +205,35 @@ function HomeMiniChart(props) {
   return <Chart chart={chart} className="home-stats-chart" />
 }
 
-function Stats(props) {
-  const { info } = props
-  /*const stats = [
-    { title: `Hash rate`, value: `100 MH/s` },
-    { title: `Total txs`, value: `34.44 M` },
-    { title: `TPS`, value: `10.5` },
-    { title: `Difficulty`, value: `4534454` },
-    { title: `Total supply`, value: `145230` },
-    { title: `Tx pool`, value: `5 tx` },
-    { title: `Avg block size`, value: `10 bytes` },
-    { title: `Avg block time`, value: `18s` },
-    { title: `Blockchain size`, value: `1.5 GB` },
-  ]*/
+function Stats() {
+  const nodeSocket = useNodeSocket()
+
+  const [info, setInfo] = useState({})
+
+  const [err, setErr] = useState()
+  const loadInfo = useCallback(async () => {
+    const [err, info] = await to(nodeSocket.sendMethod(`get_info`))
+    if (err) return setErr(err)
+    setInfo(info)
+  }, [nodeSocket])
+
+  useNodeSocketSubscribe({
+    event: `NewBlock`,
+    onLoad: loadInfo,
+    onData: loadInfo
+  })
 
   const stats = useMemo(() => {
     return [
-      { title: `Hash rate`, value: `?` },
-      { title: `Total txs`, value: `?` },
-      { title: `TPS`, value: `?` },
-      { title: `Difficulty`, value: info.difficulty },
-      { title: `Total supply`, value: formatXelis(info.native_supply) },
-      { title: `Tx pool`, value: `${info.mempool_size} tx` },
-      { title: `Avg block size`, value: `?` },
-      { title: `Avg block time`, value: `?` },
-      { title: `Blockchain size`, value: `?` },
+      { title: `Hash rate`, value: `?` }, // 100 MH/s
+      { title: `Total txs`, value: `?` }, // 34.44 M
+      { title: `TPS`, value: `?` }, // 10.5
+      { title: `Difficulty`, value: info.difficulty }, // 4534454
+      { title: `Total supply`, value: formatXelis(info.native_supply) }, // 145230
+      { title: `Tx pool`, value: `${info.mempool_size} tx` }, // 5 tx
+      { title: `Avg block size`, value: `?` }, // 10B
+      { title: `Avg block time`, value: `?` }, // 18s
+      { title: `Blockchain size`, value: `?` }, // 1.5GB
     ]
   }, [info])
 
@@ -271,36 +251,34 @@ function Stats(props) {
   </div>
 }
 
+function P2PStatus() {
+  const [p2pStatus, setP2PStatus] = useState()
+  const nodeSocket = useNodeSocket()
+
+  const loadP2PStatus = useCallback(async () => {
+    const [err, p2pStatus] = await to(nodeSocket.sendMethod(`p2p_status`))
+    if (err) return setErr(err)
+    setP2PStatus(p2pStatus)
+  }, [nodeSocket])
+
+  useNodeSocketSubscribe({
+    event: `NewBlock`,
+    onLoad: loadP2PStatus,
+    onData: loadP2PStatus
+  })
+
+  return <div>{JSON.stringify(p2pStatus)}</div>
+}
+
 function Home() {
-  const nodeRPC = useNodeRPC()
-  const [info, setInfo] = useState()
-  const [peerStatus, setPeerStatus] = useState()
-
-  const [err, setErr] = useState()
-  const load = useCallback(async () => {
-    const [err1, info] = await to(nodeRPC.getInfo())
-    if (err1) return setErr(err)
-    setInfo(info)
-
-    const [err2, p2pStatus] = await to(nodeRPC.p2pStatus())
-    if (err2) return setErr(err2)
-    setPeerStatus(p2pStatus)
-  }, [])
-
-  useEffect(() => {
-    load()
-  }, [load])
-
   return <div>
     <Helmet>
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <NodeConnection info={info} />
-    {info && <>
-      <RecentBlocks info={info} />
-      <Stats info={info} />
-    </>}
+    <P2PStatus />
+    <RecentBlocks />
+    <Stats />
   </div>
 }
 

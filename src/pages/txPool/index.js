@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet'
 import { useCallback, useEffect, useState } from 'react'
 import TableBody from '../../components/tableBody'
-import useNodeSocket from '../../context/useNodeSocket'
+import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import to from 'await-to-js'
 import { formatXelis, reduceText } from '../../utils'
@@ -10,7 +10,6 @@ import Age from '../../components/age'
 
 function TxPool() {
   const [memPool, setMemPool] = useState([])
-  const nodeSocket = useNodeSocket()
   const nodeRPC = useNodeRPC()
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
@@ -31,21 +30,16 @@ function TxPool() {
   }, [])
 
   useEffect(() => {
-    if (!nodeSocket.connected) return
-
-    const unsubscribe = nodeSocket.onTransactionAddedInMempool((data) => {
-      data.timestamp = new Date().getTime()
-      setMemPool((pool) => [data, ...pool])
-    })
-
-    return () => {
-      unsubscribe()
-    }
-  }, [nodeSocket.connected])
-
-  useEffect(() => {
     loadMemPool()
   }, [loadMemPool])
+
+  useNodeSocketSubscribe({
+    event: `TransactionAddedInMempool`,
+    onData: (data) => {
+      data.timestamp = new Date().getTime()
+      setMemPool((pool) => [data, ...pool])
+    }
+  })
 
   return <div>
     <Helmet>
@@ -132,10 +126,9 @@ function TxExecuted(props) {
     setExecutedTxs(recentExecuted)
   }, [])
 
-  useEffect(() => {
-    if (!nodeSocket.connected) return
-
-    const unsubscribe = nodeSocket.onTransactionExecuted((data) => {
+  useNodeSocketSubscribe({
+    event: `TransactionExecuted`,
+    onData: (data) => {
       // remove from mempool and add tx to data
       setMemPool((pool) => {
         let filteredPool = []
@@ -152,20 +145,13 @@ function TxExecuted(props) {
 
         return filteredPool
       })
-    })
-
-    return () => {
-      unsubscribe()
     }
-  }, [nodeSocket.connected])
+  })
 
-  useEffect(() => {
-    loadExecutedTxs()
-  }, [loadExecutedTxs])
-
-  useEffect(() => {
-    // remove txs with blocks lower than the first tx block
-    const filterExecutedTxs = async () => {
+  useNodeSocketSubscribe({
+    event: `NewBlock`,
+    onData: async () => {
+      // remove txs with blocks lower than the first tx block
       const [err, topoheight] = await to(nodeRPC.getTopoHeight())
       if (err) return console.log(err)
 
@@ -174,12 +160,11 @@ function TxExecuted(props) {
         return item.block.topoheight > topoheight - 20
       }))
     }
+  })
 
-    let intervalId = setInterval(filterExecutedTxs, 5000)
-    return () => {
-      clearTimeout(intervalId)
-    }
-  }, [])
+  useEffect(() => {
+    loadExecutedTxs()
+  }, [loadExecutedTxs])
 
   return <div>
     <h2>Executed Transactions</h2>

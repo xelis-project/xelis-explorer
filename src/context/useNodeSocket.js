@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef } from 'react'
 import useWebSocket from '../hooks/useWebSocket'
 
 const Context = createContext(null)
@@ -17,7 +17,7 @@ export const NodeSocketProvider = (props) => {
 
       let timeoutId = null
       const onMessage = (message) => {
-        const data = JSON.parse(message)
+        const data = JSON.parse(message.data)
         if (data.id === id) {
           clearTimeout(timeoutId)
           socketRef.current.removeEventListener(`message`, onMessage)
@@ -70,12 +70,28 @@ export const NodeSocketProvider = (props) => {
 
   const values = {
     connected, loading, err,
-    sendMethod, onNewBlock, onTransactionAddedInMempool, onTransactionExecuted
+    sendMethod, subscribe, onNewBlock, onTransactionAddedInMempool, onTransactionExecuted
   }
 
   return <Context.Provider value={values}>
     {children}
   </Context.Provider>
+}
+
+// handy helper function to avoid rewriting useEffect subscription in components
+export const useNodeSocketSubscribe = ({ event, onLoad, onData }) => {
+  const nodeSocket = useNodeSocket()
+
+  useEffect(() => {
+    if (!nodeSocket.connected) return
+
+    if (typeof onLoad === `function`) onLoad()
+    const unsubscribe = nodeSocket.subscribe(event, onData)
+
+    return () => {
+      unsubscribe()
+    }
+  }, [nodeSocket])
 }
 
 export const useNodeSocket = () => useContext(Context)

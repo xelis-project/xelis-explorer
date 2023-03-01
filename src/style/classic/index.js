@@ -6,13 +6,13 @@ import './vars.css'
 
 import './home/explorer_search.css'
 import './home/home_stats.css'
-import './home/node_connection.css'
 import './home/recent_blocks.css'
 
 import './layout/footer.css'
 import './layout/header.css'
 import './layout/layout.css'
 
+import './misc/node_connection.css'
 import "./misc/alert.css"
 import "./misc/card.css"
 import "./misc/page_loading.css"

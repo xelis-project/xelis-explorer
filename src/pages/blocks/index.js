@@ -62,6 +62,7 @@ function Blocks() {
         <thead>
           <tr>
             <th>Topo Height</th>
+            <th>Type</th>
             <th>Txs</th>
             <th>Age</th>
             <th>Size</th>
@@ -71,16 +72,15 @@ function Blocks() {
             <th>Reward</th>
           </tr>
         </thead>
-        <TableBody list={blocks} err={err} loading={loading} colSpan={8} emptyText="No blocks"
+        <TableBody list={blocks} err={err} loading={loading} colSpan={9} emptyText="No blocks"
           onItem={(item) => {
             const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
                 <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
-              <td>
-                {item.txs_hashes.length}
-              </td>
+              <td>{item.block_type}</td>
+              <td>{item.txs_hashes.length}</td>
               <td>
                 <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
               </td>

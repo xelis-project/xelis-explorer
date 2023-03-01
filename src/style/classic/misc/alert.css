@@ -3,6 +3,10 @@
   padding: 0.5em;
   border-radius: 5px;
   font-size: .9em;
+  display: flex;
+  gap: .5em;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .env-alert-badge {
@@ -12,6 +16,5 @@
   color: var(--bg-color);
   font-size: .8em;
   font-weight: bold;
-  margin-right: .5em;
   line-height: 13px;
 }

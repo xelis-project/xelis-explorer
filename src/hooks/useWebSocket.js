@@ -5,7 +5,6 @@ const useWebSocket = (endpoint) => {
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [connected, setConnected] = useState(false)
-  const [lastMessage, setLastMessage] = useState(``)
   const triesRef = useRef()
 
   const send = useCallback((data) => {
@@ -47,20 +46,14 @@ const useWebSocket = (endpoint) => {
         console.log(err)
       }
 
-      const onMessage = (obj) => {
-        setLastMessage(obj.data)
-      }
-
       socket.addEventListener('open', onOpen)
       socket.addEventListener('close', onClose)
       socket.addEventListener('error', onError)
-      socket.addEventListener('message', onMessage)
 
       return () => {
         socket.removeEventListener('close', onClose)
         socket.removeEventListener('error', onError)
         socket.removeEventListener('open', onOpen)
-        socket.removeEventListener('message', onMessage)
       }
     } catch (err) {
       setLoading(false)
@@ -72,7 +65,7 @@ const useWebSocket = (endpoint) => {
     connectWebSocket()
   }, [connectWebSocket])
 
-  return { loading, err, connected, send, lastMessage, socketRef }
+  return { loading, err, connected, send, socketRef }
 }
 
 export default useWebSocket
