@@ -75,6 +75,7 @@ function RecentBlocks(props) {
   const nodeRPC = useNodeRPC()
 
   const [blocks, setBlocks] = useState([])
+  const [animateBlocks, setAnimateBlocks] = useState(false) // make sure to not animate on pageload and only when we get a new block
 
   const loadRecenBlocks = useCallback(async () => {
     if (!info) return
@@ -94,6 +95,7 @@ function RecentBlocks(props) {
 
     const unsubscribe = nodeSocket.onNewBlock((block) => {
       setBlocks((blocks) => [block, ...blocks])
+      setAnimateBlocks(true)
     })
 
     return () => {
@@ -146,7 +148,8 @@ function RecentBlocks(props) {
         const [height, groupBlocks] = entry
         const key = index + Math.random() // random key to force re-render and repeat animation
 
-        return <div className="recent-blocks-group" key={key}>
+        
+        return <div className={`recent-blocks-group ${animateBlocks ? `animate` : ``}`} key={key}>
           <div className="recent-blocks-group-items">
             {groupBlocks.map((block) => {
               const txCount = block.txs_hashes.length

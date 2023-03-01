@@ -24,16 +24,6 @@
   user-select: none;
 }
 
-.recent-blocks-group:first-child {
-  animation: backInDown;
-  animation-duration: 1s;
-}
-
-.recent-blocks-group:not(:first-child) {
-  animation: slideInLeft;
-  animation-duration: 1s;
-}
-
 .recent-blocks-item:hover {
   transform: scale(.95);
   cursor: pointer;
@@ -85,6 +75,16 @@
 .recent-blocks-group {
   flex-shrink: 0;
   border: thin solid var(--text-color);
+}
+
+.recent-blocks-group.animate:first-child {
+  animation: backInDown;
+  animation-duration: 1s;
+}
+
+.recent-blocks-group.animate:not(:first-child) {
+  animation: slideInLeft;
+  animation-duration: 1s;
 }
 
 .recent-blocks-group-title {
