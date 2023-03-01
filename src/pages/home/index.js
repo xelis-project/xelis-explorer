@@ -45,7 +45,7 @@ function ExplorerSearch() {
 }
 
 function NodeConnection(props) {
-  const { info } = props
+  const { info = {} } = props
   const { connected, loading, err } = useNodeSocket()
 
   return <div className="node-connection">
@@ -293,7 +293,7 @@ function Home() {
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <NodeConnection info={info || {}} />
+    <NodeConnection info={info} />
     {info && <>
       <RecentBlocks info={info} />
       <Stats info={info} />

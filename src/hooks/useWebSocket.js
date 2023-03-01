@@ -6,12 +6,15 @@ const useWebSocket = (endpoint) => {
   const [err, setErr] = useState()
   const [connected, setConnected] = useState(false)
   const [lastMessage, setLastMessage] = useState(``)
+  const triesRef = useRef()
 
   const send = useCallback((data) => {
-    if (connected) socketRef.current.send(data)
-  }, [connected])
+    if (socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(data)
+    }
+  }, [])
 
-  useEffect(() => {
+  const connectWebSocket = useCallback(() => {
     try {
       setErr(null)
       setLoading(true)
@@ -23,12 +26,19 @@ const useWebSocket = (endpoint) => {
       const onOpen = async () => {
         setLoading(false)
         setConnected(true)
+        triesRef.current = 0
       }
 
       const onClose = (event) => {
         setConnected(false)
         setLoading(false)
         console.log(event)
+
+        // try reconnecting max 3 tries
+        triesRef.current++
+        if (triesRef.current < 3) {
+          setTimeout(connectWebSocket, 1000)
+        }
       }
 
       const onError = (err) => {
@@ -57,6 +67,10 @@ const useWebSocket = (endpoint) => {
       return setErr(err)
     }
   }, [endpoint])
+
+  useEffect(() => {
+    connectWebSocket()
+  }, [connectWebSocket])
 
   return { loading, err, connected, send, lastMessage, socketRef }
 }
