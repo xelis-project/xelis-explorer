@@ -132,7 +132,7 @@ function RecentBlocks(props) {
                   statusClassName = `stable`
               }
 
-              return <Link to={`/blocks/${block.topoheight}`} key={block.topoheight} className={`recent-blocks-item`}>
+              return <Link to={`/blocks/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
                 <div className={`recent-blocks-item-status ${statusClassName}`} />
                 <div className="recent-blocks-item-title">Block {block.topoheight}</div>
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>

@@ -32,15 +32,22 @@ function Block() {
       setLoading(false)
     }
 
-    const height = parseInt(id)
-    const [err1, blockData] = await to(nodeRPC.getBlockAtTopoHeight(height))
-    if (err1) return resErr(err1)
+    if (/[a-z]/i.test(id)) {
+      // by hash
+      const [err, blockData] = await to(nodeRPC.getBlockByHash(id))
+      if (err) return resErr(err)
+      setBlock(blockData)
+    } else {
+      // by height
+      const height = parseInt(id);
+      const [err, blockData] = await to(nodeRPC.getBlockAtTopoHeight(height))
+      if (err) return resErr(err)
+      setBlock(blockData)
+    }
 
-    const [err2, currentTopoheight] = await to(nodeRPC.getTopoHeight())
-    if (err2) return resErr(err2)
-
+    const [err, currentTopoheight] = await to(nodeRPC.getTopoHeight())
+    if (err) return resErr(err)
     setTopoheight(currentTopoheight)
-    setBlock(blockData)
 
     setLoading(false)
   }, [id])
@@ -73,9 +80,9 @@ function Block() {
     <PageLoading loading={loading} />
     <div>
       <Helmet>
-        <title>Block {id}</title>
+        <title>Block {block.topoheight.toString()}</title>
       </Helmet>
-      <h1>Block {id}</h1>
+      <h1>Block {block.topoheight}</h1>
       <div className="card">
         This block was mined on {formatBlock.date} by {formatBlock.miner}. It currently has {formatBlock.confirmations} confirmations.
         The miner of this block earned {formatBlock.reward}.
