@@ -7,6 +7,7 @@ import './vars.css'
 import './home/explorer_search.css'
 import './home/home_stats.css'
 import './home/recent_blocks.css'
+import './dag/index.css'
 
 import './layout/footer.css'
 import './layout/header.css'

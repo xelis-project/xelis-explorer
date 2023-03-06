@@ -15,7 +15,8 @@ function useMenuLinks() {
     return [
       { path: `/`, title: `Home`, className: isActive },
       { path: `/blocks`, title: `Blocks`, className: isActive },
-      { path: `/txpool`, title: `Tx Pool`, className: isActive }
+      { path: `/txpool`, title: `Tx Pool`, className: isActive },
+      { path: `/dag`, title: `DAG`, className: isActive }
     ]
   }, [])
 }

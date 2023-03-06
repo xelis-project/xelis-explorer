@@ -1,15 +1,18 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import Block from './pages/block'
-import Blocks from './pages/blocks'
-import Home from './pages/home'
+import { Helmet } from 'react-helmet'
+
 import Layout from './layout'
-import NotFound from './pages/notFound'
 import { ThemeProvider } from './context/useTheme'
 import { NodeSocketProvider } from './context/useNodeSocket'
 import { SettingsProvider } from './context/useSettings'
+
+import Block from './pages/block'
+import Blocks from './pages/blocks'
+import Home from './pages/home'
+import NotFound from './pages/notFound'
 import TxPool from './pages/txPool'
-import { Helmet } from 'react-helmet'
 import Transaction from './pages/transaction'
+import DAG from './pages/dag'
 
 const router = createBrowserRouter([
   {
@@ -34,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: `/txs/:hash`,
         element: <Transaction />
+      },
+      {
+        path: `/dag`,
+        element: <DAG />
       },
       {
         path: '*',

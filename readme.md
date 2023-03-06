@@ -1,8 +1,11 @@
 # Xelis Explorer
 
-Official Explorer for Xelis Blockhain.  
-Realtime statistics with web sockets.  
-List all blocks of the entire blockchain.  
+Official Explorer for Xelis Blockchain.
+
+- Realtime statistics with web sockets
+- Navigate all blocks of the entire blockchain
+- Live transaction pool
+- BlockDAG viewer
 
 <https://explorer.xelis.io>  
 <https://testnet-explorer.xelis.io>  

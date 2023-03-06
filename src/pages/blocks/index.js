@@ -62,6 +62,7 @@ function Blocks() {
         <thead>
           <tr>
             <th>Topo Height</th>
+            <th>Height</th>
             <th>Type</th>
             <th>Txs</th>
             <th>Age</th>
@@ -79,6 +80,7 @@ function Blocks() {
               <td>
                 <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
+              <td>{item.height}</td>
               <td>{item.block_type}</td>
               <td>{item.txs_hashes.length}</td>
               <td>

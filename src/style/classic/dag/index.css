@@ -1,0 +1,9 @@
+.dag-canvas {
+  border: thin solid black;
+  border-radius: 5px;
+  height: 500px !important;
+}
+
+.dag-canvas canvas {
+  background-color: black;
+}
