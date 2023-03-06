@@ -12,7 +12,7 @@ import { groupBy, reduceText } from '../../utils'
 // import dagMock from './dagMock'
 
 function BlockMesh(props) {
-  const { title, ...restProps } = props
+  const { title, block, ...restProps } = props
   const [hover, _setHover] = useState()
   const navigate = useNavigate()
 
@@ -110,7 +110,7 @@ function DAG() {
           }
 
           return <Fragment key={block.hash}>
-            <BlockMesh title={title} position={[-x, y, 0]} />
+            <BlockMesh title={title} block={block} position={[-x, y, 0]} />
             {groupIndex < groupBlocks.length - 1 && <mesh>
               <Line points={[new Vector3(-x, y, 0), new Vector3(-x - 2, 0, 0)]} color="rgb(1,1,255)" lineWidth={2} />
             </mesh>}
