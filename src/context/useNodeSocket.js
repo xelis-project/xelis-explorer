@@ -79,7 +79,7 @@ export const NodeSocketProvider = (props) => {
 }
 
 // handy helper function to avoid rewriting useEffect subscription in components
-export const useNodeSocketSubscribe = ({ event, onLoad, onData }) => {
+export const useNodeSocketSubscribe = ({ event, onLoad, onData }, dependencies) => {
   const nodeSocket = useNodeSocket()
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export const useNodeSocketSubscribe = ({ event, onLoad, onData }) => {
     return () => {
       unsubscribe()
     }
-  }, [nodeSocket])
+  }, [nodeSocket, ...dependencies])
 }
 
 export const useNodeSocket = () => useContext(Context)

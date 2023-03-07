@@ -5,28 +5,3 @@
   margin-bottom: 1em;
   line-height: 1.3em;
 }
-
-.left-right-buttons {
-  display: flex;
-  margin-bottom: 1em;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: .5em;
-}
-
-.left-right-buttons a {
-  display: flex;
-  gap: .5em;
-  align-items: center;
-  color: var(--text-color);
-  border: thin solid var(--text-color);
-  padding: .5em;
-  border-radius: 5px;
-  text-decoration: none;
-  user-select: none;
-}
-
-.left-right-buttons a:hover {
-  animation: pulse;
-  animation-duration: .5s;
-}

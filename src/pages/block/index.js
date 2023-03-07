@@ -88,10 +88,10 @@ function Block() {
         The miner of this block earned {formatBlock.reward}.
       </div>
       <div className="left-right-buttons">
-        {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="chevron-left-r">
+        {formatBlock.hasPreviousBlock && <Button className="button" link={`/blocks/${block.topoheight - 1}`} icon="chevron-left-r">
           Previous Block ({block.topoheight - 1})
         </Button>}
-        {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="chevron-right-r" iconLocation="right">
+        {formatBlock.hasNextBlock && <Button className="button" link={`/blocks/${block.topoheight + 1}`} icon="chevron-right-r" iconLocation="right">
           Next Block ({block.topoheight + 1})
         </Button>}
       </div>

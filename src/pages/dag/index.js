@@ -1,15 +1,16 @@
-import { Fragment, useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import { Fragment, useEffect, useState, useCallback, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import { OrbitControls, Text, Line, OrthographicCamera } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion-3d'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { groupBy, reduceText } from '../../utils'
-// import dagMock from './dagMock'
+import { groupBy } from '../../utils'
+//import dagMock from './dagMock'
 
 function BlockMesh(props) {
   const { title, block, ...restProps } = props
@@ -31,44 +32,104 @@ function BlockMesh(props) {
     _setHover(hover)
   })
 
+  let color = `white`
+  switch (block.block_type) {
+    case 'Sync':
+      color = `green`
+      break
+    case 'Side':
+      color = `blue`
+      break
+  }
+
+  const variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  }
+
   return <>
-    <mesh {...restProps}
+    <motion.mesh {...restProps}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
       onClick={(e) => onBlockClick(block.hash)}
       onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}>
-      <Text color="gray" anchorX="left" anchorY="top" fontSize={.4} position={[-.5, 1, 0]}>
-        {title}
+      onPointerLeave={() => setHover(false)}
+      scale={0}
+      animate={{ scale: 1 }}
+      transition={{ duration: .5, ease: 'backInOut' }}
+    >
+      <Text color="gray" anchorX="center" anchorY="top" fontSize={.4} position={[0, 1, 0]}>
+        {block.topoheight}
       </Text>
       <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="white" wireframe={!hover} />
-    </mesh>
+      <motion.meshBasicMaterial color={color} wireframe={!hover}
+        initial="hidden"
+        animate="visible"
+        variants={variants}
+        transition={{ delay: .1 }}
+      />
+    </motion.mesh>
   </>
 }
 
 function DAG() {
   const nodeRPC = useNodeRPC()
   const [blocks, setBlocks] = useState([])
+  //const [blocks, setBlocks] = useState(dagMock.reverse())
+  const [paused, _setPaused] = useState(false)
 
-  const loadBlocks = useCallback(async () => {
-    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
-    if (err1) return console.log(err1)
+  const [topoheight, setTopoheight] = useState()
+  const [inputTopoheight, setInputTopoheight] = useState(0)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 19, topoheight))
-    if (err2) return console.log(err2)
+  const loadTopoheight = useCallback(async () => {
+    const [err, topoheight] = await to(nodeRPC.getTopoHeight())
+    if (err) return console.log(err)
 
-    setBlocks(blocks.reverse())
+    setTopoheight(topoheight)
+    setInputTopoheight(topoheight)
   }, [])
 
+  const loadBlocks = useCallback(async () => {
+    if (!inputTopoheight) return
+    const [err, blocks] = await to(nodeRPC.getBlocks(inputTopoheight - 19, inputTopoheight))
+    if (err) return console.log(err)
+
+    setBlocks(blocks.reverse())
+  }, [inputTopoheight])
+
   useEffect(() => {
-    loadBlocks()
+    loadTopoheight()
+  }, [loadTopoheight])
+
+  useEffect(() => {
+    let timeoutId = setTimeout(() => loadBlocks(), [100])
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [loadBlocks])
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
     onData: (newBlock) => {
-      setBlocks((blocks) => [newBlock, ...blocks])
+      if (paused) return
+      setBlocks((blocks) => {
+        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
+        return [newBlock, ...blocks]
+      })
     }
-  })
+  }, [paused])
+
+  useNodeSocketSubscribe({
+    event: `BlockOrdered`,
+    onData: (data) => {
+      const { topoheight, block_hash } = data
+      setBlocks((blocks) => blocks.map(block => {
+        if (block.hash === block_hash) block.topoheight = topoheight
+        return block
+      }))
+    }
+  }, [])
 
   useEffect(() => {
     if (blocks.length >= 20) {
@@ -78,44 +139,69 @@ function DAG() {
   }, [blocks])
 
   const groupBlocks = useMemo(() => {
+    /*const filteredBlocks = blocks.filter((block, index) => {
+      return blocks.findIndex((item) => item.hash === block.hash) === index
+    })*/ // in newBlock instead
+
     return [...groupBy(blocks, (b) => b.height).entries()]
   }, [blocks])
+
+  const setPaused = useCallback(() => {
+    if (paused) loadTopoheight()
+    _setPaused(!paused)
+  }, [paused])
 
   return <div>
     <Helmet>
       <title>DAG</title>
     </Helmet>
     <h1>DAG</h1>
+    <button className="button" onClick={() => setPaused(!paused)}>
+      {paused ? `Play` : `Pause`}
+    </button>
+    <input type="range" min={20} max={topoheight} value={inputTopoheight} onChange={(e) => {
+      setInputTopoheight(e.target.valueAsNumber)
+    }} style={{ width: `100%` }} disabled={!paused} />
+    <div>{inputTopoheight}</div>
+    <button className="button" disabled={!paused} onClick={() => setInputTopoheight((v) => v - 10)}>
+      Previous (10)
+    </button>
+    <button className="button" disabled={!paused} onClick={() => setInputTopoheight((v) => v + 10)}>
+      Next (10)
+    </button>
     <Canvas className="dag-canvas">
       <OrthographicCamera makeDefault position={[0, 0, 1]} zoom={40} />
-      {groupBlocks.map((entry, groupIndex) => {
+      {groupBlocks.map((entry, heightIndex) => {
         const [height, blocks] = entry
-        let even = 0, odd = 1
-        return blocks.map((block, blockIndex) => {
-          let x = groupIndex * 2
-          let y = 0
+        let even = 0, odd = 0
+        let distance = 3
 
-          const remainder = blockIndex % 2
-          if (remainder === 0) {
-            y = -even * 2
-            even++
-          } else {
-            y = odd * 2
-            odd++
-          }
+        return <Fragment key={height}>
+          {blocks.map((block, groupIndex) => {
+            let x = heightIndex * distance
+            let y = 0
+            if (blocks.length > 1) {
+              if (groupIndex % 2 === 0) {
+                y = even++ * 2 + 1
+              } else {
+                y = odd-- * 2 - 1
+              }
+            }
 
-          let title = block.height
-          if (blockIndex > 0) {
-            title = reduceText(block.hash, 0, 4)
-          }
-
-          return <Fragment key={block.hash}>
-            <BlockMesh title={title} block={block} position={[-x, y, 0]} />
-            {groupIndex < groupBlocks.length - 1 && <mesh>
-              <Line points={[new Vector3(-x, y, 0), new Vector3(-x - 2, 0, 0)]} color="rgb(1,1,255)" lineWidth={2} />
-            </mesh>}
-          </Fragment>
-        })
+            return <Fragment key={block.hash}>
+              <mesh>
+                <Line points={[new Vector3(-x, y, 0), new Vector3(-x - (distance / 2), 0, 0)]} color="gray" lineWidth={2} />
+              </mesh>
+              <mesh>
+                <Line points={[new Vector3(-x, y, 0), new Vector3(-x + (distance / 2), 0, 0)]} color="gray" lineWidth={2} />
+              </mesh>
+              <BlockMesh block={block} position={[-x, y, 0]} />
+              {blocks.length - 1 === groupIndex && <Text color="white" anchorX="center" anchorY="top" fontSize={.3} position={[-x, 1 * blocks.length + 1, 0]}>
+                {height}
+              </Text>}
+            </Fragment>
+          })}
+        </Fragment>
       })}
       <OrbitControls enableDamping={false} enableRotate={false} />
     </Canvas>

@@ -4,9 +4,11 @@
   "description": "Official Explorer for Xelis Blockchain.",
   "scripts": {
     "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
+    "start:testnet": "concurrently \"npm run build:local_testnet\" \"npm run serve\"",
     "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",
     "build:local_dev": "node bundle.js --env=local_dev --watch --sourcemap",
     "build:dev": "node bundle.js --env=dev --sourcemap",
+    "build:local_testnet": "node bundle.js --env=testnet --watch --sourcemap",
     "build:testnet": "node bundle.js --env=testnet --sourcemap",
     "build:mainnet": "node bundle.js --env=mainnet --minify"
   },
@@ -20,6 +22,7 @@
     "classnames": "^2.3.2",
     "concurrently": "^7.6.0",
     "css.gg": "^2.0.0",
+    "framer-motion-3d": "^10.1.0",
     "pretty-ms": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

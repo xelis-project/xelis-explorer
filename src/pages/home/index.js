@@ -66,11 +66,25 @@ function RecentBlocks(props) {
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
-    onData: (block) => {
-      setBlocks((blocks) => [block, ...blocks])
+    onData: (newBlock) => {
+      setBlocks((blocks) => {
+        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
+        return [newBlock, ...blocks]
+      })
       setAnimateBlocks(true)
     }
-  })
+  }, [])
+
+  useNodeSocketSubscribe({
+    event: `BlockOrdered`,
+    onData: (data) => {
+      const { topoheight, block_hash } = data
+      setBlocks((blocks) => blocks.map(block => {
+        if (block.hash === block_hash) block.topoheight = topoheight
+        return block
+      }))
+    }
+  }, [])
 
   /*
   const blocks = useMemo(() => {
@@ -220,7 +234,7 @@ function Stats() {
     event: `NewBlock`,
     onLoad: loadInfo,
     onData: loadInfo
-  })
+  }, [])
 
   const stats = useMemo(() => {
     return [
@@ -264,7 +278,7 @@ function P2PStatus() {
     event: `NewBlock`,
     onLoad: loadP2PStatus,
     onData: loadP2PStatus
-  })
+  }, [])
 
   return <div>{JSON.stringify(p2pStatus)}</div>
 }

@@ -39,7 +39,7 @@ function TxPool() {
       data.timestamp = new Date().getTime()
       setMemPool((pool) => [data, ...pool])
     }
-  })
+  }, [])
 
   return <div>
     <Helmet>
@@ -146,7 +146,7 @@ function TxExecuted(props) {
         return filteredPool
       })
     }
-  })
+  }, [])
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
@@ -160,7 +160,7 @@ function TxExecuted(props) {
         return item.block.topoheight > topoheight - 20
       }))
     }
-  })
+  }, [])
 
   useEffect(() => {
     loadExecutedTxs()

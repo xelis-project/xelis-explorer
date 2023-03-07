@@ -16,6 +16,7 @@ import './layout/layout.css'
 import './misc/node_connection.css'
 import "./misc/alert.css"
 import "./misc/card.css"
+import "./misc/button.css"
 import "./misc/page_loading.css"
 import "./misc/pagination.css"
 import "./misc/scrollbar.css"
