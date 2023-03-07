@@ -140,7 +140,10 @@ function Block() {
             </tr>
             <tr>
               <th>Difficulty</th>
-              <td>{block.difficulty}</td>
+              <td>
+                <span>{block.difficulty} </span>
+                <span title="Cumulative Difficulty">({block.cumulative_difficulty})</span>
+              </td>
             </tr>
             <tr>
               <th>Size</th>
@@ -148,11 +151,18 @@ function Block() {
             </tr>
             <tr>
               <th>Nonce</th>
-              <td>{block.nonce} ({block.extra_nonce})</td>
+              <td>
+                <span>{block.nonce} </span>
+                <span title="Extra Nonce">({block.extra_nonce})</span>
+              </td>
             </tr>
             <tr>
               <th>Tips</th>
-              <td>{JSON.stringify(block.tips)}</td>
+              <td style={{ lineHeight: `1.4em` }}>
+                {block.tips.map((tip, index) => {
+                  return <div>{index + 1}. <Link to={`/block/${tip}`}>{tip}</Link></div>
+                })}
+              </td>
             </tr>
           </tbody>
         </table>
