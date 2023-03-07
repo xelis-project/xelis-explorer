@@ -23,7 +23,7 @@ function BlockMesh(props) {
 
   const onBlockClick = useCallback((hash) => {
     setCursor(``)
-    navigate(`/blocks/${hash}`)
+    navigate(`/block/${hash}`)
   }, [])
 
   const setHover = useCallback((hover) => {

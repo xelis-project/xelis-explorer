@@ -27,7 +27,7 @@ const router = createBrowserRouter([
         element: <Blocks />,
       },
       {
-        path: '/blocks/:id',
+        path: '/block/:id',
         element: <Block />
       },
       {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
         element: <TxPool />
       },
       {
-        path: `/txs/:hash`,
+        path: `/tx/:hash`,
         element: <Transaction />
       },
       {

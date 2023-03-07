@@ -78,7 +78,7 @@ function Blocks() {
             const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
-                <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
+                <Link to={`/block/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
               <td>{item.height}</td>
               <td>{item.block_type}</td>

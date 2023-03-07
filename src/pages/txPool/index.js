@@ -187,11 +187,11 @@ function TxExecuted(props) {
             const { tx, block } = item
             return <tr key={tx.hash}>
               <td>
-                <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
+                <Link to={`/block/${block.topoheight}`}>{block.topoheight}</Link>
                 &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
               </td>
               <td>
-                <Link to={`/txs/${tx.hash}`}>{tx.hash}</Link>
+                <Link to={`/tx/${tx.hash}`}>{tx.hash}</Link>
               </td>
               <td>{tx.data.Transfer.length}</td>
               <td>{reduceText(tx.owner)}</td>

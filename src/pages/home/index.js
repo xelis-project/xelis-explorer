@@ -20,12 +20,12 @@ function ExplorerSearch() {
     if (searchValue === ``) return
 
     if (searchValue.length === 64) {
-      return navigate(`/txs/${searchValue}`)
+      return navigate(`/tx/${searchValue}`)
     }
 
     const height = parseInt(searchValue)
     if (!isNaN(height)) {
-      return navigate(`/blocks/${height}`)
+      return navigate(`/block/${height}`)
     }
   }, [])
 
@@ -114,7 +114,7 @@ function RecentBlocks(props) {
         const statusClassName = item.height <= stableHeight ? `stable` : `mined`
         const key = index + Math.random() // random key to force re-render and repeat animation
 
-        return <Link to={`/blocks/${item.height}`} key={key} className={`recent-blocks-item`}>
+        return <Link to={`/block/${item.height}`} key={key} className={`recent-blocks-item`}>
           <div className={`recent-blocks-item-status ${statusClassName}`} />
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
@@ -145,7 +145,7 @@ function RecentBlocks(props) {
                   statusClassName = `stable`
               }
 
-              return <Link to={`/blocks/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
+              return <Link to={`/block/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
                 <div className={`recent-blocks-item-status ${statusClassName}`} />
                 <div className="recent-blocks-item-title">Block {block.topoheight}</div>
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
