@@ -48,3 +48,47 @@ export const groupBy = (list, getKey) => {
   })
   return map
 }
+
+const HASH_RATE_MAP = {
+  h: 1,
+  kh: 1000, // KiloHash
+  mh: 1000000, // MegaHash
+  gh: 1000000000, // GigaHash
+  th: 1000000000000, // TeraHash
+  ph: 1000000000000000, // PetaHash
+  eh: 1000000000000000000,	// ExaHash
+  zh: 1000000000000000000000, // ZettaHash
+  yh: 1000000000000000000000000 // YottaHash
+}
+
+export const formatHashRate = (value, decimals = 2) => {
+  let unit = `H/s`
+
+  if (value >= HASH_RATE_MAP.yh) {
+    value /= HASH_RATE_MAP.yh
+    unit = `YH/s`
+  } else if (value >= HASH_RATE_MAP.zh) {
+    value /= HASH_RATE_MAP.zh
+    unit = `ZH/s`
+  } else if (value >= HASH_RATE_MAP.eh) {
+    value /= HASH_RATE_MAP.eh
+    unit = `EH/s`
+  } else if (value >= HASH_RATE_MAP.ph) {
+    value /= HASH_RATE_MAP.ph
+    unit = `PH/s`
+  } else if (value >= HASH_RATE_MAP.th) {
+    value /= HASH_RATE_MAP.th
+    unit = `TH/s`
+  } else if (value >= HASH_RATE_MAP.gh) {
+    value /= HASH_RATE_MAP.gh
+    unit = `GH/s`
+  } else if (value >= HASH_RATE_MAP.mh) {
+    value /= HASH_RATE_MAP.mh
+    unit = `MH/s`
+  } else if (value >= HASH_RATE_MAP.kh) {
+    value /= HASH_RATE_MAP.kh
+    unit = `KH/s`
+  }
+
+  return `${value.toFixed(decimals)} ${unit}`
+}

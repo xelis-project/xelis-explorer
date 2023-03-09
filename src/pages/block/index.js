@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { formatAsset, formatXelis, reduceText } from '../../utils'
+import { formatAsset, formatXelis, reduceText, formatHashRate } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
 import { Helmet } from 'react-helmet'
@@ -67,7 +67,8 @@ function Block() {
       confirmations: _topoheight - block.topoheight,
       size: bytes.format(block.total_size_in_bytes),
       hasPreviousBlock: block.topoheight > 0,
-      hasNextBlock: block.topoheight < _topoheight
+      hasNextBlock: block.topoheight < _topoheight,
+      hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15
     }
   }, [block, topoheight])
 
@@ -142,7 +143,15 @@ function Block() {
               <th>Difficulty</th>
               <td>
                 <span>{block.difficulty} </span>
-                <span title="Cumulative Difficulty">({block.cumulative_difficulty})</span>
+                <span title="Cumulative Difficulty">
+                  ({block.cumulative_difficulty})
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>Hash Rate</th>
+              <td>
+                {formatBlock.hashRate}
               </td>
             </tr>
             <tr>
@@ -160,7 +169,9 @@ function Block() {
               <th>Tips</th>
               <td style={{ lineHeight: `1.4em` }}>
                 {block.tips.map((tip, index) => {
-                  return <div>{index + 1}. <Link to={`/block/${tip}`}>{tip}</Link></div>
+                  return <div>
+                    {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
+                  </div>
                 })}
               </td>
             </tr>

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import bytes from 'bytes'
 import Age from '../../components/age'
-import { formatXelis, groupBy, reduceText } from '../../utils'
+import { formatHashRate, formatXelis, groupBy, reduceText } from '../../utils'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
@@ -238,7 +238,7 @@ function Stats() {
 
   const stats = useMemo(() => {
     return [
-      { title: `Hash rate`, value: `?` }, // 100 MH/s
+      { title: `Hash rate`, value: formatHashRate(info.difficulty / 15) }, // 100 MH/s
       { title: `Total txs`, value: `?` }, // 34.44 M
       { title: `TPS`, value: `?` }, // 10.5
       { title: `Difficulty`, value: info.difficulty }, // 4534454
