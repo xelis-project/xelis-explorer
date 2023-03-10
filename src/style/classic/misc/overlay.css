@@ -1,0 +1,85 @@
+/* offcanvas */
+.offcanvas-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity .3s ease-in-out;
+}
+
+.offcanvas-backdrop.overlay-opened {
+  opacity: 1;
+}
+
+.offcanvas-backdrop.overlay-closed {
+  opacity: 0;
+}
+
+.offcanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px; /* default but can be overwride js side */
+  height: 100%;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: translate .3s ease-in-out;
+  z-index: 9999;
+  translate: -100%;
+}
+
+.offcanvas.overlay-opened {
+  translate: 0;
+}
+
+.offcanvas.overlay-closed {
+  translate: -100%;
+}
+
+.offcanvas-header {
+  display: flex;
+  padding: 1em;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.offcanvas-title {
+  font-size: 1.3em;
+}
+
+.offcanvas-close {
+  animation: pulse;
+  animation-duration: .5s;
+}
+
+@media screen and (max-width: 769px) {
+  .offcanvas {
+    width: 100% !important;
+  }
+}
+
+/* modals */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  z-index: 2;
+}

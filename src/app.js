@@ -5,6 +5,7 @@ import Layout from './layout'
 import { ThemeProvider } from './context/useTheme'
 import { NodeSocketProvider } from './context/useNodeSocket'
 import { SettingsProvider } from './context/useSettings'
+import { OverlayProvider } from './context/useOverlay'
 
 import Block from './pages/block'
 import Blocks from './pages/blocks'
@@ -55,7 +56,9 @@ function App() {
     <Helmet titleTemplate="%s · Xelis Explorer" />
     <SettingsProvider>
       <NodeSocketProvider>
-        <RouterProvider router={router} />
+        <OverlayProvider>
+          <RouterProvider router={router} />
+        </OverlayProvider>
       </NodeSocketProvider>
     </SettingsProvider>
   </ThemeProvider>

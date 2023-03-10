@@ -3,27 +3,20 @@ import { Canvas } from '@react-three/fiber'
 import { Helmet } from 'react-helmet'
 import to from 'await-to-js'
 import { OrbitControls, Text, Line, OrthographicCamera } from '@react-three/drei'
-import { Vector3 } from 'three'
-import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion-3d'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import { groupBy } from '../../utils'
-//import dagMock from './dagMock'
+import dagMock from './dagMock'
+import useOffCanvas from '../../hooks/useOffCanvas'
 
 function BlockMesh(props) {
-  const { title, block, ...restProps } = props
+  const { title, block, onClick, ...restProps } = props
   const [hover, _setHover] = useState()
-  const navigate = useNavigate()
 
   const setCursor = useCallback((cursor) => {
     document.documentElement.style.cursor = cursor
-  }, [])
-
-  const onBlockClick = useCallback((hash) => {
-    setCursor(``)
-    navigate(`/block/${hash}`)
   }, [])
 
   const setHover = useCallback((hover) => {
@@ -51,7 +44,7 @@ function BlockMesh(props) {
     <motion.mesh {...restProps}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      onClick={(e) => onBlockClick(block.hash)}
+      onClick={onClick}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => setHover(false)}
       scale={0}
@@ -74,12 +67,13 @@ function BlockMesh(props) {
 
 function DAG() {
   const nodeRPC = useNodeRPC()
-  const [blocks, setBlocks] = useState([])
-  //const [blocks, setBlocks] = useState(dagMock.reverse())
+  //const [blocks, setBlocks] = useState([])
+  const [blocks, setBlocks] = useState(dagMock.reverse())
   const [paused, _setPaused] = useState(false)
 
   const [topoheight, setTopoheight] = useState()
   const [inputTopoheight, setInputTopoheight] = useState(0)
+  const offCanvas = useOffCanvas()
 
   const loadTopoheight = useCallback(async () => {
     const [err, topoheight] = await to(nodeRPC.getTopoHeight())
@@ -94,7 +88,7 @@ function DAG() {
     const [err, blocks] = await to(nodeRPC.getBlocks(inputTopoheight - 19, inputTopoheight))
     if (err) return console.log(err)
 
-    setBlocks(blocks.reverse())
+    //setBlocks(blocks.reverse())
   }, [inputTopoheight])
 
   useEffect(() => {
@@ -113,10 +107,10 @@ function DAG() {
     event: `NewBlock`,
     onData: (newBlock) => {
       if (paused) return
-      setBlocks((blocks) => {
+      /*setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
-      })
+      })*/
     }
   }, [paused])
 
@@ -124,10 +118,10 @@ function DAG() {
     event: `BlockOrdered`,
     onData: (data) => {
       const { topoheight, block_hash } = data
-      setBlocks((blocks) => blocks.map(block => {
+      /*setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) block.topoheight = topoheight
         return block
-      }))
+      }))*/
     }
   }, [])
 
@@ -150,6 +144,16 @@ function DAG() {
     if (paused) loadTopoheight()
     _setPaused(!paused)
   }, [paused])
+
+  const openBlockOffCanvas = useCallback((block) => {
+    offCanvas.createOffCanvas({
+      title: `Block`,
+      component: <div>
+        {JSON.stringify(block)}
+      </div>,
+      width: 500
+    })
+  }, [offCanvas])
 
   return <div>
     <Helmet>
@@ -189,13 +193,13 @@ function DAG() {
             }
 
             return <Fragment key={block.hash}>
-              <mesh>
+              {/*<mesh>
                 <Line points={[new Vector3(-x, y, 0), new Vector3(-x - (distance / 2), 0, 0)]} color="gray" lineWidth={2} />
               </mesh>
               <mesh>
                 <Line points={[new Vector3(-x, y, 0), new Vector3(-x + (distance / 2), 0, 0)]} color="gray" lineWidth={2} />
-              </mesh>
-              <BlockMesh block={block} position={[-x, y, 0]} />
+          </mesh>*/}
+              <BlockMesh block={block} position={[-x, y, 0]} onClick={() => openBlockOffCanvas(block)} />
               {blocks.length - 1 === groupIndex && <Text color="white" anchorX="center" anchorY="top" fontSize={.3} position={[-x, 1 * blocks.length + 1, 0]}>
                 {height}
               </Text>}
