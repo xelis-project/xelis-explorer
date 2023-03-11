@@ -202,9 +202,10 @@ function useControls(props) {
 
 function CameraWithControls(props) {
   const { flat, camRef, ...restProps } = props
-  const [mouseDown, setMouseDown] = useState(false)
+  const [canMove, setCanMove] = useState(false)
   const { camera, gl } = useThree()
-  const lastPosition = useRef([0, 0])
+  const lastPosition = useRef()
+  const lastDistance = useRef()
 
   useEffect(() => {
     if (flat) {
@@ -219,55 +220,81 @@ function CameraWithControls(props) {
   }, [flat])
 
   useEffect(() => {
+    let touchMoveTimeoutId
     const updatePosition = (x, y) => {
       const [lastX, lastY] = lastPosition.current
       const deltaX = x - lastX
       const deltaY = y - lastY
 
-      camera.position.x -= deltaX * 0.015
-      camera.position.y += deltaY * 0.015
+      camera.position.x -= deltaX / camera.zoom * 2
+      camera.position.y += deltaY / camera.zoom * 2
 
       lastPosition.current = [x, y]
       camera.updateProjectionMatrix()
     }
 
+    const updateZoom = (deltaY, speed) => {
+      const _speed = camera.zoom / speed
+      camera.zoom += deltaY > 0 ? -_speed : +_speed
+      //camera.zoom = Math.max(5, Math.min(camera.zoom, 140))
+      camera.updateProjectionMatrix()
+    }
+
     const handleMouseDown = (event) => {
-      setMouseDown(true)
+      event.preventDefault()
+      setCanMove(true)
       lastPosition.current = [event.clientX, event.clientY]
     }
 
     const handleTouchDown = (event) => {
       const touches = event.touches
       if (touches.length === 1) {
-        setMouseDown(true)
+        setCanMove(true)
         lastPosition.current = [touches[0].clientX, touches[0].clientY]
+      }
+
+      if (touches.length === 2) {
+        const dx = touches[0].clientX - touches[1].clientX
+        const dy = touches[0].clientY - touches[1].clientY
+        lastDistance.current = Math.sqrt(dx * dx + dy * dy)
       }
     }
 
     const handleMouseUp = (event) => {
-      setMouseDown(false)
+      event.preventDefault()
+      setCanMove(false)
+    }
+
+    const handleTouchEnd = (event) => {
+      setCanMove(false)
     }
 
     const handleMouseMove = (event) => {
-      if (!mouseDown) return
+      event.preventDefault()
+      if (!canMove) return
       updatePosition(event.clientX, event.clientY)
     }
 
     const handleTouchMove = (event) => {
-      if (!mouseDown) return
-
+      event.preventDefault()
       const touches = event.touches
-      if (touches.length === 1) {
+
+      if (canMove && touches.length === 1) {
         updatePosition(touches[0].clientX, touches[0].clientY)
+      }
+
+      if (touches.length === 2) {
+        if (touchMoveTimeoutId) clearTimeout(touchMoveTimeoutId)
+        const dx = touches[0].clientX - touches[1].clientX
+        const dy = touches[0].clientY - touches[1].clientY
+        let distance = Math.sqrt(dx * dx + dy * dy)
+        touchMoveTimeoutId = setTimeout(() => lastDistance.current = distance, 100)
+        updateZoom(-(distance - lastDistance.current), 25)
       }
     }
 
     const handleZoom = (event) => {
-      const delta = event.deltaY
-      const speed = camera.zoom / 5
-      camera.zoom += delta > 0 ? -speed : +speed
-      //camera.zoom = Math.max(5, Math.min(camera.zoom, 140))
-      camera.updateProjectionMatrix()
+      updateZoom(event.deltaY, 5)
     }
 
     gl.domElement.addEventListener('wheel', handleZoom, { passive: true })
@@ -275,9 +302,9 @@ function CameraWithControls(props) {
     gl.domElement.addEventListener('mouseup', handleMouseUp)
     gl.domElement.addEventListener('mousemove', handleMouseMove)
     gl.domElement.addEventListener('mouseout', handleMouseUp)
-    gl.domElement.addEventListener('touchmove', handleTouchMove, { passive: true })
-    gl.domElement.addEventListener('touchstart', handleTouchDown, { passive: true })
-    gl.domElement.addEventListener('touchend', handleMouseUp, { passive: true })
+    gl.domElement.addEventListener('touchmove', handleTouchMove)
+    gl.domElement.addEventListener('touchstart', handleTouchDown)
+    gl.domElement.addEventListener('touchend', handleTouchEnd)
 
     return () => {
       gl.domElement.removeEventListener('wheel', handleZoom, { passive: true })
@@ -285,11 +312,11 @@ function CameraWithControls(props) {
       gl.domElement.removeEventListener('mouseup', handleMouseUp)
       gl.domElement.removeEventListener('mousemove', handleMouseMove)
       gl.domElement.removeEventListener('mouseout', handleMouseUp)
-      gl.domElement.removeEventListener('touchmove', handleTouchMove, { passive: true })
+      gl.domElement.removeEventListener('touchmove', handleTouchMove) // can't passive because we need preventDefault()
       gl.domElement.removeEventListener('touchstart', handleTouchDown, { passive: true })
-      gl.domElement.removeEventListener('touchend', handleMouseUp, { passive: true })
+      gl.domElement.removeEventListener('touchend', handleTouchEnd, { passive: true }) // don't preventDefault here it will cancel onClick event for block info
     }
-  }, [mouseDown, camera, gl])
+  }, [canMove, camera, gl])
 
   return <orthographicCamera
     ref={camRef}
@@ -310,7 +337,7 @@ function DAG() {
 
   const openBlockOffCanvas = useCallback((block) => {
     offCanvas.createOffCanvas({
-      title: `Block`,
+      title: `Block Information`,
       component: <div style={{ wordBreak: `break-word` }}>
         {JSON.stringify(block)}
       </div >,
