@@ -4,7 +4,7 @@ import packageJSON from '../../../package.json'
 import useNodeSocket from '../../context/useNodeSocket'
 import DotLoading from '../dotLoading'
 
-function NodeConnection() {
+export function NodeConnection() {
   const [info, setInfo] = useState({})
   const { connected, loading, err, sendMethod } = useNodeSocket()
 
@@ -27,7 +27,7 @@ function NodeConnection() {
     </>}
     {connected && <>
       <div className="node-connection-status alive" />
-      <div>Connected to remote node (version: {info.version})</div>
+      <div>Connected to remote node (version: {info.version} | network: {info.network})</div>
     </>}
     {err && <>
       <div className="node-connection-status error" />

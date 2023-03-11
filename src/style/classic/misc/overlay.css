@@ -53,6 +53,10 @@
 }
 
 .offcanvas-close {
+  color: var(--text-color);
+}
+
+.offcanvas-close:hover {
   animation: pulse;
   animation-duration: .5s;
 }

@@ -2,8 +2,9 @@ import { Fragment, useEffect, useState, useCallback, useMemo, useRef } from 'rea
 import { Canvas, useThree } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { OrbitControls, Text, Line, OrthographicCamera, PerspectiveCamera } from '@react-three/drei'
+import { Text, Line, PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import { motion } from 'framer-motion-3d'
+import { Vector3 } from 'three'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
@@ -13,7 +14,7 @@ import useOffCanvas from '../../hooks/useOffCanvas'
 import { useNavigate } from 'react-router'
 import useTheme from '../../context/useTheme'
 import Icon from '../../components/icon'
-import { Vector3 } from 'three'
+import { NodeConnection } from '../../components/envAlert'
 
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
@@ -70,20 +71,34 @@ function BlockMesh(props) {
 }
 
 function useControls(props) {
-  const { topoheight } = props
+  const { topoheight, blocks, openBlockOffCanvas } = props
   const { toggleTheme } = useTheme()
   const navigate = useNavigate()
   const dagControlsRef = useRef()
 
   const [grabbing, setGrabbing] = useState(false)
-  const [pos, setPos] = useState({ top: 20, right: 20 })
+  const [position, setPosition] = useState({ top: 20, right: 20 })
   const [paused, setPaused] = useState(false)
-  const [_3D, set3D] = useState(false)
+  const [flat, setFlat] = useState(true)
   const [inputTopoheight, setInputTopoheight] = useState(0)
+  const [lastBlockTime, setLastBlockTime] = useState(0)
 
   useEffect(() => {
+    if (!topoheight) return
     setInputTopoheight(topoheight)
   }, [topoheight])
+
+  useEffect(() => {
+    if (paused) return
+    const intervalId = setInterval(() => {
+      setLastBlockTime(v => ++v)
+    }, [1000])
+
+    return () => {
+      setLastBlockTime(0)
+      clearInterval(intervalId)
+    }
+  }, [blocks, paused])
 
   useEffect(() => {
     if (!grabbing) return
@@ -104,11 +119,11 @@ function useControls(props) {
       const x = e.x - offsetX
       const y = e.y - offsetY
       if (x >= 0 && (x + boxW) <= w) {
-        setPos(({ top }) => ({ left: x, top }))
+        setPosition(({ top }) => ({ left: x, top }))
       }
 
       if (y >= 0 && (y + boxH) <= h) {
-        setPos(({ left }) => ({ top: y, left }))
+        setPosition(({ left }) => ({ top: y, left }))
       }
     }
 
@@ -126,7 +141,18 @@ function useControls(props) {
     }
   }, [grabbing])
 
-  const component = <div ref={dagControlsRef} className="dag-controls" style={{ ...pos }}>
+  useEffect(() => {
+    const onResize = () => {
+      setPosition({ top: 20, right: 20 })
+    }
+
+    window.addEventListener(`resize`, onResize)
+    return () => {
+      window.removeEventListener(`resize`, onResize)
+    }
+  }, [])
+
+  const component = <div ref={dagControlsRef} className="dag-controls" style={{ ...position }}>
     <div className="dag-controls-header"
       style={{ cursor: grabbing ? `grabbing` : `grab` }}
       onMouseDown={() => setGrabbing(true)}
@@ -138,8 +164,8 @@ function useControls(props) {
       <button className="button" onClick={() => navigate(`/`)}>Home</button>
       <button className="button" onClick={toggleTheme}>Toggle Theme</button>
       <div>
-        <input type="checkbox" checked={_3D} onChange={() => set3D(!_3D)} />
-        <label>3D</label>
+        <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
+        <label>Flat</label>
       </div>
       <div>
         <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
@@ -153,10 +179,101 @@ function useControls(props) {
         <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Previous (10)</button>
         <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Next (10)</button>
       </div>
+      {!paused && <div>Last block since {lastBlockTime}s...</div>}
+      {paused && <div>Block update is paused.</div>}
+      <div style={{ maxHeight: 250, overflowY: `auto`, width: `100%` }}>
+        <table>
+          <tbody>
+            {blocks.map((block) => {
+              return <tr key={block.hash} onClick={() => openBlockOffCanvas(block)} style={{ cursor: `pointer` }}>
+                <td>{block.topoheight}</td>
+                <td>{block.block_type}</td>
+                <td>{reduceText(block.hash, 0, 4)}</td>
+              </tr>
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  return { component, paused, _3D }
+  return { component, paused, flat, inputTopoheight }
+}
+
+function CameraWithControls(props) {
+  const { flat, camRef, ...restProps } = props
+  const [mouseDown, setMouseDown] = useState(false)
+  const { camera, gl } = useThree()
+  const lastMousePosition = useRef([0, 0])
+
+  useEffect(() => {
+    if (flat) {
+      camera.zoom = 140
+      camera.position.z = 1000
+    } else {
+      camera.position.z = 6
+      camera.zoom = 1
+    }
+
+    camera.updateProjectionMatrix()
+  }, [flat])
+
+  useEffect(() => {
+    const handleMouseDown = (event) => {
+      event.preventDefault()
+      setMouseDown(true)
+      lastMousePosition.current = [event.clientX, event.clientY]
+    }
+
+    const handleMouseUp = (event) => {
+      event.preventDefault()
+      setMouseDown(false)
+    }
+
+    const handleMouseMove = (event) => {
+      event.preventDefault()
+      if (!mouseDown) return
+
+      const [lastX, lastY] = lastMousePosition.current
+      const deltaX = event.clientX - lastX
+      const deltaY = event.clientY - lastY
+
+      camera.position.x -= deltaX * 0.015
+      camera.position.y += deltaY * 0.015
+
+      lastMousePosition.current = [event.clientX, event.clientY]
+      camera.updateProjectionMatrix()
+    }
+
+    const handleZoom = (event) => {
+      const delta = event.deltaY
+      const speed = camera.zoom / 5
+      camera.zoom += delta > 0 ? -speed : +speed
+      //camera.zoom = Math.max(5, Math.min(camera.zoom, 140))
+      camera.updateProjectionMatrix()
+    }
+
+    gl.domElement.addEventListener('wheel', handleZoom, { passive: true })
+    gl.domElement.addEventListener('mousedown', handleMouseDown)
+    gl.domElement.addEventListener('mouseup', handleMouseUp)
+    gl.domElement.addEventListener('mousemove', handleMouseMove)
+    gl.domElement.addEventListener('mouseout', handleMouseUp)
+
+    return () => {
+      gl.domElement.removeEventListener('wheel', handleZoom, { passive: true })
+      gl.domElement.removeEventListener('mousedown', handleMouseDown)
+      gl.domElement.removeEventListener('mouseup', handleMouseUp)
+      gl.domElement.removeEventListener('mousemove', handleMouseMove)
+      gl.domElement.addEventListener('mouseout', handleMouseUp)
+    }
+  }, [mouseDown, camera, gl])
+
+  return <orthographicCamera
+    ref={camRef}
+    {...restProps}
+  >
+    <primitive object={camera} />
+  </orthographicCamera>
 }
 
 function DAG() {
@@ -165,33 +282,47 @@ function DAG() {
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
   const [topoheight, setTopoheight] = useState()
-  const [inputTopoheight, setInputTopoheight] = useState(0)
   const offCanvas = useOffCanvas()
+  const cameraRef = useRef()
 
-  const controls = useControls({ topoheight })
+  const openBlockOffCanvas = useCallback((block) => {
+    offCanvas.createOffCanvas({
+      title: `Block`,
+      component: <div style={{ wordBreak: `break-word` }}>
+        {JSON.stringify(block)}
+      </div >,
+      width: 500
+    })
+  }, [offCanvas])
+
+  const controls = useControls({ topoheight, blocks, openBlockOffCanvas })
 
   const loadTopoheight = useCallback(async () => {
     const [err, topoheight] = await to(nodeRPC.getTopoHeight())
     if (err) return console.log(err)
 
     setTopoheight(topoheight)
-    setInputTopoheight(topoheight)
   }, [])
 
   const loadBlocks = useCallback(async () => {
+    const inputTopoheight = controls.inputTopoheight
     if (!inputTopoheight) return
     const [err, blocks] = await to(nodeRPC.getBlocks(inputTopoheight - 19, inputTopoheight))
     if (err) return console.log(err)
 
     setBlocks(blocks.reverse())
-  }, [inputTopoheight])
+  }, [controls.inputTopoheight])
 
-  useEffect(() => {
+  /*useEffect(() => {
     loadTopoheight()
-  }, [loadTopoheight])
+  }, [loadTopoheight])*/
 
   useEffect(() => {
-    let timeoutId = setTimeout(() => loadBlocks(), [100])
+    if (!controls.paused) loadTopoheight()
+  }, [controls.paused])
+
+  useEffect(() => {
+    let timeoutId = setTimeout(() => loadBlocks(), [500])
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
@@ -202,30 +333,34 @@ function DAG() {
     event: `NewBlock`,
     onData: (newBlock) => {
       if (controls.paused) return
-      /*setBlocks((blocks) => {
+      setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
-      })*/
+      })
     }
   }, [controls.paused])
 
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
     onData: (data) => {
-      const { topoheight, block_hash } = data
-      /*setBlocks((blocks) => blocks.map(block => {
-        if (block.hash === block_hash) block.topoheight = topoheight
+      if (controls.paused) return
+      const { topoheight, block_hash, block_type } = data
+      setBlocks((blocks) => blocks.map(block => {
+        if (block.hash === block_hash) {
+          block.topoheight = topoheight
+          block.block_type = block_type
+        }
         return block
-      }))*/
+      }))
     }
-  }, [])
+  }, [controls.paused])
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (blocks.length >= 20) {
       blocks.pop()
       setBlocks(blocks)
     }
-  }, [blocks])*/
+  }, [blocks])
 
   const groupBlocks = useMemo(() => {
     /*const filteredBlocks = blocks.filter((block, index) => {
@@ -250,31 +385,27 @@ function DAG() {
       })
     })
 
+    if (entries.length > 0) {
+      const last = entries[entries.length - 1][1][0]
+      cameraRef.current.position.x = last.x * 2
+    }
+
     return entries
   }, [blocks])
-
-  const openBlockOffCanvas = useCallback((block) => {
-    offCanvas.createOffCanvas({
-      title: `Block`,
-      component: <div style={{ wordBreak: `break-word` }}>
-        {JSON.stringify(block)}
-      </div >,
-      width: 500
-    })
-  }, [offCanvas])
 
   return <div>
     <Helmet>
       <title>DAG</title>
     </Helmet>
-    <div className="dag-title">Xelis DAG</div>
+    <div className="dag-header">
+      <h1>Xelis DAG</h1>
+      <NodeConnection />
+    </div>
     {controls.component}
     <div className="dag-canvas">
       <Canvas>
-        {!controls._3D && <OrthographicCamera makeDefault position={[0, 0, 2]} near={1} far={3} zoom={40} />}
-        {controls._3D && <PerspectiveCamera makeDefault position={[0, 0, 20]} />}
-        <OrbitControls enableDamping={false} enableRotate={controls._3D} />
-        <group position={[-15, 0, 0]}>
+        <CameraWithControls camRef={cameraRef} flat={controls.flat} />
+        <group>
           {groupBlocks.map((entry, heightIndex) => {
             const [height, innerBlocks] = entry
             let even = heightIndex % 2 === 0
@@ -291,7 +422,7 @@ function DAG() {
                     const tipBlock = blocks.find((b) => b.hash === tip)
                     if (!tipBlock) return null
                     return <mesh key={tip}>
-                      <Line points={[new Vector3(x * distance, y, 1), new Vector3(tipBlock.x * distance, tipBlock.y, 1)]} color="red" lineWidth={2} />
+                      <Line points={[new Vector3(x * distance, y, 0), new Vector3(tipBlock.x * distance, tipBlock.y, 0)]} color="red" lineWidth={2} />
                     </mesh>
                   })}
                   <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => openBlockOffCanvas(block)} />
