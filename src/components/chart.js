@@ -11,6 +11,9 @@ function ReactChart(props) {
     const _chart = new Chart(ctx, chart)
 
 
+    return () => {
+      return _chart.destroy()
+    }
   }, [])
 
   return <div style={{ position: `relative`, ...style }} {...restProps}>

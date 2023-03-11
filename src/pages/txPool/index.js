@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import { useCallback, useEffect, useState } from 'react'
 import TableBody from '../../components/tableBody'
 import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'

@@ -21,8 +21,9 @@
   color: var(--text-color);
   position: fixed;
   z-index: 2;
-  padding: 1em;
-  opacity: .3;
+  padding: .5em;
+  margin: .5em;
+  background-color: var(--bg-color);
 }
 
 .dag-controls {

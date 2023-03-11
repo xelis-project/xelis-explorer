@@ -6,7 +6,7 @@ import useNodeRPC from '../../hooks/useNodeRPC'
 import bytes from 'bytes'
 import Age from '../../components/age'
 import { formatHashRate, formatXelis, groupBy, reduceText } from '../../utils'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
 

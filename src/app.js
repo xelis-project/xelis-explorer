@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { Helmet } from 'react-helmet'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 
 import Layout from './layout'
 import { ThemeProvider } from './context/useTheme'
@@ -57,14 +57,16 @@ const router = createBrowserRouter([
 
 function App() {
   return <ThemeProvider>
-    <Helmet titleTemplate="%s · Xelis Explorer" />
-    <SettingsProvider>
-      <NodeSocketProvider>
-        <OverlayProvider>
-          <RouterProvider router={router} />
-        </OverlayProvider>
-      </NodeSocketProvider>
-    </SettingsProvider>
+    <HelmetProvider>
+      <Helmet titleTemplate="%s · Xelis Explorer" />
+      <SettingsProvider>
+        <NodeSocketProvider>
+          <OverlayProvider>
+            <RouterProvider router={router} />
+          </OverlayProvider>
+        </NodeSocketProvider>
+      </SettingsProvider>
+    </HelmetProvider>
   </ThemeProvider>
 }
 
