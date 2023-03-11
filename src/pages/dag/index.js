@@ -204,7 +204,7 @@ function CameraWithControls(props) {
   const { flat, camRef, ...restProps } = props
   const [mouseDown, setMouseDown] = useState(false)
   const { camera, gl } = useThree()
-  const lastMousePosition = useRef([0, 0])
+  const lastPosition = useRef([0, 0])
 
   useEffect(() => {
     if (flat) {
@@ -219,30 +219,47 @@ function CameraWithControls(props) {
   }, [flat])
 
   useEffect(() => {
-    const handleMouseDown = (event) => {
-      event.preventDefault()
-      setMouseDown(true)
-      lastMousePosition.current = [event.clientX, event.clientY]
-    }
-
-    const handleMouseUp = (event) => {
-      event.preventDefault()
-      setMouseDown(false)
-    }
-
-    const handleMouseMove = (event) => {
-      event.preventDefault()
-      if (!mouseDown) return
-
-      const [lastX, lastY] = lastMousePosition.current
-      const deltaX = event.clientX - lastX
-      const deltaY = event.clientY - lastY
+    const updatePosition = (x, y) => {
+      const [lastX, lastY] = lastPosition.current
+      const deltaX = x - lastX
+      const deltaY = y - lastY
 
       camera.position.x -= deltaX * 0.015
       camera.position.y += deltaY * 0.015
 
-      lastMousePosition.current = [event.clientX, event.clientY]
+      lastPosition.current = [x, y]
       camera.updateProjectionMatrix()
+    }
+
+    const handleMouseDown = (event) => {
+      setMouseDown(true)
+      lastPosition.current = [event.clientX, event.clientY]
+    }
+
+    const handleTouchDown = (event) => {
+      const touches = event.touches
+      if (touches.length === 1) {
+        setMouseDown(true)
+        lastPosition.current = [touches[0].clientX, touches[0].clientY]
+      }
+    }
+
+    const handleMouseUp = (event) => {
+      setMouseDown(false)
+    }
+
+    const handleMouseMove = (event) => {
+      if (!mouseDown) return
+      updatePosition(event.clientX, event.clientY)
+    }
+
+    const handleTouchMove = (event) => {
+      if (!mouseDown) return
+
+      const touches = event.touches
+      if (touches.length === 1) {
+        updatePosition(touches[0].clientX, touches[0].clientY)
+      }
     }
 
     const handleZoom = (event) => {
@@ -258,13 +275,19 @@ function CameraWithControls(props) {
     gl.domElement.addEventListener('mouseup', handleMouseUp)
     gl.domElement.addEventListener('mousemove', handleMouseMove)
     gl.domElement.addEventListener('mouseout', handleMouseUp)
+    gl.domElement.addEventListener('touchmove', handleTouchMove, { passive: true })
+    gl.domElement.addEventListener('touchstart', handleTouchDown, { passive: true })
+    gl.domElement.addEventListener('touchend', handleMouseUp, { passive: true })
 
     return () => {
       gl.domElement.removeEventListener('wheel', handleZoom, { passive: true })
       gl.domElement.removeEventListener('mousedown', handleMouseDown)
       gl.domElement.removeEventListener('mouseup', handleMouseUp)
       gl.domElement.removeEventListener('mousemove', handleMouseMove)
-      gl.domElement.addEventListener('mouseout', handleMouseUp)
+      gl.domElement.removeEventListener('mouseout', handleMouseUp)
+      gl.domElement.removeEventListener('touchmove', handleTouchMove, { passive: true })
+      gl.domElement.removeEventListener('touchstart', handleTouchDown, { passive: true })
+      gl.domElement.removeEventListener('touchend', handleMouseUp, { passive: true })
     }
   }, [mouseDown, camera, gl])
 
@@ -401,7 +424,7 @@ function DAG() {
       <h1>Xelis DAG</h1>
       <NodeConnection />
     </div>
-    {controls.component}
+    {/*controls.component*/}
     <div className="dag-canvas">
       <Canvas>
         <CameraWithControls camRef={cameraRef} flat={controls.flat} />
