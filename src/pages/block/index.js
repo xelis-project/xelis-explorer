@@ -169,7 +169,7 @@ function Block() {
               <th>Tips</th>
               <td style={{ lineHeight: `1.4em` }}>
                 {block.tips.map((tip, index) => {
-                  return <div>
+                  return <div key={tip}>
                     {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
                   </div>
                 })}
