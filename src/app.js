@@ -17,35 +17,39 @@ import DAG from './pages/dag'
 
 const router = createBrowserRouter([
   {
-    element: <Layout />,
     children: [
       {
-        path: '/',
-        element: <Home />,
-      },
-      {
-        path: '/blocks',
-        element: <Blocks />,
-      },
-      {
-        path: '/block/:id',
-        element: <Block />
-      },
-      {
-        path: '/txpool',
-        element: <TxPool />
-      },
-      {
-        path: `/tx/:hash`,
-        element: <Transaction />
+        element: <Layout />,
+        children: [
+          {
+            path: '/',
+            element: <Home />,
+          },
+          {
+            path: '/blocks',
+            element: <Blocks />,
+          },
+          {
+            path: '/block/:id',
+            element: <Block />
+          },
+          {
+            path: '/txpool',
+            element: <TxPool />
+          },
+          {
+            path: `/tx/:hash`,
+            element: <Transaction />
+          },
+          {
+            path: '*',
+            element: <NotFound />
+          }
+        ]
       },
       {
         path: `/dag`,
         element: <DAG />
-      },
-      {
-        path: '*',
-        element: <NotFound />
       }
     ]
   }

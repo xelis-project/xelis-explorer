@@ -22,12 +22,7 @@ function useMenuLinks() {
 }
 
 function ToggleThemeButton(props) {
-  const { theme, setTheme } = useTheme()
-
-  const toggleTheme = useCallback(() => {
-    if (theme === `dark`) setTheme(`light`)
-    else setTheme(`dark`)
-  }, [theme])
+  const { theme, toggleTheme } = useTheme()
 
   const icon = useMemo(() => {
     const map = {
@@ -40,7 +35,7 @@ function ToggleThemeButton(props) {
   return <Button icon={icon} size={1} title="Toggle Theme" onClick={toggleTheme} {...props} />
 }
 
-function Header() {
+function Header(props) {
   const links = useMenuLinks()
   const headerMenuRef = useRef()
 
@@ -60,7 +55,9 @@ function Header() {
     }
   }, [menuOpen])
 
-  return <div className="header">
+  const className = `header ${props.className || ``}`
+
+  return <div className={className} {...props}>
     <Link to="/" className="header-logo" />
     <div className="header-dropdown">
       <div ref={headerMenuRef} className="header-menu-button" onClick={() => setMenuOpen(!menuOpen)}>

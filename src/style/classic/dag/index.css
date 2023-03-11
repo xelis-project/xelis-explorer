@@ -1,9 +1,55 @@
 .dag-canvas {
-  border: thin solid black;
-  border-radius: 5px;
-  height: 500px !important;
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
 }
 
 .dag-canvas canvas {
-  background-color: black;
+  background-color: var(--bg-color);
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+.dag-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--text-color);
+  position: fixed;
+  z-index: 2;
+  padding: 1em;
+  opacity: .3;
+}
+
+.dag-controls {
+  position: fixed;
+  width: 250px;
+  top: 0;
+  right: 0;
+  background-color: var(--bg-color);
+  border: thin solid black;
+  z-index: 1;
+}
+
+.dag-controls-header {
+  width: 100%;
+  user-select: none;
+  padding: .6em 1em;
+  margin-bottom: .5em;
+  display: flex;
+  gap: .6em;
+  align-items: center;
+  border-bottom: thin solid black;
+}
+
+.dag-controls-items {
+  display: flex;
+  gap: .5em;
+  flex-direction: column;
+  align-items: start;
+  padding: .5em;
 }
