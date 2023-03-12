@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import useTheme from '../../context/useTheme'
 import Button from '../button'
@@ -15,6 +15,7 @@ function useMenuLinks() {
     return [
       { path: `/`, title: `Home`, className: isActive },
       { path: `/blocks`, title: `Blocks`, className: isActive },
+      { path: `/txs`, title: `Txs`, className: isActive },
       { path: `/txpool`, title: `Tx Pool`, className: isActive },
       { path: `/dag`, title: `DAG`, className: isActive }
     ]
