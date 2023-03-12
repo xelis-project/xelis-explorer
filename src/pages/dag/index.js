@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState, useCallback, useMemo, useRef } from 'rea
 import { Canvas, useThree } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { Text, Line, PerspectiveCamera, OrbitControls } from '@react-three/drei'
+import { Text, Line } from '@react-three/drei'
 import { motion } from 'framer-motion-3d'
 import { Vector3 } from 'three'
 
@@ -10,11 +10,11 @@ import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import { groupBy, reduceText } from '../../utils'
 import dagMock from './dagMock'
-import useOffCanvas from '../../hooks/useOffCanvas'
 import { useNavigate } from 'react-router'
 import useTheme from '../../context/useTheme'
 import Icon from '../../components/icon'
 import { NodeConnection } from '../../components/envAlert'
+import OffCanvas from '../../components/offCanvas'
 
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
@@ -70,14 +70,13 @@ function BlockMesh(props) {
   </>
 }
 
-function useControls(props) {
-  const { topoheight, blocks, openBlockOffCanvas } = props
+function useOffCanvasControls(props) {
+  const { topoheight, blocks, onBlockClick } = props
   const { toggleTheme } = useTheme()
   const navigate = useNavigate()
   const dagControlsRef = useRef()
 
-  const [grabbing, setGrabbing] = useState(false)
-  const [position, setPosition] = useState({ top: 20, right: 20 })
+  const [opened, setOpened] = useState(false)
   const [paused, setPaused] = useState(false)
   const [flat, setFlat] = useState(true)
   const [inputTopoheight, setInputTopoheight] = useState(0)
@@ -100,104 +99,55 @@ function useControls(props) {
     }
   }, [blocks, paused])
 
-  useEffect(() => {
-    if (!grabbing) return
-
-    const startX = dagControlsRef.current.offsetLeft
-    const startY = dagControlsRef.current.offsetTop
-    const boxW = dagControlsRef.current.offsetWidth
-    const boxH = dagControlsRef.current.offsetHeight
-    const w = window.innerWidth
-    const h = window.innerHeight
-
-    let offsetX, offsetY
-
-    const onMouseMove = (e) => {
-      if (!offsetX) offsetX = e.x - startX
-      if (!offsetY) offsetY = e.y - startY
-
-      const x = e.x - offsetX
-      const y = e.y - offsetY
-      if (x >= 0 && (x + boxW) <= w) {
-        setPosition(({ top }) => ({ left: x, top }))
-      }
-
-      if (y >= 0 && (y + boxH) <= h) {
-        setPosition(({ left }) => ({ top: y, left }))
-      }
-    }
-
-    const onMouseOut = (e) => {
-      if (e.relatedTarget === null) {
-        setGrabbing(false)
-      }
-    }
-
-    window.addEventListener(`mouseout`, onMouseOut)
-    window.addEventListener(`mousemove`, onMouseMove)
-    return () => {
-      window.removeEventListener(`mousemove`, onMouseMove)
-      window.removeEventListener(`mouseout`, onMouseOut)
-    }
-  }, [grabbing])
-
-  useEffect(() => {
-    const onResize = () => {
-      setPosition({ top: 20, right: 20 })
-    }
-
-    window.addEventListener(`resize`, onResize)
-    return () => {
-      window.removeEventListener(`resize`, onResize)
-    }
-  }, [])
-
-  const component = <div ref={dagControlsRef} className="dag-controls" style={{ ...position }}>
-    <div className="dag-controls-header"
-      style={{ cursor: grabbing ? `grabbing` : `grab` }}
-      onMouseDown={() => setGrabbing(true)}
-      onMouseUp={() => setGrabbing(false)}>
-      <Icon name="options" />
-      <div>Controls</div>
-    </div>
-    <div className="dag-controls-items">
-      <button className="button" onClick={() => navigate(`/`)}>Home</button>
-      <button className="button" onClick={toggleTheme}>Toggle Theme</button>
-      <div>
-        <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
-        <label>Flat</label>
-      </div>
-      <div>
-        <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
-        <label>Paused</label>
-      </div>
-      <div>{inputTopoheight}</div>
-      <input type="range" min={20} max={topoheight} value={inputTopoheight} onChange={(e) => {
-        setInputTopoheight(e.target.valueAsNumber)
-      }} style={{ width: `100%` }} disabled={!paused} />
-      <div>
-        <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Previous (10)</button>
-        <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Next (10)</button>
-      </div>
-      {!paused && <div>Last block since {lastBlockTime}s...</div>}
-      {paused && <div>Block update is paused.</div>}
-      <div style={{ maxHeight: 250, overflowY: `auto`, width: `100%` }}>
-        <table>
-          <tbody>
-            {blocks.map((block) => {
-              return <tr key={block.hash} onClick={() => openBlockOffCanvas(block)} style={{ cursor: `pointer` }}>
-                <td>{block.topoheight}</td>
-                <td>{block.block_type}</td>
-                <td>{reduceText(block.hash, 0, 4)}</td>
-              </tr>
-            })}
-          </tbody>
-        </table>
+  const render = <OffCanvas
+    title="Controls"
+    opened={opened}
+    width={500}
+    position="right"
+    onClose={() => setOpened(false)}
+  >
+    <div ref={dagControlsRef} className="dag-controls">
+      <div className="dag-controls-items">
+        <button className="button" onClick={() => {
+          navigate(`/`)
+        }}>Home</button>
+        <button className="button" onClick={toggleTheme}>Toggle Theme</button>
+        <div>
+          <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
+          <label>Flat</label>
+        </div>
+        <div>
+          <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
+          <label>Paused</label>
+        </div>
+        <div>{inputTopoheight}</div>
+        <input type="range" min={20} max={topoheight} value={inputTopoheight} onChange={(e) => {
+          setInputTopoheight(e.target.valueAsNumber)
+        }} style={{ width: `100%` }} disabled={!paused} />
+        <div className="dag-controls-buttons">
+          <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Previous (10)</button>
+          <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight + 10)}>Next (10)</button>
+        </div>
+        {!paused && <div>Last block since {lastBlockTime}s...</div>}
+        {paused && <div>Block update is paused.</div>}
+        <div className="dag-controls-table">
+          <table>
+            <tbody>
+              {blocks.map((block) => {
+                return <tr key={block.hash} onClick={() => onBlockClick(block)}>
+                  <td>{block.topoheight}</td>
+                  <td>{block.block_type}</td>
+                  <td>{reduceText(block.hash, 0, 4)}</td>
+                </tr>
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
+  </OffCanvas>
 
-  return { component, paused, flat, inputTopoheight }
+  return { render, setOpened, paused, flat, inputTopoheight }
 }
 
 function CameraWithControls(props) {
@@ -226,8 +176,8 @@ function CameraWithControls(props) {
       const deltaX = x - lastX
       const deltaY = y - lastY
 
-      camera.position.x -= deltaX / camera.zoom * 2
-      camera.position.y += deltaY / camera.zoom * 2
+      camera.position.x -= deltaX * 0.015
+      camera.position.y += deltaY * 0.015
 
       lastPosition.current = [x, y]
       camera.updateProjectionMatrix()
@@ -289,7 +239,7 @@ function CameraWithControls(props) {
         const dy = touches[0].clientY - touches[1].clientY
         let distance = Math.sqrt(dx * dx + dy * dy)
         touchMoveTimeoutId = setTimeout(() => lastDistance.current = distance, 100)
-        updateZoom(-(distance - lastDistance.current), 25)
+        updateZoom(-(distance - lastDistance.current), 50)
       }
     }
 
@@ -326,26 +276,42 @@ function CameraWithControls(props) {
   </orthographicCamera>
 }
 
+function useOffCanvasBlock(props) {
+  const [block, setBlock] = useState({})
+  const [opened, setOpened] = useState(false)
+
+  const open = useCallback((block) => {
+    setBlock(block)
+    setOpened(true)
+  }, [])
+
+  const render = <OffCanvas title="Block Information" position="left"
+    width={500} opened={opened} onClose={() => setOpened(false)}>
+    <div style={{ wordBreak: `break-word` }}>
+      {JSON.stringify(block)}
+    </div >
+  </OffCanvas>
+
+  return { render, open }
+}
+
 function DAG() {
   const nodeRPC = useNodeRPC()
   const [blocks, setBlocks] = useState([])
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
   const [topoheight, setTopoheight] = useState()
-  const offCanvas = useOffCanvas()
   const cameraRef = useRef()
 
-  const openBlockOffCanvas = useCallback((block) => {
-    offCanvas.createOffCanvas({
-      title: `Block Information`,
-      component: <div style={{ wordBreak: `break-word` }}>
-        {JSON.stringify(block)}
-      </div >,
-      width: 500
-    })
-  }, [offCanvas])
+  const offCanvasBlock = useOffCanvasBlock()
 
-  const controls = useControls({ topoheight, blocks, openBlockOffCanvas })
+  const offCanvasControls = useOffCanvasControls({
+    topoheight,
+    blocks,
+    onBlockClick: (block) => {
+      offCanvasBlock.open(block)
+    }
+  })
 
   const loadTopoheight = useCallback(async () => {
     const [err, topoheight] = await to(nodeRPC.getTopoHeight())
@@ -355,21 +321,17 @@ function DAG() {
   }, [])
 
   const loadBlocks = useCallback(async () => {
-    const inputTopoheight = controls.inputTopoheight
+    const inputTopoheight = offCanvasControls.inputTopoheight
     if (!inputTopoheight) return
     const [err, blocks] = await to(nodeRPC.getBlocks(inputTopoheight - 19, inputTopoheight))
     if (err) return console.log(err)
 
     setBlocks(blocks.reverse())
-  }, [controls.inputTopoheight])
-
-  /*useEffect(() => {
-    loadTopoheight()
-  }, [loadTopoheight])*/
+  }, [offCanvasControls.inputTopoheight])
 
   useEffect(() => {
-    if (!controls.paused) loadTopoheight()
-  }, [controls.paused])
+    if (!offCanvasControls.paused) loadTopoheight()
+  }, [offCanvasControls.paused])
 
   useEffect(() => {
     let timeoutId = setTimeout(() => loadBlocks(), [500])
@@ -382,18 +344,18 @@ function DAG() {
   useNodeSocketSubscribe({
     event: `NewBlock`,
     onData: (newBlock) => {
-      if (controls.paused) return
+      if (offCanvasControls.paused) return
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
       })
     }
-  }, [controls.paused])
+  }, [offCanvasControls.paused])
 
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
     onData: (data) => {
-      if (controls.paused) return
+      if (offCanvasControls.paused) return
       const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
@@ -403,7 +365,7 @@ function DAG() {
         return block
       }))
     }
-  }, [controls.paused])
+  }, [offCanvasControls.paused])
 
   useEffect(() => {
     if (blocks.length >= 20) {
@@ -447,14 +409,18 @@ function DAG() {
     <Helmet>
       <title>DAG</title>
     </Helmet>
+    {offCanvasControls.render}
+    {offCanvasBlock.render}
     <div className="dag-header">
       <h1>Xelis DAG</h1>
       <NodeConnection />
     </div>
-    {/*controls.component*/}
+    <button className="dag-offcanvas-controls-button" onClick={() => offCanvasControls.setOpened(true)}>
+      <Icon name="options" />
+    </button>
     <div className="dag-canvas">
       <Canvas>
-        <CameraWithControls camRef={cameraRef} flat={controls.flat} />
+        <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
         <group>
           {groupBlocks.map((entry, heightIndex) => {
             const [height, innerBlocks] = entry
@@ -475,7 +441,7 @@ function DAG() {
                       <Line points={[new Vector3(x * distance, y, 0), new Vector3(tipBlock.x * distance, tipBlock.y, 0)]} color="red" lineWidth={2} />
                     </mesh>
                   })}
-                  <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => openBlockOffCanvas(block)} />
+                  <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => offCanvasBlock.open(block)} />
                   {innerBlocks.length - 1 === blockIndex && <Text color="black" anchorX="center"
                     anchorY="middle" fontSize={.3} position={[x * distance, 0, 1]}
                     outlineWidth={.05} outlineColor="#ffffff">

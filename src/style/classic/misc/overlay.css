@@ -23,21 +23,37 @@
 .offcanvas {
   position: fixed;
   top: 0;
-  left: 0;
   width: 300px; /* default but can be overwride js side */
   height: 100%;
   background-color: var(--bg-color);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   transition: translate .3s ease-in-out;
   z-index: 9999;
-  translate: -100%;
 }
 
-.offcanvas.overlay-opened {
+.offcanvas.offcanvas-right {
+  translate: 100%;
+  right: 0;
+}
+
+.offcanvas.offcanvas-left {
+  translate: 0;
+  left: 0;
+}
+
+.offcanvas.offcanvas-right.overlay-opened {
   translate: 0;
 }
 
-.offcanvas.overlay-closed {
+.offcanvas.offcanvas-right.overlay-closed {
+  translate: 100%;
+}
+
+.offcanvas.offcanvas-left.overlay-opened {
+  translate: 0;
+}
+
+.offcanvas.offcanvas-left.overlay-closed {
   translate: -100%;
 }
 
@@ -54,6 +70,7 @@
 
 .offcanvas-close {
   color: var(--text-color);
+  --ggs: 1.5;
 }
 
 .offcanvas-close:hover {

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState, cloneElement } from 'react'
+import React, { createContext, useCallback, useContext, useState, cloneElement, useEffect } from 'react'
 
 const Context = createContext()
 
@@ -7,16 +7,25 @@ export const OverlayProvider = (props) => {
 
   const [overlays, setOverlays] = useState([])
 
-  const createOverlay = useCallback((cb) => {
-    const key = Date.now()
+  const createOverlay = useCallback((key, cb) => {
+    if (!key) key = Date.now()
+
     const obj = cb(key)
     const { opened, component, backdrop } = obj
-    setOverlays((overlays) => [...overlays, {
-      key,
-      opened: false,
-      component,
-      backdrop
-    }])
+
+    setOverlays((overlays) => {
+      if (overlays.find(item => item.key === key)) {
+        return overlays.map((item) => {
+          if (item.key === key) {
+            item.component = component
+            item.opened = opened
+          }
+          return item
+        })
+      } else {
+        return [...overlays, { key, ...obj }]
+      }
+    })
 
     // important for css trigger open animation
     setTimeout(() => {
