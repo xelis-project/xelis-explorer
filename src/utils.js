@@ -13,8 +13,8 @@ export const shiftNumber = (value, decimals) => {
   return value / Math.pow(10, decimals)
 }
 
-export const formatXelis = (value) => {
-  return `${shiftNumber(value, 5)} XELIS`
+export const formatXelis = (value, withSuffy = true) => {
+  return `${shiftNumber(value, 5)}${withSuffy ? ` XELIS` : ``}`
 }
 
 export const formatAsset = (value, asset) => {
@@ -29,7 +29,7 @@ export const formatAsset = (value, asset) => {
 export const formatAssetName = (asset) => {
   switch (asset) {
     case XELIS_ASSET:
-      return `XELIS (${reduceText(XELIS_ASSET)})`
+      return `XELIS(${reduceText(XELIS_ASSET)})`
     default:
       return value
   }
@@ -62,33 +62,33 @@ const HASH_RATE_MAP = {
 }
 
 export const formatHashRate = (value, decimals = 2) => {
-  let unit = `H/s`
+  let unit = `H / s`
 
   if (value >= HASH_RATE_MAP.yh) {
     value /= HASH_RATE_MAP.yh
-    unit = `YH/s`
+    unit = `YH / s`
   } else if (value >= HASH_RATE_MAP.zh) {
     value /= HASH_RATE_MAP.zh
-    unit = `ZH/s`
+    unit = `ZH / s`
   } else if (value >= HASH_RATE_MAP.eh) {
     value /= HASH_RATE_MAP.eh
-    unit = `EH/s`
+    unit = `EH / s`
   } else if (value >= HASH_RATE_MAP.ph) {
     value /= HASH_RATE_MAP.ph
-    unit = `PH/s`
+    unit = `PH / s`
   } else if (value >= HASH_RATE_MAP.th) {
     value /= HASH_RATE_MAP.th
-    unit = `TH/s`
+    unit = `TH / s`
   } else if (value >= HASH_RATE_MAP.gh) {
     value /= HASH_RATE_MAP.gh
-    unit = `GH/s`
+    unit = `GH / s`
   } else if (value >= HASH_RATE_MAP.mh) {
     value /= HASH_RATE_MAP.mh
-    unit = `MH/s`
+    unit = `MH / s`
   } else if (value >= HASH_RATE_MAP.kh) {
     value /= HASH_RATE_MAP.kh
-    unit = `KH/s`
+    unit = `KH / s`
   }
 
-  return `${value.toFixed(decimals)} ${unit}`
+  return `${value.toFixed(decimals)} ${unit} `
 }

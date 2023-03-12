@@ -16,6 +16,7 @@ import TxPool from './pages/txPool'
 import Transaction from './pages/transaction'
 import DAG from './pages/dag'
 import Transactions from './pages/transactions'
+import Stats from './pages/stats'
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
           {
             path: `/tx/:hash`,
             element: <Transaction />
+          },
+          {
+            path: `/stats`,
+            element: <Stats />
           },
           {
             path: '*',
