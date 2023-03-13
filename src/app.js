@@ -17,6 +17,8 @@ import Transaction from './pages/transaction'
 import DAG from './pages/dag'
 import Transactions from './pages/transactions'
 import Stats from './pages/stats'
+import StatsTable from './pages/stats/table'
+import StatsChart from './pages/stats/chart'
 
 const router = createBrowserRouter([
   {
@@ -50,7 +52,15 @@ const router = createBrowserRouter([
           },
           {
             path: `/stats`,
-            element: <Stats />
+            element: <Stats />,
+            children: [{
+              index: true,
+              element: <StatsTable />
+            },
+            {
+              path: `/stats/chart`,
+              element: <StatsChart />
+            }]
           },
           {
             path: '*',

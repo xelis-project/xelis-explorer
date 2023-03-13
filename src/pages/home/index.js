@@ -168,7 +168,7 @@ function RecentBlocks(props) {
 function HomeMiniChart(props) {
   const { labels, datasets } = props
 
-  const data = useMemo(() => {
+  const chartData = useMemo(() => {
     let rnd = []
     for (let i = 0; i < 6; i++) {
       rnd.push(Math.random())
@@ -186,10 +186,10 @@ function HomeMiniChart(props) {
     }
   }, [])
 
-  const chart = useMemo(() => {
+  const chartConfig = useMemo(() => {
     return {
       type: 'line',
-      data: data,
+      data: chartData,
       options: {
         maintainAspectRatio: false,
         elements: {
@@ -213,9 +213,9 @@ function HomeMiniChart(props) {
         }
       }
     }
-  }, [])
+  }, [chartData])
 
-  return <Chart chart={chart} className="home-stats-chart" />
+  return <Chart config={chartConfig} className="home-stats-chart" />
 }
 
 function Stats() {
