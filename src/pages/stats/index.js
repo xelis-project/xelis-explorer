@@ -151,7 +151,7 @@ function Stats() {
       <title>Stats</title>
     </Helmet>
 
-    <h1>Stats [Hash rate]</h1>
+    <h1>Statistics</h1>
     <div className="stats-buttons">
       <Button icon="chart" className="button">Graph</Button>
       <Button icon="view-list" className="button">Table</Button>

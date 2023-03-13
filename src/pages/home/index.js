@@ -265,6 +265,7 @@ function Stats() {
 }
 
 function P2PStatus() {
+  const [err, setErr] = useState()
   const [p2pStatus, setP2PStatus] = useState()
   const nodeSocket = useNodeSocket()
 

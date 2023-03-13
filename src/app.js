@@ -9,7 +9,7 @@ import { OverlayProvider } from './context/useOverlay'
 import { SupabaseProvider } from './hooks/useSupabase'
 
 import Block from './pages/block'
-import Blocks from './pages/blocks'
+import Blocks from './pages/blocks/indexREST'
 import Home from './pages/home'
 import NotFound from './pages/notFound'
 import TxPool from './pages/txPool'

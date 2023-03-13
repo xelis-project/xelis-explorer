@@ -8,12 +8,13 @@ html, body {
   color: var(--text-color);
   font-family: sans-serif;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .container {
   margin: 0 auto;
   max-width: 1200px;
-  padding: 1em 0;
+  padding: 1em;
 }
 
 button {
