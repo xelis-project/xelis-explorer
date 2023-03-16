@@ -52,6 +52,7 @@ const main = async () => {
     minify: argv.minify,
     sourcemap,
     define: env,
+    external: [`*.svg`],
     plugins: [
       stylePlugin({
         postcss: {

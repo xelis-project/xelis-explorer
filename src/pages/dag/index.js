@@ -411,7 +411,10 @@ function DAG() {
     {offCanvasControls.render}
     {offCanvasBlock.render}
     <div className="dag-header">
-      <h1>Xelis DAG</h1>
+      <div className="dag-header-title">
+        <div className="header-logo" />
+        <h1>Xelis DAG</h1>
+      </div>
       <NodeConnection />
     </div>
     <div className="dag-offcanvas-tr-buttons">

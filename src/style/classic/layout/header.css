@@ -11,6 +11,7 @@
   align-items: center;
 }
 
+/* old logo
 .header-logo {
   background-color: var(--header-logo-color);
   width: 35px;
@@ -27,6 +28,23 @@
   margin-left: 5px;
   margin-top: 6px;
   display: block;
+}
+*/
+
+.header-logo {
+  width: 35px;
+  height: 35px;
+  text-decoration: none;
+  display: block;
+  background-size: contain;
+}
+
+[data-theme="dark"] .header-logo {
+  background-image: url('/img/white_background_black_logo.svg');
+}
+
+[data-theme="light"] .header-logo  {
+  background-image: url('/img/black_background_white_logo.svg');
 }
 
 /* phone */
@@ -133,6 +151,7 @@
     display: flex;
     align-items: center;
     gap: 1em;
+    --ggs: 1.2;
   }
 
   .header-nav-item-active::after {
