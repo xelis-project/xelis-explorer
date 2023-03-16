@@ -36,8 +36,7 @@ function ExplorerSearch() {
       <div className="explorer-search-form">
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />
-        <Button type="submit" icon="search"
-          XiconLocation="right" iconProps={{ style: { rotate: `90deg` } }}>
+        <Button type="submit" icon="search" iconLocation="right" iconProps={{ style: { rotate: `90deg` } }}>
           Search
         </Button>
       </div>
