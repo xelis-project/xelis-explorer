@@ -1,13 +1,20 @@
-import Icon from './icon'
 import { Link } from 'react-router-dom'
 
+import Icon from './icon'
+
 function Button(props) {
-  const { type = 'submit', icon, iconLocation = 'left', link, iconProps, ...restProps } = props
+  const { type = 'submit', icon, loading, loadingIcon = 'spinner', iconLocation = 'left', link, iconProps, ...restProps } = props
 
   const children = <>
-    {icon && iconLocation === `left` && <Icon name={icon} {...iconProps} />}
+    {icon && iconLocation === `left` && <>
+      {!loading && <Icon name={icon} {...iconProps} />}
+      {loading && <Icon name={loadingIcon} />}
+    </>}
     {props.children}
-    {icon && iconLocation === `right` && <Icon name={icon} {...iconProps} />}
+    {icon && iconLocation === `right` && <>
+      {!loading && <Icon name={icon} {...iconProps} />}
+      {loading && <Icon name={loadingIcon} />}
+    </>}
   </>
 
   if (link) {
