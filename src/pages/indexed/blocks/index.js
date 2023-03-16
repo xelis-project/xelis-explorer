@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
+import { formatXelis, reduceText } from '../../../utils'
 import { Link } from 'react-router-dom'
 import bytes from 'bytes'
-import to from 'await-to-js'
 
-import { formatXelis, reduceText } from '../../utils'
-import useNodeRPC from '../../hooks/useNodeRPC'
-import Age from '../../components/age'
+import Age from '../../../components/age'
 import { Helmet } from 'react-helmet-async'
-import TableBody from '../../components/tableBody'
-
-import Pagination, { getPaginationRange } from '../../components/pagination'
+import TableBody from '../../../components/tableBody'
+import Pagination, { getPaginationRange } from '../../../components/pagination'
+import useSupabase from '../../../hooks/useSupabase'
 
 function Blocks() {
-  const nodeRPC = useNodeRPC()
+  const supabase = useSupabase()
 
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
@@ -24,29 +22,19 @@ function Blocks() {
     setErr(null)
     setLoading(true)
 
-    const resErr = (err) => {
-      setErr(err)
-      setLoading(false)
-    }
+    const query = supabase
+      .rpc(`get_blocks`, null, { count: `exact` })
 
-    let pagination = getPaginationRange(pageState)
+    query.order(`timestamp`, { ascending: false })
 
-    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
-    if (err1) return resErr(err1)
-
-    const count = topoheight + 1
-    // reverse pager range
-    let start = count - pagination.end - 1
-    if (start < 0) start = 0
-    let end = count - pagination.start - 1
-
-    const [err2, blocks] = await to(nodeRPC.getBlocks(start, end))
-    if (err2) return resErr(err2)
+    let { start, end } = getPaginationRange(pageState)
+    const { error, data, count } = await query.range(start, end)
+    setLoading(false)
+    if (error) return setErr(error)
 
     setCount(count)
-    setLoading(false)
-    setBlocks(blocks.reverse())
-  }, [pageState])
+    setBlocks(data)
+  }, [supabase, pageState])
 
   useEffect(() => {
     loadBlocks()
@@ -77,18 +65,17 @@ function Blocks() {
         </thead>
         <TableBody list={blocks} err={err} loading={loading} colSpan={9} emptyText="No blocks"
           onItem={(item) => {
-            const size = bytes.format(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
                 <Link to={`/block/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
               <td>{item.height}</td>
               <td>{item.block_type}</td>
-              <td>{item.txs_hashes.length}</td>
+              <td>{item.tx_count}</td>
               <td>
                 <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
               </td>
-              <td>{size}</td>
+              <td>{bytes.format(item.size)}</td>
               <td>{reduceText(item.hash)}</td>
               <td>{formatXelis(item.total_fees)}</td>
               <td>{reduceText(item.miner)}</td>

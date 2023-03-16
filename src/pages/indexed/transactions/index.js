@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Age from '../../components/age'
+import Age from '../../../components/age'
 
-import Pagination, { getPaginationRange } from '../../components/pagination'
-import TableBody from '../../components/tableBody'
-import useSupabase from '../../hooks/useSupabase'
-import { formatXelis, reduceText } from '../../utils'
+import Pagination, { getPaginationRange } from '../../../components/pagination'
+import TableBody from '../../../components/tableBody'
+import useSupabase from '../../../hooks/useSupabase'
+import { formatXelis, reduceText } from '../../../utils'
 
 function Transactions() {
   const supabase = useSupabase()

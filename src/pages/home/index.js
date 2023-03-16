@@ -9,6 +9,7 @@ import { formatHashRate, formatXelis, groupBy, reduceText } from '../../utils'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
+import useSupabase from '../../hooks/useSupabase'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -43,19 +44,27 @@ function ExplorerSearch() {
   </form>
 }
 
-function RecentBlocks(props) {
-  const nodeSocket = useNodeSocket()
+function RecentBlocks() {
   const nodeRPC = useNodeRPC()
 
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState()
   const [blocks, setBlocks] = useState([])
   const [animateBlocks, setAnimateBlocks] = useState(false) // make sure to not animate on pageload and only when we get a new block
 
   const loadRecentBlocks = useCallback(async () => {
+    setLoading(true)
+
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
+
     const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
-    if (err1) return console.log(err1)
+    if (err1) return resErr(err1)
 
     const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 10, topoheight))
-    if (err2) return console.log(err2)
+    if (err2) return resErr(err2)
 
     setBlocks(blocks.reverse())
   }, [])
@@ -103,6 +112,8 @@ function RecentBlocks(props) {
       setBlocks(blocks)
     }
   }, [blocks])
+
+  if (loading || err) return null
 
   return <div className="recent-blocks">
     <div className="recent-blocks-title">Recent Blocks</div>
@@ -166,30 +177,12 @@ function RecentBlocks(props) {
 }
 
 function HomeMiniChart(props) {
-  const { labels, datasets } = props
-
-  const chartData = useMemo(() => {
-    let rnd = []
-    for (let i = 0; i < 6; i++) {
-      rnd.push(Math.random())
-    }
-
-    return {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-      datasets: [{
-        label: 'Units',
-        data: rnd,
-        borderColor: '#1870cb',
-        borderWidth: 4,
-        tension: .3
-      }]
-    }
-  }, [])
+  const { data } = props
 
   const chartConfig = useMemo(() => {
     return {
       type: 'line',
-      data: chartData,
+      data,
       options: {
         maintainAspectRatio: false,
         elements: {
@@ -213,7 +206,7 @@ function HomeMiniChart(props) {
         }
       }
     }
-  }, [chartData])
+  }, [data])
 
   return <Chart config={chartConfig} className="home-stats-chart" />
 }
@@ -222,8 +215,28 @@ function Stats() {
   const nodeSocket = useNodeSocket()
 
   const [info, setInfo] = useState({})
-
   const [err, setErr] = useState()
+
+  const supabase = useSupabase()
+  const [loading, setLoading] = useState(true)
+  const [list, setList] = useState([])
+
+  const loadStats = useCallback(async () => {
+    setLoading(true)
+    const query = supabase
+      .rpc(`get_stats`, { interval: `hour` })
+      .order(`time`, { ascending: false })
+
+    const { error, data } = await query.range(0, 10)
+    setLoading(false)
+    if (error) return setErr(error)
+    setList(data.reverse())
+  }, [supabase])
+
+  useEffect(() => {
+    loadStats()
+  }, [loadStats])
+
   const loadInfo = useCallback(async () => {
     const [err, info] = await to(nodeSocket.sendMethod(`get_info`))
     if (err) return setErr(err)
@@ -236,19 +249,57 @@ function Stats() {
     onData: loadInfo
   }, [])
 
+  const statsChart = useCallback(({ key, color }) => {
+    const labels = list.map((item) => item.time)
+    const data = list.map((item) => item[key])
+    return {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#1870cb',
+        borderWidth: 4,
+        tension: .3
+      }]
+    }
+  }, [list])
+
   const stats = useMemo(() => {
+
     return [
-      { title: `Hash rate`, value: formatHashRate(info.difficulty / 15) }, // 100 MH/s
-      { title: `Total txs`, value: `?` }, // 34.44 M
-      { title: `TPS`, value: `?` }, // 10.5
-      { title: `Difficulty`, value: info.difficulty }, // 4534454
-      { title: `Total supply`, value: formatXelis(info.native_supply) }, // 145230
-      { title: `Tx pool`, value: `${info.mempool_size} tx` }, // 5 tx
-      { title: `Avg block size`, value: `?` }, // 10B
-      { title: `Avg block time`, value: `?` }, // 18s
-      { title: `Blockchain size`, value: `?` }, // 1.5GB
+      {
+        title: `Total supply`, value: formatXelis(info.native_supply)
+      },
+      { title: `Tx pool`, value: `${info.mempool_size} tx` },
+      { title: `TPS`, value: `?` },
+      {
+        title: `Hash rate`, value: formatHashRate(info.difficulty / 15),
+        stats: statsChart({ key: `block_count` })
+      },
+      {
+        title: `Total txs`, value: `?`,
+        stats: statsChart({ key: `tx_count` })
+      },
+
+      {
+        title: `Difficulty`, value: info.difficulty,
+        stats: statsChart({ key: `avg_difficulty` })
+      },
+      {
+        title: `Avg block size`, value: `?`,
+        stats: statsChart({ key: `avg_block_size` })
+      },
+      {
+        title: `Avg block time`, value: `?`,
+        stats: statsChart({ key: `avg_block_time` })
+      },
+      {
+        title: `Blockchain size`, value: `?`,
+        stats: statsChart({ key: `sum_size` })
+      }
     ]
-  }, [info])
+  }, [info, statsChart])
+
+  if (loading || err) return null
 
   return <div className="home-stats">
     <div className="home-stats-title">Realtime Stats</div>
@@ -257,7 +308,7 @@ function Stats() {
         return <div key={item.title} className="home-stats-item">
           <div className="home-stats-item-title">{item.title}</div>
           <div className="home-stats-item-value">{item.value}</div>
-          <HomeMiniChart />
+          {item.stats && <HomeMiniChart data={item.stats} />}
         </div>
       })}
     </div>

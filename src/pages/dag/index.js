@@ -9,12 +9,11 @@ import { Vector3 } from 'three'
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import { groupBy, reduceText } from '../../utils'
-import dagMock from './dagMock'
 import { useNavigate } from 'react-router'
 import useTheme from '../../context/useTheme'
-import Icon from '../../components/icon'
 import { NodeConnection } from '../../components/envAlert'
 import OffCanvas from '../../components/offCanvas'
+import Button from '../../components/button'
 
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
@@ -415,9 +414,10 @@ function DAG() {
       <h1>Xelis DAG</h1>
       <NodeConnection />
     </div>
-    <button className="dag-offcanvas-controls-button" onClick={() => offCanvasControls.setOpened(true)}>
-      <Icon name="options" />
-    </button>
+    <div className="dag-offcanvas-tr-buttons">
+      <Button icon="home" link="/" />
+      <Button icon="options" onClick={() => offCanvasControls.setOpened(true)} />
+    </div>
     <div className="dag-canvas">
       <Canvas>
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />

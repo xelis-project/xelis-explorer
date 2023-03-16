@@ -9,16 +9,17 @@ import { OverlayProvider } from './context/useOverlay'
 import { SupabaseProvider } from './hooks/useSupabase'
 
 import Block from './pages/block'
-import Blocks from './pages/blocks/indexREST'
+import Blocks from './pages/blocks'
 import Home from './pages/home'
 import NotFound from './pages/notFound'
 import TxPool from './pages/txPool'
 import Transaction from './pages/transaction'
 import DAG from './pages/dag'
-import Transactions from './pages/transactions'
 import Stats from './pages/stats'
 import StatsTable from './pages/stats/table'
 import StatsChart from './pages/stats/chart'
+import IndexedTransactions from './pages/indexed/transactions'
+import IndexedBlocks from './pages/indexed/blocks'
 
 const router = createBrowserRouter([
   {
@@ -43,12 +44,18 @@ const router = createBrowserRouter([
             element: <TxPool />
           },
           {
-            path: `/txs`,
-            element: <Transactions />
-          },
-          {
             path: `/tx/:hash`,
             element: <Transaction />
+          },
+          {
+            path: `/indexed`,
+            children: [{
+              path: `/indexed/blocks`,
+              element: <IndexedBlocks />
+            }, {
+              path: `/indexed/txs`,
+              element: <IndexedTransactions />
+            }]
           },
           {
             path: `/stats`,
