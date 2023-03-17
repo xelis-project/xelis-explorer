@@ -65,6 +65,7 @@ function RecentBlocks() {
 
     const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 10, topoheight))
     if (err2) return resErr(err2)
+    setLoading(false)
 
     setBlocks(blocks.reverse())
   }, [])

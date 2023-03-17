@@ -398,7 +398,7 @@ function DAG() {
 
     if (entries.length > 0) {
       const last = entries[entries.length - 1][1][0]
-      cameraRef.current.position.x = last.x * 2
+      if (cameraRef.current) cameraRef.current.position.x = last.x * 2
     }
 
     return entries
@@ -421,6 +421,7 @@ function DAG() {
       <Button icon="home" link="/" />
       <Button icon="options" onClick={() => offCanvasControls.setOpened(true)} />
     </div>
+    <div className="dag-loading-logo" />
     <div className="dag-canvas">
       <Canvas>
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />

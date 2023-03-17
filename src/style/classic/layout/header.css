@@ -37,6 +37,7 @@
   text-decoration: none;
   display: block;
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 [data-theme="dark"] .header-logo {

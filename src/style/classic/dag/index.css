@@ -52,15 +52,47 @@
   gap: 1em;
 }
 
-.dag-offcanvas-tr-buttons > * {
+.dag-offcanvas-tr-buttons>* {
   --ggs: 1.3;
   padding: .5em;
   color: var(--text-color);
 }
 
-.dag-offcanvas-tr-buttons > *:hover {
+.dag-offcanvas-tr-buttons>*:hover {
   animation: pulse;
   animation-duration: .5s;
+}
+
+.dag-loading-logo {
+  background-image: url('/img/green_logo.svg');
+  position: fixed;
+  width: 16em;
+  height: 16em;
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 1;
+  left: 50%;
+  display: flex;
+  margin-left: -8em;
+  top: 50%;
+  margin-top: -8em;
+  animation: rotate-center .5s cubic-bezier(0.550, 0.085, 0.680, 0.530);
+  opacity: 0;
+  left: -999999px;
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: rotate(0);
+    opacity: 1;
+    left: 50%;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    opacity: 0;
+    left: 50%;
+  }
 }
 
 .dag-controls-buttons {
