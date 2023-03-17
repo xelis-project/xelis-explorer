@@ -125,3 +125,12 @@
 .dag-controls-table table tr:hover {
   background-color: gray;
 }
+
+.dag-offcanvas-block {
+  word-break: break-word;
+  padding: 0 1em 1em 1em;
+  overflow: auto;
+  position: fixed;
+  bottom: 0;
+  top: 55px;
+}

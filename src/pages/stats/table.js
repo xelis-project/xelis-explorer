@@ -32,7 +32,7 @@ function StatsTable(props) {
     const { start, end } = getPaginationRange(pageState)
     const { error, data, count } = await query.range(start, end)
     setLoading(false)
-    if (error) return console.log(error)
+    if (error) return setErr(error)
 
     setCount(count)
     setList(data)

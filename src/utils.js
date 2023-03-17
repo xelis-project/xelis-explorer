@@ -1,3 +1,5 @@
+import bytes from 'bytes'
+
 export const reduceText = (text, maxLeft = 7, maxRight = 7) => {
   if (typeof text !== 'string') return text
   const length = text.length
@@ -91,4 +93,18 @@ export const formatHashRate = (value, decimals = 2) => {
   }
 
   return `${value.toFixed(decimals)} ${unit} `
+}
+
+export const formattedBlock = (block, topoheight) => {
+  return {
+    date: new Date(block.timestamp).toLocaleString(),
+    miner: reduceText(block.miner),
+    totalFees: formatXelis(block.total_fees),
+    reward: formatXelis(block.reward),
+    confirmations: topoheight - block.topoheight,
+    size: bytes.format(block.total_size_in_bytes),
+    hasPreviousBlock: block.topoheight > 0,
+    hasNextBlock: block.topoheight < topoheight,
+    hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15
+  }
 }

@@ -8,12 +8,13 @@ import { Vector3 } from 'three'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { groupBy, reduceText } from '../../utils'
+import { formattedBlock, groupBy, reduceText } from '../../utils'
 import { useNavigate } from 'react-router'
 import useTheme from '../../context/useTheme'
 import { NodeConnection } from '../../components/envAlert'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
+import { Link } from 'react-router-dom'
 
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
@@ -276,7 +277,8 @@ function CameraWithControls(props) {
 }
 
 function useOffCanvasBlock(props) {
-  const [block, setBlock] = useState({})
+  const { topoheight } = props
+  const [block, setBlock] = useState()
   const [opened, setOpened] = useState(false)
 
   const open = useCallback((block) => {
@@ -284,12 +286,136 @@ function useOffCanvasBlock(props) {
     setOpened(true)
   }, [])
 
-  const render = <OffCanvas title="Block Information" position="left"
-    width={500} opened={opened} onClose={() => setOpened(false)}>
-    <div style={{ wordBreak: `break-word` }}>
-      {JSON.stringify(block)}
-    </div >
-  </OffCanvas>
+  const formatBlock = useMemo(() => {
+    if (!block) return {}
+    return formattedBlock(block, topoheight || 0)
+  }, [block, topoheight])
+
+  let render = null
+
+  if (block) {
+    render = <OffCanvas title="Block Information" position="left"
+      width={500} opened={opened} onClose={() => setOpened(false)}>
+      <div className="dag-offcanvas-block">
+        <table>
+          <tbody>
+            <tr>
+              <th>Block Type</th>
+            </tr>
+            <tr>
+              <td>{block.block_type}</td>
+            </tr>
+            <tr>
+              <th>Hash</th>
+            </tr>
+            <tr>
+              <td>
+                <Link to={`/block/${block.hash}`}>{block.hash}</Link>
+              </td>
+            </tr>
+            <tr>
+              <th>Timestamp</th>
+            </tr>
+            <tr>
+              <td>{formatBlock.date} ({block.timestamp})</td>
+            </tr>
+            <tr>
+              <th>Confirmations</th>
+
+            </tr>
+            <tr>
+              <td>{formatBlock.confirmations}</td>
+            </tr>
+            <tr>
+              <th>Topoheight</th>
+            </tr>
+            <tr>
+              <td>{block.topoheight}</td>
+            </tr>
+            <tr>
+              <th>Height</th>
+
+            </tr>
+            <tr>
+              <td>{block.height}</td>
+            </tr>
+            <tr>
+              <th>Miner</th>
+
+            </tr>
+            <tr>
+              <td>{block.miner}</td>
+            </tr>
+            <tr>
+              <th>Total Fees</th>
+            </tr>
+            <tr>
+              <td>{formatBlock.totalFees}</td>
+            </tr>
+            <tr>
+              <th>Reward</th>
+            </tr>
+            <tr>
+              <td>{formatBlock.reward}</td>
+            </tr>
+            <tr>
+              <th>Txs</th>
+            </tr>
+            <tr>
+              <td>{block.txs_hashes.length}</td>
+            </tr>
+            <tr>
+              <th>Difficulty</th>
+            </tr>
+            <tr>
+              <td>
+                <span>{block.difficulty} </span>
+                <span title="Cumulative Difficulty">
+                  ({block.cumulative_difficulty})
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>Hash Rate</th>
+            </tr>
+            <tr>
+              <td>
+                {formatBlock.hashRate}
+              </td>
+            </tr>
+            <tr>
+              <th>Size</th>
+
+            </tr>
+            <tr>
+              <td>{formatBlock.size}</td>
+            </tr>
+            <tr>
+              <th>Nonce</th>
+            </tr>
+            <tr>
+              <td>
+                <span>{block.nonce} </span>
+                <span title="Extra Nonce">({block.extra_nonce})</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Tips</th>
+            </tr>
+            <tr>
+              <td style={{ lineHeight: `1.4em` }}>
+                {block.tips.map((tip, index) => {
+                  return <div key={tip} style={{ wordBreak: `break-all` }}>
+                    {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
+                  </div>
+                })}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div >
+    </OffCanvas>
+  }
 
   return { render, open }
 }
@@ -302,7 +428,7 @@ function DAG() {
   const [topoheight, setTopoheight] = useState()
   const cameraRef = useRef()
 
-  const offCanvasBlock = useOffCanvasBlock()
+  const offCanvasBlock = useOffCanvasBlock({ topoheight })
 
   const offCanvasControls = useOffCanvasControls({
     topoheight,

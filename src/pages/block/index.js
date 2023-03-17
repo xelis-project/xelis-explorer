@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import { formatAsset, formatXelis, reduceText, formatHashRate } from '../../utils'
+import { formatAsset, formatXelis, reduceText, formatHashRate, formattedBlock } from '../../utils'
 import NotFound from '../notFound'
 import bytes from 'bytes'
 import { Helmet } from 'react-helmet-async'
@@ -57,19 +57,8 @@ function Block() {
   }, [load])
 
   const formatBlock = useMemo(() => {
-    let _topoheight = topoheight || 0
     if (!block) return {}
-    return {
-      date: new Date(block.timestamp).toLocaleString(),
-      miner: reduceText(block.miner),
-      totalFees: formatXelis(block.total_fees),
-      reward: formatXelis(block.reward),
-      confirmations: _topoheight - block.topoheight,
-      size: bytes.format(block.total_size_in_bytes),
-      hasPreviousBlock: block.topoheight > 0,
-      hasNextBlock: block.topoheight < _topoheight,
-      hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15
-    }
+    return formattedBlock(block, topoheight || 0)
   }, [block, topoheight])
 
   if (err) return <div>{err.message}</div>
@@ -169,7 +158,7 @@ function Block() {
               <th>Tips</th>
               <td style={{ lineHeight: `1.4em` }}>
                 {block.tips.map((tip, index) => {
-                  return <div key={tip}>
+                  return <div key={tip} style={{ wordBreak: `break-all` }}>
                     {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
                   </div>
                 })}
