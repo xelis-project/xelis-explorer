@@ -265,19 +265,23 @@ function Stats() {
   }, [list])
 
   const stats = useMemo(() => {
-
+    const maxSupply = 1840000000000
+    const mined = (info.native_supply * 100 / maxSupply).toFixed(2)
     return [
       {
-        title: `Total supply`, value: formatXelis(info.native_supply)
+        title: `Total Supply`, value: formatXelis(info.native_supply)
       },
-      { title: `Tx pool`, value: `${info.mempool_size} tx` },
+      { title: `Tx Pool`, value: `${info.mempool_size} tx` },
       { title: `TPS`, value: `?` },
+      { title: `Block Count`, value: info.topoheight },
+      { title: `Address Count`, value: `?` },
+      { title: `Mined`, value: `${mined}%` },
       {
-        title: `Hash rate`, value: formatHashRate(info.difficulty / 15),
+        title: `Hashrate`, value: formatHashRate(info.difficulty / 15),
         stats: statsChart({ key: `block_count` })
       },
       {
-        title: `Total txs`, value: `?`,
+        title: `Total Txs`, value: `?`,
         stats: statsChart({ key: `tx_count` })
       },
 
@@ -286,15 +290,15 @@ function Stats() {
         stats: statsChart({ key: `avg_difficulty` })
       },
       {
-        title: `Avg block size`, value: `?`,
+        title: `Avg Block Size`, value: `?`,
         stats: statsChart({ key: `avg_block_size` })
       },
       {
-        title: `Avg block time`, value: `?`,
+        title: `Avg Block Time`, value: `?`,
         stats: statsChart({ key: `avg_block_time` })
       },
       {
-        title: `Blockchain size`, value: `?`,
+        title: `Blockchain Size`, value: `?`,
         stats: statsChart({ key: `sum_size` })
       }
     ]
