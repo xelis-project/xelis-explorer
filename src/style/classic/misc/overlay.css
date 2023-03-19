@@ -31,6 +31,12 @@
   z-index: 9999;
 }
 
+.offcanvas-flex {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+}
+
 .offcanvas.offcanvas-right {
   translate: 100%;
   right: 0;
@@ -59,9 +65,9 @@
 
 .offcanvas-header {
   display: flex;
-  padding: 1em;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 1em;
 }
 
 .offcanvas-title {
@@ -81,6 +87,7 @@
 @media screen and (max-width: 769px) {
   .offcanvas {
     width: 100% !important;
+    box-shadow: none;
   }
 }
 

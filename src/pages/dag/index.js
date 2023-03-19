@@ -9,12 +9,12 @@ import { Vector3 } from 'three'
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import { formattedBlock, groupBy, reduceText } from '../../utils'
-import { useNavigate } from 'react-router'
-import useTheme from '../../context/useTheme'
 import { NodeConnection } from '../../components/envAlert'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { Link } from 'react-router-dom'
+import { ToggleThemeButton } from '../../components/header'
+import Age from '../../components/age'
 
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
@@ -72,9 +72,6 @@ function BlockMesh(props) {
 
 function useOffCanvasControls(props) {
   const { topoheight, blocks, onBlockClick } = props
-  const { toggleTheme } = useTheme()
-  const navigate = useNavigate()
-  const dagControlsRef = useRef()
 
   const [opened, setOpened] = useState(false)
   const [paused, setPaused] = useState(false)
@@ -106,44 +103,39 @@ function useOffCanvasControls(props) {
     position="right"
     onClose={() => setOpened(false)}
   >
-    <div ref={dagControlsRef} className="dag-controls">
-      <div className="dag-controls-items">
-        <button className="button" onClick={() => {
-          navigate(`/`)
-        }}>Home</button>
-        <button className="button" onClick={toggleTheme}>Toggle Theme</button>
-        <div>
-          <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
-          <label>Flat</label>
-        </div>
-        <div>
-          <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
-          <label>Paused</label>
-        </div>
-        <div>{inputTopoheight}</div>
-        <input type="range" min={20} max={topoheight} value={inputTopoheight} onChange={(e) => {
-          setInputTopoheight(e.target.valueAsNumber)
-        }} style={{ width: `100%` }} disabled={!paused} />
-        <div className="dag-controls-buttons">
-          <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Previous (10)</button>
-          <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight + 10)}>Next (10)</button>
-        </div>
-        {!paused && <div>Last block since {lastBlockTime}s...</div>}
-        {paused && <div>Block update is paused.</div>}
-        <div className="dag-controls-table">
-          <table>
-            <tbody>
-              {blocks.map((block) => {
-                return <tr key={block.hash} onClick={() => onBlockClick(block)}>
-                  <td>{block.topoheight}</td>
-                  <td>{block.block_type}</td>
-                  <td>{reduceText(block.hash, 0, 4)}</td>
-                </tr>
-              })}
-            </tbody>
-          </table>
-        </div>
+    <div className="dag-controls-items">
+      <div>
+        <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
+        <label>Flat Viewport</label>
       </div>
+      <div>
+        <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
+        <label>Pause DAG</label>
+      </div>
+      <div>Topo height: {paused ? inputTopoheight : topoheight}</div>
+      <input type="range" min={20} max={topoheight} value={inputTopoheight} onChange={(e) => {
+        setInputTopoheight(e.target.valueAsNumber)
+      }} style={{ width: `100%` }} disabled={!paused} />
+      <div className="dag-controls-buttons">
+        <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight - 10)}>Previous (10)</button>
+        <button className="button" disabled={!paused} onClick={() => setInputTopoheight(inputTopoheight + 10)}>Next (10)</button>
+      </div>
+      {!paused && <div>Last block since {lastBlockTime}s...</div>}
+      {paused && <div>Block update is paused.</div>}
+    </div>
+    <div className="dag-controls-table">
+      <table>
+        <tbody>
+          {blocks.map((block) => {
+            return <tr key={block.hash} onClick={() => onBlockClick(block)}>
+              <td>{block.topoheight}</td>
+              <td>{block.block_type}</td>
+              <td>{reduceText(block.hash, 0, 4)}</td>
+              <td><Age timestamp={block.timestamp} update /></td>
+            </tr>
+          })}
+        </tbody>
+      </table>
     </div>
   </OffCanvas>
 
@@ -280,6 +272,7 @@ function useOffCanvasBlock(props) {
   const { topoheight } = props
   const [block, setBlock] = useState()
   const [opened, setOpened] = useState(false)
+  const nodeRPC = useNodeRPC()
 
   const open = useCallback((block) => {
     setBlock(block)
@@ -291,11 +284,23 @@ function useOffCanvasBlock(props) {
     return formattedBlock(block, topoheight || 0)
   }, [block, topoheight])
 
-  let render = null
+  const loadBlock = useCallback(async (topoheight) => {
+    const [err, blockData] = await to(nodeRPC.getBlockAtTopoHeight(topoheight))
+    if (err) return resErr(err)
+    setBlock(blockData)
+  }, [])
 
-  if (block) {
-    render = <OffCanvas title="Block Information" position="left"
-      width={500} opened={opened} onClose={() => setOpened(false)}>
+  const render = <OffCanvas title="Block Information" position="left"
+    width={500} opened={opened} onClose={() => setOpened(false)}>
+    {block && <>
+      <div className="left-right-buttons">
+        {formatBlock.hasPreviousBlock && <Button className="button" onClick={() => loadBlock(block.topoheight - 1)} icon="chevron-left-r">
+          Previous Block ({block.topoheight - 1})
+        </Button>}
+        {formatBlock.hasNextBlock && <Button className="button" onClick={() => loadBlock(block.topoheight + 1)} icon="chevron-right-r" iconLocation="right">
+          Next Block ({block.topoheight + 1})
+        </Button>}
+      </div>
       <div className="dag-offcanvas-block">
         <table>
           <tbody>
@@ -413,9 +418,9 @@ function useOffCanvasBlock(props) {
             </tr>
           </tbody>
         </table>
-      </div >
-    </OffCanvas>
-  }
+      </div>
+    </>}
+  </OffCanvas>
 
   return { render, open }
 }
@@ -474,6 +479,7 @@ function DAG() {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
       })
+      setTopoheight(newBlock.topoheight)
     }
   }, [offCanvasControls.paused])
 
@@ -546,6 +552,7 @@ function DAG() {
     <div className="dag-offcanvas-tr-buttons">
       <Button icon="home" link="/" />
       <Button icon="options" onClick={() => offCanvasControls.setOpened(true)} />
+      <ToggleThemeButton />
     </div>
     <div className="dag-loading-logo" />
     <div className="dag-canvas">

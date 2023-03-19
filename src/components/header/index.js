@@ -23,7 +23,7 @@ function useMenuLinks() {
   }, [])
 }
 
-function ToggleThemeButton(props) {
+export function ToggleThemeButton(props) {
   const { theme, toggleTheme } = useTheme()
 
   const icon = useMemo(() => {
@@ -34,7 +34,7 @@ function ToggleThemeButton(props) {
     return map[theme]
   }, [theme])
 
-  return <Button icon={icon} size={1} title="Toggle Theme" onClick={toggleTheme} {...props} />
+  return <Button icon={icon} title="Toggle Theme" onClick={toggleTheme} {...props} />
 }
 
 function Header(props) {
@@ -73,7 +73,7 @@ function Header(props) {
           </NavLink>
         })}
         <div className="header-nav-icons">
-          <Button icon="options" size={1.2} title="Settings" className="header-nav-item" style={{ height: 20 }} />
+          <Button icon="options" title="Settings" className="header-nav-item" style={{ height: 20 }} />
           <ToggleThemeButton className="header-nav-item" />
         </div>
       </div>

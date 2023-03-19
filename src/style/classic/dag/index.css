@@ -106,17 +106,11 @@
   gap: .5em;
   flex-direction: column;
   align-items: start;
-  padding: .5em;
 }
 
 .dag-controls-table {
-  max-height: 250px;
-  overflow-y: auto;
-  width: 100%;
-  border: thin solid var(--text-color);
+  overflow: auto;
 }
-
-.dag-controls-table table {}
 
 .dag-controls-table table tr {
   cursor: pointer;
@@ -126,11 +120,13 @@
   background-color: gray;
 }
 
+.dag-offcanvas-flex {
+  padding: 0 1em 1em 1em;
+  display: flex;
+  flex-direction: column;
+}
+
 .dag-offcanvas-block {
   word-break: break-word;
-  padding: 0 1em 1em 1em;
   overflow: auto;
-  position: fixed;
-  bottom: 0;
-  top: 55px;
 }
