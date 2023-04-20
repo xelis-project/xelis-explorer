@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
-import { createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, useContext } from 'react'
 
-const supabaseUrl = NODE_REST_ENDPOINT
-const supabaseKey = NODE_REST_KEY
+const supabaseUrl = INDEX_REST_ENDPOINT
+const supabaseKey = INDEX_REST_KEY
 
 let supabase = {}
 

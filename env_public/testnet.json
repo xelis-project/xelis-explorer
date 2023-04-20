@@ -1,5 +1,7 @@
 {
+  "ENV": "testnet",
   "NODE_WS_ENDPOINT": "wss://testnet-node.xelis.io/ws",
   "NODE_RPC_ENDPOINT": "https://testnet-node.xelis.io/json_rpc",
-  "ENV": "testnet"
+  "INDEX_REST_ENDPOINT": "https://testnet-node.xelis.io",
+  "INDEX_REST_KEY": ""
 }

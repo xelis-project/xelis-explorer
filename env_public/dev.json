@@ -1,7 +1,7 @@
 {
+  "ENV": "dev",
   "NODE_WS_ENDPOINT": "wss://dev-node.xelis.io/ws",
   "NODE_RPC_ENDPOINT": "https://dev-node.xelis.io/json_rpc",
-  "ENV": "dev",
-  "NODE_REST_ENDPOINT": "https://dev-node.xelis.io",
-  "NODE_REST_KEY": ""
+  "INDEX_REST_ENDPOINT": "https://dev-node.xelis.io",
+  "INDEX_REST_KEY": ""
 }

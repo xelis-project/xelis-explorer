@@ -30,7 +30,7 @@ const argv = yargs(process.argv)
 const main = async () => {
   const outdir = `./public/dist`
 
-  const envData = fs.readFileSync(`./env/${argv.env}.json`, { encoding: `utf-8` })
+  const envData = fs.readFileSync(`./env_public/${argv.env}.json`, { encoding: `utf-8` })
   const env = JSON.parse(envData)
   Object.keys(env).forEach((key) => {
     const value = env[key]

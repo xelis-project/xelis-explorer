@@ -1,5 +1,7 @@
 {
+  "ENV": "mainnet",
   "NODE_WS_ENDPOINT": "wss://node.xelis.io/ws",
   "NODE_RPC_ENDPOINT": "https://node.xelis.io/json_rpc",
-  "ENV": "mainnet"
+  "INDEX_REST_ENDPOINT": "https://node.xelis.io",
+  "INDEX_REST_KEY": ""
 }
