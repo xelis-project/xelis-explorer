@@ -16,6 +16,13 @@ import { Link } from 'react-router-dom'
 import { ToggleThemeButton } from '../../components/header'
 import Age from '../../components/age'
 
+const BLOCK_COLOR = {
+  'Normal': `gray`,
+  'Sync': `green`,
+  'Side': `blue`,
+  'Orphaned': `red`,
+}
+
 function BlockMesh(props) {
   const { title, block, onClick, ...restProps } = props
   const [hover, _setHover] = useState()
@@ -30,15 +37,7 @@ function BlockMesh(props) {
     _setHover(hover)
   })
 
-  let color = `white`
-  switch (block.block_type) {
-    case 'Sync':
-      color = `green`
-      break
-    case 'Side':
-      color = `blue`
-      break
-  }
+  let color = BLOCK_COLOR[block.block_type] || `black`
 
   const variants = {
     hidden: { opacity: 0 },
@@ -60,7 +59,9 @@ function BlockMesh(props) {
         {reduceText(block.hash, 0, 4)}
       </Text>
       <boxGeometry args={[1, 1, 1]} />
-      <motion.meshBasicMaterial color={color} wireframe={!hover}
+      <motion.meshBasicMaterial
+        color={color}
+        //wireframe={!hover}
         initial="hidden"
         animate="visible"
         variants={variants}
@@ -68,6 +69,18 @@ function BlockMesh(props) {
       />
     </motion.mesh>
   </>
+}
+
+function BlockTypeLegend() {
+  return <div className="dag-legend">
+    {Object.keys(BLOCK_COLOR).map((key) => {
+      const color = BLOCK_COLOR[key]
+      return <div className="dag-legend-item">
+        <div className="dag-legend-type">{key}</div>
+        <div className="dag-legend-color" style={{ backgroundColor: color }}></div>
+      </div>
+    })}
+  </div>
 }
 
 function useOffCanvasControls(props) {
@@ -339,7 +352,6 @@ function useOffCanvasBlock(props) {
             </tr>
             <tr>
               <th>Height</th>
-
             </tr>
             <tr>
               <td>{block.height}</td>
@@ -390,7 +402,6 @@ function useOffCanvasBlock(props) {
             </tr>
             <tr>
               <th>Size</th>
-
             </tr>
             <tr>
               <td>{formatBlock.size}</td>
@@ -548,6 +559,7 @@ function DAG() {
         <h1>Xelis DAG</h1>
       </div>
       <NodeConnection />
+      <BlockTypeLegend />
     </div>
     <div className="dag-offcanvas-tr-buttons">
       <Button icon="home" link="/" />
@@ -575,7 +587,7 @@ function DAG() {
                     const tipBlock = blocks.find((b) => b.hash === tip)
                     if (!tipBlock) return null
                     return <mesh key={tip}>
-                      <Line points={[new Vector3(x * distance, y, 0), new Vector3(tipBlock.x * distance, tipBlock.y, 0)]} color="red" lineWidth={2} />
+                      <Line points={[new Vector3(x * distance, y, 0), new Vector3(tipBlock.x * distance, tipBlock.y, 0)]} color="gray" lineWidth={2} />
                     </mesh>
                   })}
                   <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => offCanvasBlock.open(block)} />

@@ -130,3 +130,23 @@
   word-break: break-word;
   overflow: auto;
 }
+
+
+.dag-legend {
+  display: flex;
+  gap: .5em;
+  margin-top: .5em;
+}
+
+.dag-legend-item {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  border: thin solid black;
+  padding: .5em
+}
+
+.dag-legend-color {
+  width: 12px;
+  height: 12px;
+}
