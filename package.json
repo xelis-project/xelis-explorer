@@ -5,7 +5,7 @@
   "scripts": {
     "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
     "start:testnet": "concurrently \"npm run build:local_testnet\" \"npm run serve\"",
-    "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:3010",
+    "serve": "live-server ./public --port=9999 --entry-file=index.html --proxy=/node-proxy:http://127.0.0.1:8080",
     "build:local_dev": "node bundle.js --env=local_dev --watch --sourcemap",
     "build:dev": "node bundle.js --env=dev --sourcemap",
     "build:local_testnet": "node bundle.js --env=testnet --watch --sourcemap",
