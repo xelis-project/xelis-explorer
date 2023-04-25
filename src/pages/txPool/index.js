@@ -26,6 +26,7 @@ function TxPool() {
     const [err, data] = await to(nodeRPC.getMemPool())
     if (err) return resErr(err)
     setMemPool(data)
+    console.log(data)
     setLoading(false)
   }, [])
 
@@ -59,13 +60,16 @@ function TxPool() {
         </thead>
         <TableBody list={memPool} loading={loading} err={err} colSpan={5} emptyText="No transactions"
           onItem={(item) => {
+            const transfers = item.data.transfers || []
             return <tr key={item.hash}>
-              <td>{item.hash}</td> {/* Don't need <Link /> here because tx still does not exists and it will redirect to not found */}
-              <td>{item.data.Transfer.length}</td>
+              <td>{item.hash}</td>{/* Don't need <Link /> here because tx still does not exists and it will redirect to not found */}
+              <td>{transfers.length}</td>
               <td>{reduceText(item.owner)}</td>
               <td>{formatXelis(item.fee)}</td>
               <td>
-                {item.timestamp ? <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} /> : `?`}
+                {item.timestamp
+                  ? <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+                  : `?`}
               </td>
             </tr>
           }}
@@ -185,6 +189,7 @@ function TxExecuted(props) {
           emptyText="No tx executed from last 20 blocks."
           onItem={(item) => {
             const { tx, block } = item
+            const transfers = tx.data.transfers || []
             return <tr key={tx.hash}>
               <td>
                 <Link to={`/block/${block.topoheight}`}>{block.topoheight}</Link>
@@ -193,7 +198,7 @@ function TxExecuted(props) {
               <td>
                 <Link to={`/tx/${tx.hash}`}>{tx.hash}</Link>
               </td>
-              <td>{tx.data.Transfer.length}</td>
+              <td>{transfers.length}</td>
               <td>{reduceText(tx.owner)}</td>
               <td>{formatXelis(tx.fee)}</td>
               <td>

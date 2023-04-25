@@ -43,7 +43,10 @@ function Transaction() {
   if (loading) return <div>Loading<DotLoading /></div>
   if (!loading && !tx) return <NotFound />
 
-  const transfers = tx.data.Transfer
+  const transfers = tx.data.transfers || []
+
+  let burns = []
+  if (tx.data.burn) burns = [tx.data.burn]
 
   return <div>
     <Helmet>
@@ -78,8 +81,9 @@ function Transaction() {
         </table>
       </div>
       <Transfers transfers={transfers} />
+      <Burns burns={burns} />
       <Blocks tx={tx} />
-      <h2>Extra Data</h2>
+      <h2>Extra</h2>
       <div>
         {!tx.extra_data && `No extra data`}
         {tx.extra_data && JSON.stringify(tx.extra_data, null, 2)}
@@ -101,12 +105,39 @@ function Transfers(props) {
             <th>Recipient</th>
           </tr>
         </thead>
-        <TableBody list={transfers} emptyText="No transfers"
+        <TableBody list={transfers} emptyText="No transfers" colSpan={3}
           onItem={(item, index) => {
+            const { amount, asset, to } = item
             return <tr key={index}>
-              <td>{formatAssetName(item.asset)}</td>
-              <td>{formatAsset(item.amount, item.asset)}</td>
-              <td>{item.to}</td>
+              <td>{formatAssetName(asset)}</td>
+              <td>{formatAsset(amount, asset)}</td>
+              <td>{to}</td>
+            </tr>
+          }}
+        />
+      </table>
+    </div>
+  </div>
+}
+
+function Burns(props) {
+  const { burns } = props
+  return <div>
+    <h2>Burns</h2>
+    <div className="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <TableBody list={burns} emptyText="No burns" colSpan={2}
+          onItem={(item, index) => {
+            const { amount, asset } = item
+            return <tr key={index}>
+              <td>{formatAssetName(asset)}</td>
+              <td>{formatAsset(amount, asset)}</td>
             </tr>
           }}
         />

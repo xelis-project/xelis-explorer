@@ -222,38 +222,35 @@ function Transactions(props) {
             <th>Fees</th>
           </tr>
         </thead>
-        <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={5}
+        <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={4}
           onItem={(item) => {
-            const transfer = item.data.Transfer || []
-            const burn = item.data.Burn || []
+            const transfers = item.data.transfers || []
+
+            // only one burn per tx for now but I expect multiple burns per tx later
+            let burns = []
+            if (item.data.burn) burns = [item.data.burn]
+
             return <React.Fragment key={item.hash}>
               <tr>
                 <td><Link to={`/tx/${item.hash}`}>{item.hash}</Link></td>
-                <td>{transfer.length} / {burn.length / 2}</td>
+                <td>{transfers.length} / {burns.length}</td>
                 <td>{reduceText(item.owner)}</td>
                 <td>{formatXelis(item.fee)}</td>
               </tr>
               <tr>
                 <td colSpan={4}>
-                  {transfer.map((transferItem, index) => {
-                    const { amount, asset, to } = transferItem
+                  {transfers.map((transfer, index) => {
+                    const { amount, asset, to } = transfer
                     return <div key={index}>
                       {index + 1}. Sent {formatAsset(amount, asset)} to {to}
                     </div>
                   })}
-                  {(() => {
-                    const burns = []
-                    for (let i = 0; i < burn.length; i += 2) {
-                      const asset = burn[i]
-                      const amount = burn[i + 1]
-                      const key = asset + amount + i
-                      burns.push(<div key={key}>
-                        {i / 2 + 1}. Burn {formatAsset(amount, asset)}
-                      </div>)
-                    }
-
-                    return burns
-                  })()}
+                  {burns.map((burn, index) => {
+                    const { amount, asset } = burn
+                    return <div key={index}>
+                      {index + 1}. Burn {formatAsset(amount, asset)}
+                    </div>
+                  })}
                 </td>
               </tr>
             </React.Fragment>
