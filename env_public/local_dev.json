@@ -1,5 +1,5 @@
 {
-  "ENV": "local_dev",
+  "ENV": "dev",
   "NODE_WS_ENDPOINT": "ws://127.0.0.1:8080/ws",
   "NODE_RPC_ENDPOINT": "/node-proxy/json_rpc",
   "INDEX_REST_ENDPOINT": "http://localhost:54321",
