@@ -217,27 +217,43 @@ function Transactions(props) {
         <thead>
           <tr>
             <th>Hash</th>
-            <th>Transfers</th>
+            <th>Transfers / Burns</th>
             <th>Signer</th>
             <th>Fees</th>
           </tr>
         </thead>
         <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={5}
           onItem={(item) => {
+            const transfer = item.data.Transfer || []
+            const burn = item.data.Burn || []
             return <React.Fragment key={item.hash}>
               <tr>
                 <td><Link to={`/tx/${item.hash}`}>{item.hash}</Link></td>
-                <td>{item.data.Transfer.length}</td>
+                <td>{transfer.length} / {burn.length / 2}</td>
                 <td>{reduceText(item.owner)}</td>
                 <td>{formatXelis(item.fee)}</td>
               </tr>
               <tr>
                 <td colSpan={4}>
-                  {item.data.Transfer.map((transfer, index) => {
+                  {transfer.map((transferItem, index) => {
+                    const { amount, asset, to } = transferItem
                     return <div key={index}>
-                      {index + 1}. Sent {formatAsset(transfer.amount, transfer.asset)} to {transfer.to}
+                      {index + 1}. Sent {formatAsset(amount, asset)} to {to}
                     </div>
                   })}
+                  {(() => {
+                    const burns = []
+                    for (let i = 0; i < burn.length; i += 2) {
+                      const asset = burn[i]
+                      const amount = burn[i + 1]
+                      const key = asset + amount + i
+                      burns.push(<div key={key}>
+                        {i / 2 + 1}. Burn {formatAsset(amount, asset)}
+                      </div>)
+                    }
+
+                    return burns
+                  })()}
                 </td>
               </tr>
             </React.Fragment>
