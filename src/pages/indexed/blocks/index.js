@@ -75,7 +75,7 @@ function Blocks() {
               <td>
                 <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
               </td>
-              <td>{bytes.format(item.size)}</td>
+              <td>{formatSize(item.size)}</td>
               <td>{reduceText(item.hash)}</td>
               <td>{formatXelis(item.total_fees)}</td>
               <td>{reduceText(item.miner)}</td>

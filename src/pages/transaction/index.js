@@ -7,7 +7,6 @@ import to from 'await-to-js'
 import TableBody from '../../components/tableBody'
 import { formatXelis, formatAsset, formatAssetName, reduceText } from '../../utils'
 import { Link } from 'react-router-dom'
-import bytes from 'bytes'
 import DotLoading from '../../components/dotLoading'
 
 function Transaction() {
@@ -195,7 +194,7 @@ function Blocks(props) {
         </thead>
         <TableBody list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={6}
           onItem={(item, index) => {
-            const size = bytes.format(item.total_size_in_bytes)
+            const size = formatSize(item.total_size_in_bytes)
             const time = new Date(item.timestamp).toLocaleString()
             return <tr key={item.hash}>
               <td><Link to={`/block/${item.topoheight}`}>{item.topoheight}</Link></td>

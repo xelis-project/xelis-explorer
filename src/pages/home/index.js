@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import bytes from 'bytes'
 import Age from '../../components/age'
-import { formatHashRate, formatXelis, groupBy, reduceText } from '../../utils'
+import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
@@ -121,7 +120,7 @@ function RecentBlocks() {
     {/*<div className="recent-blocks-items">
       {blocks.map((item, index) => {
         const txCount = item.txs_hashes.length
-        const size = bytes.format(item.total_size_in_bytes || 0)
+        const size = formatSize(item.total_size_in_bytes || 0)
         const stableHeight = blocks[0].height - 8
         const statusClassName = item.height <= stableHeight ? `stable` : `mined`
         const key = index + Math.random() // random key to force re-render and repeat animation
@@ -148,7 +147,7 @@ function RecentBlocks() {
           <div className="recent-blocks-group-items">
             {groupBlocks.map((block) => {
               const txCount = block.txs_hashes.length
-              const size = bytes.format(block.total_size_in_bytes || 0)
+              const size = formatSize(block.total_size_in_bytes || 0)
 
               let statusClassName = `mined`
               switch (block.block_type) {

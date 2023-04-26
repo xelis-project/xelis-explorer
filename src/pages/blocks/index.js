@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import bytes from 'bytes'
 import to from 'await-to-js'
 
-import { formatXelis, reduceText } from '../../utils'
+import { formatSize, formatXelis, reduceText } from '../../utils'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet-async'
@@ -77,7 +76,7 @@ function Blocks() {
         </thead>
         <TableBody list={blocks} err={err} loading={loading} colSpan={10} emptyText="No blocks"
           onItem={(item) => {
-            const size = bytes.format(item.total_size_in_bytes)
+            const size = formatSize(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
                 <Link to={`/block/${item.topoheight}`}>{item.topoheight}</Link>
@@ -89,7 +88,9 @@ function Blocks() {
                 <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
               </td>
               <td>{size}</td>
-              <td>{reduceText(item.hash)}</td>
+              <td>
+                <Link to={`/block/${item.hash}`}>{reduceText(item.hash)}</Link>
+              </td>
               <td>{formatXelis(item.total_fees)}</td>
               <td>{reduceText(item.miner)}</td>
               <td>{formatXelis(item.reward)}</td>

@@ -28,6 +28,10 @@ export const formatAsset = (value, asset) => {
   }
 }
 
+export const formatSize = (value, options = { unitSeparator: ` ` }) => {
+  return bytes.format(value, options)
+}
+
 export const formatAssetName = (asset) => {
   switch (asset) {
     case XELIS_ASSET:
@@ -92,7 +96,7 @@ export const formatHashRate = (value, decimals = 2) => {
     unit = `KH/s`
   }
 
-  return `${value.toFixed(decimals)} ${unit} `
+  return `${value.toFixed(decimals)} ${unit}`
 }
 
 export const formattedBlock = (block, topoheight) => {
@@ -102,7 +106,7 @@ export const formattedBlock = (block, topoheight) => {
     totalFees: formatXelis(block.total_fees),
     reward: formatXelis(block.reward),
     confirmations: topoheight - block.topoheight,
-    size: bytes.format(block.total_size_in_bytes),
+    size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
     hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15

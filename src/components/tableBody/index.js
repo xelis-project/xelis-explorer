@@ -3,7 +3,7 @@ import DotLoading from '../dotLoading'
 function TableBody(props) {
   const { list = [], onItem, loading, err, colSpan, emptyText = `No items` } = props
 
-  const listBodyStyle = loading ? { opacity: .5 } : {}
+  const listBodyStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
 
   return <>
     <tbody>
@@ -19,9 +19,9 @@ function TableBody(props) {
         </td>}
       </tr>
     </tbody>
-    {!loading && <tbody style={listBodyStyle}>
+    <tbody style={listBodyStyle}>
       {list.map((item, index) => onItem(item, index))}
-    </tbody>}
+    </tbody>
   </>
 }
 

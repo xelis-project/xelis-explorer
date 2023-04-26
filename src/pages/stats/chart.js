@@ -1,11 +1,10 @@
-import bytes from 'bytes'
 import prettyMS from 'pretty-ms'
 import { useCallback, useEffect, useState, useMemo } from 'react'
 
 import Button from '../../components/button'
 import Chart from '../../components/chart'
 import useSupabase from '../../hooks/useSupabase'
-import { formatXelis } from '../../utils'
+import { formatXelis, formatSize } from '../../utils'
 import { IntervalSelect } from './table'
 
 function StatsChart() {
@@ -111,7 +110,7 @@ function StatsChart() {
                 switch (column) {
                   case `avg_block_size`:
                   case `sum_size`:
-                    return bytes.format(value)
+                    return formatSize(value)
                   case 'sum_block_fees':
                   case 'sum_block_reward':
                   case 'avg_block_reward':

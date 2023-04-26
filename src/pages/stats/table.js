@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import bytes from 'bytes'
 
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableBody from '../../components/tableBody'
@@ -68,13 +67,13 @@ function StatsTable(props) {
             return <tr key={item.time}>
               <td>{new Date(item.time).toLocaleString()}</td>
               <td>{item.block_count}</td>
-              <td>{bytes.format(item.sum_size)}</td>
+              <td>{formatSize(item.sum_size)}</td>
               <td>{formatXelis(item.sum_block_reward, false)}</td>
               <td>{formatXelis(item.sum_block_fees, false)}</td>
               <td>{item.tx_count}</td>
               <td>{item.avg_difficulty}</td>
               <td>{item.avg_block_time}</td>
-              <td>{bytes.format(item.avg_block_size)}</td>
+              <td>{formatSize(item.avg_block_size)}</td>
               <td>{formatXelis(item.avg_block_reward, false)}</td>
               <td>{formatXelis(item.avg_block_fees, false)}</td>
             </tr>
