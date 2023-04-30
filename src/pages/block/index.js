@@ -78,10 +78,10 @@ function Block() {
         The miner of this block earned {formatBlock.reward}.
       </div>
       <div className="left-right-buttons">
-        {formatBlock.hasPreviousBlock && <Button className="button" link={`/block/${block.topoheight - 1}`} icon="chevron-left-r">
+        {formatBlock.hasPreviousBlock && <Button className="button" link={`/blocks/${block.topoheight - 1}`} icon="chevron-left-r">
           Previous Block ({block.topoheight - 1})
         </Button>}
-        {formatBlock.hasNextBlock && <Button className="button" link={`/block/${block.topoheight + 1}`} icon="chevron-right-r" iconLocation="right">
+        {formatBlock.hasNextBlock && <Button className="button" link={`/blocks/${block.topoheight + 1}`} icon="chevron-right-r" iconLocation="right">
           Next Block ({block.topoheight + 1})
         </Button>}
       </div>
@@ -159,7 +159,7 @@ function Block() {
               <td style={{ lineHeight: `1.4em` }}>
                 {block.tips.map((tip, index) => {
                   return <div key={tip} style={{ wordBreak: `break-all` }}>
-                    {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
+                    {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
                   </div>
                 })}
               </td>
@@ -232,9 +232,9 @@ function Transactions(props) {
 
             return <React.Fragment key={item.hash}>
               <tr>
-                <td><Link to={`/tx/${item.hash}`}>{item.hash}</Link></td>
+                <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
                 <td>{transfers.length} / {burns.length}</td>
-                <td>{reduceText(item.owner)}</td>
+                <td>{reduceText(item.owner, 0, 7)}</td>
                 <td>{formatXelis(item.fee)}</td>
               </tr>
               <tr>

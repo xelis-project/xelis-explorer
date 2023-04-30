@@ -4,7 +4,7 @@ Official Explorer for Xelis Blockchain.
 
 - Realtime statistics with web sockets
 - Navigate all blocks of the entire blockchain
-- Live transaction pool
+- Live mempool
 - BlockDAG viewer
 
 <https://explorer.xelis.io>  

@@ -8,7 +8,6 @@ import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '..
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
-import useSupabase from '../../hooks/useSupabase'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -20,12 +19,12 @@ function ExplorerSearch() {
     if (searchValue === ``) return
 
     if (searchValue.length === 64) {
-      return navigate(`/tx/${searchValue}`)
+      return navigate(`/txs/${searchValue}`)
     }
 
     const height = parseInt(searchValue)
     if (!isNaN(height)) {
-      return navigate(`/block/${height}`)
+      return navigate(`/blocks/${height}`)
     }
   }, [])
 
@@ -125,7 +124,7 @@ function RecentBlocks() {
         const statusClassName = item.height <= stableHeight ? `stable` : `mined`
         const key = index + Math.random() // random key to force re-render and repeat animation
 
-        return <Link to={`/block/${item.height}`} key={key} className={`recent-blocks-item`}>
+        return <Link to={`/blocks/${item.height}`} key={key} className={`recent-blocks-item`}>
           <div className={`recent-blocks-item-status ${statusClassName}`} />
           <div className="recent-blocks-item-title">Block {item.height}</div>
           <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
@@ -156,11 +155,11 @@ function RecentBlocks() {
                   statusClassName = `stable`
               }
 
-              return <Link to={`/block/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
+              return <Link to={`/blocks/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
                 <div className={`recent-blocks-item-status ${statusClassName}`} />
                 <div className="recent-blocks-item-title">Block {block.topoheight}</div>
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
-                <div className="recent-blocks-item-miner">{reduceText(block.miner)}</div>
+                <div className="recent-blocks-item-miner">{reduceText(block.miner, 0, 7)}</div>
                 <div className="recent-blocks-item-time">
                   <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
                 </div>
@@ -217,25 +216,8 @@ function Stats() {
   const [info, setInfo] = useState({})
   const [err, setErr] = useState()
 
-  const supabase = useSupabase()
   const [loading, setLoading] = useState(true)
   const [list, setList] = useState([])
-
-  const loadStats = useCallback(async () => {
-    setLoading(true)
-    const query = supabase
-      .rpc(`get_stats`, { interval: `hour` })
-      .order(`time`, { ascending: false })
-
-    const { error, data } = await query.range(0, 10)
-    setLoading(false)
-    if (error) return setErr(error)
-    setList(data.reverse())
-  }, [supabase])
-
-  useEffect(() => {
-    loadStats()
-  }, [loadStats])
 
   const loadInfo = useCallback(async () => {
     const [err, info] = await to(nodeSocket.sendMethod(`get_info`))

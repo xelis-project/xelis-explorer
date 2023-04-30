@@ -69,17 +69,16 @@ function Blocks() {
             <th>Age</th>
             <th>Size</th>
             <th>Hash</th>
-            <th>Total Fees</th>
             <th>Miner</th>
             <th>Reward</th>
           </tr>
         </thead>
-        <TableBody list={blocks} err={err} loading={loading} colSpan={10} emptyText="No blocks"
+        <TableBody list={blocks} err={err} loading={loading} colSpan={9} emptyText="No blocks"
           onItem={(item) => {
             const size = formatSize(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
-                <Link to={`/block/${item.topoheight}`}>{item.topoheight}</Link>
+                <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
               <td>{item.height}</td>
               <td>{item.block_type}</td>
@@ -89,10 +88,9 @@ function Blocks() {
               </td>
               <td>{size}</td>
               <td>
-                <Link to={`/block/${item.hash}`}>{reduceText(item.hash)}</Link>
+                <Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link>
               </td>
-              <td>{formatXelis(item.total_fees)}</td>
-              <td>{reduceText(item.miner)}</td>
+              <td>{reduceText(item.miner, 0, 7)}</td>
               <td>{formatXelis(item.reward)}</td>
             </tr>
           }}

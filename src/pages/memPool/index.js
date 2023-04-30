@@ -8,7 +8,7 @@ import to from 'await-to-js'
 import { formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 
-function TxPool() {
+function MemPool() {
   const [memPool, setMemPool] = useState([])
   const nodeRPC = useNodeRPC()
   const [loading, setLoading] = useState(true)
@@ -44,9 +44,9 @@ function TxPool() {
 
   return <div>
     <Helmet>
-      <title>Transaction Pool</title>
+      <title>Mempool</title>
     </Helmet>
-    <h1>Transaction Pool</h1>
+    <h1>Mempool</h1>
     <div className="table-responsive">
       <table>
         <thead>
@@ -64,7 +64,7 @@ function TxPool() {
             return <tr key={item.hash}>
               <td>{item.hash}</td>{/* Don't need <Link /> here because tx still does not exists and it will redirect to not found */}
               <td>{transfers.length}</td>
-              <td>{reduceText(item.owner)}</td>
+              <td>{reduceText(item.owner, 0, 7)}</td>
               <td>{formatXelis(item.fee)}</td>
               <td>
                 {item.timestamp
@@ -192,11 +192,11 @@ function TxExecuted(props) {
             const transfers = tx.data.transfers || []
             return <tr key={tx.hash}>
               <td>
-                <Link to={`/block/${block.topoheight}`}>{block.topoheight}</Link>
+                <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
                 &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
               </td>
               <td>
-                <Link to={`/tx/${tx.hash}`}>{tx.hash}</Link>
+                <Link to={`/txs/${tx.hash}`}>{tx.hash}</Link>
               </td>
               <td>{transfers.length}</td>
               <td>{reduceText(tx.owner)}</td>
@@ -212,4 +212,4 @@ function TxExecuted(props) {
   </div>
 }
 
-export default TxPool
+export default MemPool

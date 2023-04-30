@@ -75,7 +75,7 @@ function BlockTypeLegend() {
   return <div className="dag-legend">
     {Object.keys(BLOCK_COLOR).map((key) => {
       const color = BLOCK_COLOR[key]
-      return <div className="dag-legend-item">
+      return <div key={key} className="dag-legend-item">
         <div className="dag-legend-type">{key}</div>
         <div className="dag-legend-color" style={{ backgroundColor: color }}></div>
       </div>
@@ -328,7 +328,7 @@ function useOffCanvasBlock(props) {
             </tr>
             <tr>
               <td>
-                <Link to={`/block/${block.hash}`}>{block.hash}</Link>
+                <Link to={`/blocks/${block.hash}`}>{block.hash}</Link>
               </td>
             </tr>
             <tr>
@@ -422,7 +422,7 @@ function useOffCanvasBlock(props) {
               <td style={{ lineHeight: `1.4em` }}>
                 {block.tips.map((tip, index) => {
                   return <div key={tip} style={{ wordBreak: `break-all` }}>
-                    {index + 1}. <Link to={`/block/${tip}`}>{tip}</Link>
+                    {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
                   </div>
                 })}
               </td>
