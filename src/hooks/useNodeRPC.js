@@ -80,8 +80,15 @@ const useNodeRPC = () => {
     return rpcPost(`get_info`)
   }, [])
 
-  const getBlocks = useCallback((start, end) => {
-    return rpcPost(`get_blocks`, {
+  const getBlocksRangeByHeight = useCallback((start, end) => {
+    return rpcPost(`get_blocks_range_by_height`, {
+      start_height: start,
+      end_height: end
+    })
+  }, [])
+
+  const getBlocksRangeByTopoheight = useCallback((start, end) => {
+    return rpcPost(`get_blocks_range_by_topoheight`, {
       start_topoheight: start,
       end_topoheight: end
     })
@@ -103,7 +110,8 @@ const useNodeRPC = () => {
     getTopBlock, getHeight, getTopoHeight, getBlockTemplate,
     getBlockAtTopoHeight, getBlockByHash, getBlocksAtHeight,
     getNonce, getBalance, getAssets, countTransactions,
-    getTips, p2pStatus, getInfo, getBlocks, getMemPool,
+    getTips, p2pStatus, getInfo, getBlocksRangeByHeight,
+    getBlocksRangeByTopoheight, getMemPool,
     getTransaction, getTransactions
   }
 }

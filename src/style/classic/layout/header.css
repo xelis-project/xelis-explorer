@@ -138,6 +138,7 @@
     font-weight: bold;
     color: var(--header-nav-color);
     user-select: none;
+    position: relative;
   }
 
   .header-nav-item:hover {
@@ -158,7 +159,7 @@
   .header-nav-item-active::after {
     content: '';
     background-color: var(--header-nav-active-color);
-    width: 30px;
+    width: 50%;
     height: 4px;
     display: block;
     margin: .3em 0;

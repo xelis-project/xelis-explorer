@@ -35,11 +35,11 @@ function Blocks() {
 
     const count = topoheight + 1
     // reverse pager range
-    let start = count - pagination.end - 1
-    if (start < 0) start = 0
-    let end = count - pagination.start - 1
+    let startTopoheight = count - pagination.end - 1
+    if (startTopoheight < 0) startTopoheight = 0
+    let endTopoheight = count - pagination.start - 1
 
-    const [err2, blocks] = await to(nodeRPC.getBlocks(start, end))
+    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByTopoheight(startTopoheight, endTopoheight))
     if (err2) return resErr(err2)
 
     setCount(count)

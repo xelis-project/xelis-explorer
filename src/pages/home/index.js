@@ -58,10 +58,10 @@ function RecentBlocks() {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
+    const [err1, height] = await to(nodeRPC.getHeight())
     if (err1) return resErr(err1)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 10, topoheight))
+    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByHeight(height - 10, height))
     if (err2) return resErr(err2)
     setLoading(false)
 

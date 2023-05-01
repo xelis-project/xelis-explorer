@@ -103,7 +103,7 @@ export const formattedBlock = (block, topoheight) => {
   return {
     date: new Date(block.timestamp).toLocaleString(),
     miner: reduceText(block.miner),
-    totalFees: formatXelis(block.total_fees),
+    totalFees: formatXelis(block.total_fees), // if available (include_txs?)
     reward: formatXelis(block.reward),
     confirmations: topoheight - block.topoheight,
     size: formatSize(block.total_size_in_bytes),

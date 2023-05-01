@@ -103,7 +103,7 @@ function TxExecuted(props) {
     if (err1) return resErr(err1)
     setTopoheight(topoheight)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocks(topoheight - 19, topoheight))
+    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByTopoheight(topoheight - 19, topoheight))
     if (err2) return resErr(err2)
 
     blocks.reverse()
