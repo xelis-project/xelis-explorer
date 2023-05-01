@@ -25,18 +25,22 @@ const BLOCK_COLOR = {
 }
 
 function BlockMesh(props) {
-  const { title, block, onClick, ...restProps } = props
-  const [hover, _setHover] = useState()
+  const { title, block, onPointerEnter, onPointerLeave, onClick, ...restProps } = props
 
   const setCursor = useCallback((cursor) => {
     document.documentElement.style.cursor = cursor
   }, [])
 
-  const setHover = useCallback((hover) => {
-    if (hover) setCursor(`pointer`)
-    else setCursor(``)
-    _setHover(hover)
-  })
+  const setHoverState = useCallback((value) => {
+    if (value) {
+      if (typeof onPointerEnter === `function`) onPointerEnter()
+      setCursor(`pointer`)
+    }
+    else {
+      if (typeof onPointerLeave === `function`) onPointerLeave()
+      setCursor(``)
+    }
+  }, [onPointerEnter, onPointerLeave])
 
   let color = BLOCK_COLOR[block.block_type] || `black`
 
@@ -47,14 +51,14 @@ function BlockMesh(props) {
 
   return <>
     <motion.mesh {...restProps}
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ scale: 1.2 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
+      onPointerEnter={() => setHoverState(true)}
+      onPointerLeave={() => setHoverState(false)}
       scale={0}
       animate={{ scale: 1 }}
-      transition={{ duration: .5, ease: 'backInOut' }}
+      transition={{ duration: .25, ease: 'backInOut' }}
     >
       <Text color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .9, 0]}>
         {reduceText(block.hash, 0, 4)}
@@ -587,6 +591,8 @@ function DAG() {
     return entries
   }, [blocks])
 
+  const [hoveredBlock, setHoveredBlock] = useState(null)
+
   return <div>
     <Helmet>
       <title>DAG</title>
@@ -626,11 +632,24 @@ function DAG() {
                   {block.tips.map((tip) => {
                     const blockTip = blocks.find((b) => b.hash === tip)
                     if (!blockTip) return null
+
+                    let z = 0
+                    let color = `lightgray`
+                    let lineWidth = 2
+                    if (hoveredBlock && hoveredBlock.hash === block.hash) {
+                      color = `yellow`
+                      z = 1
+                      lineWidth = 3
+                    }
+
                     return <mesh key={tip}>
-                      <Line points={[new Vector3(blockTip.x * distance, blockTip.y, 0), new Vector3(x * distance, y, 0)]} color="lightgray" lineWidth={2} />
+                      <Line points={[new Vector3(blockTip.x * distance, blockTip.y, z), new Vector3(x * distance, y, z)]}
+                        color={color} lineWidth={lineWidth} />
                     </mesh>
                   })}
-                  <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => offCanvasBlock.open(block)} />
+                  <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => offCanvasBlock.open(block)}
+                    onPointerEnter={() => setHoveredBlock(block)} onPointerLeave={() => setHoveredBlock(null)}
+                  />
                   {innerBlocks.length - 1 === blockIndex && <Text color="black" anchorX="center"
                     anchorY="middle" fontSize={.3} position={[x * distance, 0, 1]}
                     outlineWidth={.05} outlineColor="#ffffff">

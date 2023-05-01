@@ -38,7 +38,7 @@ export const NodeSocketProvider = (props) => {
   const subscribe = useCallback((event, onData) => {
     const onMessage = (message) => {
       const data = JSON.parse(message.data)
-      if (data.id === 1 && data.result.event === event) {
+      if (data.id === 1 && data.result && data.result.event === event) {
         onData(data.result)
       }
     }
