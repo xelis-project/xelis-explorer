@@ -638,8 +638,8 @@ function DAG() {
                     let lineWidth = 2
                     if (hoveredBlock && hoveredBlock.hash === block.hash) {
                       color = `yellow`
-                      z = 1
-                      lineWidth = 3
+                      z = 5
+                      lineWidth = 4
                     }
 
                     return <mesh key={tip}>
