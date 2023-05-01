@@ -138,12 +138,20 @@ function useOffCanvasControls(props) {
       }} style={{ width: `100%` }} disabled={!paused} />
       <div className="dag-controls-buttons">
         <button className="button" disabled={!paused}
+          onClick={() => setInputHeight(inputHeight - 1)}>
+          Previous
+        </button>
+        <button className="button" disabled={!paused}
           onClick={() => setInputHeight(inputHeight - 10)}>
           Previous (10)
         </button>
         <button className="button" disabled={!paused}
           onClick={() => setInputHeight(inputHeight + 10)}>
           Next (10)
+        </button>
+        <button className="button" disabled={!paused}
+          onClick={() => setInputHeight(inputHeight + 1)}>
+          Next
         </button>
       </div>
       {!paused && <div>Last block since {prettyMilliseconds(lastBlockTime, { secondsDecimalDigits: 0 })}...</div>}
@@ -386,7 +394,6 @@ function useOffCanvasBlock(props) {
             </tr>
             <tr>
               <th>Miner</th>
-
             </tr>
             <tr>
               <td>{block.miner}</td>
@@ -543,7 +550,7 @@ function DAG() {
   }, [offCanvasControls.paused])
 
   useEffect(() => {
-    if (blocks.length >= 20) {
+    if (blocks.length > 20) {
       blocks.pop()
       setBlocks(blocks)
     }
