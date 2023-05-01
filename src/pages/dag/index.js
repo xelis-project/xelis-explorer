@@ -638,7 +638,7 @@ function DAG() {
                     let lineWidth = 2
                     if (hoveredBlock && hoveredBlock.hash === block.hash) {
                       color = `yellow`
-                      z = 5
+                      z = 1
                       lineWidth = 4
                     }
 
@@ -647,11 +647,11 @@ function DAG() {
                         color={color} lineWidth={lineWidth} />
                     </mesh>
                   })}
-                  <BlockMesh block={block} position={[x * distance, y, 0]} onClick={() => offCanvasBlock.open(block)}
+                  <BlockMesh block={block} position={[x * distance, y, 2]} onClick={() => offCanvasBlock.open(block)}
                     onPointerEnter={() => setHoveredBlock(block)} onPointerLeave={() => setHoveredBlock(null)}
                   />
                   {innerBlocks.length - 1 === blockIndex && <Text color="black" anchorX="center"
-                    anchorY="middle" fontSize={.3} position={[x * distance, 0, 1]}
+                    anchorY="middle" fontSize={.3} position={[x * distance, 0, 4]}
                     outlineWidth={.05} outlineColor="#ffffff">
                     {height}
                   </Text>}
