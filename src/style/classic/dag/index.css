@@ -76,22 +76,16 @@
   margin-left: -8em;
   top: 50%;
   margin-top: -8em;
-  animation: rotate-center .5s cubic-bezier(0.550, 0.085, 0.680, 0.530);
-  opacity: 0;
-  left: -999999px;
+  animation: rotate-center 1s infinite;
 }
 
 @keyframes rotate-center {
   0% {
     transform: rotate(0);
-    opacity: 1;
-    left: 50%;
   }
 
   100% {
     transform: rotate(360deg);
-    opacity: 0;
-    left: 50%;
   }
 }
 
@@ -135,7 +129,7 @@
 .dag-legend {
   display: flex;
   gap: .5em;
-  margin-top: .5em;
+  margin: .5em 0;
 }
 
 .dag-legend-item {

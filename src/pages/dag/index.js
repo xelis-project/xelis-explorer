@@ -49,6 +49,8 @@ function BlockMesh(props) {
     visible: { opacity: 1 },
   }
 
+  let topoheight = block.topoheight ? reduceText(block.topoheight.toString(), 0, 4) : `--`
+
   return <>
     <motion.mesh {...restProps}
       whileHover={{ scale: 1.2 }}
@@ -62,6 +64,11 @@ function BlockMesh(props) {
     >
       <Text color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .9, 0]}>
         {reduceText(block.hash, 0, 4)}
+      </Text>
+      <Text color="black" anchorX="center"
+        anchorY="middle" fontSize={.3} position={[0, 0, 4]}
+        outlineWidth={.05} outlineColor="#ffffff">
+        {topoheight}
       </Text>
       <boxGeometry args={[1, 1, 1]} />
       <motion.meshBasicMaterial
@@ -88,22 +95,41 @@ function BlockTypeLegend() {
   </div>
 }
 
+function HeightRangeInput(props) {
+  const { height, inputHeight, setInputHeight, paused } = props
+  const [_value, setValue] = useState()
+
+  let value = _value ? _value : inputHeight || 0
+
+  return <div style={{ width: `100%` }}>
+    <div>Height: {value}</div>
+    <input type="range" value={value} step={1}
+      onChange={(e) => setValue(e.target.valueAsNumber)}
+      onMouseUp={() => {
+        setValue(null)
+        setInputHeight(value)
+      }}
+      min={0} max={height}
+      disabled={!paused} style={{ width: `100%` }} />
+  </div>
+}
+
 function useOffCanvasControls(props) {
   const { height, blocks, onBlockClick } = props
 
   const [opened, setOpened] = useState(false)
   const [paused, setPaused] = useState(false)
-  const [flat, setFlat] = useState(true)
-  const [inputHeight, setInputHeight] = useState(0)
+  const [hideOrphaned, setHideOrphaned] = useState(false)
+  const [inputHeight, setInputHeight] = useState()
   const [lastBlockTime, setLastBlockTime] = useState(0)
 
   useEffect(() => {
-    if (!height) return
-    setInputHeight(height)
+    if (!inputHeight) setInputHeight(height)
   }, [height])
 
   useEffect(() => {
     if (paused) return
+
     const intervalId = setInterval(() => {
       setLastBlockTime(v => v += 1000)
     }, [1000])
@@ -120,26 +146,28 @@ function useOffCanvasControls(props) {
     }
   }, [blocks, paused])
 
-  const render = <OffCanvas
-    title="Controls"
-    opened={opened}
-    width={500}
-    position="right"
-    onClose={() => setOpened(false)}
-  >
+  const filteredBlocks = useMemo(() => {
+    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned')
+    return blocks
+  }, [hideOrphaned, blocks])
+
+  const render = <OffCanvas title="Controls" opened={opened}
+    width={500} position="right" onClose={() => setOpened(false)}>
     <div className="dag-controls-items">
-      {/*<div>
-        <input type="checkbox" checked={flat} onChange={() => setFlat(!flat)} />
-        <label>Flat Viewport</label>
-</div>*/}
       <div>
-        <input type="checkbox" checked={paused} onChange={() => setPaused(!paused)} />
+        <input type="checkbox" checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
+        <label>Hide Orphaned</label>
+      </div>
+      <div>
+        <input type="checkbox" checked={paused} onChange={(e) => {
+          const value = e.target.checked
+          setPaused(value)
+          if (!value) setInputHeight(height)
+        }} />
         <label>Pause DAG</label>
       </div>
-      <div>Height: {paused ? inputHeight : height}</div>
-      <input type="range" min={20} max={height} value={inputHeight} onChange={(e) => {
-        setInputHeight(e.target.valueAsNumber)
-      }} style={{ width: `100%` }} disabled={!paused} />
+      <HeightRangeInput height={height}
+        inputHeight={inputHeight} setInputHeight={setInputHeight} paused={paused} />
       <div className="dag-controls-buttons">
         <button className="button" disabled={!paused}
           onClick={() => setInputHeight(inputHeight - 1)}>
@@ -173,14 +201,16 @@ function useOffCanvasControls(props) {
           </tr>
         </thead>
         <tbody>
-          {blocks.map((block) => {
+          {filteredBlocks.map((block) => {
             const txCount = block.txs_hashes.length
             return <tr key={block.hash} onClick={() => onBlockClick(block)}>
               <td>
                 <span title="Height">{block.height}</span>&nbsp;
                 {block.topoheight && <span title="Topo Height">({block.topoheight})</span>}
               </td>
-              <td>{block.block_type}</td>
+              <td style={{ color: BLOCK_COLOR[block.block_type] || `black` }}>
+                {block.block_type}
+              </td>
               <td>{reduceText(block.hash, 0, 4)}</td>
               <td>{txCount}</td>
               <td>
@@ -193,11 +223,11 @@ function useOffCanvasControls(props) {
     </div>
   </OffCanvas>
 
-  return { render, setOpened, paused, flat, inputHeight }
+  return { render, setOpened, paused, inputHeight, hideOrphaned }
 }
 
 function CameraWithControls(props) {
-  const { flat, camRef, ...restProps } = props
+  const { flat = true, camRef, ...restProps } = props
   const [canMove, setCanMove] = useState(false)
   const { camera, gl } = useThree()
   const lastPosition = useRef()
@@ -237,7 +267,7 @@ function CameraWithControls(props) {
     }
 
     const handleMouseDown = (event) => {
-      event.preventDefault()
+      //event.preventDefault()
       setCanMove(true)
       lastPosition.current = [event.clientX, event.clientY]
     }
@@ -257,7 +287,7 @@ function CameraWithControls(props) {
     }
 
     const handleMouseUp = (event) => {
-      event.preventDefault()
+      //event.preventDefault()
       setCanMove(false)
     }
 
@@ -266,13 +296,13 @@ function CameraWithControls(props) {
     }
 
     const handleMouseMove = (event) => {
-      event.preventDefault()
+      //event.preventDefault()
       if (!canMove) return
       updatePosition(event.clientX, event.clientY)
     }
 
     const handleTouchMove = (event) => {
-      event.preventDefault()
+      //event.preventDefault()
       const touches = event.touches
 
       if (canMove && touches.length === 1) {
@@ -294,21 +324,21 @@ function CameraWithControls(props) {
     }
 
     gl.domElement.addEventListener('wheel', handleZoom, { passive: true })
-    gl.domElement.addEventListener('mousedown', handleMouseDown)
-    gl.domElement.addEventListener('mouseup', handleMouseUp)
-    gl.domElement.addEventListener('mousemove', handleMouseMove)
-    gl.domElement.addEventListener('mouseout', handleMouseUp)
-    gl.domElement.addEventListener('touchmove', handleTouchMove)
-    gl.domElement.addEventListener('touchstart', handleTouchDown)
-    gl.domElement.addEventListener('touchend', handleTouchEnd)
+    gl.domElement.addEventListener('mousedown', handleMouseDown, { passive: true })
+    gl.domElement.addEventListener('mouseup', handleMouseUp, { passive: true })
+    gl.domElement.addEventListener('mousemove', handleMouseMove, { passive: true })
+    gl.domElement.addEventListener('mouseout', handleMouseUp, { passive: true })
+    gl.domElement.addEventListener('touchmove', handleTouchMove, { passive: true })
+    gl.domElement.addEventListener('touchstart', handleTouchDown, { passive: true })
+    gl.domElement.addEventListener('touchend', handleTouchEnd, { passive: true })
 
     return () => {
       gl.domElement.removeEventListener('wheel', handleZoom, { passive: true })
-      gl.domElement.removeEventListener('mousedown', handleMouseDown)
-      gl.domElement.removeEventListener('mouseup', handleMouseUp)
-      gl.domElement.removeEventListener('mousemove', handleMouseMove)
-      gl.domElement.removeEventListener('mouseout', handleMouseUp)
-      gl.domElement.removeEventListener('touchmove', handleTouchMove) // can't passive because we need preventDefault()
+      gl.domElement.removeEventListener('mousedown', handleMouseDown, { passive: true })
+      gl.domElement.removeEventListener('mouseup', handleMouseUp, { passive: true })
+      gl.domElement.removeEventListener('mousemove', handleMouseMove, { passive: true })
+      gl.domElement.removeEventListener('mouseout', handleMouseUp, { passive: true })
+      gl.domElement.removeEventListener('touchmove', handleTouchMove, { passive: true }) // can't passive because we need preventDefault()
       gl.domElement.removeEventListener('touchstart', handleTouchDown, { passive: true })
       gl.domElement.removeEventListener('touchend', handleTouchEnd, { passive: true }) // don't preventDefault here it will cancel onClick event for block info
     }
@@ -474,9 +504,12 @@ function DAG() {
   const [blocks, setBlocks] = useState([])
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
+  const [loading, setLoading] = useState(true)
   const [topoheight, setTopoheight] = useState()
   const [height, setHeight] = useState()
   const cameraRef = useRef()
+
+  const maxBlockHeight = 20
 
   const offCanvasBlock = useOffCanvasBlock({ topoheight })
 
@@ -505,10 +538,14 @@ function DAG() {
   const loadBlocks = useCallback(async () => {
     const inputHeight = offCanvasControls.inputHeight
     if (!inputHeight) return
-    const [err, blocks] = await to(nodeRPC.getBlocksRangeByHeight(inputHeight - 19, inputHeight))
-    if (err) return console.log(err)
 
-    setBlocks(blocks.reverse())
+    setLoading(true)
+    let start = Math.max(0, inputHeight - (maxBlockHeight - 1))
+    let end = inputHeight
+    const [err, blocks] = await to(nodeRPC.getBlocksRangeByHeight(start, end))
+    setLoading(false)
+    if (err) return console.log(err)
+    if (blocks) setBlocks(blocks.reverse())
   }, [offCanvasControls.inputHeight])
 
   useEffect(() => {
@@ -519,22 +556,29 @@ function DAG() {
   }, [offCanvasControls.paused])
 
   useEffect(() => {
-    let timeoutId = setTimeout(() => loadBlocks(), [500])
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId)
-    }
+    loadBlocks()
   }, [loadBlocks])
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
     onData: (newBlock) => {
-      if (offCanvasControls.paused) return
-      setBlocks((blocks) => {
-        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
-        return [newBlock, ...blocks]
-      })
-      setTopoheight(newBlock.topoheight)
+      loadHeight()
+      loadTopoheight()
+      //setTopoheight(newBlock.topoheight)
+      //if (newBlock.height) setHeight(newBlock.height)
+
+      if (!offCanvasControls.paused) {
+        setBlocks((blocks) => {
+          const entries = [...groupBy(blocks, (b) => b.height).entries()].reverse()
+          if (entries.length > maxBlockHeight) {
+            const height = entries[0][0]
+            blocks = blocks.filter(b => b.height !== height)
+          }
+
+          if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
+          return [newBlock, ...blocks]
+        })
+      }
     }
   }, [offCanvasControls.paused])
 
@@ -553,28 +597,26 @@ function DAG() {
     }
   }, [offCanvasControls.paused])
 
-  useEffect(() => {
-    if (blocks.length > 20) {
-      blocks.pop()
-      setBlocks(blocks)
-    }
-  }, [blocks])
+  const distance = 2
 
   const groupBlocks = useMemo(() => {
-    /*const filteredBlocks = blocks.filter((block, index) => {
-      return blocks.findIndex((item) => item.hash === block.hash) === index
-    })*/ // in newBlock instead
+    let filteredBlocks = blocks
+    if (offCanvasControls.hideOrphaned) {
+      filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
+    }
 
-    const entries = [...groupBy(blocks, (b) => b.height).entries()].reverse()
+    const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()].reverse()
     entries.forEach(([height, innerBlocks], heightIndex) => {
+      innerBlocks.sort((a, b) => a.topoheight - b.topoheight) // when dag is paused make sure its sorted to avoid displacement when fetching next block
       let evenCount = 0, oddCount = 0
+
       innerBlocks.forEach((block, blockIndex) => {
         let y = 0
         if (innerBlocks.length > 1) {
           if (blockIndex % 2 === 0) {
-            y = evenCount++ * 2 + 1
+            y = evenCount++ * distance + 1
           } else {
-            y = oddCount-- * 2 - 1
+            y = oddCount-- * distance - 1
           }
         }
 
@@ -585,11 +627,13 @@ function DAG() {
 
     if (entries.length > 0) {
       const last = entries[entries.length - 1][1][0]
-      if (cameraRef.current) cameraRef.current.position.x = last.x * 2
+      setTimeout(() => {
+        if (cameraRef.current) cameraRef.current.position.x = last.x * distance
+      }, 100)
     }
 
     return entries
-  }, [blocks])
+  }, [blocks, offCanvasControls.hideOrphaned])
 
   const [hoveredBlock, setHoveredBlock] = useState(null)
 
@@ -606,21 +650,22 @@ function DAG() {
       </div>
       <NodeConnection />
       <BlockTypeLegend />
+      <div>Height: {height} | Topoheight: {topoheight}</div>
     </div>
     <div className="dag-offcanvas-tr-buttons">
       <Button icon="home" link="/" />
       <Button icon="options" onClick={() => offCanvasControls.setOpened(true)} />
       <ToggleThemeButton />
     </div>
-    <div className="dag-loading-logo" />
+    {!cameraRef.current && <div className="dag-loading-logo" />}
     <div className="dag-canvas">
       <Canvas>
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
-        <group>
+        {cameraRef.current && <group>
           {groupBlocks.map((entry, heightIndex) => {
             const [height, innerBlocks] = entry
             //let even = heightIndex % 2 === 0
-            const distance = 2
+            //const distance = 4
             return <Fragment key={height}>
               {/*<mesh position={[heightIndex * distance, 0, -1]}>
                 <boxGeometry args={[distance, 1000, 0]} />
@@ -632,6 +677,8 @@ function DAG() {
                   {block.tips.map((tip) => {
                     const blockTip = blocks.find((b) => b.hash === tip)
                     if (!blockTip) return null
+                    //console.log(blockTip)
+                    //if (!blockTip.x && !blockTip.y) return null
 
                     let z = 0
                     let color = `lightgray`
@@ -642,8 +689,10 @@ function DAG() {
                       lineWidth = 4
                     }
 
+                    const points = [new Vector3(blockTip.x * distance, blockTip.y, z), new Vector3(x * distance, y, z)]
+                    //console.log(points)
                     return <mesh key={tip}>
-                      <Line points={[new Vector3(blockTip.x * distance, blockTip.y, z), new Vector3(x * distance, y, z)]}
+                      <Line points={points}
                         color={color} lineWidth={lineWidth} />
                     </mesh>
                   })}
@@ -651,15 +700,15 @@ function DAG() {
                     onPointerEnter={() => setHoveredBlock(block)} onPointerLeave={() => setHoveredBlock(null)}
                   />
                   {innerBlocks.length - 1 === blockIndex && <Text color="black" anchorX="center"
-                    anchorY="middle" fontSize={.3} position={[x * distance, 0, 4]}
+                    anchorY="middle" fontSize={.3} position={[x * distance, Math.min(-0.5, -Math.floor(innerBlocks.length / 2)) * distance, 4]}
                     outlineWidth={.05} outlineColor="#ffffff">
-                    {height}
+                    {reduceText(height.toString(), 0, 4)}
                   </Text>}
                 </Fragment>
               })}
             </Fragment>
           })}
-        </group>
+        </group>}
       </Canvas>
     </div>
   </div>

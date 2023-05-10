@@ -17,20 +17,23 @@ export const NodeSocketProvider = (props) => {
 
       let timeoutId = null
       const onMessage = (message) => {
-        const data = JSON.parse(message.data)
-        if (data.id === id) {
-          clearTimeout(timeoutId)
-          socketRef.current.removeEventListener(`message`, onMessage)
-          resolve(data.result)
+        if (typeof message.data === 'string') {
+          const data = JSON.parse(message.data)
+          if (data.id === id) {
+            clearTimeout(timeoutId)
+            socketRef.current.removeEventListener(`message`, onMessage)
+            resolve(data.result)
+          }
         }
       }
+
+      socketRef.current.addEventListener(`message`, onMessage)
 
       timeoutId = setTimeout(() => {
         socketRef.current.removeEventListener(`message`, onMessage)
         reject(`timeout`)
       }, sendMethodTimeout)
 
-      socketRef.current.addEventListener(`message`, onMessage)
       send(JSON.stringify(data))
     })
   }, [send, sendMethodTimeout])
