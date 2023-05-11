@@ -327,9 +327,9 @@ function Home() {
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <P2PStatus />
+    {/*<P2PStatus />*/}
     <RecentBlocks />
-    <Stats />
+    {/*<Stats />*/}
   </div>
 }
 

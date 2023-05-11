@@ -15,6 +15,10 @@ const useNodeRPC = () => {
 
       if (res.ok) {
         const data = await res.json()
+        if (data.error) {
+          return Promise.reject(data.error.message)
+        }
+
         return Promise.resolve(data.result)
       } else {
         return Promise.reject(new Error(`${res.status} - ${res.statusText}`))

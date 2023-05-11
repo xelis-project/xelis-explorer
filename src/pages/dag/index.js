@@ -1,10 +1,9 @@
-import { Fragment, useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { Canvas, useThree, useFrame, extend } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { Text, Line } from '@react-three/drei'
-import { motion } from 'framer-motion-3d'
-import { Vector3 } from 'three'
+import { Text, Segment, Segments, Instance, Instances, Html } from '@react-three/drei'
+import { Object3D, BoxGeometry, MeshBasicMaterial } from 'three'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
@@ -24,6 +23,7 @@ const BLOCK_COLOR = {
   'Orphaned': `red`,
 }
 
+/*
 function BlockMesh(props) {
   const { title, block, onPointerEnter, onPointerLeave, onClick, ...restProps } = props
 
@@ -44,7 +44,7 @@ function BlockMesh(props) {
 
   let color = BLOCK_COLOR[block.block_type] || `black`
 
-  const variants = {
+  const meshMaterialVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
   }
@@ -54,7 +54,6 @@ function BlockMesh(props) {
   return <>
     <motion.mesh {...restProps}
       whileHover={{ scale: 1.2 }}
-      whileTap={{ scale: 0.9 }}
       onClick={onClick}
       onPointerEnter={() => setHoverState(true)}
       onPointerLeave={() => setHoverState(false)}
@@ -76,12 +75,12 @@ function BlockMesh(props) {
         //wireframe={!hover}
         initial="hidden"
         animate="visible"
-        variants={variants}
+        variants={meshMaterialVariants}
         transition={{ delay: .1 }}
       />
     </motion.mesh>
   </>
-}
+}*/
 
 function BlockTypeLegend() {
   return <div className="dag-legend">
@@ -147,8 +146,8 @@ function useOffCanvasControls(props) {
   }, [blocks, paused])
 
   const filteredBlocks = useMemo(() => {
-    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned')
-    return blocks
+    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned').sort((a, b) => b.height - a.height)
+    return blocks.sort((a, b) => b.height - a.height)
   }, [hideOrphaned, blocks])
 
   const render = <OffCanvas title="Controls" opened={opened}
@@ -228,10 +227,17 @@ function useOffCanvasControls(props) {
 
 function CameraWithControls(props) {
   const { flat = true, camRef, ...restProps } = props
-  const [canMove, setCanMove] = useState(false)
+  const [canMove, _setCanMove] = useState(false)
   const { camera, gl } = useThree()
   const lastPosition = useRef()
   const lastDistance = useRef()
+
+  // don't select text when moving out of canvas
+  const setCanMove = useCallback((value) => {
+    _setCanMove(value)
+    if (value) document.body.style.setProperty('user-select', 'none')
+    else document.body.style.removeProperty('user-select')
+  }, [])
 
   useEffect(() => {
     if (flat) {
@@ -252,8 +258,8 @@ function CameraWithControls(props) {
       const deltaX = x - lastX
       const deltaY = y - lastY
 
-      camera.position.x -= deltaX * 0.015
-      camera.position.y += deltaY * 0.015
+      camera.position.x -= deltaX / camera.zoom // use camera.zoom to change move speed :)
+      camera.position.y += deltaY / camera.zoom // * 0.015
 
       lastPosition.current = [x, y]
       camera.updateProjectionMatrix()
@@ -333,7 +339,7 @@ function CameraWithControls(props) {
     gl.domElement.addEventListener('touchend', handleTouchEnd, { passive: true })
 
     return () => {
-      gl.domElement.removeEventListener('wheel', handleZoom, { passive: true })
+      gl.domElement.removeEventListener('wheel', handleZoom)
       gl.domElement.removeEventListener('mousedown', handleMouseDown, { passive: true })
       gl.domElement.removeEventListener('mouseup', handleMouseUp, { passive: true })
       gl.domElement.removeEventListener('mousemove', handleMouseMove, { passive: true })
@@ -499,6 +505,165 @@ function useOffCanvasBlock(props) {
   return { render, open }
 }
 
+function InstancedLines(props) {
+  const { blocks = [], hoveredBlock } = props
+
+  const count = useMemo(() => {
+    return blocks.reduce((t, b) => t + b.data.tips.length, 0)
+  }, [blocks])
+
+  // make sure key is count or won't unmount - https://github.com/pmndrs/drei/issues/923
+  return <Segments key={count} lineWidth={2} >
+    {blocks.map((block) => {
+      let { data, x, y } = block
+      return data.tips.map((tip) => {
+        const blockTip = blocks.find((b) => b.data.hash === tip)
+        if (!blockTip) return null
+
+        let z = 0
+        let color = `lightgray`
+        if (hoveredBlock && hoveredBlock.data.hash === data.hash) {
+          color = `yellow`
+          z = 1
+        }
+
+        const key = data.hash + tip
+        return <Segment key={key} start={[blockTip.x, blockTip.y, z]} end={[x, y, z]} color={color} />
+      })
+    })}
+  </Segments>
+}
+
+function InstancedBlocks(props) {
+  const { blocks = [], setHoveredBlock, offCanvasBlock } = props
+
+  const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
+  const material = useMemo(() => new MeshBasicMaterial(), [])
+  /*useFrame(({ gl }) => {
+    console.log(gl.info.render.calls)
+  })*/
+  const [pointerDown, setPointerDown] = useState(false)
+
+  // avoid block over if pointer is already down (moving screen)
+  useEffect(() => {
+    const onPointerDown = () => {
+      setPointerDown(true)
+    }
+
+    const onPointerUp = () => {
+      setPointerDown(false)
+    }
+
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('pointerup', onPointerUp)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointerup', onPointerUp)
+    }
+  }, [])
+
+  /*const textStyle = useMemo(() => {
+    return {
+      userSelect: 'none',
+      color: 'black',
+      fontWeight: 'bold',
+      textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white'
+    }
+  }, [])*/
+
+  const onPointerEnter = useCallback((block, e) => {
+    if (pointerDown) return
+    if (e.object.name === 'hash') return
+
+    setHoveredBlock(block)
+    document.body.style.setProperty('cursor', 'pointer')
+    e.eventObject.scale.set(1.3, 1.3, 1.3)
+  }, [pointerDown])
+
+  const onPointerLeave = useCallback((e) => {
+    if (pointerDown) return
+    if (e.object.name === 'topoheight') return
+    if (e.object.name === 'hash') return
+
+    setHoveredBlock(null)
+    document.body.style.removeProperty('cursor')
+    e.eventObject.scale.set(1, 1, 1)
+  }, [pointerDown])
+
+  const onClick = useCallback((block) => {
+    offCanvasBlock.open(block.data)
+  }, [offCanvasBlock])
+
+  return <Instances material={material} geometry={geometry}>
+    {blocks.map((block) => {
+      const { x, y, data } = block
+      const color = BLOCK_COLOR[data.block_type] || `black`
+      return <Instance key={data.hash} position={[x, y, 2]} color={color}
+        onPointerOver={(e) => onPointerEnter(block, e)}
+        onPointerOut={onPointerLeave}
+        onClick={() => onClick(block)}
+      >
+        {/*Anything inside <Instance> is not using <instancedMesh>}
+        {/*This still uses a lot of cpu}
+        {/*<Html sprite transform distanceFactor={8} position={[0, .7, 0]} style={textStyle}>
+          {reduceText(data.hash, 0, 4)}
+        </Html>
+        <Html sprite transform distanceFactor={8} position={[0, 0, 4]} style={textStyle}>
+          {reduceText(data.topoheight, 0, 4)}
+      </Html>*/}
+        <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .8, 0]}>
+          {reduceText(data.hash, 0, 4)}
+        </Text>
+        {data.topoheight && <Text name="topoheight" color="black" anchorX="center"
+          anchorY="middle" fontSize={.3} position={[0, 0, 4]}
+          outlineWidth={.05} outlineColor="#ffffff">
+          {reduceText(data.topoheight, 0, 4)}
+        </Text>}
+      </Instance>
+    })}
+  </Instances>
+}
+
+function CanvasFrame() {
+  const previousTimeRef = useRef(0)
+
+  const fpsRef = useRef(50)
+  const fpsDropTimeout = 2000
+
+  // lower fps if mouse is not moving - reduce cpu usage
+  useEffect(() => {
+    let timeoutId = null
+    const pointerMove = () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      fpsRef.current = 50
+
+      timeoutId = setTimeout(() => {
+        fpsRef.current = 1
+      }, fpsDropTimeout)
+    }
+
+    window.addEventListener('wheel', pointerMove)
+    window.addEventListener('pointermove', pointerMove)
+    return () => {
+      window.removeEventListener('wheel', pointerMove)
+      window.removeEventListener('pointermove', pointerMove)
+    }
+  }, [])
+
+  useFrame(({ gl, scene, camera, clock }) => {
+    const currentTime = clock.getElapsedTime()
+    const delta = currentTime - previousTimeRef.current
+    const fps = 1 / fpsRef.current
+
+    if (delta > fps) {
+      gl.render(scene, camera)
+      previousTimeRef.current = currentTime - (delta % fps)
+    }
+  }, 1)
+
+  return null
+}
+
 function DAG() {
   const nodeRPC = useNodeRPC()
   const [blocks, setBlocks] = useState([])
@@ -509,7 +674,8 @@ function DAG() {
   const [height, setHeight] = useState()
   const cameraRef = useRef()
 
-  const maxBlockHeight = 20
+  const fetchMaxBlockHeight = 20
+  const displayMaxBlockHeight = 20
 
   const offCanvasBlock = useOffCanvasBlock({ topoheight })
 
@@ -540,12 +706,22 @@ function DAG() {
     if (!inputHeight) return
 
     setLoading(true)
-    let start = Math.max(0, inputHeight - (maxBlockHeight - 1))
+    let start = Math.max(0, inputHeight - (fetchMaxBlockHeight - 1))
     let end = inputHeight
-    const [err, blocks] = await to(nodeRPC.getBlocksRangeByHeight(start, end))
+    const [err, newBlocks] = await to(nodeRPC.getBlocksRangeByHeight(start, end))
     setLoading(false)
     if (err) return console.log(err)
-    if (blocks) setBlocks(blocks.reverse())
+    if (newBlocks) {
+      setBlocks(newBlocks)
+      /*
+      setBlocks((blocks) => {
+        newBlocks.forEach(block => {
+          const index = blocks.findIndex(b => b.hash === block.hash)
+          if (index === -1) blocks.push(block)
+        })
+        return [...blocks]
+      })*/
+    }
   }, [offCanvasControls.inputHeight])
 
   useEffect(() => {
@@ -569,8 +745,9 @@ function DAG() {
 
       if (!offCanvasControls.paused) {
         setBlocks((blocks) => {
-          const entries = [...groupBy(blocks, (b) => b.height).entries()].reverse()
-          if (entries.length > maxBlockHeight) {
+          const entries = [...groupBy(blocks, (b) => b.height).entries()]
+          entries.sort((a, b) => a[0] - b[0])
+          if (entries.length > displayMaxBlockHeight) {
             const height = entries[0][0]
             blocks = blocks.filter(b => b.height !== height)
           }
@@ -598,17 +775,23 @@ function DAG() {
   }, [offCanvasControls.paused])
 
   const distance = 2
+  const [blocksToRender, setBlocksToRender] = useState([])
 
-  const groupBlocks = useMemo(() => {
+  useEffect(() => {
     let filteredBlocks = blocks
     if (offCanvasControls.hideOrphaned) {
       filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
     }
 
-    const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()].reverse()
+    const blocksToRender = []
+    const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()]
+    entries.sort((a, b) => a[0] - b[0])
+
     entries.forEach(([height, innerBlocks], heightIndex) => {
       innerBlocks.sort((a, b) => a.topoheight - b.topoheight) // when dag is paused make sure its sorted to avoid displacement when fetching next block
       let evenCount = 0, oddCount = 0
+
+      const x = heightIndex * distance
 
       innerBlocks.forEach((block, blockIndex) => {
         let y = 0
@@ -620,19 +803,19 @@ function DAG() {
           }
         }
 
-        block.x = heightIndex
-        block.y = y
+        blocksToRender.push({ data: block, x, y })
       })
     })
 
-    if (entries.length > 0) {
-      const last = entries[entries.length - 1][1][0]
+
+    if (blocksToRender.length > 0) {
+      const last = blocksToRender[blocksToRender.length - 1]
       setTimeout(() => {
-        if (cameraRef.current) cameraRef.current.position.x = last.x * distance
+        if (cameraRef.current) cameraRef.current.position.x = last.x
       }, 100)
     }
 
-    return entries
+    setBlocksToRender(blocksToRender)
   }, [blocks, offCanvasControls.hideOrphaned])
 
   const [hoveredBlock, setHoveredBlock] = useState(null)
@@ -660,55 +843,10 @@ function DAG() {
     {!cameraRef.current && <div className="dag-loading-logo" />}
     <div className="dag-canvas">
       <Canvas>
+        <CanvasFrame />
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
-        {cameraRef.current && <group>
-          {groupBlocks.map((entry, heightIndex) => {
-            const [height, innerBlocks] = entry
-            //let even = heightIndex % 2 === 0
-            //const distance = 4
-            return <Fragment key={height}>
-              {/*<mesh position={[heightIndex * distance, 0, -1]}>
-                <boxGeometry args={[distance, 1000, 0]} />
-                <motion.meshBasicMaterial color={even ? `#333` : `#111`} />
-          </mesh>*/}
-              {innerBlocks.map((block, blockIndex) => {
-                let { x, y } = block
-                return <Fragment key={block.hash}>
-                  {block.tips.map((tip) => {
-                    const blockTip = blocks.find((b) => b.hash === tip)
-                    if (!blockTip) return null
-                    //console.log(blockTip)
-                    //if (!blockTip.x && !blockTip.y) return null
-
-                    let z = 0
-                    let color = `lightgray`
-                    let lineWidth = 2
-                    if (hoveredBlock && hoveredBlock.hash === block.hash) {
-                      color = `yellow`
-                      z = 1
-                      lineWidth = 4
-                    }
-
-                    const points = [new Vector3(blockTip.x * distance, blockTip.y, z), new Vector3(x * distance, y, z)]
-                    //console.log(points)
-                    return <mesh key={tip}>
-                      <Line points={points}
-                        color={color} lineWidth={lineWidth} />
-                    </mesh>
-                  })}
-                  <BlockMesh block={block} position={[x * distance, y, 2]} onClick={() => offCanvasBlock.open(block)}
-                    onPointerEnter={() => setHoveredBlock(block)} onPointerLeave={() => setHoveredBlock(null)}
-                  />
-                  {innerBlocks.length - 1 === blockIndex && <Text color="black" anchorX="center"
-                    anchorY="middle" fontSize={.3} position={[x * distance, Math.min(-0.5, -Math.floor(innerBlocks.length / 2)) * distance, 4]}
-                    outlineWidth={.05} outlineColor="#ffffff">
-                    {reduceText(height.toString(), 0, 4)}
-                  </Text>}
-                </Fragment>
-              })}
-            </Fragment>
-          })}
-        </group>}
+        <InstancedBlocks blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
+        <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
       </Canvas>
     </div>
   </div>

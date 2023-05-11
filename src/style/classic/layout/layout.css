@@ -14,7 +14,13 @@ html, body {
 .container {
   margin: 0 auto;
   max-width: 1200px;
-  padding: 1em;
+  padding: 1em 2em;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 1em;
+  }
 }
 
 button {
