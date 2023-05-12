@@ -74,8 +74,10 @@ function Block() {
       </Helmet>
       <h1>Block {block.topoheight}</h1>
       <div className="card">
-        This block was mined on {formatBlock.date} by {formatBlock.miner}. It currently has {formatBlock.confirmations} confirmations.
+        This block was mined on {formatBlock.date} by {formatBlock.miner}.
+        It currently has {formatBlock.confirmations} confirmations.
         The miner of this block earned {formatBlock.reward}.
+        &nbsp;<Link to={`/dag?height=${block.height}`}>Check from DAG</Link>
       </div>
       <div className="left-right-buttons">
         {formatBlock.hasPreviousBlock && <Button className="button" link={`/blocks/${block.topoheight - 1}`} icon="chevron-left-r">

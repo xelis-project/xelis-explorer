@@ -3,7 +3,10 @@ import { Canvas, useThree, useFrame, extend } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Text, Segment, Segments, Instance, Instances, Html } from '@react-three/drei'
-import { Object3D, BoxGeometry, MeshBasicMaterial } from 'three'
+import { BoxGeometry, MeshBasicMaterial } from 'three'
+import queryString from 'query-string'
+import { Link, useLocation, useParams } from 'react-router-dom'
+import prettyMilliseconds from 'pretty-ms'
 
 import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
@@ -11,10 +14,8 @@ import { formattedBlock, groupBy, reduceText } from '../../utils'
 import { NodeConnection } from '../../components/envAlert'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
-import { Link } from 'react-router-dom'
 import { ToggleThemeButton } from '../../components/header'
 import Age from '../../components/age'
-import prettyMilliseconds from 'pretty-ms'
 
 const BLOCK_COLOR = {
   'Normal': `gray`,
@@ -116,15 +117,34 @@ function HeightRangeInput(props) {
 function useOffCanvasControls(props) {
   const { height, blocks, onBlockClick } = props
 
+  const location = useLocation()
+
+  const searchHeight = useMemo(() => {
+    const query = queryString.parse(location.search)
+    const height = parseInt(query.height)
+    if (!Number.isNaN(height)) return height
+    return null
+  }, [location])
+
   const [opened, setOpened] = useState(false)
-  const [paused, setPaused] = useState(false)
+  const [paused, setPaused] = useState(searchHeight ? true : false)
   const [hideOrphaned, setHideOrphaned] = useState(false)
-  const [inputHeight, setInputHeight] = useState()
+  const [inputHeight, setInputHeight] = useState(searchHeight)
   const [lastBlockTime, setLastBlockTime] = useState(0)
+
+  /*
+  useEffect(() => {
+    const query = queryString.parse(location.search)
+    const height = parseInt(query.height)
+    if (!Number.isNaN(height)) {
+      setPaused(true)
+      setInputHeight(height)
+    }
+  }, [location])*/
 
   useEffect(() => {
     if (!inputHeight) setInputHeight(height)
-  }, [height])
+  }, [height, inputHeight])
 
   useEffect(() => {
     if (paused) return
