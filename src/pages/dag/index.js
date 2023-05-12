@@ -512,8 +512,15 @@ function InstancedLines(props) {
     return blocks.reduce((t, b) => t + b.data.tips.length, 0)
   }, [blocks])
 
+  const [lineWidth, setLineWidth] = useState(5)
+  // scale line width based on camera zoom
+  useFrame(({ camera }) => {
+    let newLineWidth = 20 * (camera.zoom / 1000)
+    setLineWidth(newLineWidth)
+  })
+
   // make sure key is count or won't unmount - https://github.com/pmndrs/drei/issues/923
-  return <Segments key={count} lineWidth={2} >
+  return <Segments key={count} lineWidth={lineWidth} >
     {blocks.map((block) => {
       let { data, x, y } = block
       return data.tips.map((tip) => {
@@ -617,7 +624,7 @@ function InstancedBlocks(props) {
         {data.topoheight && <Text name="topoheight" color="black" anchorX="center"
           anchorY="middle" fontSize={.3} position={[0, 0, 4]}
           outlineWidth={.05} outlineColor="#ffffff">
-          {reduceText(data.topoheight, 0, 4)}
+          {reduceText(data.topoheight.toString(), 0, 4)}
         </Text>}
       </Instance>
     })}
@@ -776,6 +783,7 @@ function DAG() {
 
   const distance = 2
   const [blocksToRender, setBlocksToRender] = useState([])
+  const [heightsText, setHeightsText] = useState([])
 
   useEffect(() => {
     let filteredBlocks = blocks
@@ -784,6 +792,7 @@ function DAG() {
     }
 
     const blocksToRender = []
+    const heightsText = []
     const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()]
     entries.sort((a, b) => a[0] - b[0])
 
@@ -804,6 +813,12 @@ function DAG() {
         }
 
         blocksToRender.push({ data: block, x, y })
+
+        if (innerBlocks.length - 1 === blockIndex) {
+          //const x = x * distance
+          y = Math.min(-0.5, -Math.floor(innerBlocks.length / 2)) * distance
+          heightsText.push({ height, x, y })
+        }
       })
     })
 
@@ -816,6 +831,7 @@ function DAG() {
     }
 
     setBlocksToRender(blocksToRender)
+    setHeightsText(heightsText)
   }, [blocks, offCanvasControls.hideOrphaned])
 
   const [hoveredBlock, setHoveredBlock] = useState(null)
@@ -847,6 +863,14 @@ function DAG() {
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
         <InstancedBlocks blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
         <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
+        {heightsText.map((text) => {
+          const { height, x, y } = text
+          return <Text key={height} color="black" anchorX="center"
+            anchorY="middle" fontSize={.3} position={[x, y, 4]}
+            outlineWidth={.05} outlineColor="#ffffff">
+            {reduceText(height.toString(), 0, 4)}
+          </Text>
+        })}
       </Canvas>
     </div>
   </div>
