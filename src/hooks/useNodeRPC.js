@@ -110,13 +110,17 @@ const useNodeRPC = () => {
     return rpcPost(`get_transactions`, { tx_hashes: hashes })
   }, [])
 
+  const getStableHeight = useCallback(() => {
+    return rpcPost(`get_stableheight`)
+  }, [])
+
   return {
     getTopBlock, getHeight, getTopoHeight, getBlockTemplate,
     getBlockAtTopoHeight, getBlockByHash, getBlocksAtHeight,
     getNonce, getBalance, getAssets, countTransactions,
     getTips, p2pStatus, getInfo, getBlocksRangeByHeight,
     getBlocksRangeByTopoheight, getMemPool,
-    getTransaction, getTransactions
+    getTransaction, getTransactions, getStableHeight
   }
 }
 

@@ -17,11 +17,19 @@ import Button from '../../components/button'
 import { ToggleThemeButton } from '../../components/header'
 import Age from '../../components/age'
 
-const BLOCK_COLOR = {
+export const BLOCK_COLOR = {
   'Normal': `gray`,
   'Sync': `green`,
   'Side': `blue`,
   'Orphaned': `red`,
+}
+
+export function getBlockType(block, stableHeight) {
+  if (block.block_type === 'Normal' && block.height <= stableHeight) {
+    return "Sync"
+  }
+
+  return block.block_type
 }
 
 /*
@@ -115,7 +123,7 @@ function HeightRangeInput(props) {
 }
 
 function useOffCanvasControls(props) {
-  const { height, blocks, onBlockClick } = props
+  const { height, stableHeight, blocks, onBlockClick } = props
 
   const location = useLocation()
 
@@ -222,13 +230,15 @@ function useOffCanvasControls(props) {
         <tbody>
           {filteredBlocks.map((block) => {
             const txCount = block.txs_hashes.length
+            const blockType = getBlockType(block, stableHeight)
+            const blockColor = BLOCK_COLOR[blockType]
             return <tr key={block.hash} onClick={() => onBlockClick(block)}>
               <td>
                 <span title="Height">{block.height}</span>&nbsp;
                 {block.topoheight && <span title="Topo Height">({block.topoheight})</span>}
               </td>
-              <td style={{ color: BLOCK_COLOR[block.block_type] || `black` }}>
-                {block.block_type}
+              <td style={{ color: blockColor }}>
+                {blockType}
               </td>
               <td>{reduceText(block.hash, 0, 4)}</td>
               <td>{txCount}</td>
@@ -379,7 +389,7 @@ function CameraWithControls(props) {
 }
 
 function useOffCanvasBlock(props) {
-  const { topoheight } = props
+  const { topoheight, stableHeight } = props
   const [block, setBlock] = useState()
   const [opened, setOpened] = useState(false)
   const nodeRPC = useNodeRPC()
@@ -418,7 +428,7 @@ function useOffCanvasBlock(props) {
               <th>Block Type</th>
             </tr>
             <tr>
-              <td>{block.block_type}</td>
+              <td>{getBlockType(block, stableHeight)}</td>
             </tr>
             <tr>
               <th>Hash</th>
@@ -562,7 +572,7 @@ function InstancedLines(props) {
 }
 
 function InstancedBlocks(props) {
-  const { blocks = [], setHoveredBlock, offCanvasBlock } = props
+  const { blocks = [], setHoveredBlock, offCanvasBlock, stableHeight } = props
 
   const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
   const material = useMemo(() => new MeshBasicMaterial(), [])
@@ -624,8 +634,9 @@ function InstancedBlocks(props) {
   return <Instances material={material} geometry={geometry}>
     {blocks.map((block) => {
       const { x, y, data } = block
-      const color = BLOCK_COLOR[data.block_type] || `black`
-      return <Instance key={data.hash} position={[x, y, 2]} color={color}
+      const blockType = getBlockType(data, stableHeight)
+      const blockColor = BLOCK_COLOR[blockType]
+      return <Instance key={data.hash} position={[x, y, 2]} color={blockColor}
         onPointerOver={(e) => onPointerEnter(block, e)}
         onPointerOut={onPointerLeave}
         onClick={() => onClick(block)}
@@ -699,15 +710,17 @@ function DAG() {
   const [loading, setLoading] = useState(true)
   const [topoheight, setTopoheight] = useState()
   const [height, setHeight] = useState()
+  const [stableHeight, setStableHeight] = useState()
   const cameraRef = useRef()
 
   const fetchMaxBlockHeight = 20
   const displayMaxBlockHeight = 20
 
-  const offCanvasBlock = useOffCanvasBlock({ topoheight })
+  const offCanvasBlock = useOffCanvasBlock({ topoheight, stableHeight })
 
   const offCanvasControls = useOffCanvasControls({
     height,
+    stableHeight,
     blocks,
     onBlockClick: (block) => {
       offCanvasBlock.open(block)
@@ -727,6 +740,13 @@ function DAG() {
 
     setHeight(height)
   }, [])
+
+  const loadStableHeight = useCallback(async () => {
+    const [err, height] = await to(nodeRPC.getStableHeight())
+    if (err) return console.log(err)
+
+    setStableHeight(height)
+  })
 
   const loadBlocks = useCallback(async () => {
     const inputHeight = offCanvasControls.inputHeight
@@ -755,6 +775,7 @@ function DAG() {
     if (!offCanvasControls.paused) {
       loadHeight()
       loadTopoheight()
+      loadStableHeight()
     }
   }, [offCanvasControls.paused])
 
@@ -767,6 +788,7 @@ function DAG() {
     onData: (newBlock) => {
       loadHeight()
       loadTopoheight()
+      loadStableHeight()
       //setTopoheight(newBlock.topoheight)
       //if (newBlock.height) setHeight(newBlock.height)
 
@@ -869,7 +891,7 @@ function DAG() {
       </div>
       <NodeConnection />
       <BlockTypeLegend />
-      <div>Height: {height} | Topoheight: {topoheight}</div>
+      <div>Height: {height} | Topoheight: {topoheight} | Stableheight: {stableHeight}</div>
     </div>
     <div className="dag-offcanvas-tr-buttons">
       <Button icon="home" link="/" />
@@ -881,7 +903,7 @@ function DAG() {
       <Canvas>
         <CanvasFrame />
         <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
-        <InstancedBlocks blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
+        <InstancedBlocks stableHeight={stableHeight} blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
         <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
         {heightsText.map((text) => {
           const { height, x, y } = text

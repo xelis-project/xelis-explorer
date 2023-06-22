@@ -35,15 +35,6 @@
   height: 10px;
   top: 0;
   left: 0;
-  background-color: var(--muted-color);
-}
-
-.recent-blocks-item-status.mined {
-  background-color: var(--warning-color);
-}
-
-.recent-blocks-item-status.stable {
-  background-color: var(--success-color);
 }
 
 .recent-blocks-item-title {

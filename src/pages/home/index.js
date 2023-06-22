@@ -8,6 +8,7 @@ import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '..
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import Chart from '../../components/chart'
+import { getBlockType, BLOCK_COLOR } from '../dag'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -50,6 +51,15 @@ function RecentBlocks() {
   const [blocks, setBlocks] = useState([])
   const [animateBlocks, setAnimateBlocks] = useState(false) // make sure to not animate on pageload and only when we get a new block
 
+  const [stableHeight, setStableHeight] = useState()
+
+  const loadStableHeight = useCallback(async () => {
+    const [err, height] = await to(nodeRPC.getStableHeight())
+    if (err) return console.log(err)
+
+    setStableHeight(height)
+  })
+
   const loadRecentBlocks = useCallback(async () => {
     setLoading(true)
 
@@ -61,7 +71,7 @@ function RecentBlocks() {
     const [err1, height] = await to(nodeRPC.getHeight())
     if (err1) return resErr(err1)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByHeight(height - 10, height))
+    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByHeight(height - 19, height))
     if (err2) return resErr(err2)
     setLoading(false)
 
@@ -69,12 +79,14 @@ function RecentBlocks() {
   }, [])
 
   useEffect(() => {
+    loadStableHeight()
     loadRecentBlocks()
   }, [loadRecentBlocks])
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
     onData: (newBlock) => {
+      loadStableHeight()
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
@@ -86,9 +98,12 @@ function RecentBlocks() {
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
     onData: (data) => {
-      const { topoheight, block_hash } = data
+      const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
-        if (block.hash === block_hash) block.topoheight = topoheight
+        if (block.hash === block_hash) {
+          block.topoheight = topoheight
+          block.block_type = block_type
+        }
         return block
       }))
     }
@@ -106,7 +121,7 @@ function RecentBlocks() {
   }, [newBlocks, lastBlocks])*/
 
   useEffect(() => {
-    if (blocks.length >= 10) {
+    if (blocks.length > 20) {
       blocks.pop()
       setBlocks(blocks)
     }
@@ -148,15 +163,11 @@ function RecentBlocks() {
               const txCount = block.txs_hashes.length
               const size = formatSize(block.total_size_in_bytes || 0)
 
-              let statusClassName = `mined`
-              switch (block.block_type) {
-                case 'Sync':
-                case 'Side':
-                  statusClassName = `stable`
-              }
+              const blockType = getBlockType(block, stableHeight)
+              const blockColor = BLOCK_COLOR[blockType]
 
               return <Link to={`/blocks/${block.hash}`} key={block.hash} className={`recent-blocks-item`}>
-                <div className={`recent-blocks-item-status ${statusClassName}`} />
+                <div className={`recent-blocks-item-status`} style={{ backgroundColor: blockColor }} />
                 <div className="recent-blocks-item-title">Block {block.topoheight}</div>
                 <div className="recent-blocks-item-value">{txCount} txs | {size}</div>
                 <div className="recent-blocks-item-miner">{reduceText(block.miner, 0, 7)}</div>
