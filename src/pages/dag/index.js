@@ -18,10 +18,10 @@ import { ToggleThemeButton } from '../../components/header'
 import Age from '../../components/age'
 
 export const BLOCK_COLOR = {
-  'Normal': `gray`,
-  'Sync': `green`,
-  'Side': `blue`,
-  'Orphaned': `red`,
+  'Sync': `#32C732`,
+  'Normal': `#FAC898`,
+  'Side': `#5581AA`,
+  'Orphaned': `#FF6961`,
 }
 
 export function getBlockType(block, stableHeight) {
@@ -219,7 +219,7 @@ function useOffCanvasControls(props) {
     <div className="dag-controls-table">
       <table>
         <thead>
-          <tr style={{ position: `sticky`, top: 0, background: `white` }}>
+          <tr style={{ position: `sticky`, top: 0 }}>
             <th>Height</th>
             <th>Type</th>
             <th>Hash</th>
@@ -240,7 +240,7 @@ function useOffCanvasControls(props) {
               <td style={{ color: blockColor }}>
                 {blockType}
               </td>
-              <td>{reduceText(block.hash, 0, 4)}</td>
+              <td>{block.hash.slice(-6).toUpperCase()}</td>
               <td>{txCount}</td>
               <td>
                 <Age timestamp={block.timestamp} update />
@@ -442,25 +442,25 @@ function useOffCanvasBlock(props) {
               <th>Timestamp</th>
             </tr>
             <tr>
-              <td>{formatBlock.date} ({block.timestamp})</td>
+              <td>{formatBlock.date} ({block.timestamp.toLocaleString()})</td>
             </tr>
             <tr>
               <th>Confirmations</th>
             </tr>
             <tr>
-              <td>{formatBlock.confirmations}</td>
+              <td>{formatBlock.confirmations.toLocaleString()}</td>
             </tr>
             <tr>
               <th>Topo Height</th>
             </tr>
             <tr>
-              <td>{block.topoheight}</td>
+              <td>{block.topoheight.toLocaleString()}</td>
             </tr>
             <tr>
               <th>Height</th>
             </tr>
             <tr>
-              <td>{block.height}</td>
+              <td>{block.height.toLocaleString()}</td>
             </tr>
             <tr>
               <th>Miner</th>
@@ -478,16 +478,16 @@ function useOffCanvasBlock(props) {
               <th>Txs</th>
             </tr>
             <tr>
-              <td>{block.txs_hashes.length}</td>
+              <td>{block.txs_hashes.length.toLocaleString()}</td>
             </tr>
             <tr>
               <th>Difficulty</th>
             </tr>
             <tr>
               <td>
-                <span>{block.difficulty} </span>
+                <span>{block.difficulty.toLocaleString()} </span>
                 <span title="Cumulative Difficulty">
-                  ({block.cumulative_difficulty})
+                  ({block.cumulative_difficulty.toLocaleString()})
                 </span>
               </td>
             </tr>
@@ -510,7 +510,7 @@ function useOffCanvasBlock(props) {
             </tr>
             <tr>
               <td>
-                <span>{block.nonce} </span>
+                <span>{block.nonce.toLocaleString()} </span>
                 <span title="Extra Nonce">({block.extra_nonce})</span>
               </td>
             </tr>
@@ -650,12 +650,11 @@ function InstancedBlocks(props) {
           {reduceText(data.topoheight, 0, 4)}
       </Html>*/}
         <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .8, 0]}>
-          {reduceText(data.hash, 0, 4)}
+          {data.hash.slice(-6).toUpperCase()}
         </Text>
         {data.topoheight && <Text name="topoheight" color="black" anchorX="center"
-          anchorY="middle" fontSize={.3} position={[0, 0, 4]}
-          outlineWidth={.05} outlineColor="#ffffff">
-          {reduceText(data.topoheight.toString(), 0, 4)}
+          anchorY="middle" fontSize={.2} position={[0, 0, 4]}>
+          {data.topoheight.toLocaleString()}
         </Text>}
       </Instance>
     })}
@@ -891,7 +890,11 @@ function DAG() {
       </div>
       <NodeConnection />
       <BlockTypeLegend />
-      <div>Height: {height} | Topoheight: {topoheight} | Stableheight: {stableHeight}</div>
+      {
+        loading
+        ? <div className="dag-loading">Loading...</div>
+        : <div>Height: {height.toLocaleString()} | Topo Height: {topoheight.toLocaleString()} | Stable Height: {stableHeight.toLocaleString()}</div>
+      }
     </div>
     <div className="dag-offcanvas-tr-buttons">
       <Button icon="home" link="/" />
@@ -907,10 +910,9 @@ function DAG() {
         <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
         {heightsText.map((text) => {
           const { height, x, y } = text
-          return <Text key={height} color="black" anchorX="center"
-            anchorY="middle" fontSize={.3} position={[x, y, 4]}
-            outlineWidth={.05} outlineColor="#ffffff">
-            {reduceText(height.toString(), 0, 4)}
+          return <Text key={height} color="white" anchorX="center"
+            anchorY="middle" fontSize={.20} position={[x, y + 0.25, 4]}>
+            {height.toLocaleString()}
           </Text>
         })}
       </Canvas>
