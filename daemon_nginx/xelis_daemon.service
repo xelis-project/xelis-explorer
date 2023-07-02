@@ -1,9 +1,0 @@
-[Unit]
-Description=Xelis
-
-[Service]
-Type=forking
-ExecStart=/root/xelis/target/release/xelis_daemon
-
-[Install]
-WantedBy=multi-user.target

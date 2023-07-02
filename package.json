@@ -1,7 +1,7 @@
 {
   "name": "xelis-explorer",
   "version": "0.1.0",
-  "description": "Official Explorer for Xelis Blockchain.",
+  "description": "Official Explorer for XELIS Blockchain.",
   "scripts": {
     "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
     "start:testnet": "concurrently \"npm run build:local_testnet\" \"npm run serve\"",

@@ -887,7 +887,7 @@ function DAG() {
     <div className="dag-header">
       <div className="dag-header-title">
         <div className="header-logo" />
-        <h1>Xelis DAG</h1>
+        <h1>XELIS DAG</h1>
       </div>
       <NodeConnection />
       <BlockTypeLegend />

@@ -31,7 +31,7 @@ function ExplorerSearch() {
 
   return <form onSubmit={search}>
     <div className="explorer-search">
-      <div className="explorer-search-title">Xelis Explorer</div>
+      <div className="explorer-search-title">XELIS Explorer</div>
       <div className="explorer-search-form">
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />
