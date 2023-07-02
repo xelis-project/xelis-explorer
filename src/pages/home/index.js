@@ -12,15 +12,21 @@ import { getBlockType, BLOCK_COLOR } from '../dag'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
+  const nodeRPC = useNodeRPC()
 
-  const search = useCallback((e) => {
+  const search = useCallback(async (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
     const searchValue = formData.get(`search`)
     if (searchValue === ``) return
 
     if (searchValue.length === 64) {
-      return navigate(`/txs/${searchValue}`)
+      const [err, block] = await to(nodeRPC.getBlockByHash(searchValue))
+      if (block) {
+        return navigate(`/blocks/${searchValue}`)
+      } else {
+        return navigate(`/txs/${searchValue}`)
+      }
     }
 
     const height = parseInt(searchValue)
