@@ -795,7 +795,7 @@ function DAG() {
         setBlocks((blocks) => {
           const entries = [...groupBy(blocks, (b) => b.height).entries()]
           entries.sort((a, b) => a[0] - b[0])
-          if (entries.length > displayMaxBlockHeight) {
+          if (entries.length >= displayMaxBlockHeight) {
             const height = entries[0][0]
             blocks = blocks.filter(b => b.height !== height)
           }
@@ -827,6 +827,12 @@ function DAG() {
   const [heightsText, setHeightsText] = useState([])
 
   useEffect(() => {
+    if (cameraRef.current) {
+      // use fixed value of 38 instead of calculating last block position on page load
+      // this avoid flickering and seeing block moving from left to right
+      cameraRef.current.position.x = 38
+    }   
+
     let filteredBlocks = blocks
     if (offCanvasControls.hideOrphaned) {
       filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
@@ -863,13 +869,14 @@ function DAG() {
       })
     })
 
-
+    /*
     if (blocksToRender.length > 0) {
       const last = blocksToRender[blocksToRender.length - 1]
       setTimeout(() => {
         if (cameraRef.current) cameraRef.current.position.x = last.x
       }, 100)
     }
+    */
 
     setBlocksToRender(blocksToRender)
     setHeightsText(heightsText)
@@ -892,8 +899,8 @@ function DAG() {
       <BlockTypeLegend />
       {
         loading
-        ? <div className="dag-loading">Loading...</div>
-        : <div>Height: {height.toLocaleString()} | Topo Height: {topoheight.toLocaleString()} | Stable Height: {stableHeight.toLocaleString()}</div>
+          ? <div className="dag-loading">Loading...</div>
+          : <div>Height: {height.toLocaleString()} | Topo Height: {topoheight.toLocaleString()} | Stable Height: {stableHeight.toLocaleString()}</div>
       }
     </div>
     <div className="dag-offcanvas-tr-buttons">

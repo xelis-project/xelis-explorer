@@ -162,7 +162,6 @@ function RecentBlocks() {
         const [height, groupBlocks] = entry
         const key = index + Math.random() // random key to force re-render and repeat animation
 
-
         return <div className={`recent-blocks-group ${animateBlocks ? `animate` : ``}`} key={key}>
           <div className="recent-blocks-group-items">
             {groupBlocks.map((block) => {
@@ -218,7 +217,6 @@ function Stats() {
 
     const maxSupply = 1840000000000
     const mined = (info.native_supply * 100 / maxSupply).toFixed(2)
-    console.log(info)
     return [
       { title: `Max Supply`, value: formatXelis(maxSupply) },
       { title: `Circulating Supply`, value: formatXelis(info.native_supply) },
@@ -226,8 +224,8 @@ function Stats() {
       { title: `Hashrate`, value: formatHashRate(info.difficulty / 15) },
       { title: `Block Reward`, value: formatXelis(info.block_reward) },
       { title: `Tx Pool`, value: `${info.mempool_size} tx` },
-      { title: `Block Count`, value: info.topoheight },
-      { title: `Difficulty`, value: info.difficulty },
+      { title: `Block Count`, value: info.topoheight.toLocaleString() },
+      { title: `Difficulty`, value: info.difficulty.toLocaleString() },
       { title: `Avg Block Time`, value: prettyMs(info.average_block_time, { compact: true }) },
     ]
   }, [info])
@@ -236,10 +234,6 @@ function Stats() {
 
   return <div className="home-stats">
     <div className="home-stats-title">Statistics</div>
-    <div>
-      For more detailed Statistics visit&nbsp;
-      <a href="https://stats.xelis.io" target="_blank">https://stats.xelis.io</a>
-    </div>
     <div className="home-stats-items">
       {stats.map((item) => {
         return <div key={item.title} className="home-stats-item">
