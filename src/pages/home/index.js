@@ -7,8 +7,8 @@ import Age from '../../components/age'
 import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import Chart from '../../components/chart'
 import { getBlockType, BLOCK_COLOR } from '../dag'
+import prettyMs from 'pretty-ms'
 
 function ExplorerSearch() {
   const navigate = useNavigate()
@@ -192,54 +192,19 @@ function RecentBlocks() {
   </div>
 }
 
-function HomeMiniChart(props) {
-  const { data } = props
-
-  const chartConfig = useMemo(() => {
-    return {
-      type: 'line',
-      data,
-      options: {
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            radius: 0
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-        },
-        scales: {
-          y: {
-            display: false,
-            beginAtZero: false
-          },
-          x: {
-            display: false
-          }
-        }
-      }
-    }
-  }, [data])
-
-  return <Chart config={chartConfig} className="home-stats-chart" />
-}
-
 function Stats() {
   const nodeSocket = useNodeSocket()
 
   const [info, setInfo] = useState({})
   const [err, setErr] = useState()
-
   const [loading, setLoading] = useState(true)
-  const [list, setList] = useState([])
 
   const loadInfo = useCallback(async () => {
+    setLoading(true)
     const [err, info] = await to(nodeSocket.sendMethod(`get_info`))
     if (err) return setErr(err)
     setInfo(info)
+    setLoading(false)
   }, [nodeSocket])
 
   useNodeSocketSubscribe({
@@ -248,70 +213,38 @@ function Stats() {
     onData: loadInfo
   }, [])
 
-  const statsChart = useCallback(({ key, color }) => {
-    const labels = list.map((item) => item.time)
-    const data = list.map((item) => item[key])
-    return {
-      labels,
-      datasets: [{
-        data,
-        borderColor: '#1870cb',
-        borderWidth: 4,
-        tension: .3
-      }]
-    }
-  }, [list])
-
   const stats = useMemo(() => {
+    if (loading || err) return []
+
     const maxSupply = 1840000000000
     const mined = (info.native_supply * 100 / maxSupply).toFixed(2)
+    console.log(info)
     return [
-      {
-        title: `Total Supply`, value: formatXelis(info.native_supply)
-      },
-      { title: `Tx Pool`, value: `${info.mempool_size} tx` },
-      { title: `TPS`, value: `?` },
-      { title: `Block Count`, value: info.topoheight },
-      { title: `Address Count`, value: `?` },
+      { title: `Max Supply`, value: formatXelis(maxSupply) },
+      { title: `Circulating Supply`, value: formatXelis(info.native_supply) },
       { title: `Mined`, value: `${mined}%` },
-      {
-        title: `Hashrate`, value: formatHashRate(info.difficulty / 15),
-        stats: statsChart({ key: `block_count` })
-      },
-      {
-        title: `Total Txs`, value: `?`,
-        stats: statsChart({ key: `tx_count` })
-      },
-
-      {
-        title: `Difficulty`, value: info.difficulty,
-        stats: statsChart({ key: `avg_difficulty` })
-      },
-      {
-        title: `Avg Block Size`, value: `?`,
-        stats: statsChart({ key: `avg_block_size` })
-      },
-      {
-        title: `Avg Block Time`, value: `?`,
-        stats: statsChart({ key: `avg_block_time` })
-      },
-      {
-        title: `Blockchain Size`, value: `?`,
-        stats: statsChart({ key: `sum_size` })
-      }
+      { title: `Hashrate`, value: formatHashRate(info.difficulty / 15) },
+      { title: `Block Reward`, value: formatXelis(info.block_reward) },
+      { title: `Tx Pool`, value: `${info.mempool_size} tx` },
+      { title: `Block Count`, value: info.topoheight },
+      { title: `Difficulty`, value: info.difficulty },
+      { title: `Avg Block Time`, value: prettyMs(info.average_block_time, { compact: true }) },
     ]
-  }, [info, statsChart])
+  }, [info])
 
-  if (loading || err) return null
+  if (stats.length === 0) return null
 
   return <div className="home-stats">
-    <div className="home-stats-title">Realtime Stats</div>
+    <div className="home-stats-title">Statistics</div>
+    <div>
+      For more detailed Statistics visit&nbsp;
+      <a href="https://stats.xelis.io" target="_blank">https://stats.xelis.io</a>
+    </div>
     <div className="home-stats-items">
       {stats.map((item) => {
         return <div key={item.title} className="home-stats-item">
           <div className="home-stats-item-title">{item.title}</div>
           <div className="home-stats-item-value">{item.value}</div>
-          {item.stats && <HomeMiniChart data={item.stats} />}
         </div>
       })}
     </div>
@@ -346,7 +279,7 @@ function Home() {
     <ExplorerSearch />
     {/*<P2PStatus />*/}
     <RecentBlocks />
-    {/*<Stats />*/}
+    <Stats />
   </div>
 }
 
