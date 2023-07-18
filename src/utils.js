@@ -16,7 +16,7 @@ export const shiftNumber = (value, decimals) => {
 }
 
 export const formatXelis = (value, withSuffy = true) => {
-  return `${shiftNumber(value, 5)}${withSuffy ? ` XELIS` : ``}`
+  return `${shiftNumber(value, 5).toLocaleString()}${withSuffy ? ` XELIS` : ``}`
 }
 
 export const formatAsset = (value, asset) => {
