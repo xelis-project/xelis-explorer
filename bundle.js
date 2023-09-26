@@ -58,7 +58,7 @@ const main = async () => {
         postcss: {
           plugins: [
             autoprefixer(),
-            prefixer({
+            /*prefixer({
               // add style prefix to css
               transform: function (prefix, selector, prefixedSelector, filePath, rule) {
                 if (filePath.indexOf(`\\style\\classic`) !== -1) {
@@ -71,7 +71,7 @@ const main = async () => {
 
                 return selector
               }
-            })
+            })*/
           ]
         }
       }),

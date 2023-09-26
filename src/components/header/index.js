@@ -1,15 +1,116 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import useTheme from '../../context/useTheme'
-import Button from '../button'
+import { css } from 'goober'
 import { Link } from 'react-router-dom'
+
+import useTheme from '../../context/useTheme'
 import Icon from '../icon'
+import theme from '../../theme'
+
+const style = {
+  container: css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding-top: 2em;
+  `,
+  logo: css`
+    display: flex;
+    gap: .5em;
+    font-size: 1.2em;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
+
+    .logo {
+      width: 30px;
+      height: 30px;
+      display: block;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-image: ${theme.apply({
+    xelis: `url('/img/white_background_black_logo.svg')`,
+    light: `url('/img/black_background_white_logo.svg')`,
+    dark: `url('/img/white_background_black_logo.svg')`,
+  })};
+    }
+  `,
+  menu: css`
+    .button {
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      height: 20px;
+      color: var(--text-color);
+      --ggs: 1.3;
+    }
+
+    .container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-color);
+      gap: .7em;
+      z-index: 1;
+      font-size: 1.2em;
+      transition: all .25s;
+      transform: translateY(0);
+      opacity: 1;
+      box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
+
+      ${theme.query.desktop} {
+        max-width: 200px;
+        position: absolute;
+        right: 0;
+        left: inherit;
+      }
+
+      &.closed {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+
+      .item {
+        text-decoration: none;
+        color: var(--header-nav-color);
+        user-select: none;
+        cursor: pointer;
+      }
+    
+      .item:hover {
+        color: var(--header-nav-active-color);
+      }
+    
+      .item-active {
+        color: var(--header-nav-active-color);
+      }
+    }
+  `,
+  themeButtons: css`
+    display: flex;
+    gap: .25em;
+
+    button {
+      border: none;
+      padding: .5em .7em;
+      cursor: pointer;
+      color: var(--bg-color);
+      background-color: var(--text-color);
+    }
+  `
+}
 
 function useMenuLinks() {
   return useMemo(() => {
     const isActive = ({ isActive }) => {
-      if (isActive) return `header-nav-item header-nav-item-active`
-      return `header-nav-item`
+      if (isActive) return `item item-active`
+      return `item`
     }
 
     return [
@@ -21,25 +122,12 @@ function useMenuLinks() {
   }, [])
 }
 
-export function ToggleThemeButton(props) {
-  const { theme, toggleTheme } = useTheme()
-
-  const icon = useMemo(() => {
-    const map = {
-      'light': 'moon',
-      'dark': 'sun'
-    }
-    return map[theme]
-  }, [theme])
-
-  return <Button icon={icon} title="Toggle Theme" onClick={toggleTheme} {...props} />
-}
-
 function Header(props) {
   const links = useMenuLinks()
   const headerMenuRef = useRef()
 
   const [menuOpen, setMenuOpen] = useState(false)
+  const { setTheme } = useTheme()
 
   useEffect(() => {
     const clickOutside = (e) => {
@@ -55,24 +143,27 @@ function Header(props) {
     }
   }, [menuOpen])
 
-  const className = `header ${props.className || ``}`
-
-  return <div className={className} {...props}>
-    <Link to="/" className="header-logo" />
-    <div className="header-dropdown">
-      <div ref={headerMenuRef} className="header-menu-button" onClick={() => setMenuOpen(!menuOpen)}>
-        <Icon name="menu" />Menu
-      </div>
-      <div className={`header-nav ${menuOpen ? `` : `closed`}`}>
+  return <div className={style.container} {...props}>
+    <Link to="/" className={style.logo}>
+      <span className="logo" />
+      <span>Xelis</span>
+    </Link>
+    <div className={style.menu}>
+      <button className="button" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
+        <Icon name="menu" />
+      </button>
+      <div className={`container ${menuOpen ? `` : `closed`}`}>
         {links.map((item) => {
           return <NavLink key={item.path} to={item.path}
             className={item.className}>
             {item.title}
           </NavLink>
         })}
-        <div className="header-nav-icons">
-          <Button icon="options" title="Settings" className="header-nav-item" style={{ height: 20 }} />
-          <ToggleThemeButton className="header-nav-item" />
+        <a className="item">Settings</a>
+        <div className={style.themeButtons}>
+          <button onClick={() => setTheme('light')}>Light</button>
+          <button onClick={() => setTheme('dark')}>Dark</button>
+          <button onClick={() => setTheme('xelis')}>Xelis</button>
         </div>
       </div>
     </div>

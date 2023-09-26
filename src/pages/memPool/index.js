@@ -1,12 +1,24 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
-import TableBody from '../../components/tableBody'
+import { css } from 'goober'
+
+import TableBody, { style as tableStyle} from '../../components/tableBody'
 import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import useNodeRPC from '../../hooks/useNodeRPC'
-import to from 'await-to-js'
 import { formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
+
+const style = {
+  container: css`
+    h1, h2 {
+      margin: 1.5em 0 .5em 0;
+      font-weight: bold;
+      font-size: 2em;
+    }
+  `
+}
 
 function MemPool() {
   const [memPool, setMemPool] = useState([])
@@ -42,12 +54,12 @@ function MemPool() {
     }
   }, [])
 
-  return <div>
+  return <div className={style.container}>
     <Helmet>
       <title>Mempool</title>
     </Helmet>
     <h1>Mempool</h1>
-    <div className="table-responsive">
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>
@@ -172,8 +184,7 @@ function TxExecuted(props) {
 
   return <div>
     <h2>Executed Transactions</h2>
-    <div>Last 20 blocks</div>
-    <div className="table-responsive">
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>

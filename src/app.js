@@ -58,7 +58,7 @@ const router = createBrowserRouter([
 function App() {
   return <ThemeProvider>
     <HelmetProvider>
-      <Helmet titleTemplate="%s · XELIS Explorer" />
+      <Helmet titleTemplate="%s · Xelis Explorer" />
       <SettingsProvider>
         <NodeSocketProvider>
           <OverlayProvider>

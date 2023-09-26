@@ -17,17 +17,11 @@ export const ThemeProvider = (props) => {
     _setTheme(value)
   }, [])
 
-  const toggleTheme = useCallback(() => {
-    if (theme === `dark`) _setTheme(`light`)
-    else _setTheme(`dark`)
-  }, [theme])
-
   useLayoutEffect(() => {
-    document.documentElement.setAttribute('data-style', `classic`)
     document.body.setAttribute('data-theme', theme)
   }, [theme])
 
-  return <Context.Provider value={{ theme, setTheme, toggleTheme }}>
+  return <Context.Provider value={{ theme, setTheme }}>
     {children}
   </Context.Provider>
 }

@@ -1,14 +1,39 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
+import { css } from 'goober'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import useNodeRPC from '../../hooks/useNodeRPC'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet-async'
-import TableBody from '../../components/tableBody'
+import TableBody, { style as tableStyle } from '../../components/tableBody'
+import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
+import theme from '../../theme'
 
-import Pagination, { getPaginationRange } from '../../components/pagination'
+const style = {
+  container: css`
+    .header {
+      display: flex;
+      gap: 1em;
+      margin: 2em 0;
+      justify-content: space-between;
+
+      h1 {
+        font-size: 2.5em;
+        font-weight: bold;
+      }
+
+      ${theme.query.tablet} {
+        flex-direction: column;
+      }
+
+      ${theme.query.desktop} {
+        flex-direction: row;
+      }
+    }
+  `
+}
 
 function Blocks() {
   const nodeRPC = useNodeRPC()
@@ -24,6 +49,7 @@ function Blocks() {
     setLoading(true)
 
     const resErr = (err) => {
+      setBlocks([])
       setErr(err)
       setLoading(false)
     }
@@ -51,37 +77,39 @@ function Blocks() {
     loadBlocks()
   }, [loadBlocks])
 
-  return <div>
+  return <div className={style.container}>
     <Helmet>
       <title>Blocks</title>
     </Helmet>
-    <h1>Blocks</h1>
-    <Pagination state={pageState} setState={setPageState}
-      countText="blocks" count={count} style={{ marginBottom: `1em` }} />
-    <div className="table-responsive">
+    <div className="header">
+      <h1>Blocks</h1>
+      <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={count} />
+    </div>
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>
             <th>Topo Height</th>
-            <th>Height</th>
-            <th>Type</th>
+            {/*<th>Height</th>*/}
+            {/*<th>Type</th>*/}
             <th>Txs</th>
             <th>Age</th>
             <th>Size</th>
             <th>Hash</th>
+            <th>Fees</th>
             <th>Miner</th>
             <th>Reward</th>
           </tr>
         </thead>
-        <TableBody list={blocks} err={err} loading={loading} colSpan={9} emptyText="No blocks"
+        <TableBody list={blocks} err={err} loading={loading} colSpan={8} emptyText="No blocks"
           onItem={(item) => {
             const size = formatSize(item.total_size_in_bytes)
             return <tr key={item.topoheight}>
               <td>
                 <Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link>
               </td>
-              <td>{item.height}</td>
-              <td>{item.block_type}</td>
+              {/*<td>{item.height}</td>*/}
+              {/*<td>{item.block_type}</td>*/}
               <td>{item.txs_hashes.length}</td>
               <td>
                 <Age timestamp={item.timestamp} format={{ secondsDecimalDigits: 0 }} />
@@ -90,15 +118,14 @@ function Blocks() {
               <td>
                 <Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link>
               </td>
+              <td>{formatXelis(item.total_fees, false)}</td>
               <td>{reduceText(item.miner, 0, 7)}</td>
-              <td>{formatXelis(item.reward)}</td>
+              <td>{formatXelis(item.reward, false)}</td>
             </tr>
           }}
         />
       </table>
     </div>
-    <Pagination state={pageState} setState={setPageState}
-      countText="blocks" count={count} style={{ marginTop: `.5em` }} />
   </div>
 }
 

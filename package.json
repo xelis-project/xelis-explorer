@@ -1,7 +1,7 @@
 {
   "name": "xelis-explorer",
-  "version": "0.1.0",
-  "description": "Official Explorer for XELIS Blockchain.",
+  "version": "0.2.0",
+  "description": "Official Explorer for Xelis Blockchain.",
   "scripts": {
     "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
     "start:testnet": "concurrently \"npm run build:local_testnet\" \"npm run serve\"",
@@ -16,7 +16,6 @@
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@supabase/supabase-js": "^2.10.0",
-    "animate.css": "^4.1.1",
     "await-to-js": "^3.0.0",
     "bytes": "^3.1.2",
     "chart.js": "^4.2.1",
@@ -24,6 +23,8 @@
     "concurrently": "^7.6.0",
     "css.gg": "^2.0.0",
     "framer-motion-3d": "^10.1.0",
+    "goober": "^2.1.10",
+    "hash-it": "^6.0.0",
     "pretty-ms": "^8.0.0",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
