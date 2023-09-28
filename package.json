@@ -9,7 +9,7 @@
     "build:local_dev": "node bundle.js --env=local_dev --watch --sourcemap",
     "build:dev": "node bundle.js --env=dev --sourcemap",
     "build:local_testnet": "node bundle.js --env=testnet --watch --sourcemap",
-    "build:testnet": "node bundle.js --env=testnet --sourcemap",
+    "build:testnet": "node bundle.js --env=testnet --minify",
     "build:mainnet": "node bundle.js --env=mainnet --minify"
   },
   "dependencies": {

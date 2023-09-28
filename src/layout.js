@@ -13,7 +13,7 @@ const style = {
     left: -10px;
     right: -10px;
     bottom: -10px;
-    background: ${theme.apply({ xelis: `url('/img/bg_xelis.jpeg')` })};
+    background: ${theme.apply({ xelis: `url('/img/bg_xelis.jpg')` })};
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
