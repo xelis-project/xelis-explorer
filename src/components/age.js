@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import prettyMs from 'pretty-ms'
 
 function Age(props) {
-  const { timestamp, ms = 3000, format = { compact: true }, update = false } = props
+  const { timestamp, ms = 1000, format = { compact: true }, update = false } = props
 
   const [age, setAge] = useState(0)
   useEffect(() => {

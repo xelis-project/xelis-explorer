@@ -12,11 +12,11 @@ export const reduceText = (text, maxLeft = 7, maxRight = 7) => {
 export const XELIS_ASSET = `0000000000000000000000000000000000000000000000000000000000000000`
 
 export const shiftNumber = (value, decimals) => {
-  return value / Math.pow(10, decimals)
+  return value / Math.pow(10, decimals).toLocaleString()
 }
 
 export const formatXelis = (value, withSuffy = true) => {
-  return `${shiftNumber(value, 5).toLocaleString()}${withSuffy ? ` XELIS` : ``}`
+  return `${shiftNumber(value, 5)}${withSuffy ? ` Xelis` : ``}`
 }
 
 export const formatAsset = (value, asset) => {
@@ -103,12 +103,29 @@ export const formattedBlock = (block, topoheight) => {
   return {
     date: new Date(block.timestamp).toLocaleString(),
     miner: reduceText(block.miner),
-    totalFees: formatXelis(block.total_fees), // if available (include_txs?)
-    reward: formatXelis(block.reward),
+    totalFees: formatXelis(block.total_fees, false), // if available (include_txs?)
+    reward: formatXelis(block.reward, false),
     confirmations: topoheight - block.topoheight,
     size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
-    hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15
+    hashRate: formatHashRate(block.difficulty / 15), // BLOCK_TIME is 15
   }
+}
+
+export const displayError = (err) => {
+  if (err instanceof Error) {
+    return err.message
+  }
+
+  if (typeof err === 'string') {
+    return err
+  }
+
+  if (typeof err === 'object') {
+    return JSON.stringify(err)
+  }
+
+  console.error(err)
+  return 'An error occured. Check console log.'
 }

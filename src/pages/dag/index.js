@@ -1,27 +1,82 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { Canvas, useThree, useFrame, extend } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { Text, Segment, Segments, Instance, Instances, Html } from '@react-three/drei'
+import { Text, Segment, Segments, Instance, Instances } from '@react-three/drei'
 import { BoxGeometry, MeshBasicMaterial } from 'three'
-import queryString from 'query-string'
-import { Link, useLocation, useParams } from 'react-router-dom'
-import prettyMilliseconds from 'pretty-ms'
+import { css } from 'goober'
+import prettyMs from 'pretty-ms'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
-import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
-import useNodeRPC from '../../hooks/useNodeRPC'
-import { formattedBlock, groupBy, reduceText } from '../../utils'
-import { NodeConnection } from '../../components/envAlert'
-import OffCanvas from '../../components/offCanvas'
+import { groupBy } from '../../utils'
 import Button from '../../components/button'
-import { ToggleThemeButton } from '../../components/header'
-import Age from '../../components/age'
+import NodeStatus from '../../components/nodeStatus'
+import useOffCanvasTable from './offCanvasTable'
+import useOffCanvasBlock from './offCanvasBlock'
+import blockColor from './blockColor'
+import useTheme from '../../context/useTheme'
+import BottomInfo from './bottomInfo'
+import { scaleOnHover } from '../../style/animate'
+import theme from '../../style/theme'
 
-export const BLOCK_COLOR = {
-  'Sync': `#32C732`,
-  'Normal': `#FAC898`,
-  'Side': `#5581AA`,
-  'Orphaned': `#FF6961`,
+const style = {
+  container: css`
+    .canvas {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      opacity: 1;
+      --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef'})};
+      background-image:  linear-gradient(var(--bg-line-color) 1px, transparent 1px), linear-gradient(to right, var(--bg-line-color) 1px, var(--bg-color) 1px);
+      background-size: 20px 20px;
+    }
+
+    .controls {
+      position: fixed;
+      right: 0;
+      padding: 1em;
+      display: flex;
+      gap: 1em;
+      flex-direction: column;
+      align-items: center;
+      top: 0;
+  
+      button, a {
+        background-color: var(--text-color);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: block;
+        height: 50px;
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--bg-color);
+        ${scaleOnHover({ scale: .9 })}
+      }
+    }
+
+    .status {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 1em;
+      display: flex;
+      gap: .5em;
+      flex-direction: column;
+
+      > :nth-child(2) {
+        font-size: .8em;
+        text-align: center;
+        position: relative;
+      }
+    }
+  `
 }
 
 export function getBlockType(block, stableHeight) {
@@ -30,229 +85,6 @@ export function getBlockType(block, stableHeight) {
   }
 
   return block.block_type
-}
-
-/*
-function BlockMesh(props) {
-  const { title, block, onPointerEnter, onPointerLeave, onClick, ...restProps } = props
-
-  const setCursor = useCallback((cursor) => {
-    document.documentElement.style.cursor = cursor
-  }, [])
-
-  const setHoverState = useCallback((value) => {
-    if (value) {
-      if (typeof onPointerEnter === `function`) onPointerEnter()
-      setCursor(`pointer`)
-    }
-    else {
-      if (typeof onPointerLeave === `function`) onPointerLeave()
-      setCursor(``)
-    }
-  }, [onPointerEnter, onPointerLeave])
-
-  let color = BLOCK_COLOR[block.block_type] || `black`
-
-  const meshMaterialVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  }
-
-  let topoheight = block.topoheight ? reduceText(block.topoheight.toString(), 0, 4) : `--`
-
-  return <>
-    <motion.mesh {...restProps}
-      whileHover={{ scale: 1.2 }}
-      onClick={onClick}
-      onPointerEnter={() => setHoverState(true)}
-      onPointerLeave={() => setHoverState(false)}
-      scale={0}
-      animate={{ scale: 1 }}
-      transition={{ duration: .25, ease: 'backInOut' }}
-    >
-      <Text color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .9, 0]}>
-        {reduceText(block.hash, 0, 4)}
-      </Text>
-      <Text color="black" anchorX="center"
-        anchorY="middle" fontSize={.3} position={[0, 0, 4]}
-        outlineWidth={.05} outlineColor="#ffffff">
-        {topoheight}
-      </Text>
-      <boxGeometry args={[1, 1, 1]} />
-      <motion.meshBasicMaterial
-        color={color}
-        //wireframe={!hover}
-        initial="hidden"
-        animate="visible"
-        variants={meshMaterialVariants}
-        transition={{ delay: .1 }}
-      />
-    </motion.mesh>
-  </>
-}*/
-
-function BlockTypeLegend() {
-  return <div className="dag-legend">
-    {Object.keys(BLOCK_COLOR).map((key) => {
-      const color = BLOCK_COLOR[key]
-      return <div key={key} className="dag-legend-item">
-        <div className="dag-legend-type">{key}</div>
-        <div className="dag-legend-color" style={{ backgroundColor: color }}></div>
-      </div>
-    })}
-  </div>
-}
-
-function HeightRangeInput(props) {
-  const { height, inputHeight, setInputHeight, paused } = props
-  const [_value, setValue] = useState()
-
-  let value = _value ? _value : inputHeight || 0
-
-  return <div style={{ width: `100%` }}>
-    <div>Height: {value}</div>
-    <input type="range" value={value} step={1}
-      onChange={(e) => setValue(e.target.valueAsNumber)}
-      onMouseUp={() => {
-        setValue(null)
-        setInputHeight(value)
-      }}
-      min={0} max={height}
-      disabled={!paused} style={{ width: `100%` }} />
-  </div>
-}
-
-function useOffCanvasControls(props) {
-  const { height, stableHeight, blocks, onBlockClick } = props
-
-  const location = useLocation()
-
-  const searchHeight = useMemo(() => {
-    const query = queryString.parse(location.search)
-    const height = parseInt(query.height)
-    if (!Number.isNaN(height)) return height
-    return null
-  }, [location])
-
-  const [opened, setOpened] = useState(false)
-  const [paused, setPaused] = useState(searchHeight ? true : false)
-  const [hideOrphaned, setHideOrphaned] = useState(false)
-  const [inputHeight, setInputHeight] = useState(searchHeight)
-  const [lastBlockTime, setLastBlockTime] = useState(0)
-
-  /*
-  useEffect(() => {
-    const query = queryString.parse(location.search)
-    const height = parseInt(query.height)
-    if (!Number.isNaN(height)) {
-      setPaused(true)
-      setInputHeight(height)
-    }
-  }, [location])*/
-
-  useEffect(() => {
-    if (!inputHeight) setInputHeight(height)
-  }, [height, inputHeight])
-
-  useEffect(() => {
-    if (paused) return
-
-    const intervalId = setInterval(() => {
-      setLastBlockTime(v => v += 1000)
-    }, [1000])
-
-    let last = 0
-    if (blocks && blocks.length > 0) {
-      last = new Date().getTime() - blocks[0].timestamp
-    }
-
-    setLastBlockTime(last)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [blocks, paused])
-
-  const filteredBlocks = useMemo(() => {
-    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned').sort((a, b) => b.height - a.height)
-    return blocks.sort((a, b) => b.height - a.height)
-  }, [hideOrphaned, blocks])
-
-  const render = <OffCanvas title="Controls" opened={opened}
-    width={500} position="right" onClose={() => setOpened(false)}>
-    <div className="dag-controls-items">
-      <div>
-        <input type="checkbox" checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
-        <label>Hide Orphaned</label>
-      </div>
-      <div>
-        <input type="checkbox" checked={paused} onChange={(e) => {
-          const value = e.target.checked
-          setPaused(value)
-          if (!value) setInputHeight(height)
-        }} />
-        <label>Pause DAG</label>
-      </div>
-      <HeightRangeInput height={height}
-        inputHeight={inputHeight} setInputHeight={setInputHeight} paused={paused} />
-      <div className="dag-controls-buttons">
-        <button className="button" disabled={!paused}
-          onClick={() => setInputHeight(inputHeight - 1)}>
-          Previous
-        </button>
-        <button className="button" disabled={!paused}
-          onClick={() => setInputHeight(inputHeight - 10)}>
-          Previous (10)
-        </button>
-        <button className="button" disabled={!paused}
-          onClick={() => setInputHeight(inputHeight + 10)}>
-          Next (10)
-        </button>
-        <button className="button" disabled={!paused}
-          onClick={() => setInputHeight(inputHeight + 1)}>
-          Next
-        </button>
-      </div>
-      {!paused && <div>Last block since {prettyMilliseconds(lastBlockTime, { secondsDecimalDigits: 0 })}...</div>}
-      {paused && <div>Block update is paused.</div>}
-    </div>
-    <div className="dag-controls-table">
-      <table>
-        <thead>
-          <tr style={{ position: `sticky`, top: 0 }}>
-            <th>Height</th>
-            <th>Type</th>
-            <th>Hash</th>
-            <th>Txs</th>
-            <th>Age</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredBlocks.map((block) => {
-            const txCount = block.txs_hashes.length
-            const blockType = getBlockType(block, stableHeight)
-            const blockColor = BLOCK_COLOR[blockType]
-            return <tr key={block.hash} onClick={() => onBlockClick(block)}>
-              <td>
-                <span title="Height">{block.height}</span>&nbsp;
-                {block.topoheight && <span title="Topo Height">({block.topoheight})</span>}
-              </td>
-              <td style={{ color: blockColor }}>
-                {blockType}
-              </td>
-              <td>{block.hash.slice(-6).toUpperCase()}</td>
-              <td>{txCount}</td>
-              <td>
-                <Age timestamp={block.timestamp} update />
-              </td>
-            </tr>
-          })}
-        </tbody>
-      </table>
-    </div>
-  </OffCanvas>
-
-  return { render, setOpened, paused, inputHeight, hideOrphaned }
 }
 
 function CameraWithControls(props) {
@@ -388,153 +220,6 @@ function CameraWithControls(props) {
   </orthographicCamera>
 }
 
-function useOffCanvasBlock(props) {
-  const { topoheight, stableHeight } = props
-  const [block, setBlock] = useState()
-  const [opened, setOpened] = useState(false)
-  const nodeRPC = useNodeRPC()
-
-  const open = useCallback((block) => {
-    setBlock(block)
-    setOpened(true)
-  }, [])
-
-  const formatBlock = useMemo(() => {
-    if (!block) return {}
-    return formattedBlock(block, topoheight || 0)
-  }, [block, topoheight])
-
-  const loadBlock = useCallback(async (topoheight) => {
-    const [err, blockData] = await to(nodeRPC.getBlockAtTopoHeight(topoheight))
-    if (err) return resErr(err)
-    setBlock(blockData)
-  }, [])
-
-  const render = <OffCanvas title="Block Information" position="left"
-    width={500} opened={opened} onClose={() => setOpened(false)}>
-    {block && <>
-      <div className="left-right-buttons">
-        {formatBlock.hasPreviousBlock && <Button className="button" onClick={() => loadBlock(block.topoheight - 1)} icon="chevron-left-r">
-          Previous Block ({block.topoheight - 1})
-        </Button>}
-        {formatBlock.hasNextBlock && <Button className="button" onClick={() => loadBlock(block.topoheight + 1)} icon="chevron-right-r" iconLocation="right">
-          Next Block ({block.topoheight + 1})
-        </Button>}
-      </div>
-      <div className="dag-offcanvas-block">
-        <table>
-          <tbody>
-            <tr>
-              <th>Block Type</th>
-            </tr>
-            <tr>
-              <td>{getBlockType(block, stableHeight)}</td>
-            </tr>
-            <tr>
-              <th>Hash</th>
-            </tr>
-            <tr>
-              <td>
-                <Link to={`/blocks/${block.hash}`}>{block.hash}</Link>
-              </td>
-            </tr>
-            <tr>
-              <th>Timestamp</th>
-            </tr>
-            <tr>
-              <td>{formatBlock.date} ({block.timestamp.toLocaleString()})</td>
-            </tr>
-            <tr>
-              <th>Confirmations</th>
-            </tr>
-            <tr>
-              <td>{formatBlock.confirmations.toLocaleString()}</td>
-            </tr>
-            <tr>
-              <th>Topo Height</th>
-            </tr>
-            <tr>
-              <td>{block.topoheight.toLocaleString()}</td>
-            </tr>
-            <tr>
-              <th>Height</th>
-            </tr>
-            <tr>
-              <td>{block.height.toLocaleString()}</td>
-            </tr>
-            <tr>
-              <th>Miner</th>
-            </tr>
-            <tr>
-              <td>{block.miner}</td>
-            </tr>
-            <tr>
-              <th>Reward</th>
-            </tr>
-            <tr>
-              <td>{formatBlock.reward}</td>
-            </tr>
-            <tr>
-              <th>Txs</th>
-            </tr>
-            <tr>
-              <td>{block.txs_hashes.length.toLocaleString()}</td>
-            </tr>
-            <tr>
-              <th>Difficulty</th>
-            </tr>
-            <tr>
-              <td>
-                <span>{block.difficulty.toLocaleString()} </span>
-                <span title="Cumulative Difficulty">
-                  ({block.cumulative_difficulty.toLocaleString()})
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th>Hash Rate</th>
-            </tr>
-            <tr>
-              <td>
-                {formatBlock.hashRate}
-              </td>
-            </tr>
-            <tr>
-              <th>Size</th>
-            </tr>
-            <tr>
-              <td>{formatBlock.size}</td>
-            </tr>
-            <tr>
-              <th>Nonce</th>
-            </tr>
-            <tr>
-              <td>
-                <span>{block.nonce.toLocaleString()} </span>
-                <span title="Extra Nonce">({block.extra_nonce})</span>
-              </td>
-            </tr>
-            <tr>
-              <th>Tips</th>
-            </tr>
-            <tr>
-              <td style={{ lineHeight: `1.4em` }}>
-                {block.tips.map((tip, index) => {
-                  return <div key={tip} style={{ wordBreak: `break-all` }}>
-                    {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
-                  </div>
-                })}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </>}
-  </OffCanvas>
-
-  return { render, open }
-}
-
 function InstancedLines(props) {
   const { blocks = [], hoveredBlock } = props
 
@@ -574,6 +259,7 @@ function InstancedLines(props) {
 function InstancedBlocks(props) {
   const { blocks = [], setHoveredBlock, offCanvasBlock, stableHeight } = props
 
+  const { theme: currentTheme } = useTheme()
   const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
   const material = useMemo(() => new MeshBasicMaterial(), [])
   /*useFrame(({ gl }) => {
@@ -635,20 +321,11 @@ function InstancedBlocks(props) {
     {blocks.map((block) => {
       const { x, y, data } = block
       const blockType = getBlockType(data, stableHeight)
-      const blockColor = BLOCK_COLOR[blockType]
-      return <Instance key={data.hash} position={[x, y, 2]} color={blockColor}
+      return <Instance key={data.hash} position={[x, y, 2]} color={blockColor.value(currentTheme, blockType)}
         onPointerOver={(e) => onPointerEnter(block, e)}
         onPointerOut={onPointerLeave}
         onClick={() => onClick(block)}
       >
-        {/*Anything inside <Instance> is not using <instancedMesh>}
-        {/*This still uses a lot of cpu}
-        {/*<Html sprite transform distanceFactor={8} position={[0, .7, 0]} style={textStyle}>
-          {reduceText(data.hash, 0, 4)}
-        </Html>
-        <Html sprite transform distanceFactor={8} position={[0, 0, 4]} style={textStyle}>
-          {reduceText(data.topoheight, 0, 4)}
-      </Html>*/}
         <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .8, 0]}>
           {data.hash.slice(-6).toUpperCase()}
         </Text>
@@ -701,82 +378,97 @@ function CanvasFrame() {
   return null
 }
 
+
+function LastBlockTime(props) {
+  const { blocks, paused } = props
+  const [lastBlockTime, setLastBlockTime] = useState(0)
+
+  useEffect(() => {
+    if (paused) return
+
+    const intervalId = setInterval(() => {
+      setLastBlockTime(v => v += 1000)
+    }, [1000])
+
+    let last = 0
+    if (blocks && blocks.length > 0) {
+      last = new Date().getTime() - blocks[0].timestamp
+    }
+
+    setLastBlockTime(last)
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [blocks, paused])
+
+  if (paused) return <div>Paused</div>
+
+  return <div>
+    Last block {prettyMs(lastBlockTime, { secondsDecimalDigits: 0 })} ago
+  </div>
+}
+
 function DAG() {
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
-  const [loading, setLoading] = useState(true)
-  const [topoheight, setTopoheight] = useState()
-  const [height, setHeight] = useState()
-  const [stableHeight, setStableHeight] = useState()
+  const [loading, setLoading] = useState()
+  const [info, setInfo] = useState({})
+  const [err, setErr] = useState()
+
+  const stableHeight = info.stableheight
+
   const cameraRef = useRef()
 
   const fetchMaxBlockHeight = 20
   const displayMaxBlockHeight = 20
 
-  const offCanvasBlock = useOffCanvasBlock({ topoheight, stableHeight })
+  const offCanvasBlock = useOffCanvasBlock({ info })
 
-  const offCanvasControls = useOffCanvasControls({
-    height,
-    stableHeight,
+  const offCanvasTable = useOffCanvasTable({
+    info,
     blocks,
     onBlockClick: (block) => {
       offCanvasBlock.open(block)
     }
   })
 
-  const loadTopoheight = useCallback(async () => {
-    const [err, topoheight] = await to(nodeRPC.getTopoHeight())
-    if (err) return console.log(err)
-
-    setTopoheight(topoheight)
-  }, [])
-
-  const loadHeight = useCallback(async () => {
-    const [err, height] = await to(nodeRPC.getHeight())
-    if (err) return console.log(err)
-
-    setHeight(height)
-  }, [])
-
-  const loadStableHeight = useCallback(async () => {
-    const [err, height] = await to(nodeRPC.getStableHeight())
-    if (err) return console.log(err)
-
-    setStableHeight(height)
-  })
+  const loadInfo = useCallback(async () => {
+    if (!nodeSocket.connected) return
+    const [err, info] = await to(nodeSocket.daemon.getInfo())
+    if (err) return setErr(err)
+    setInfo(info)
+  }, [nodeSocket])
 
   const loadBlocks = useCallback(async () => {
-    const inputHeight = offCanvasControls.inputHeight
+    if (!nodeSocket.connected) return
+    const inputHeight = offCanvasTable.inputHeight
     if (!inputHeight) return
+
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
 
     setLoading(true)
     let start = Math.max(0, inputHeight - (fetchMaxBlockHeight - 1))
     let end = inputHeight
-    const [err, newBlocks] = await to(nodeRPC.getBlocksRangeByHeight(start, end))
+    const [err, newBlocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
+      start_height: start,
+      end_height: end
+    }))
+    if (err) return resErr(err)
+
+    setBlocks(newBlocks)
     setLoading(false)
-    if (err) return console.log(err)
-    if (newBlocks) {
-      setBlocks(newBlocks)
-      /*
-      setBlocks((blocks) => {
-        newBlocks.forEach(block => {
-          const index = blocks.findIndex(b => b.hash === block.hash)
-          if (index === -1) blocks.push(block)
-        })
-        return [...blocks]
-      })*/
-    }
-  }, [offCanvasControls.inputHeight])
+  }, [offCanvasTable.inputHeight, nodeSocket])
 
   useEffect(() => {
-    if (!offCanvasControls.paused) {
-      loadHeight()
-      loadTopoheight()
-      loadStableHeight()
-    }
-  }, [offCanvasControls.paused])
+    if (offCanvasTable.paused) return
+    loadInfo()
+  }, [loadInfo, offCanvasTable.paused])
 
   useEffect(() => {
     loadBlocks()
@@ -784,14 +476,9 @@ function DAG() {
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
-    onData: (newBlock) => {
-      loadHeight()
-      loadTopoheight()
-      loadStableHeight()
-      //setTopoheight(newBlock.topoheight)
-      //if (newBlock.height) setHeight(newBlock.height)
-
-      if (!offCanvasControls.paused) {
+    onData: (_, newBlock) => {
+      loadInfo()
+      if (!offCanvasTable.paused) {
         setBlocks((blocks) => {
           const entries = [...groupBy(blocks, (b) => b.height).entries()]
           entries.sort((a, b) => a[0] - b[0])
@@ -805,12 +492,12 @@ function DAG() {
         })
       }
     }
-  }, [offCanvasControls.paused])
+  }, [offCanvasTable.paused])
 
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
-    onData: (data) => {
-      if (offCanvasControls.paused) return
+    onData: (_, data) => {
+      if (offCanvasTable.paused) return
       const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
@@ -820,7 +507,7 @@ function DAG() {
         return block
       }))
     }
-  }, [offCanvasControls.paused])
+  }, [offCanvasTable.paused])
 
   const distance = 2
   const [blocksToRender, setBlocksToRender] = useState([])
@@ -831,10 +518,10 @@ function DAG() {
       // use fixed value of 38 instead of calculating last block position on page load
       // this avoid flickering and seeing block moving from left to right
       cameraRef.current.position.x = 38
-    }   
+    }
 
     let filteredBlocks = blocks
-    if (offCanvasControls.hideOrphaned) {
+    if (offCanvasTable.hideOrphaned) {
       filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
     }
 
@@ -880,39 +567,18 @@ function DAG() {
 
     setBlocksToRender(blocksToRender)
     setHeightsText(heightsText)
-  }, [blocks, offCanvasControls.hideOrphaned])
+  }, [blocks, offCanvasTable.hideOrphaned])
 
   const [hoveredBlock, setHoveredBlock] = useState(null)
 
-  return <div>
+  return <div className={style.container}>
     <Helmet>
       <title>DAG</title>
     </Helmet>
-    {offCanvasControls.render}
-    {offCanvasBlock.render}
-    <div className="dag-header">
-      <div className="dag-header-title">
-        <div className="header-logo" />
-        <h1>XELIS DAG</h1>
-      </div>
-      <NodeConnection />
-      <BlockTypeLegend />
-      {
-        loading
-          ? <div className="dag-loading">Loading...</div>
-          : <div>Height: {height.toLocaleString()} | Topo Height: {topoheight.toLocaleString()} | Stable Height: {stableHeight.toLocaleString()}</div>
-      }
-    </div>
-    <div className="dag-offcanvas-tr-buttons">
-      <Button icon="home" link="/" />
-      <Button icon="options" onClick={() => offCanvasControls.setOpened(true)} />
-      <ToggleThemeButton />
-    </div>
-    {!cameraRef.current && <div className="dag-loading-logo" />}
-    <div className="dag-canvas">
+    <div className="canvas">
       <Canvas>
         <CanvasFrame />
-        <CameraWithControls camRef={cameraRef} flat={offCanvasControls.flat} />
+        <CameraWithControls camRef={cameraRef} flat />
         <InstancedBlocks stableHeight={stableHeight} blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
         <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
         {heightsText.map((text) => {
@@ -923,6 +589,19 @@ function DAG() {
           </Text>
         })}
       </Canvas>
+    </div>
+    {offCanvasTable.render}
+    {offCanvasBlock.render}
+    <BottomInfo info={info} />
+    <div className="status">
+      <NodeStatus />
+      <div>
+        {blocks.length > 0 && <LastBlockTime blocks={blocks} paused={offCanvasTable.paused} />}
+      </div>
+    </div>
+    <div className="controls">
+      <Button icon="home" link="/" />
+      <Button icon="list" onClick={() => offCanvasTable.setOpened(true)} />
     </div>
   </div>
 }

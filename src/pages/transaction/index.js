@@ -1,24 +1,51 @@
 import { useCallback, useEffect, useState } from 'react'
-import useNodeRPC from '../../hooks/useNodeRPC'
 import { useParams } from 'react-router'
 import { Helmet } from 'react-helmet-async'
-import NotFound from '../notFound'
 import to from 'await-to-js'
-import TableBody from '../../components/tableBody'
-import { formatXelis, formatAsset, formatAssetName, reduceText } from '../../utils'
 import { Link } from 'react-router-dom'
-import DotLoading from '../../components/dotLoading'
+import { useNodeSocket } from '@xelis/sdk/react/context'
+import { css } from 'goober'
+
+import TableBody, { style as tableStyle } from '../../components/tableBody'
+import { formatXelis, formatAsset, formatAssetName, reduceText, displayError } from '../../utils'
+import PageLoading from '../../components/pageLoading'
+import TableFlex from '../../components/tableFlex'
+
+const style = {
+  container: css`
+    h1 {
+      margin: 1.5em 0 .5em 0;
+      font-weight: bold;
+      font-size: 2em;
+    }
+
+    h2 {
+      margin: 1em 0 .5em 0;
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+
+    .error {
+      padding: 1em;
+      color: white;
+      font-weight: bold;
+      background-color: var(--error-color);
+    }
+  `
+}
 
 function Transaction() {
   const { hash } = useParams()
 
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
 
   const [err, setErr] = useState()
-  const [loading, setLoading] = useState(true)
-  const [tx, setTx] = useState()
+  const [loading, setLoading] = useState()
+  const [tx, setTx] = useState({})
 
   const loadTx = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setErr(null)
     setLoading(true)
 
@@ -27,64 +54,64 @@ function Transaction() {
       setLoading(false)
     }
 
-    const [err, data] = await to(nodeRPC.getTransaction(hash))
+    const [err, data] = await to(nodeSocket.daemon.getTransaction(hash))
     if (err) return resErr(err)
 
     setTx(data)
     setLoading(false)
-  }, [hash])
+  }, [hash, nodeSocket])
 
   useEffect(() => {
     loadTx()
   }, [loadTx])
 
-  if (err) return <div>{err.message}</div>
-  if (loading) return <div>Loading<DotLoading /></div>
-  if (!loading && !tx) return <NotFound />
-
-  const transfers = tx.data.transfers || []
+  let transfers = []
+  if (tx.data && tx.data.transfers) transfers = tx.data.transfers
 
   let burns = []
-  if (tx.data.burn) burns = [tx.data.burn]
+  if (tx.data && tx.data.burn) burns = [tx.data.burn]
 
-  return <div>
+  return <div className={style.container}>
+    <PageLoading loading={loading} />
     <Helmet>
-      <title>Transaction {hash}</title>
+      <title>Transaction {tx.hash || ''}</title>
     </Helmet>
-    <h1>Transaction {reduceText(hash, 4, 4)}</h1>
+    <h1>Transaction {reduceText(tx.hash, 4, 4)}</h1>
+    {err && <div className="error">{displayError(err)}</div>}
     <div>
-      <div className="table-responsive">
-        <table>
-          <tbody>
-            <tr>
-              <th>Hash</th>
-              <td>{hash}</td>
-            </tr>
-            <tr>
-              <th>Signer</th>
-              <td>{tx.owner}</td>
-            </tr>
-            <tr>
-              <th>Signature</th>
-              <td>{tx.signature}</td>
-            </tr>
-            <tr>
-              <th>Fees</th>
-              <td>{formatXelis(tx.fee)}</td>
-            </tr>
-            <tr>
-              <th>Nonce</th>
-              <td>{tx.nonce}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <TableFlex 
+        headers={[
+          {
+            key: 'hash',
+            title: 'Hash',
+          },
+          {
+            key: 'owner',
+            title: 'Signer',
+          },
+          {
+            key: 'signature',
+            title: 'Signature',
+          },
+          {
+            key: 'fee',
+            title: 'Fee',
+            render: (value) => value && formatXelis(value, false)
+          },
+          {
+            key: 'nonce',
+            title: 'Nonce',
+          },
+        ]}
+        data={[tx]}
+        rowKey="hash"
+      />
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <Blocks tx={tx} />
       <h2>Extra</h2>
       <div>
-        {!tx.extra_data && `No extra data`}
+        {!tx.extra_data && <div>No extra data</div>}
         {tx.extra_data && JSON.stringify(tx.extra_data, null, 2)}
       </div>
     </div>
@@ -95,7 +122,7 @@ function Transfers(props) {
   const { transfers } = props
   return <div>
     <h2>Transfers</h2>
-    <div className="table-responsive">
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>
@@ -123,7 +150,7 @@ function Burns(props) {
   const { burns } = props
   return <div>
     <h2>Burns</h2>
-    <div className="table-responsive">
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>
@@ -148,12 +175,14 @@ function Burns(props) {
 function Blocks(props) {
   const { tx } = props
 
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
   const [err, setErr] = useState()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
   const [blocks, setBlocks] = useState([])
 
   const loadTxBlocks = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setLoading(true)
     setErr(null)
 
@@ -163,16 +192,16 @@ function Blocks(props) {
     }
 
     const blocks = []
-    for (let i = 0; i < tx.blocks.length; i++) {
+    for (let i = 0; i < (tx.blocks || []).length; i++) {
       const hash = tx.blocks[i]
-      const [err, data] = await to(nodeRPC.getBlockByHash(hash))
+      const [err, data] = await to(nodeSocket.daemon.getBlockByHash(hash))
       if (err) return resErr(err)
       blocks.push(data)
     }
 
     setLoading(false)
     setBlocks(blocks)
-  }, [tx])
+  }, [tx, nodeSocket])
 
   useEffect(() => {
     loadTxBlocks()
@@ -180,14 +209,14 @@ function Blocks(props) {
 
   return <div>
     <h2>Blocks</h2>
-    <div className="table-responsive">
+    <div className={tableStyle}>
       <table>
         <thead>
           <tr>
             <th>Topoheight</th>
             <th>Type</th>
             <th>Size</th>
-            <th>Total Fees</th>
+            <th>Fees</th>
             <th>Timestamp</th>
             <th>Txs</th>
           </tr>

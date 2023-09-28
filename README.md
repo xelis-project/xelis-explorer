@@ -1,6 +1,6 @@
-# XELIS Explorer
+# Xelis Explorer
 
-Official Explorer for XELIS Blockchain.
+Official Explorer for Xelis Blockchain.
 
 - Realtime statistics with web sockets
 - Navigate all blocks of the entire blockchain

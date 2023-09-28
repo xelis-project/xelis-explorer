@@ -56,23 +56,7 @@ const main = async () => {
     plugins: [
       stylePlugin({
         postcss: {
-          plugins: [
-            autoprefixer(),
-            prefixer({
-              // add style prefix to css
-              transform: function (prefix, selector, prefixedSelector, filePath, rule) {
-                if (filePath.indexOf(`\\style\\classic`) !== -1) {
-                  return `[data-style=classic] ${selector}`
-                }
-
-                if (filePath.indexOf(`\\style\\xelis`) !== -1) {
-                  return `[data-style=xelis] ${selector}`
-                }
-
-                return selector
-              }
-            })
-          ]
+          plugins: [autoprefixer()]
         }
       }),
       {

@@ -1,8 +1,16 @@
+import { css } from 'goober'
 import packageJSON from '../../../package.json'
 
+const style = {
+  container: css`
+    margin: 2em 0 3em 0;
+    color: var(--muted-color);
+  `
+}
+
 function Footer() {
-  return <div className="footer">
-    XELIS Explorer v{packageJSON.version} by g45t345rt
+  return <div className={style.container}>
+    Xelis Explorer v{packageJSON.version} by g45t345rt | {ENV}
   </div>
 }
 
