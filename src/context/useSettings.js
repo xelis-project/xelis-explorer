@@ -17,7 +17,7 @@ export function SettingsProvider(props) {
   const { children } = props
 
   const [settings, setSettings] = useState(() => {
-    return storeSettings.getAll() || defaultSettings
+    return storeSettings.getAll(Object.assign({}, defaultSettings)) // use object.assign or defaultSettings will get overwritten
   })
 
   const setValue = useCallback((key, value) => {
