@@ -1,20 +1,16 @@
 import { createContext, useCallback, useContext, useLayoutEffect, useState } from 'react'
-import store from 'store2'
+import useSettings, { settingsKeys } from './useSettings'
 
 const Context = createContext()
 
-const storeTheme = store.namespace(`theme`)
-
 export const ThemeProvider = (props) => {
-  const { children, defaultTheme = `dark` } = props
+  const { children } = props
 
-  const [theme, _setTheme] = useState(() => {
-    return storeTheme.get(`current`, defaultTheme)
-  })
+  const { settings, setValue  } = useSettings()
+  const theme = settings[settingsKeys.THEME]
 
   const setTheme = useCallback((value) => {
-    storeTheme.set(`current`, value)
-    _setTheme(value)
+    setValue(settingsKeys.THEME, value)
   }, [])
 
   useLayoutEffect(() => {

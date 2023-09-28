@@ -7,10 +7,12 @@ const storeSettings = store.namespace(`settings`)
 
 export const settingsKeys = {
   NODE_WS_ENDPOINT: 'node_ws_endpoint',
+  THEME: 'theme'
 }
 
 export const defaultSettings = {
   [settingsKeys.NODE_WS_ENDPOINT]: NODE_WS_ENDPOINT,
+  [settingsKeys.THEME]: 'xelis'
 }
 
 export function SettingsProvider(props) {
