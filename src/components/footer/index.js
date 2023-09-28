@@ -10,7 +10,7 @@ const style = {
 
 function Footer() {
   return <div className={style.container}>
-    Xelis Explorer v{packageJSON.version} by g45t345rt | {ENV}
+    XELIS Explorer v{packageJSON.version} by g45t345rt | {ENV}
   </div>
 }
 

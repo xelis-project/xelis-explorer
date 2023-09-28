@@ -72,7 +72,7 @@ function Routes() {
 
 function App() {
   return <HelmetProvider>
-    <Helmet titleTemplate="%s · Xelis Explorer" />
+    <Helmet titleTemplate="%s · XELIS Explorer" />
     <SettingsProvider>
       <ThemeProvider>
         <Routes />

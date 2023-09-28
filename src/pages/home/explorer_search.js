@@ -101,7 +101,7 @@ export function ExplorerSearch() {
 
   return <form onSubmit={search}>
     <div className={style.container}>
-      <div className="title">Xelis Explorer</div>
+      <div className="title">XELIS Explorer</div>
       <div className="form">
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />

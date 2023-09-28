@@ -152,7 +152,7 @@ function Header(props) {
   return <div className={style.container} {...props}>
     <Link to="/" className={style.logo}>
       <span className="logo" />
-      <span>Xelis</span>
+      <span>XELIS</span>
     </Link>
     <div className={style.menu}>
       <button className="button" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
@@ -168,7 +168,7 @@ function Header(props) {
         <div className={style.themeButtons}>
           <button onClick={() => setTheme('light')}>Light</button>
           <button onClick={() => setTheme('dark')}>Dark</button>
-          <button onClick={() => setTheme('xelis')}>Xelis</button>
+          <button onClick={() => setTheme('xelis')}>XELIS</button>
         </div>
       </div>
     </div>
