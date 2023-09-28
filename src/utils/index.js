@@ -12,7 +12,7 @@ export const reduceText = (text, maxLeft = 7, maxRight = 7) => {
 export const XELIS_ASSET = `0000000000000000000000000000000000000000000000000000000000000000`
 
 export const shiftNumber = (value, decimals) => {
-  return value / Math.pow(10, decimals).toLocaleString()
+  return (value / Math.pow(10, decimals) || 0).toLocaleString()
 }
 
 export const formatXelis = (value, withSuffy = true) => {
