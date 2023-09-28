@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
-import { css } from 'goober'
+import { css, keyframes } from 'goober'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
-import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
-import useNodeRPC from '../../hooks/useNodeRPC'
 import Age from '../../components/age'
 import { formatSize, reduceText } from '../../utils'
-import theme from '../../theme'
+import theme from '../../style/theme'
+import { bounceIn, scaleOnHover } from '../../style/animate'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -49,12 +49,17 @@ const style = {
       flex-shrink: 0;
       text-decoration: none;
       display: block;
-      transition: .25s transform;
       user-select: none;
+      cursor: pointer;
+      ${scaleOnHover}
 
-      ${theme.query.desktop} {
+      ${theme.query.minDesktop} {
         border-top: 3px solid var(--block-border-color);
         border-left: none;
+      }
+
+      &.animate {
+        ${bounceIn(.8)};
       }
 
       .title {
@@ -84,25 +89,22 @@ const style = {
         color: var(--link-color);
       }
     }
-
-    item:hover {
-      transform: scale(.95);
-      cursor: pointer;
-    }
   `
 }
 
 export function RecentBlocks() {
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
   const [err, setErr] = useState()
   const [blocks, setBlocks] = useState(() => {
     return [{}, {}, {}, {}, {}, {}, {}]
   })
-  const [animateBlocks, setAnimateBlocks] = useState(false) // make sure to not animate on pageload and only when we get a new block
+  const [animateBlock, setAnimateBlock] = useState('')
 
   const loadRecentBlocks = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setLoading(true)
 
     const resErr = (err) => {
@@ -110,15 +112,18 @@ export function RecentBlocks() {
       setErr(err)
     }
 
-    const [err1, height] = await to(nodeRPC.getHeight())
+    const [err1, height] = await to(nodeSocket.daemon.getHeight())
     if (err1) return resErr(err1)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByHeight(height - 19, height))
+    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
+      start_height: height - 19,
+      end_height: height
+    }))
     if (err2) return resErr(err2)
     setLoading(false)
 
     setBlocks(blocks.reverse())
-  }, [])
+  }, [nodeSocket])
 
   useEffect(() => {
     loadRecentBlocks()
@@ -126,18 +131,18 @@ export function RecentBlocks() {
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
-    onData: (newBlock) => {
+    onData: (_, newBlock) => {
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
       })
-      setAnimateBlocks(true)
+      setAnimateBlock(newBlock.hash)
     }
   }, [])
 
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
-    onData: (data) => {
+    onData: (_, data) => {
       const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
@@ -160,12 +165,11 @@ export function RecentBlocks() {
     <div className={style.title}>Recent Blocks</div>
     <div className={style.items}>
       {blocks.map((block, index) => {
-        const key = index + Math.random() // random key to force re-render and repeat animation
+        const key = index //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
-
-        return <div className={`${animateBlocks ? `animate` : ``}`} key={key}>
-          <Link to={`/blocks/${block.hash}`} key={block.hash} className="item">
+        return <div key={key}>
+          <Link to={`/blocks/${block.hash}`} key={block.hash} className={`item ${animateBlock === block.hash ? `animate` : ``}`}>
             <div className="title">Block {block.topoheight}</div>
             <div className="value">{txCount} txs | {size}</div>
             <div className="miner">{reduceText(block.miner, 0, 7) || '--'}</div>

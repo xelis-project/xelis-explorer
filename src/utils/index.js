@@ -109,6 +109,23 @@ export const formattedBlock = (block, topoheight) => {
     size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
-    hashRate: formatHashRate(block.difficulty / 15) // BLOCK_TIME is 15
+    hashRate: formatHashRate(block.difficulty / 15), // BLOCK_TIME is 15
   }
+}
+
+export const displayError = (err) => {
+  if (err instanceof Error) {
+    return err.message
+  }
+
+  if (typeof err === 'string') {
+    return err
+  }
+
+  if (typeof err === 'object') {
+    return JSON.stringify(err)
+  }
+
+  console.error(err)
+  return 'An error occured. Check console log.'
 }

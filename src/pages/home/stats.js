@@ -2,17 +2,18 @@ import to from 'await-to-js'
 import prettyMs from 'pretty-ms'
 import { css } from 'goober'
 import { useCallback, useMemo, useState } from 'react'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
-import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
 import { formatHashRate, formatXelis } from '../../utils'
-import theme from '../../theme'
+import theme from '../../style/theme'
 import Icon from '../../components/icon'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
     margin-bottom: 3em;
 
-    ${theme.query.desktop} {
+    ${theme.query.minDesktop} {
       padding: 4em;
       background-color: ${theme.apply({ xelis: 'rgb(14 30 32 / 70%)', light: '#e7e7e7', dark: '#0c0c0c'})};
 
@@ -34,50 +35,53 @@ const style = {
       cursor: pointer;
       text-decoration: none;
       margin-top: 2em;
-    }
-  `,
-  title: css`
-    margin-bottom: 1em;
-    font-weight: bold;
-    font-size: 1.5em;
-    
-    &::after {
-      margin-top:.6em;
-      height: 2px;
-      content: "";
-      background-color: var(--text-color);
-      width: 100%;
-      display: block;
-    }
-  `,
-  items: css`
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1em;
-
-    ${theme.query.tablet} {
-      grid-template-columns: 1fr 1fr;
+      ${scaleOnHover}
     }
 
-    ${theme.query.desktop} {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    .item {
-      padding: .5em 0;
-
-      .title {
-        margin-bottom: .5em;
-        font-size: .8em;
-        color: var(--muted-color);
-      }
-
-      .value {
-        font-weight: bold;
-        font-size: 1.6em;
+    .title {
+      margin-bottom: 1em;
+      font-weight: bold;
+      font-size: 1.5em;
+      
+      &::after {
+        margin-top:.6em;
+        height: 2px;
+        content: "";
+        background-color: var(--text-color);
+        width: 100%;
+        display: block;
       }
     }
-  `
+
+    .items {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1em;
+  
+      ${theme.query.minMobile} {
+        grid-template-columns: 1fr 1fr;
+      }
+  
+      ${theme.query.minDesktop} {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+  
+      > div {
+        padding: .5em 0;
+  
+        :nth-child(1) {
+          margin-bottom: .5em;
+          font-size: .8em;
+          color: var(--muted-color);
+        }
+  
+        :nth-child(2) {
+          font-weight: bold;
+          font-size: 1.6em;
+        }
+      }
+    }
+  `,
 }
 
 export function Stats() {
@@ -85,11 +89,11 @@ export function Stats() {
 
   const [info, setInfo] = useState()
   const [err, setErr] = useState()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
 
   const loadInfo = useCallback(async () => {
     setLoading(true)
-    const [err, info] = await to(nodeSocket.sendMethod(`get_info`))
+    const [err, info] = await to(nodeSocket.daemon.getInfo())
     if (err) return setErr(err)
     setInfo(info)
     setLoading(false)
@@ -97,7 +101,7 @@ export function Stats() {
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
-    onLoad: loadInfo,
+    onConnected: loadInfo,
     onData: loadInfo
   }, [])
 
@@ -120,12 +124,12 @@ export function Stats() {
   }, [info])
 
   return <div className={style.container}>
-    <div className={style.title}>Statistics</div>
-    <div className={style.items}>
+    <div className="title">Realtime Stats</div>
+    <div className="items">
       {stats.map((item) => {
-        return <div key={item.title} className="item">
-          <div className="title">{item.title}</div>
-          <div className="value">{info ? item.value : '--'}</div>
+        return <div key={item.title}>
+          <div>{item.title}</div>
+          <div>{info ? item.value : '--'}</div>
         </div>
       })}
     </div>

@@ -4,15 +4,16 @@ import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
+import { useNodeSocket } from '@xelis/sdk/react/context'
 
-import useNodeRPC from '../../hooks/useNodeRPC'
-import { formattedBlock } from '../../utils'
+import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock } from '../../utils'
 import NotFound from '../notFound'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
-import { style as tableStyle } from '../../components/tableBody'
-import theme from '../../theme'
+import theme from '../../style/theme'
+import { scaleOnHover } from '../../style/animate'
+import TableFlex from '../../components/tableFlex'
 
 const style = {
   container: css`
@@ -22,13 +23,20 @@ const style = {
       font-size: 2em;
     }
 
-    .description {
+    .error {
+      padding: 1em;
+      color: white;
+      font-weight: bold;
+      background-color: var(--error-color);
+    }
+
+    .controls {
       display: flex;
       flex-direction: column;
       margin-bottom: 2em;
       gap: 1em;
 
-      ${theme.query.desktop} {
+      ${theme.query.minDesktop} {
         flex-direction: row;
         align-items: start;
         justify-content: space-between;
@@ -48,6 +56,13 @@ const style = {
           align-items: center;
           text-wrap: nowrap;
           text-decoration: none;
+          ${scaleOnHover}
+
+          ${theme.query.maxDesktop} {
+            > div {
+              display: none;
+            }
+          }
         }
       }
     }
@@ -57,54 +72,52 @@ const style = {
 function Block() {
   const { id } = useParams()
 
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
 
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(true)
-  let [block, setBlock] = useState({})
+  const [block, setBlock] = useState({})
   const [topoheight, setTopoheight] = useState()
 
   const load = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setErr(null)
     setLoading(true)
 
     const resErr = (err) => {
       setErr(err)
       setLoading(false)
-      setBlock(null)
     }
 
     if (/[a-z]/i.test(id)) {
       // by hash
-      const [err, blockData] = await to(nodeRPC.getBlockByHash(id))
+      const [err, blockData] = await to(nodeSocket.daemon.getBlockByHash(id))
       if (err) return resErr(err)
       setBlock(blockData)
     } else {
       // by height
       const height = parseInt(id);
-      const [err, blockData] = await to(nodeRPC.getBlockAtTopoHeight(height))
+      const [err, blockData] = await to(nodeSocket.daemon.getBlockAtTopoHeight(height))
       if (err) return resErr(err)
       setBlock(blockData)
     }
 
-    const [err, currentTopoheight] = await to(nodeRPC.getTopoHeight())
+    const [err, currentTopoheight] = await to(nodeSocket.daemon.getTopoHeight())
     if (err) return resErr(err)
     setTopoheight(currentTopoheight)
 
     setLoading(false)
-  }, [id])
+  }, [id, nodeSocket])
 
   useEffect(() => {
     load()
   }, [load])
 
   const formatBlock = useMemo(() => {
-    if (Object.keys(block).length == 0) return {}
+    if (!block) return {}
     return formattedBlock(block, topoheight || 0)
   }, [block, topoheight])
-
-  if (err) return <div>{err.message}</div>
-  if (!loading && !block) return <NotFound />
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
@@ -113,112 +126,114 @@ function Block() {
         <title>Block {(block.topoheight || -1).toString()}</title>
       </Helmet>
       <h1>Block {block.topoheight}</h1>
-      <div className="description">
+      {err && <div className="error">{displayError(err)}</div>}
+      {!err && <div className="controls">
         <div>
-          This block was mined on {formatBlock.date} by {formatBlock.miner}.
-          It currently has {formatBlock.confirmations} confirmations.
-          The miner of this block earned {formatBlock.reward}.
+          {!loading && <>
+            This block was mined on {formatBlock.date} by {formatBlock.miner}.
+            It currently has {formatBlock.confirmations} confirmations.
+            The miner of this block earned {formatBlock.reward}.
+          </>}
         </div>
         <div className="buttons">
           <Button link={`/dag?height=${block.height}`} icon="layout-pin">DAG</Button>
           {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
-            Previous Block
+            <div>Previous Block</div>
           </Button>}
           {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="arrow-right" iconLocation="right">
-            Next Block
+            <div> Next Block</div>
           </Button>}
         </div>
-      </div>
-      <div className={tableStyle}>
-        <table className="td-100">
-          <tbody>
-            <tr>
-              <th>Block Type</th>
-              <td>{block.block_type}</td>
-            </tr>
-            <tr>
-              <th>Hash</th>
-              <td>{block.hash}</td>
-            </tr>
-            <tr>
-              <th>Timestamp</th>
-              <td>
-                {block.timestamp && <>
-                  {formatBlock.date} ({block.timestamp})
-                </>}
-              </td>
-            </tr>
-            <tr>
-              <th>Confirmations</th>
-              <td>{formatBlock.confirmations || ''}</td>
-            </tr>
-            <tr>
-              <th>Topoheight</th>
-              <td>{block.topoheight}</td>
-            </tr>
-            <tr>
-              <th>Height</th>
-              <td>{block.height}</td>
-            </tr>
-            <tr>
-              <th>Miner</th>
-              <td>{block.miner}</td>
-            </tr>
-            <tr>
-              <th>Fees</th>
-              <td>{formatBlock.totalFees || ''}</td>
-            </tr>
-            <tr>
-              <th>Reward</th>
-              <td>{formatBlock.reward || ''}</td>
-            </tr>
-            <tr>
-              <th>Txs</th>
-              <td>{(block.txs_hashes || 0).length}</td>
-            </tr>
-            <tr>
-              <th>Difficulty</th>
-              <td>
-                {block.difficulty && <>
-                  <span>{block.difficulty} </span>
-                  <span title="Cumulative Difficulty">
-                    ({block.cumulative_difficulty})
-                  </span>
-                </>}
-              </td>
-            </tr>
-            <tr>
-              <th>Hash Rate</th>
-              <td>
-                {formatBlock.hashRate || ''}
-              </td>
-            </tr>
-            <tr>
-              <th>Size</th>
-              <td>{formatBlock.size}</td>
-            </tr>
-            <tr>
-              <th>Nonce</th>
-              <td>
-                {block.nonce && <>
-                  <span>{block.nonce} </span>
-                  <span title="Extra Nonce">({block.extra_nonce})</span>
-                </>}
-              </td>
-            </tr>
-            <tr>
-              <th>Tips</th>
-              <td style={{ lineHeight: `1.4em` }}>
-                {(block.tips || []).map((tip, index) => {
-                  return <div key={tip} style={{ wordBreak: `break-all` }}>
-                    {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
-                  </div>
-                })}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </div>}
+      <TableFlex
+        rowKey="hash"
+        headers={[
+          {
+            key: 'hash',
+            title: 'Hash',
+          },
+          {
+            key: 'block_type',
+            title: 'Block type',
+          },
+          {
+            key: 'timestamp',
+            title: 'Timestamp',
+            render: (value) => value && `${formatBlock.date} (${block.timestamp})`
+          },
+          {
+            key: 'confirmations',
+            title: 'Confirmations',
+            render: (value, item) => {
+              if (formatBlock.confirmations >= 0) return formatBlock.confirmations
+              return ``
+            }
+          },
+          {
+            key: 'topoheight',
+            title: 'Topoheight',
+          },
+          {
+            key: 'height',
+            title: 'Height',
+          },
+          {
+            key: 'miner',
+            title: 'Miner',
+          },
+          {
+            key: 'total_fees',
+            title: 'Fees',
+            render: (value, item) => {
+              // total_fees can be undefined even if block is valid - use hash to check instead
+              if (item.hash) return formatXelis(value || 0, false)
+              return ``
+            }
+          },
+          {
+            key: 'reward',
+            title: 'Reward',
+            render: (value) => value && formatXelis(value, false)
+          },
+          {
+            key: 'txs_hashes',
+            title: 'Txs',
+            render: (value) => value ? value.length : ``
+          },
+          {
+            key: 'difficulty',
+            title: 'Difficulty',
+            render: (value, item) => value && <>
+              <span>{value} </span>
+              <span title="Cumulative Difficulty">
+                ({item.cumulative_difficulty})
+              </span>
+            </>,
+          },
+          {
+            key: 'hash_rate',
+            title: 'Hash Rate',
+            render: (value, item) => item.difficulty && formatHashRate(item.difficulty / 15)
+          },
+          {
+            key: 'total_size_in_bytes',
+            title: 'Size',
+            render: (value) => formatSize(value)
+          },
+          {
+            key: 'tips',
+            title: 'Tips',
+            render: (value) => <>
+              {(value || []).map((tip, index) => {
+                return <div key={tip}>
+                  {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
+                </div>
+              })}
+            </>
+          },
+        ]}
+        data={[block]}
+      />
       <Transactions block={block} />
     </div>
   </div>

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 import useTheme from '../../context/useTheme'
 import Icon from '../icon'
-import theme from '../../theme'
+import theme from '../../style/theme'
 
 const style = {
   container: css`
@@ -64,7 +64,7 @@ const style = {
       opacity: 1;
       box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
 
-      ${theme.query.desktop} {
+      ${theme.query.minDesktop} {
         max-width: 200px;
         position: absolute;
         right: 0;
@@ -102,6 +102,11 @@ const style = {
       cursor: pointer;
       color: var(--bg-color);
       background-color: var(--text-color);
+      transition: .25s all;
+
+      &:hover {
+        border-radius: 5px;
+      }
     }
   `
 }
@@ -117,7 +122,8 @@ function useMenuLinks() {
       { path: `/`, title: `Home`, className: isActive },
       { path: `/blocks`, title: `Blocks`, className: isActive },
       { path: `/mempool`, title: `Mempool`, className: isActive },
-      { path: `/dag`, title: `DAG`, className: isActive }
+      { path: `/dag`, title: `DAG`, className: isActive },
+      { path: `/settings`, title: `Settings`, className: isActive }
     ]
   }, [])
 }
@@ -159,7 +165,6 @@ function Header(props) {
             {item.title}
           </NavLink>
         })}
-        <a className="item">Settings</a>
         <div className={style.themeButtons}>
           <button onClick={() => setTheme('light')}>Light</button>
           <button onClick={() => setTheme('dark')}>Dark</button>

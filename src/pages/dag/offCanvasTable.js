@@ -1,17 +1,17 @@
 import { useEffect, useState, useMemo } from 'react'
 import queryString from 'query-string'
 import { useLocation } from 'react-router-dom'
-import prettyMilliseconds from 'pretty-ms'
 import { css } from 'goober'
 
 import OffCanvas from '../../components/offCanvas'
 import Age from '../../components/age'
-import { style as tableStyle } from '../../components/tableBody'
+import TableBody, { style as tableStyle } from '../../components/tableBody'
 import { getBlockType } from './index'
 import Button from '../../components/button'
 import Icon from '../../components/icon'
 import blockColor from './blockColor'
 import useTheme from '../../context/useTheme'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -46,6 +46,7 @@ const style = {
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        ${scaleOnHover({ scale: .9 })}
       }
     }
 
@@ -72,6 +73,7 @@ const style = {
           background-color: var(--text-color);
           color: var(--bg-color);
           cursor: pointer;
+          ${scaleOnHover}
         }
       }
     }
@@ -153,7 +155,6 @@ function useOffCanvasTable(props) {
           <button onClick={() => setInputHeight(inputHeight + 1)}>Next</button>
           <button onClick={() => setInputHeight(height)}>Reset</button>
         </div>
-        <div>Pruned topoheight: {info.pruned_topoheight}</div>
       </div>}
     </div>
     <div className={tableStyle}>
@@ -167,8 +168,8 @@ function useOffCanvasTable(props) {
             <th>Age</th>
           </tr>
         </thead>
-        <tbody>
-          {filteredBlocks.map((block) => {
+        <TableBody list={filteredBlocks} emptyText="No blocks" colSpan={5}
+          onItem={(block, index) => {
             const txCount = block.txs_hashes.length
             const blockType = getBlockType(block, stableHeight)
             return <tr key={block.hash} onClick={() => onBlockClick(block)}>
@@ -185,8 +186,8 @@ function useOffCanvasTable(props) {
                 <Age timestamp={block.timestamp} update />
               </td>
             </tr>
-          })}
-        </tbody>
+          }}>
+        </TableBody>
       </table>
     </div>
   </OffCanvas>

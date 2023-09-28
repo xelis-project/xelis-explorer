@@ -1,14 +1,15 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react'
-import { glob, setup } from 'goober'
+import { setup } from 'goober'
 
-import "css.gg/icons/all.css"
+import "css.gg/icons/icons.css"
 import "reset-css"
 
 import App from './app'
 
-import './theme'
-import './scrollbar'
+import './style/theme'
+import './style/page'
+import './style/scrollbar'
 
 setup(React.createElement)
 

@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { css } from 'goober'
 
-import Icon from './icon'
-import theme from '../theme'
+import theme from '../style/theme'
 
 const style = {
   container: css`
@@ -68,7 +67,7 @@ const style = {
       opacity: 0;
     }
 
-    ${theme.query.desktop} {
+    ${theme.query.minDesktop} {
       .offcanvas {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       }

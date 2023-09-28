@@ -1,12 +1,10 @@
 import { css } from 'goober'
+import { useNodeSocket } from '@xelis/sdk/react/context'
 
-import useNodeSocket from '../../context/useNodeSocket'
 import DotLoading from '../dotLoading'
 
 const style = {
   container: css`
-    display: flex;
-    gap: .5em;
     border-radius: 20px;
     padding: .5em 1em;
     text-transform: uppercase;
@@ -14,28 +12,34 @@ const style = {
     font-weight: bold;
     background-color: var(--text-color);
     color: var(--bg-color);
-    align-items: center;
+    user-select: none;
   
-    > :nth-child(1) {
-      width: 10px;
-      height: 10px;
-      border-radius: 15px;
+    > div {
+      display: flex;
+      gap: .5em;
+      align-items: center;
 
-      &.alive {
-        background-color: var(--success-color);
+      > :nth-child(1) {
+        width: 10px;
+        height: 10px;
+        border-radius: 15px;
+  
+        &.alive {
+          background-color: var(--success-color);
+        }
+  
+        &.loading {
+          background-color: var(--bg-color);
+        }
+  
+        &.error {
+          background-color: var(--error-color);
+        }
       }
-
-      &.loading {
-        background-color: var(--muted-color);
+  
+      :nth-child(2) {
+        margin-top: 3px;
       }
-
-      &.error {
-        background-color: var(--error-color);
-      }
-    }
-
-    :nth-child(2) {
-      margin-top: 3px;
     }
   `
 }
@@ -46,23 +50,23 @@ function NodeStatus() {
   return <div className={style.container}>
     {(() => {
       if (nodeSocket.loading) {
-        return <>
+        return <div>
           <div className="loading" />
           <div>Connecting<DotLoading /></div>
-        </>
+        </div>
       }
 
       if (!nodeSocket.connected) {
-        return <>
+        return <div onClick={() => location.reload()} style={{ cursor: 'pointer' }} title="Click to reload">
           <div className="error" />
           <div>Disconnected</div>
-        </>
+        </div>
       }
 
-      return <>
+      return <div>
         <div className="alive" />
         <div>Connected</div>
-      </>
+      </div>
     })()}
   </div>
 }

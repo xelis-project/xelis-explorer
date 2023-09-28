@@ -1,12 +1,11 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { NodeSocketProvider } from '@xelis/sdk/react/context'
 
-import Layout from './layout'
 import { ThemeProvider } from './context/useTheme'
-import { NodeSocketProvider } from './context/useNodeSocket'
-import { SettingsProvider } from './context/useSettings'
+import useSettings, { SettingsProvider } from './context/useSettings'
 import { OverlayProvider } from './context/useOverlay'
-
+import Layout from './layout'
 import Block from './pages/block'
 import Blocks from './pages/blocks'
 import Home from './pages/home'
@@ -14,6 +13,7 @@ import NotFound from './pages/notFound'
 import Transaction from './pages/transaction'
 import DAG from './pages/dag'
 import MemPool from './pages/memPool'
+import Settings from './pages/settings'
 
 const router = createBrowserRouter([
   {
@@ -42,6 +42,10 @@ const router = createBrowserRouter([
             element: <Transaction />
           },
           {
+            path: `/settings`,
+            element: <Settings />
+          },
+          {
             path: '*',
             element: <NotFound />
           }
@@ -55,16 +59,23 @@ const router = createBrowserRouter([
   }
 ])
 
+function Routes() {
+  const { settings } = useSettings()
+  const endpoint = settings['node_ws_endpoint']
+
+  return <NodeSocketProvider endpoint={endpoint}>
+    <OverlayProvider>
+      <RouterProvider router={router} />
+    </OverlayProvider>
+  </NodeSocketProvider>
+}
+
 function App() {
   return <ThemeProvider>
     <HelmetProvider>
       <Helmet titleTemplate="%s · Xelis Explorer" />
       <SettingsProvider>
-        <NodeSocketProvider>
-          <OverlayProvider>
-            <RouterProvider router={router} />
-          </OverlayProvider>
-        </NodeSocketProvider>
+        <Routes />
       </SettingsProvider>
     </HelmetProvider>
   </ThemeProvider>

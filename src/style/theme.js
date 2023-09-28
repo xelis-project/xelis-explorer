@@ -2,10 +2,10 @@ import { glob } from 'goober'
 import hashIt from 'hash-it'
 
 const query = {
-  mobile: '@media only screen and (max-width: 424px)',
-  portrait: '@media only screen and (max-width: 424px) and (orientation: portrait)',
-  tablet: '@media only screen and (min-width: 425px)',
-  desktop: '@media only screen and (min-width: 768px)'
+  maxMobile: '@media only screen and (max-width: 424px)',
+  minMobile: '@media only screen and (min-width: 424px)',
+  maxDesktop: '@media only screen and (max-width: 768px)',
+  minDesktop: '@media only screen and (min-width: 768px)'
 }
 
 // Keep goober 2.1.10 or glob will replace CSS instead of append
@@ -85,20 +85,4 @@ xelis`
   --success-color: green;
   --link-color: #326e5c;
   --warning-color: #dfde32;
-`
-
-glob`
-  * {
-    box-sizing: border-box;
-  }
-
-  html, body {
-    font-family: sans-serif;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  a {
-    color: var(--link-color);
-  }
 `

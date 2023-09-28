@@ -1,6 +1,6 @@
 import { css } from 'goober'
 import { useCallback, useMemo } from 'react'
-import theme from '../../theme'
+import theme from '../../style/theme'
 
 export function getPaginationRange(pageState) {
   const { page, size } = pageState
@@ -9,34 +9,33 @@ export function getPaginationRange(pageState) {
   return { start, end }
 }
 
-export  const style = css`
+export const style = css`
   display: flex;
-  gap: .6em;
+  gap: .5em;
   align-items: center;
-  padding: .6em 2em;
-  background-color: rgb(0 0 0 / 20%);
-  border-radius: 30px;
-  justify-content: center;
-  font-size: .9em;
-  color: var(--text-color);
-
-  button {
-    border: none;
-    cursor: pointer;
-    border-radius: 30px;
-    background-color: rgb(0 0 0 / 20%);
-    padding: .5em 1em;
-    color: var(--text-color);
-  }
+  flex-wrap: wrap;
 
   select {
-    border-radius: 20px;
-    padding: .3em .7em;
-    border: none;
+    border: thin solid var(--text-color);
+    border-radius: 25px;
+    padding: .5em 1em;
+    font-weight: bold;
     outline: none;
-    margin-right: 2em;
-    background-color: rgb(0 0 0 / 20%);
-    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  button {
+    border-radius: 25px;
+    border: thin solid var(--text-color);
+    cursor: pointer;
+    padding: .5em 1em;
+    font-weight: bold;
+    transition: .25s all;
+
+    &.active {
+      background-color: var(--text-color);
+      color: var(--bg-color);
+    }
   }
 `
 
@@ -59,12 +58,8 @@ function Pagination(props) {
     setState({ ...state, page: 1 })
   }, [state])
 
-  const setPreviousPage = useCallback(() => {
-    setState({ ...state, page: state.page - 1 })
-  }, [state])
-
-  const setNextPage = useCallback(() => {
-    setState({ ...state, page: state.page + 1 })
+  const setPage = useCallback((page) => {
+    setState({ ...state, page })
   }, [state])
 
   const setLastPage = useCallback(() => {
@@ -72,20 +67,36 @@ function Pagination(props) {
   }, [state, pageCount])
 
   const canFirstPage = state.page !== 1
-  const canPreviousPage = state.page > 1
-  const canNextPage = state.page < pageCount
   const canLastPage = state.page !== pageCount
 
   return <div {...restProps}>
-    <select value={state.size} onChange={changeSize}>
-      {sizes.map((v) => <option key={v} value={v}>{v}</option>)}
-    </select>
-    <button onClick={setFirstPage} disabled={!canFirstPage}>First</button>
-    <button onClick={setPreviousPage} disabled={!canPreviousPage}>Previous</button>
-    <div>Page {state.page} of {pageCount}</div>
-    <button onClick={setNextPage} disabled={!canNextPage}>Next</button>
-    <button onClick={setLastPage} disabled={!canLastPage}>Last</button>
-    <div>({count || 0} {countText})</div>
+      <select value={state.size} onChange={changeSize}>
+        {sizes.map((v) => <option key={v} value={v}>{v}</option>)}
+      </select>
+      <button onClick={setFirstPage} disabled={!canFirstPage} className={!canFirstPage ? `active` : ``}>1</button>
+      {(() => {
+        const items = []
+
+        const start = Math.max(2, state.page - 2)
+        const end = Math.min(pageCount, state.page + 2)
+
+        if (start - 1 > 1) {
+          items.push(<div key={1}>...</div>)
+        }
+
+        for (let i = start; i < end; i++) {
+          items.push(<button key={i} onClick={() => setPage(i)} className={i == state.page ? `active` : ``}>
+            {i}
+          </button>)
+        }
+
+        if (end < pageCount) {
+          items.push(<div key={pageCount}>...</div>)
+        }
+
+        return items
+      })()}
+      {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
   </div>
 }
 

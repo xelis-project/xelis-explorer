@@ -1,7 +1,8 @@
 import { css } from 'goober'
 
 import DotLoading from '../dotLoading'
-import theme from '../../theme'
+import theme from '../../style/theme'
+import { displayError } from '../../utils'
 
 export const style = css`
   overflow: auto;
@@ -33,6 +34,10 @@ export const style = css`
   table.td-100 td {
     width: 100%;
   }
+
+  table .error {
+    color: red;
+  }
 `
 
 function TableBody(props) {
@@ -46,8 +51,8 @@ function TableBody(props) {
         {loading && <td colSpan={colSpan}>
           loading<DotLoading />
         </td>}
-        {err && <td colSpan={colSpan}>
-          {JSON.stringify(err)}
+        {err && <td colSpan={colSpan} className="error">
+          {displayError(err)}
         </td>}
         {!err && !loading && list.length === 0 && <td colSpan={colSpan}>
           {emptyText}

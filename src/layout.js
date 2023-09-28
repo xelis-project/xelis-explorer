@@ -1,18 +1,10 @@
 import { Outlet } from 'react-router'
-import { css, glob } from 'goober'
+import { css } from 'goober'
 
 import Header from './components/header'
 import Footer from './components/footer'
 import NodeStatus from './components/nodeStatus'
-import theme from './theme'
-
-glob`
-  html, body {
-    background: var(--bg-color);
-    color: var(--text-color);
-    transition: all .25s;
-  }
-`
+import theme from './style/theme'
 
 const style = {
   background: css`
@@ -37,7 +29,20 @@ const style = {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      z-index: 1;
       margin-top: 1em;
+      transition: .25s all;
+
+      ${theme.query.maxMobile} {
+        margin-top:-2px;
+
+        > div {
+          border-radius: 10px;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          transform: scale(.9);
+        }
+      }
     }
   `
 }

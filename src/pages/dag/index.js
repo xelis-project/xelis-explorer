@@ -6,9 +6,8 @@ import { Text, Segment, Segments, Instance, Instances } from '@react-three/drei'
 import { BoxGeometry, MeshBasicMaterial } from 'three'
 import { css } from 'goober'
 import prettyMs from 'pretty-ms'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
-import { useNodeSocketSubscribe } from '../../context/useNodeSocket'
-import useNodeRPC from '../../hooks/useNodeRPC'
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
 import NodeStatus from '../../components/nodeStatus'
@@ -16,6 +15,9 @@ import useOffCanvasTable from './offCanvasTable'
 import useOffCanvasBlock from './offCanvasBlock'
 import blockColor from './blockColor'
 import useTheme from '../../context/useTheme'
+import BottomInfo from './bottomInfo'
+import { scaleOnHover } from '../../style/animate'
+import theme from '../../style/theme'
 
 const style = {
   container: css`
@@ -25,8 +27,12 @@ const style = {
       right: 0;
       bottom: 0;
       top: 0;
-      background-color: var(--bg-color);
       overflow: hidden;
+      background-color: var(--bg-color);
+      opacity: 1;
+      --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef'})};
+      background-image:  linear-gradient(var(--bg-line-color) 1px, transparent 1px), linear-gradient(to right, var(--bg-line-color) 1px, var(--bg-color) 1px);
+      background-size: 20px 20px;
     }
 
     .controls {
@@ -51,48 +57,7 @@ const style = {
         align-items: center;
         justify-content: center;
         color: var(--bg-color);
-      }
-    }
-
-    .legend {
-      position: fixed;
-      bottom: 0;
-      padding: 1em;
-      display: flex;
-      gap: .5em;
-  
-      > * {
-        display: flex;
-        align-items: center;
-        gap: .5em;
-        background-color: rgb(0 0 0 / 20%);
-        padding: .5em;
-  
-        :nth-child(2) {
-          width: 12px;
-          height: 12px;
-        }
-      }
-    }
-
-    .info {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      padding: 1em;
-      display: flex;
-      gap: 1.5em;
-  
-      > * {
-        :nth-child(1) {
-          font-size: 1.2em;
-          margin-bottom: .2em;
-        }
-  
-        :nth-child(2) {
-          font-size: .8em;
-          color: var(--muted-color);
-        }
+        ${scaleOnHover({ scale: .9 })}
       }
     }
 
@@ -445,16 +410,14 @@ function LastBlockTime(props) {
 }
 
 function DAG() {
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
-  const { theme: currentTheme } = useTheme()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
   const [info, setInfo] = useState({})
+  const [err, setErr] = useState()
 
-  const topoheight = info.topoheight
-  const height = info.height
   const stableHeight = info.stableheight
 
   const cameraRef = useRef()
@@ -473,31 +436,39 @@ function DAG() {
   })
 
   const loadInfo = useCallback(async () => {
-    const [err, info] = await to(nodeRPC.getInfo())
-    if (err) return console.log(err)
+    if (!nodeSocket.connected) return
+    const [err, info] = await to(nodeSocket.daemon.getInfo())
+    if (err) return setErr(err)
     setInfo(info)
-  }, [])
+  }, [nodeSocket])
 
   const loadBlocks = useCallback(async () => {
+    if (!nodeSocket.connected) return
     const inputHeight = offCanvasTable.inputHeight
     if (!inputHeight) return
+
+    const resErr = (err) => {
+      setLoading(false)
+      setErr(err)
+    }
 
     setLoading(true)
     let start = Math.max(0, inputHeight - (fetchMaxBlockHeight - 1))
     let end = inputHeight
-    const [err, newBlocks] = await to(nodeRPC.getBlocksRangeByHeight(start, end))
+    const [err, newBlocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
+      start_height: start,
+      end_height: end
+    }))
+    if (err) return resErr(err)
+
+    setBlocks(newBlocks)
     setLoading(false)
-    if (err) return console.log(err)
-    if (newBlocks) {
-      setBlocks(newBlocks)
-    }
-  }, [offCanvasTable.inputHeight])
+  }, [offCanvasTable.inputHeight, nodeSocket])
 
   useEffect(() => {
-    if (!offCanvasTable.paused) {
-      loadInfo()
-    }
-  }, [offCanvasTable.paused])
+    if (offCanvasTable.paused) return
+    loadInfo()
+  }, [loadInfo, offCanvasTable.paused])
 
   useEffect(() => {
     loadBlocks()
@@ -505,7 +476,7 @@ function DAG() {
 
   useNodeSocketSubscribe({
     event: `NewBlock`,
-    onData: (newBlock) => {
+    onData: (_, newBlock) => {
       loadInfo()
       if (!offCanvasTable.paused) {
         setBlocks((blocks) => {
@@ -525,7 +496,7 @@ function DAG() {
 
   useNodeSocketSubscribe({
     event: `BlockOrdered`,
-    onData: (data) => {
+    onData: (_, data) => {
       if (offCanvasTable.paused) return
       const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
@@ -621,35 +592,12 @@ function DAG() {
     </div>
     {offCanvasTable.render}
     {offCanvasBlock.render}
-    <div className="legend">
-      {blockColor.types.map((key) => {
-        return <div key={key}>
-          <div>{key}</div>
-          <div style={{ backgroundColor: blockColor.value(currentTheme, key) }} />
-        </div>
-      })}
-    </div>
-    <div className="info">
-      <div>
-        <div>{prettyMs((info.average_block_time || 0), { compact: true })}</div>
-        <div>Block Time</div>
-      </div>
-      <div>
-        <div>{(height || 0).toLocaleString()}</div>
-        <div>Height</div>
-      </div>
-      <div>
-        <div>{(topoheight || 0).toLocaleString()}</div>
-        <div>Topo Height</div>
-      </div>
-      <div>
-        <div>{(stableHeight || 0).toLocaleString()}</div>
-        <div>Stable Height</div>
-      </div>
-    </div>
+    <BottomInfo info={info} />
     <div className="status">
       <NodeStatus />
-      <div>{blocks.length > 0 && <LastBlockTime blocks={blocks} paused={offCanvasTable.paused} />}</div>
+      <div>
+        {blocks.length > 0 && <LastBlockTime blocks={blocks} paused={offCanvasTable.paused} />}
+      </div>
     </div>
     <div className="controls">
       <Button icon="home" link="/" />

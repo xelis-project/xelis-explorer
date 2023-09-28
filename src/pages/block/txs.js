@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
+import { useNodeSocket } from '@xelis/sdk/react/context'
 
-import useNodeRPC from '../../hooks/useNodeRPC'
 import { formatAsset, formatXelis, reduceText } from '../../utils'
 import TableBody, { style as tableStyle } from '../../components/tableBody'
 import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
@@ -16,7 +16,7 @@ const style = {
       font-size: 1.5em;
     }
 
-    table {
+    > :nth-child(2) {
       margin-bottom: .5em;
     }
   `
@@ -25,7 +25,7 @@ const style = {
 function Transactions(props) {
   const { block } = props
 
-  const nodeRPC = useNodeRPC()
+  const nodeSocket = useNodeSocket()
 
   const count = useMemo(() => {
     return (block.txs_hashes || []).length
@@ -37,6 +37,8 @@ function Transactions(props) {
   const [pageState, setPageState] = useState({ page: 1, size: 5 })
 
   const load = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setErr(null)
     setLoading(true)
 
@@ -52,12 +54,12 @@ function Transactions(props) {
       txHashes = block.txs_hashes.slice(start, end + 1)
     }
 
-    const [err, txs] = await to(nodeRPC.getTransactions(txHashes))
+    const [err, txs] = await to(nodeSocket.daemon.getTransactions(txHashes))
     if (err) return resErr(err)
 
     setTransactions(txs)
     setLoading(false)
-  }, [block, pageState])
+  }, [block, pageState, nodeSocket])
 
   useEffect(() => {
     if (block) load()

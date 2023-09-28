@@ -3,10 +3,9 @@ import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
 import { css } from 'goober'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
-import TableBody, { style as tableStyle} from '../../components/tableBody'
-import useNodeSocket, { useNodeSocketSubscribe } from '../../context/useNodeSocket'
-import useNodeRPC from '../../hooks/useNodeRPC'
+import TableBody, { style as tableStyle } from '../../components/tableBody'
 import { formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 
@@ -22,11 +21,13 @@ const style = {
 
 function MemPool() {
   const [memPool, setMemPool] = useState([])
-  const nodeRPC = useNodeRPC()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
   const [err, setErr] = useState()
+  const nodeSocket = useNodeSocket()
 
   const loadMemPool = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setErr(null)
     setLoading(true)
 
@@ -35,12 +36,11 @@ function MemPool() {
       setErr(err)
     }
 
-    const [err, data] = await to(nodeRPC.getMemPool())
+    const [err, data] = await to(nodeSocket.daemon.getMemPool())
     if (err) return resErr(err)
     setMemPool(data)
-    console.log(data)
     setLoading(false)
-  }, [])
+  }, [nodeSocket])
 
   useEffect(() => {
     loadMemPool()
@@ -48,7 +48,7 @@ function MemPool() {
 
   useNodeSocketSubscribe({
     event: `TransactionAddedInMempool`,
-    onData: (data) => {
+    onData: (_, data) => {
       data.timestamp = new Date().getTime()
       setMemPool((pool) => [data, ...pool])
     }
@@ -95,14 +95,15 @@ function MemPool() {
 function TxExecuted(props) {
   const { setMemPool } = props
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState()
   const [err, setErr] = useState()
   const [executedTxs, setExecutedTxs] = useState([])
   const nodeSocket = useNodeSocket()
-  const nodeRPC = useNodeRPC()
   const [topoheight, setTopoheight] = useState()
 
   const loadExecutedTxs = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     setLoading(true)
     setErr(null)
 
@@ -111,11 +112,14 @@ function TxExecuted(props) {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeRPC.getTopoHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
     if (err1) return resErr(err1)
     setTopoheight(topoheight)
 
-    const [err2, blocks] = await to(nodeRPC.getBlocksRangeByTopoheight(topoheight - 19, topoheight))
+    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
+      start_topoheight: topoheight - 19,
+      end_topoheight: topoheight
+    }))
     if (err2) return resErr(err2)
 
     blocks.reverse()
@@ -129,7 +133,7 @@ function TxExecuted(props) {
     const recentExecuted = []
     for (let i = 0; i < txBlockMap.size; i += 20) {
       const txIds = Array.from(txBlockMap.keys())
-      const [err3, txs] = await to(nodeRPC.getTransactions(txIds.slice(i, 20)))
+      const [err3, txs] = await to(nodeSocket.daemon.getTransactions(txIds.slice(i, 20)))
       if (err3) return resErr(err3)
 
       txs.forEach((tx) => {
@@ -140,18 +144,18 @@ function TxExecuted(props) {
 
     setLoading(false)
     setExecutedTxs(recentExecuted)
-  }, [])
+  }, [nodeSocket])
 
   useNodeSocketSubscribe({
     event: `TransactionExecuted`,
-    onData: (data) => {
+    onData: (_, data) => {
       // remove from mempool and add tx to data
       setMemPool((pool) => {
         let filteredPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.tx_hash) {
-            const [err, block] = await to(nodeRPC.getBlockAtTopoHeight(data.topoheight))
-            if (err) return console.log(err)
+            const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(data.topoheight))
+            if (err) return setErr(err)
 
             setExecutedTxs((executedTxs) => [{ tx, block }, ...executedTxs])
           } else {
@@ -168,8 +172,8 @@ function TxExecuted(props) {
     event: `NewBlock`,
     onData: async () => {
       // remove txs with blocks lower than the first tx block
-      const [err, topoheight] = await to(nodeRPC.getTopoHeight())
-      if (err) return console.log(err)
+      const [err, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
+      if (err) return setErr(err)
 
       setTopoheight(topoheight)
       setExecutedTxs((items) => items.filter((item) => {
