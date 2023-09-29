@@ -74,7 +74,9 @@ function MemPool() {
           onItem={(item) => {
             const transfers = item.data.transfers || []
             return <tr key={item.hash}>
-              <td>{item.hash}</td>{/* Don't need <Link /> here because tx still does not exists and it will redirect to not found */}
+              <td title={item.hash}>
+                <Link to={`/txs/${item.hash}`}>{reduceText(item.hash, 7, 7)}</Link>
+              </td>
               <td>{transfers.length}</td>
               <td>{reduceText(item.owner, 0, 7)}</td>
               <td>{formatXelis(item.fee)}</td>

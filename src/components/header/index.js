@@ -38,6 +38,8 @@ const style = {
     }
   `,
   menu: css`
+    --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#ffffff', dark: '#0a0a0a' })};
+
     .button {
       cursor: pointer;
       border: none;
@@ -56,7 +58,7 @@ const style = {
       display: flex;
       flex-direction: column;
       background-color: var(--bg-color);
-      gap: .7em;
+      gap: .5em;
       z-index: 1;
       font-size: 1.2em;
       transition: all .25s;
@@ -65,7 +67,7 @@ const style = {
       box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
 
       ${theme.query.minDesktop} {
-        max-width: 200px;
+        max-width: 225px;
         position: absolute;
         right: 0;
         left: inherit;
@@ -81,20 +83,30 @@ const style = {
         color: var(--header-nav-color);
         user-select: none;
         cursor: pointer;
+        background-color: var(--bg-color);
+        padding: .5em;
+        display: flex;
+        gap: .5em;
+        align-items: center;
       }
     
       .item:hover {
-        color: var(--header-nav-active-color);
+        background-color: var(--header-nav-active-color);
       }
     
       .item-active {
-        color: var(--header-nav-active-color);
+        background-color: var(--header-nav-active-color);
       }
     }
   `,
   themeButtons: css`
     display: flex;
-    gap: .25em;
+    gap: .5em;
+    margin-top: .5em;
+
+    ${theme.query.minDesktop} {
+      justify-content: space-evenly;
+    }
 
     button {
       border: none;
@@ -119,11 +131,11 @@ function useMenuLinks() {
     }
 
     return [
-      { path: `/`, title: `Home`, className: isActive },
-      { path: `/blocks`, title: `Blocks`, className: isActive },
-      { path: `/mempool`, title: `Mempool`, className: isActive },
-      { path: `/dag`, title: `DAG`, className: isActive },
-      { path: `/settings`, title: `Settings`, className: isActive }
+      { path: `/`, title: `Home`, className: isActive, icon: 'home-alt' },
+      { path: `/blocks`, title: `Blocks`, className: isActive, icon: 'shape-hexagon' },
+      { path: `/mempool`, title: `Mempool`, className: isActive, icon: 'calendar-due' },
+      { path: `/dag`, title: `DAG`, className: isActive, icon: 'layout-pin' },
+      { path: `/settings`, title: `Settings`, className: isActive, icon: 'options' }
     ]
   }, [])
 }
@@ -162,6 +174,7 @@ function Header(props) {
         {links.map((item) => {
           return <NavLink key={item.path} to={item.path}
             className={item.className}>
+            <Icon name={item.icon} />
             {item.title}
           </NavLink>
         })}

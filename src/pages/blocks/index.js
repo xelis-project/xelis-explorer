@@ -109,7 +109,7 @@ function Blocks() {
         {
           key: 'total_fees',
           title: 'Fees',
-          render: (value) => formatXelis(value, false)
+          render: (value) => formatXelis(value)
         },
         {
           key: 'miner',
@@ -119,7 +119,7 @@ function Blocks() {
         {
           key: 'reward',
           title: 'Reward',
-          render: (value) => formatXelis(value, false)
+          render: (value) => formatXelis(value)
         }
       ]}
       data={blocks}

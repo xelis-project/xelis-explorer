@@ -186,14 +186,14 @@ function Block() {
             title: 'Fees',
             render: (value, item) => {
               // total_fees can be undefined even if block is valid - use hash to check instead
-              if (item.hash) return formatXelis(value || 0, false)
+              if (item.hash) return formatXelis(value || 0)
               return ``
             }
           },
           {
             key: 'reward',
             title: 'Reward',
-            render: (value) => value && formatXelis(value, false)
+            render: (value) => value && formatXelis(value)
           },
           {
             key: 'txs_hashes',

@@ -142,6 +142,7 @@ const style = {
 
         > :nth-child(1) {
           padding: .7em;
+          min-width: 100px;
           background-color: var(--block-bg-color);
         }
 
@@ -297,11 +298,11 @@ export function RecentBlocks() {
         </div>
         <div>
           <div>Fees</div>
-          <div>{formatXelis(stats.fees, false)}</div>
+          <div>{formatXelis(stats.fees)}</div>
         </div>
         <div>
           <div>Reward</div>
-          <div>{formatXelis(stats.reward, false)}</div>
+          <div>{formatXelis(stats.reward)}</div>
         </div>
         <div title={`(sync, normal, side, orphan)`}>
           <div>Blocks</div>

@@ -1,6 +1,6 @@
 import bytes from 'bytes'
 
-export const reduceText = (text, maxLeft = 7, maxRight = 7) => {
+export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
   if (typeof text !== 'string') return text
   const length = text.length
   if (length <= maxLeft + maxRight) return text
@@ -16,7 +16,7 @@ export const shiftNumber = (value, decimals) => {
 }
 
 export const formatXelis = (value, withSuffy = true) => {
-  return `${shiftNumber(value, 5)}${withSuffy ? ` XELIS` : ``}`
+  return `${shiftNumber(value, 5)}${withSuffy ? ` XEL` : ``}`
 }
 
 export const formatAsset = (value, asset) => {
@@ -35,7 +35,7 @@ export const formatSize = (value, options = { unitSeparator: ` ` }) => {
 export const formatAssetName = (asset) => {
   switch (asset) {
     case XELIS_ASSET:
-      return `XELIS(${reduceText(XELIS_ASSET)})`
+      return `XEL (${reduceText(XELIS_ASSET)})`
     default:
       return value
   }
@@ -103,8 +103,8 @@ export const formattedBlock = (block, topoheight) => {
   return {
     date: new Date(block.timestamp).toLocaleString(),
     miner: reduceText(block.miner),
-    totalFees: formatXelis(block.total_fees, false), // if available (include_txs?)
-    reward: formatXelis(block.reward, false),
+    totalFees: formatXelis(block.total_fees), // if available (include_txs?)
+    reward: formatXelis(block.reward),
     confirmations: topoheight - block.topoheight,
     size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,

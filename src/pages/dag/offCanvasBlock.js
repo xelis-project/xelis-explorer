@@ -109,19 +109,19 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>Timestamp</div>
-          <div>{formatBlock.date} ({block.timestamp.toLocaleString()})</div>
+          <div>{formatBlock.date} ({(block.timestamp || 0).toLocaleString()})</div>
         </div>
         <div>
           <div>Confirmations</div>
-          <div>{formatBlock.confirmations.toLocaleString()}</div>
+          <div>{(formatBlock.confirmations || 0).toLocaleString()}</div>
         </div>
         <div>
           <div>Topo Height</div>
-          <div>{block.topoheight.toLocaleString()}</div>
+          <div>{(block.topoheight || 0).toLocaleString()}</div>
         </div>
         <div>
           <div>Height</div>
-          <div>{block.height.toLocaleString()}</div>
+          <div>{(block.height || 0).toLocaleString()}</div>
         </div>
         <div>
           <div>Miner</div>
@@ -133,7 +133,7 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>Txs</div>
-          <div>{block.txs_hashes.length.toLocaleString()}</div>
+          <div>{(block.txs_hashes || []).length.toLocaleString()}</div>
         </div>
         <div>
           <div>Difficulty</div>

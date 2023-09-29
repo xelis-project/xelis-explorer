@@ -90,13 +90,22 @@ function Transaction() {
             title: 'Signer',
           },
           {
+            key: 'in_mempool',
+            title: 'In Mempool',
+            render: (value) => {
+              if (value === true) return `Yes`
+              if (value === false) return `No`
+              return ``
+            }
+          },
+          {
             key: 'signature',
             title: 'Signature',
           },
           {
             key: 'fee',
             title: 'Fee',
-            render: (value) => value && formatXelis(value, false)
+            render: (value) => value && formatXelis(value)
           },
           {
             key: 'nonce',
@@ -108,7 +117,7 @@ function Transaction() {
       />
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
-      <Blocks tx={tx} />
+      <InBlocks tx={tx} />
       <h2>Extra</h2>
       <div>
         {!tx.extra_data && <div>No extra data</div>}
@@ -172,7 +181,7 @@ function Burns(props) {
   </div>
 }
 
-function Blocks(props) {
+function InBlocks(props) {
   const { tx } = props
 
   const nodeSocket = useNodeSocket()
@@ -208,7 +217,7 @@ function Blocks(props) {
   }, [loadTxBlocks])
 
   return <div>
-    <h2>Blocks</h2>
+    <h2>In Blocks</h2>
     <div className={tableStyle}>
       <table>
         <thead>

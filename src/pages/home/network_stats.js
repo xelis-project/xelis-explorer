@@ -123,11 +123,11 @@ export function NetworkStats() {
     const maxSupply = 1840000000000
     const mined = (data.native_supply * 100 / maxSupply).toFixed(2)
     return [
-      { title: `Max Supply`, value: formatXelis(maxSupply, false) },
-      { title: `Circulating Supply`, value: formatXelis(data.native_supply, false) },
+      { title: `Max Supply`, value: formatXelis(maxSupply) },
+      { title: `Circulating Supply`, value: formatXelis(data.native_supply) },
       { title: `Mined`, value: `${mined}%` },
       { title: `Hashrate`, value: formatHashRate(data.difficulty / 15) },
-      { title: `Block Reward`, value: formatXelis(data.block_reward, false) },
+      { title: `Block Reward`, value: formatXelis(data.block_reward) },
       { title: `Tx Pool`, value: `${data.mempool_size} tx` },
       { title: `Block Count`, value: (data.topoheight || 0).toLocaleString() },
       { title: `Difficulty`, value: (data.difficulty || 0).toLocaleString() },
