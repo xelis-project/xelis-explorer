@@ -8,6 +8,19 @@ import theme from './style/theme'
 
 const style = {
   background: css`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: ${theme.apply({ xelis: `url('./img/bg_xelis.jpg')`, dark: `url('./img/bg_xelis_dark.jpg')`, light: `url('./img/bg_xelis_light.jpg')`})};
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: top center;
+  `,
+  // Lagging when resizing so I converted to jpg
+  /*
+  background: css`
     .bg {
       position: fixed;
       top: 0;
@@ -68,7 +81,7 @@ const style = {
       background: ${theme.apply({ light: 'rgb(165 165 165 / 70%)', dark: 'rgb(22 22 22 / 70%)', xelis: `rgba(5,124,132,.7)` })};
       filter: blur(11.9791666667vw);
     }
-  `,
+  `,*/
   container: css`
     margin: 0 auto;
     max-width: 1000px;
