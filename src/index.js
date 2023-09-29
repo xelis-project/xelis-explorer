@@ -2,7 +2,6 @@ import { createRoot } from 'react-dom/client'
 import React from 'react'
 import { setup } from 'goober'
 
-import "css.gg/icons/icons.css"
 import "reset-css"
 
 import App from './app'

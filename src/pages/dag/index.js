@@ -53,6 +53,7 @@ const style = {
         display: block;
         height: 50px;
         width: 50px;
+        font-size: 1.2em;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -600,8 +601,8 @@ function DAG() {
       </div>
     </div>
     <div className="controls">
-      <Button icon="home" link="/" />
-      <Button icon="list" onClick={() => offCanvasTable.setOpened(true)} />
+      <Button icon="house" link="/" />
+      <Button icon="table-list" onClick={() => offCanvasTable.setOpened(true)} />
     </div>
   </div>
 }

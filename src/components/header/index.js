@@ -44,9 +44,8 @@ const style = {
       cursor: pointer;
       border: none;
       background: transparent;
-      height: 20px;
       color: var(--text-color);
-      --ggs: 1.3;
+      font-size: 1.5em;
     }
 
     .container {
@@ -131,11 +130,11 @@ function useMenuLinks() {
     }
 
     return [
-      { path: `/`, title: `Home`, className: isActive, icon: 'home-alt' },
-      { path: `/blocks`, title: `Blocks`, className: isActive, icon: 'shape-hexagon' },
-      { path: `/mempool`, title: `Mempool`, className: isActive, icon: 'calendar-due' },
-      { path: `/dag`, title: `DAG`, className: isActive, icon: 'layout-pin' },
-      { path: `/settings`, title: `Settings`, className: isActive, icon: 'options' }
+      { path: `/`, title: `Home`, className: isActive, icon: 'house' },
+      { path: `/blocks`, title: `Blocks`, className: isActive, icon: 'boxes-stacked' },
+      { path: `/mempool`, title: `Mempool`, className: isActive, icon: 'square-poll-horizontal' },
+      { path: `/dag`, title: `DAG`, className: isActive, icon: 'network-wired' },
+      { path: `/settings`, title: `Settings`, className: isActive, icon: 'gear' }
     ]
   }, [])
 }
@@ -168,7 +167,7 @@ function Header(props) {
     </Link>
     <div className={style.menu}>
       <button className="button" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
-        <Icon name="menu" />
+        <Icon name="bars" />
       </button>
       <div className={`container ${menuOpen ? `` : `closed`}`}>
         {links.map((item) => {

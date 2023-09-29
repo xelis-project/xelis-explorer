@@ -107,7 +107,7 @@ export function ExplorerSearch() {
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit">
-          <Icon name="search" className="icon" />
+          <Icon name="search" />
           <span>Search</span>
         </Button>
       </div>

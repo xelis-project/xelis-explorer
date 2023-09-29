@@ -136,7 +136,7 @@ function Block() {
           </>}
         </div>
         <div className="buttons">
-          <Button link={`/dag?height=${block.height}`} icon="layout-pin">DAG</Button>
+          <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>
           {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
             <div>Previous Block</div>
           </Button>}

@@ -42,6 +42,7 @@ const style = {
         border-radius: 50%;
         height: 40px;
         width: 40px;
+        font-size: 1em;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -140,8 +141,8 @@ function useOffCanvasTable(props) {
           setPaused(!paused)
           if (paused) setInputHeight(height)
         }}>
-          {paused && <Icon name="play-button" />}
-          {!paused && <Icon name="play-pause" />}
+          {paused && <Icon name="play" />}
+          {!paused && <Icon name="pause" />}
         </Button>
         <Button onClick={() => setOpened(false)} icon="close" />
       </div>

@@ -44,8 +44,11 @@ const main = async () => {
     bundle: true,
     loader: {
       '.js': `jsx`,
-      '.woff': 'text',
-      '.woff2': 'text'
+      '.woff': 'file',
+      '.woff2': 'file',
+      '.svg': 'file',
+      '.ttf': 'file',
+      '.eot': 'file'
     },
     jsx: `automatic`,
     outdir,
