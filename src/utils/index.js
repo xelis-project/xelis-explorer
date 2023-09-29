@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import bytes from 'bytes'
 
 export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
@@ -12,11 +13,12 @@ export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
 export const XELIS_ASSET = `0000000000000000000000000000000000000000000000000000000000000000`
 
 export const shiftNumber = (value, decimals) => {
-  return (value / Math.pow(10, decimals) || 0).toLocaleString()
+  return new BigNumber(value || 0).shiftedBy(-decimals)
 }
 
-export const formatXelis = (value, withSuffy = true) => {
-  return `${shiftNumber(value, 5)}${withSuffy ? ` XEL` : ``}`
+export const formatXelis = (value, { withSuffix = true } = {}) => {
+  let number = shiftNumber(value, 5).toNumber().toLocaleString(undefined, { maximumFractionDigits: 5 })
+  return `${number}${withSuffix ? ` XEL` : ``}`
 }
 
 export const formatAsset = (value, asset) => {
