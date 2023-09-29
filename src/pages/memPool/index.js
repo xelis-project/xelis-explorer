@@ -75,7 +75,7 @@ function MemPool() {
             const transfers = item.data.transfers || []
             return <tr key={item.hash}>
               <td title={item.hash}>
-                <Link to={`/txs/${item.hash}`}>{reduceText(item.hash, 7, 7)}</Link>
+                <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
               </td>
               <td>{transfers.length}</td>
               <td>{reduceText(item.owner, 0, 7)}</td>
@@ -213,7 +213,7 @@ function TxExecuted(props) {
                 &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
               </td>
               <td>
-                <Link to={`/txs/${tx.hash}`}>{tx.hash}</Link>
+                <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
               </td>
               <td>{transfers.length}</td>
               <td>{reduceText(tx.owner)}</td>

@@ -47,13 +47,12 @@ function Transactions(props) {
       setErr(err)
     }
 
-    const { start, end } = getPaginationRange(pageState)
+    let { start, end } = getPaginationRange(pageState)
 
-    let txHashes = []
-    if (block.txs_hashes && block.txs_hashes.length >= end) {
-      txHashes = block.txs_hashes.slice(start, end + 1)
-    }
-
+    const txCount = block.txs_hashes.length
+    start = Math.min(txCount, start)
+    end = Math.min(txCount, end)
+    let txHashes = block.txs_hashes.slice(start, end)
     const [err, txs] = await to(nodeSocket.daemon.getTransactions(txHashes))
     if (err) return resErr(err)
 
@@ -87,7 +86,7 @@ function Transactions(props) {
 
             return <React.Fragment key={item.hash}>
               <tr>
-                <td><Link to={`/txs/${item.hash}`}>{item.hash}</Link></td>
+                <td><Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link></td>
                 <td>{transfers.length} / {burns.length}</td>
                 <td>{reduceText(item.owner, 0, 7)}</td>
                 <td>{formatXelis(item.fee)}</td>

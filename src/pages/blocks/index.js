@@ -89,7 +89,7 @@ function Blocks() {
         {
           key: 'txs_hashes',
           title: 'Txs',
-          render: (value) => (value.txs_hashes || []).length
+          render: (value) => (value || []).length
         },
         {
           key: 'timestamp',

@@ -7,7 +7,7 @@ import { useNodeSocket } from '@xelis/sdk/react/context'
 import { css } from 'goober'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'
-import { formatXelis, formatAsset, formatAssetName, reduceText, displayError } from '../../utils'
+import { formatXelis, formatAsset, formatAssetName, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 
@@ -110,6 +110,13 @@ function Transaction() {
           {
             key: 'nonce',
             title: 'Nonce',
+          },
+          {
+            key: 'executed_in_block',
+            title: 'Executed In',
+            render: (value) => {
+              return <Link to={`/blocks/${value}`}>{reduceText(value)}</Link>
+            }
           },
         ]}
         data={[tx]}
@@ -223,6 +230,7 @@ function InBlocks(props) {
         <thead>
           <tr>
             <th>Topoheight</th>
+            <th>Hash</th>
             <th>Type</th>
             <th>Size</th>
             <th>Fees</th>
@@ -230,12 +238,13 @@ function InBlocks(props) {
             <th>Txs</th>
           </tr>
         </thead>
-        <TableBody list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={6}
+        <TableBody list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={7}
           onItem={(item, index) => {
             const size = formatSize(item.total_size_in_bytes)
             const time = new Date(item.timestamp).toLocaleString()
             return <tr key={item.hash}>
               <td><Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link></td>
+              <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
               <td>{item.block_type}</td>
               <td>{size}</td>
               <td>{formatXelis(item.total_fees)}</td>
