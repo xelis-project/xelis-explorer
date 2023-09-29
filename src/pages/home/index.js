@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async'
 
 import { ExplorerSearch } from './explorer_search'
 import { RecentBlocks } from './recent_blocks'
-import { Stats } from './stats'
+import { NetworkStats } from './network_stats'
 
 function Home() {
   return <div>
@@ -11,7 +11,7 @@ function Home() {
     </Helmet>
     <ExplorerSearch />
     <RecentBlocks />
-    <Stats />
+    <NetworkStats />
   </div>
 }
 

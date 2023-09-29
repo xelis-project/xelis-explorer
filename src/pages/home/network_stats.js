@@ -9,13 +9,25 @@ import theme from '../../style/theme'
 import Icon from '../../components/icon'
 import { scaleOnHover } from '../../style/animate'
 
+theme.xelis`
+  --stats-bg-color: rgb(14 30 32 / 70%);
+`
+
+theme.dark`
+  --stats-bg-color: rgb(12 12 12 / 50%);
+`
+
+theme.light`
+  --stats-bg-color: rgb(231 231 231 / 50%);
+`
+
 const style = {
   container: css`
     margin-bottom: 3em;
 
     ${theme.query.minDesktop} {
       padding: 4em;
-      background-color: ${theme.apply({ xelis: 'rgb(14 30 32 / 70%)', light: '#e7e7e7', dark: '#0c0c0c'})};
+      background-color: var(--stats-bg-color);
 
       > {
         max-width: 700px;
@@ -84,7 +96,7 @@ const style = {
   `,
 }
 
-export function Stats() {
+export function NetworkStats() {
   const nodeSocket = useNodeSocket()
 
   const [info, setInfo] = useState()
@@ -124,7 +136,7 @@ export function Stats() {
   }, [info])
 
   return <div className={style.container}>
-    <div className="title">Realtime Stats</div>
+    <div className="title">Network Stats</div>
     <div className="items">
       {stats.map((item) => {
         return <div key={item.title}>
