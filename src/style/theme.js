@@ -5,7 +5,9 @@ const query = {
   maxMobile: '@media only screen and (max-width: 424px)',
   minMobile: '@media only screen and (min-width: 424px)',
   maxDesktop: '@media only screen and (max-width: 768px)',
-  minDesktop: '@media only screen and (min-width: 768px)'
+  minDesktop: '@media only screen and (min-width: 768px)',
+  minLarge: '@media only screen and (min-width: 1440px)',
+  maxLarge: '@media only screen and (max-width: 1440px)',
 }
 
 // Keep goober 2.1.10 or glob will replace CSS instead of append

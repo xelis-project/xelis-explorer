@@ -36,20 +36,21 @@ const style = {
   
       button {
         position: absolute;
-        right: 5px;
-        top: 5px;
+        right: 0.4em;
+        top: 0.4em;
         font-size: 1em;
         cursor: pointer;
         background-color: var(--text-color);
         color: var(--bg-color);
         border-radius: 50%;
-        height: 42px;
-        width: 42px;
+        height: 76%;
+        min-width: 42px;
         border: none;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
+        transition: .25s transform;
         --ggs: .9;
         ${scaleOnHover({ scale: .9 })}
   

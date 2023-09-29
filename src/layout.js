@@ -75,6 +75,10 @@ const style = {
     padding: 0 2em;
     position: relative;
 
+    ${theme.query.minLarge} {
+      max-width: 1400px;
+    }
+
     .node-status {
       position: absolute;
       left: 50%;

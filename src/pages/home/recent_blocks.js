@@ -42,7 +42,7 @@ const style = {
 
     .item {
       padding: 1em;
-      min-width: 150px;
+      min-width: 9em;
       background-color: var(--block-bg-color);
       border-left: 3px solid var(--block-border-color);
       position: relative;

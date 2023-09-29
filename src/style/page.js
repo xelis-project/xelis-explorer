@@ -1,4 +1,5 @@
 import { css, glob } from 'goober'
+import theme from './theme'
 
 export const typography = css`
   h1 {
@@ -27,6 +28,7 @@ glob`
     color: var(--text-color);
     transition: all .25s;
     min-width: 320px;
+    font-size: 16px;
   }
 
   button {
@@ -35,5 +37,11 @@ glob`
 
   a {
     color: var(--link-color);
+  }
+
+  ${theme.query.minLarge} {
+    html, body {
+      font-size: 18px;
+    }
   }
 `
