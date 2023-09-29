@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
-import { css, keyframes } from 'goober'
+import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
 import Age from '../../components/age'
 import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
-import { bounceIn, scaleOnHover } from '../../style/animate'
+import { bounceIn, scaleOnHover, slideRight } from '../../style/animate'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -40,6 +40,10 @@ const style = {
     padding-bottom: 1em;
     overflow-x: auto;
 
+    &.no-animation * {
+      animation-duration: 0s !important;
+    }
+
     .item {
       padding: 1em;
       min-width: 9em;
@@ -52,6 +56,7 @@ const style = {
       user-select: none;
       cursor: pointer;
       ${scaleOnHover}
+      ${slideRight({ from: `-100%`, to: `0%`, duration: `.25s` })}
 
       ${theme.query.minDesktop} {
         border-top: 3px solid var(--block-border-color);
@@ -59,7 +64,7 @@ const style = {
       }
 
       &.animate {
-        ${bounceIn(.8)};
+        ${bounceIn({ duration: `.8s` })};
       }
 
       .title {
@@ -163,7 +168,7 @@ export function RecentBlocks() {
 
   return <div>
     <div className={style.title}>Recent Blocks</div>
-    <div className={style.items}>
+    <div className={`${style.items} ${!animateBlock ? `no-animation` : ``}`}>
       {blocks.map((block, index) => {
         const key = index //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length

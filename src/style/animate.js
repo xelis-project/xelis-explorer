@@ -1,16 +1,29 @@
-import { keyframes } from "goober"
+import { css, keyframes } from "goober"
 
 export const scaleOnHover = (props) => {
-  let { scale, duration } = props || {}
-  if (!scale) scale = '.98'
-  if (!duration) duration = '.25s'
-
+  let { scale = '.98', duration = '.25s' } = props || {}
   return `
     transition: ${duration} transform;
 
     &:hover {
       transform: scale(${scale});
     }
+  `
+}
+
+const slideRightKeyframes = (from, to) => keyframes`
+  0% {
+    transform: translateX(${from});
+  }
+  100% {
+    transform: translateX(${to});
+  }
+`
+
+export const slideRight = (props) => {
+  let { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
+  return `
+    animation: ${slideRightKeyframes(from, to)} ${duration} linear both;
   `
 }
 
@@ -51,6 +64,9 @@ const bounceInKeyframes = keyframes`
   }
 `
 
-export const bounceIn = (duration) => `
-  animation: ${bounceInKeyframes} ${duration}s both;
-`
+export const bounceIn = (props) => {
+  const { duration = `.25s` } = props || {}
+  return `
+    animation: ${bounceInKeyframes} ${duration} both;
+  `
+}
