@@ -94,7 +94,7 @@ function Blocks() {
         {
           key: 'timestamp',
           title: 'Age',
-          render: (value) => <Age timestamp={value} format={{ secondsDecimalDigits: 0 }} />
+          render: (value) => <Age timestamp={value} update format={{ secondsDecimalDigits: 0 }} />
         },
         {
           key: 'total_size_in_bytes',

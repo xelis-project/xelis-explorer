@@ -298,11 +298,11 @@ export function RecentBlocks() {
         </div>
         <div>
           <div>Fees</div>
-          <div>{formatXelis(stats.fees)}</div>
+          <div>{formatXelis(stats.fees, { withSuffix: false })}</div>
         </div>
         <div>
           <div>Reward</div>
-          <div>{formatXelis(stats.reward)}</div>
+          <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
         </div>
         <div title={`(sync, normal, side, orphan)`}>
           <div>Blocks</div>

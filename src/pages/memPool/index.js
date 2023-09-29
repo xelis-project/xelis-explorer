@@ -81,9 +81,7 @@ function MemPool() {
               <td>{reduceText(item.owner, 0, 7)}</td>
               <td>{formatXelis(item.fee)}</td>
               <td>
-                {item.timestamp
-                  ? <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
-                  : `?`}
+                <Age timestamp={item.first_seen} update format={{ secondsDecimalDigits: 0 }} />
               </td>
             </tr>
           }}

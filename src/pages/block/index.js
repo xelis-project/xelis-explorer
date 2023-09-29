@@ -7,13 +7,13 @@ import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/context'
 
 import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock } from '../../utils'
-import NotFound from '../notFound'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
 import theme from '../../style/theme'
 import { scaleOnHover } from '../../style/animate'
 import TableFlex from '../../components/tableFlex'
+import Age from '../../components/age'
 
 const style = {
   container: css`
@@ -160,6 +160,11 @@ function Block() {
             key: 'timestamp',
             title: 'Timestamp',
             render: (value) => value && `${formatBlock.date} (${block.timestamp})`
+          },
+          {
+            key: 'age',
+            title: 'Age',
+            render: (_, item) => <Age timestamp={item.timestamp} update  format={{ secondsDecimalDigits: 0 }} />
           },
           {
             key: 'confirmations',

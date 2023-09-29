@@ -27,7 +27,7 @@ function Transactions(props) {
 
   const nodeSocket = useNodeSocket()
 
-  const count = useMemo(() => {
+  const txCount = useMemo(() => {
     return (block.txs_hashes || []).length
   }, [block])
 
@@ -49,10 +49,11 @@ function Transactions(props) {
 
     let { start, end } = getPaginationRange(pageState)
 
-    const txCount = block.txs_hashes.length
+    let txHashes = block.txs_hashes || []
+    const txCount = txHashes.length
     start = Math.min(txCount, start)
     end = Math.min(txCount, end)
-    let txHashes = block.txs_hashes.slice(start, end)
+    txHashes = txHashes.slice(start, end)
     const [err, txs] = await to(nodeSocket.daemon.getTransactions(txHashes))
     if (err) return resErr(err)
 
@@ -112,7 +113,7 @@ function Transactions(props) {
         />
       </table>
     </div>
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="txs" count={count} />
+    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="txs" count={txCount} />
   </div>
 }
 

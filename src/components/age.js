@@ -6,6 +6,8 @@ function Age(props) {
 
   const [age, setAge] = useState(0)
   useEffect(() => {
+    if (!timestamp) return
+
     let timeoutId = null
     const updateTime = () => {
       const age = new Date().getTime() - timestamp
@@ -19,8 +21,9 @@ function Age(props) {
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [update])
+  }, [update, timestamp])
 
+  if (!timestamp) return null
   return prettyMs(age, format)
 }
 

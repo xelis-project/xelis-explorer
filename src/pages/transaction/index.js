@@ -115,7 +115,7 @@ function Transaction() {
             key: 'executed_in_block',
             title: 'Executed In',
             render: (value) => {
-              return <Link to={`/blocks/${value}`}>{reduceText(value)}</Link>
+              return <Link to={`/blocks/${value}`}>{value}</Link>
             }
           },
         ]}

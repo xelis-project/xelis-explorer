@@ -89,7 +89,7 @@ const style = {
   
         :nth-child(2) {
           font-weight: bold;
-          font-size: 1.6em;
+          font-size: 2em;
         }
       }
     }
@@ -123,11 +123,11 @@ export function NetworkStats() {
     const maxSupply = 1840000000000
     const mined = (data.native_supply * 100 / maxSupply).toFixed(2)
     return [
-      { title: `Max Supply`, value: formatXelis(maxSupply) },
-      { title: `Circulating Supply`, value: formatXelis(data.native_supply) },
+      { title: `Max Supply`, value: formatXelis(maxSupply, { withSuffix: false }) },
+      { title: `Circulating Supply`, value: formatXelis(data.native_supply, { withSuffix: false }) },
       { title: `Mined`, value: `${mined}%` },
       { title: `Hashrate`, value: formatHashRate(data.difficulty / 15) },
-      { title: `Block Reward`, value: formatXelis(data.block_reward) },
+      { title: `Block Reward`, value: formatXelis(data.block_reward, { withSuffix: false }) },
       { title: `Tx Pool`, value: `${data.mempool_size} tx` },
       { title: `Block Count`, value: (data.topoheight || 0).toLocaleString() },
       { title: `Difficulty`, value: (data.difficulty || 0).toLocaleString() },
