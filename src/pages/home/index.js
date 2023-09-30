@@ -11,7 +11,6 @@ function Home() {
     </Helmet>
     <ExplorerSearch />
     <RecentBlocks />
-    <NetworkStats />
   </div>
 }
 

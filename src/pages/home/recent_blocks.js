@@ -7,7 +7,8 @@ import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 import Age from '../../components/age'
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import theme from '../../style/theme'
-import { bounceIn, scaleOnHover, slideRight } from '../../style/animate'
+import { bounceIn, slideRight } from '../../style/animate'
+import { NetworkStats } from './network_stats'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -302,6 +303,7 @@ export function RecentBlocks() {
         <MinersDistribution miners={stats.miners} />
       </div>
     </div>
+    <NetworkStats blocks={blocks} />
   </div>
 }
 

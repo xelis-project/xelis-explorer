@@ -1,13 +1,15 @@
 import to from 'await-to-js'
 import prettyMs from 'pretty-ms'
 import { css } from 'goober'
-import { useCallback, useMemo, useState } from 'react'
-import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNodeSocket } from '@xelis/sdk/react/context'
 
 import { formatHashRate, formatXelis } from '../../utils'
 import theme from '../../style/theme'
 import Icon from '../../components/icon'
 import { scaleOnHover } from '../../style/animate'
+import Chart from '../../components/chart'
+import { useTheme } from '../../context/useTheme'
 
 theme.xelis`
   --stats-bg-color: rgb(14 30 32 / 70%);
@@ -80,29 +82,75 @@ const style = {
       }
   
       > div {
-        padding: .5em 0;
+        padding: 1em;
   
-        :nth-child(1) {
+        > :nth-child(1) {
           margin-bottom: .5em;
           font-size: .8em;
           color: var(--muted-color);
         }
   
-        :nth-child(2) {
+        > :nth-child(2) {
           font-weight: bold;
           font-size: 2em;
         }
       }
     }
+
+    .chart {
+      height: 3em;
+      padding: 0.25em;
+      margin-top: 0.5em;
+    }
   `,
 }
 
-export function NetworkStats() {
+function MiniChart(props) {
+  const { data } = props
+
+  const chartConfig = useMemo(() => {
+    return {
+      type: 'line',
+      data: data,
+      options: {
+        animation: {
+          duration: 0
+        },
+        maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+        },
+        scales: {
+          y: {
+            display: false,
+            beginAtZero: false
+          },
+          x: {
+            display: false
+          }
+        }
+      }
+    }
+  }, [data])
+
+  return <Chart config={chartConfig} className="chart" />
+}
+
+export function NetworkStats(props) {
+  const { blocks = [] } = props
   const nodeSocket = useNodeSocket()
 
   const [info, setInfo] = useState()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
+  const { theme: currentTheme } = useTheme()
 
   const loadInfo = useCallback(async () => {
     setLoading(true)
@@ -112,37 +160,76 @@ export function NetworkStats() {
     setLoading(false)
   }, [nodeSocket])
 
+  useEffect(() => {
+    loadInfo()
+  }, [loadInfo, blocks])
+
+  /*
   useNodeSocketSubscribe({
     event: `NewBlock`,
     onConnected: loadInfo,
     onData: loadInfo
-  }, [])
+  }, [])*/
 
   const stats = useMemo(() => {
     const data = info || {}
 
     const maxSupply = 1840000000000
     const mined = (data.native_supply * 100 / maxSupply).toFixed(2)
+
+    const labels = []
+    const difficultyHistory = []
+
+    const _blocks = Object.assign([], blocks)
+    _blocks.reverse().forEach((b, i) => {
+      labels.push(`${i}`)
+      difficultyHistory.push(b.difficulty)
+    })
+
+    const difficultyChartData = {
+      labels: labels,
+      datasets: [{
+        label: 'Units',
+        data: difficultyHistory,
+        borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+        borderWidth: 4,
+        tension: .3
+      }]
+    }
+
     return [
-      { title: `Max Supply`, value: formatXelis(maxSupply, { withSuffix: false }) },
-      { title: `Circulating Supply`, value: formatXelis(data.native_supply, { withSuffix: false }) },
-      { title: `Mined`, value: `${mined}%` },
-      { title: `Hashrate`, value: formatHashRate(data.difficulty / 15) },
-      { title: `Block Reward`, value: formatXelis(data.block_reward, { withSuffix: false }) },
-      { title: `Tx Pool`, value: `${data.mempool_size} tx` },
-      { title: `Block Count`, value: (data.topoheight || 0).toLocaleString() },
-      { title: `Difficulty`, value: (data.difficulty || 0).toLocaleString() },
-      { title: `Avg Block Time`, value: prettyMs((data.average_block_time || 0), { compact: true }) },
+      { title: `Max Supply`, render: () => formatXelis(maxSupply, { withSuffix: false }) },
+      { title: `Circulating Supply`, render: () => formatXelis(data.native_supply, { withSuffix: false }) },
+      { title: `Mined`, render: () => `${mined}%` },
+      { title: `Block Count`, render: () => (data.topoheight || 0).toLocaleString() },
+      { title: `Block Reward`, render: () => formatXelis(data.block_reward, { withSuffix: false }) },
+      { title: `Tx Pool`, render: () => `${data.mempool_size} tx` },
+      {
+        title: `Difficulty`, render: () => {
+          return <div>
+            <div>{(data.difficulty || 0).toLocaleString()}</div>
+            <MiniChart data={difficultyChartData} />
+          </div>
+        }
+      },
+      {
+        title: `Hashrate`, render: () => formatHashRate(data.difficulty / 15)
+      },
+      {
+        title: `Avg Block Time`, render: () => prettyMs((data.average_block_time || 0), { compact: true })
+      },
     ]
-  }, [info])
+  }, [info, blocks, currentTheme])
 
   return <div className={style.container}>
     <div className="title">Network Stats</div>
     <div className="items">
       {stats.map((item) => {
+        let value = null
+        if (typeof item.render === 'function') value = item.render()
         return <div key={item.title}>
           <div>{item.title}</div>
-          <div>{info ? item.value : '--'}</div>
+          <div>{info ? value : '--'}</div>
         </div>
       })}
     </div>
