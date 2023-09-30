@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/context'
 
-import { formatAsset, formatXelis, reduceText } from '../../utils'
+import { formatXelis, reduceText } from '../../utils'
 import TableBody, { style as tableStyle } from '../../components/tableBody'
 import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
 
@@ -87,26 +87,12 @@ function Transactions(props) {
 
             return <React.Fragment key={item.hash}>
               <tr>
-                <td><Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link></td>
+                <td>
+                  <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
+                </td>
                 <td>{transfers.length} / {burns.length}</td>
                 <td>{reduceText(item.owner, 0, 7)}</td>
                 <td>{formatXelis(item.fee)}</td>
-              </tr>
-              <tr>
-                <td colSpan={4}>
-                  {transfers.map((transfer, index) => {
-                    const { amount, asset, to } = transfer
-                    return <div key={index}>
-                      {index + 1}. Sent {formatAsset(amount, asset)} to {to}
-                    </div>
-                  })}
-                  {burns.map((burn, index) => {
-                    const { amount, asset } = burn
-                    return <div key={index}>
-                      {index + 1}. Burn {formatAsset(amount, asset)}
-                    </div>
-                  })}
-                </td>
               </tr>
             </React.Fragment>
           }}
