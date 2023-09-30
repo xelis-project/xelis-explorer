@@ -62,7 +62,6 @@ const style = {
       display: block;
       user-select: none;
       cursor: pointer;
-      ${scaleOnHover}
       ${slideRight({ from: `-100%`, to: `0%`, duration: `.25s` })}
 
       ${theme.query.minDesktop} {
@@ -267,11 +266,10 @@ export function RecentBlocks() {
     <div className={style.title}>Recent Blocks</div>
     <div className={`${style.items} ${!animateBlock ? `no-animation` : ``}`}>
       {blocks.map((block, index) => {
-        const key = index //+ Math.random() // random key to force re-render and repeat animation
+        const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
-        return <div key={key}>
-          <Link to={`/blocks/${block.hash}`} key={block.hash} className={`item ${animateBlock == block.hash ? `animate` : ``}`}>
+        return <Link to={`/blocks/${block.hash}`} key={key} className={`item ${animateBlock == block.hash ? `animate` : ``}`}>
             <div className="title">Block {block.topoheight}</div>
             <div className="value">{txCount} txs | {size}</div>
             <div className="miner">{reduceText(block.miner, 0, 7) || '--'}</div>
@@ -281,7 +279,6 @@ export function RecentBlocks() {
                 : '--'}
             </div>
           </Link>
-        </div>
       })}
     </div>
     <div className={style.title}>
