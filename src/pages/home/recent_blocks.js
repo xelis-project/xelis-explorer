@@ -159,6 +159,10 @@ const style = {
   `
 }
 
+const defaultStats = {
+  txs: 0, size: 0, fees: 0, miners: {}, reward: 0,
+}
+
 export function RecentBlocks() {
   const nodeSocket = useNodeSocket()
 
@@ -168,10 +172,7 @@ export function RecentBlocks() {
     return [{}, {}, {}, {}, {}, {}, {}]
   })
   const [animateBlock, setAnimateBlock] = useState('')
-  const [stats, setStats] = useState({
-    txs: 0, size: 0, fees: 0, miners: {}, reward: 0,
-    syncBlocks: 0, normalBlocks: 0, sideBlocks: 0, orphanedBlocks: 0
-  })
+  const [stats, setStats] = useState(defaultStats)
 
   const loadRecentBlocks = useCallback(async () => {
     if (!nodeSocket.connected) return
@@ -183,12 +184,12 @@ export function RecentBlocks() {
       setErr(err)
     }
 
-    const [err1, height] = await to(nodeSocket.daemon.getHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
     if (err1) return resErr(err1)
 
-    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
-      start_height: height - 19,
-      end_height: height
+    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
+      start_topoheight: topoheight - 19,
+      end_topoheight: topoheight
     }))
     if (err2) return resErr(err2)
     setLoading(false)
@@ -226,31 +227,20 @@ export function RecentBlocks() {
   }, [])
 
   useEffect(() => {
-    if (blocks.length > 50) {
+    if (blocks.length > 20) {
       blocks.pop()
       setBlocks(blocks)
     }
 
-    let txs = 0
-    let size = 0
-    let fees = 0
-    let reward = 0
+    let stats = Object.assign({}, defaultStats)
     let miners = {}
-    let syncBlocks = 0
-    let normalBlocks = 0
-    let sideBlocks = 0
-    let orphanedBlocks = 0
     blocks.forEach(block => {
       if (Object.keys(block).length == 0) return
 
-      txs += (block.txs_hashes || 0).length
-      size += block.total_size_in_bytes || 0
-      fees += block.total_fees || 0
-      reward += block.reward || 0
-      syncBlocks += block.block_type == 'Sync' ? 1 : 0
-      normalBlocks += block.block_type == 'Normal' ? 1 : 0
-      sideBlocks += block.block_type == 'Side' ? 1 : 0
-      orphanedBlocks += block.block_type == 'Orphaned' ? 1 : 0
+      stats.txs += (block.txs_hashes || 0).length
+      stats.size += block.total_size_in_bytes || 0
+      stats.fees += block.total_fees || 0
+      stats.reward += block.reward || 0
 
       if (!miners[block.miner]) {
         miners[block.miner] = 1
@@ -259,7 +249,7 @@ export function RecentBlocks() {
       }
     })
 
-    setStats({ txs, size, fees, miners, reward, syncBlocks, normalBlocks, sideBlocks, orphanedBlocks })
+    setStats({ ...stats, miners })
   }, [blocks])
 
   return <div>
@@ -302,12 +292,6 @@ export function RecentBlocks() {
         <div>
           <div>Reward</div>
           <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
-        </div>
-        <div title={`(sync, normal, side, orphan)`}>
-          <div>Blocks</div>
-          <div>
-            {stats.syncBlocks} / {stats.normalBlocks} / {stats.sideBlocks} / {stats.orphanedBlocks}
-          </div>
         </div>
       </div>
       <div className={style.title}>
