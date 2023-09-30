@@ -51,7 +51,6 @@ const style = {
         justify-content: center;
         font-weight: bold;
         transition: .25s transform;
-        --ggs: .9;
         ${scaleOnHover({ scale: .9 })}
   
         span {

@@ -47,6 +47,7 @@ const style = {
       cursor: pointer;
       text-decoration: none;
       margin-top: 2em;
+      font-size: 1.2em;
       ${scaleOnHover}
     }
 

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import useTheme from '../../context/useTheme'
 import Icon from '../icon'
 import theme from '../../style/theme'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -38,7 +39,7 @@ const style = {
     }
   `,
   menu: css`
-    --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#ffffff', dark: '#0a0a0a' })};
+    --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#dddddd', dark: '#212121' })};
 
     .button {
       cursor: pointer;
@@ -57,7 +58,7 @@ const style = {
       display: flex;
       flex-direction: column;
       background-color: var(--bg-color);
-      gap: .5em;
+      gap: .25em;
       z-index: 1;
       font-size: 1.2em;
       transition: all .25s;
@@ -83,18 +84,16 @@ const style = {
         user-select: none;
         cursor: pointer;
         background-color: var(--bg-color);
-        padding: .5em;
+        padding: 0.5em 0.7em;
         display: flex;
-        gap: .5em;
+        gap: 0.5em;
         align-items: center;
-      }
-    
-      .item:hover {
-        background-color: var(--header-nav-active-color);
-      }
-    
-      .item-active {
-        background-color: var(--header-nav-active-color);
+        justify-content: space-between;
+        border-radius: 5px;
+
+        &:hover, &.active {
+          background-color: var(--header-nav-active-color);
+        }
       }
     }
   `,
@@ -108,16 +107,15 @@ const style = {
     }
 
     button {
+      font-weight: bold;
       border: none;
       padding: .5em .7em;
       cursor: pointer;
       color: var(--bg-color);
       background-color: var(--text-color);
       transition: .25s all;
-
-      &:hover {
-        border-radius: 5px;
-      }
+      border-radius: 5px;
+      ${scaleOnHover({ scale: .93 })}
     }
   `
 }
@@ -125,7 +123,7 @@ const style = {
 function useMenuLinks() {
   return useMemo(() => {
     const isActive = ({ isActive }) => {
-      if (isActive) return `item item-active`
+      if (isActive) return `item active`
       return `item`
     }
 
@@ -173,14 +171,14 @@ function Header(props) {
         {links.map((item) => {
           return <NavLink key={item.path} to={item.path}
             className={item.className}>
+            <div>{item.title}</div>
             <Icon name={item.icon} />
-            {item.title}
           </NavLink>
         })}
         <div className={style.themeButtons}>
-          <button onClick={() => setTheme('light')}>Light</button>
+          <button onClick={() => setTheme('xelis')}>Default</button>
           <button onClick={() => setTheme('dark')}>Dark</button>
-          <button onClick={() => setTheme('xelis')}>XELIS</button>
+          <button onClick={() => setTheme('light')}>Light</button>
         </div>
       </div>
     </div>

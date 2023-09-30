@@ -78,12 +78,14 @@ const style = {
         color: var(--text-color);
         font-weight: bold;
         margin-bottom: .25em;
+        white-space: nowrap;
       }
     
       .value {
         color: var(--muted-color);
         font-weight: bold;
         font-size: .9em;
+        white-space: nowrap;
       }
     
       .miner {

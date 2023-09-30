@@ -80,10 +80,10 @@ function Settings() {
         setNodeEndpoint(e.target.value)
       }} placeholder="wss://127.0.0.1/ws" />
       <div className="buttons">
-        <Button icon="reset" onClick={() => {
+        <Button icon="circle" onClick={() => {
           setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
         }}>Reset</Button>
-        <Button icon="check-o" onClick={() => {
+        <Button icon="floppy-disk" onClick={() => {
           setValue(settingsKeys.NODE_WS_ENDPOINT, nodeEnpoint)
         }}>Apply</Button>
       </div>
