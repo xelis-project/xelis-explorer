@@ -11,7 +11,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
-import NodeStatus from '../../components/nodeStatus'
+import NodeStatus from '../../layout/node_status'
 import useOffCanvasTable from './offCanvasTable'
 import useOffCanvasBlock from './offCanvasBlock'
 import blockColor from './blockColor'

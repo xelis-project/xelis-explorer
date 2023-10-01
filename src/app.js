@@ -5,7 +5,7 @@ import { NodeSocketProvider } from '@xelis/sdk/react/context'
 import { ThemeProvider } from './context/useTheme'
 import useSettings, { SettingsProvider } from './context/useSettings'
 import { OverlayProvider } from './context/useOverlay'
-import Layout from './layout'
+import Layout from './layout/layout'
 
 import Block from './pages/block'
 import Blocks from './pages/blocks'

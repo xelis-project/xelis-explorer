@@ -1,7 +1,7 @@
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/context'
 
-import DotLoading from '../dotLoading'
+import DotLoading from '../components/dotLoading'
 
 const style = {
   container: css`

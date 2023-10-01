@@ -3,10 +3,10 @@ import { NavLink } from 'react-router-dom'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
 
-import useTheme from '../../context/useTheme'
-import Icon from '../icon'
-import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
+import useTheme from '../context/useTheme'
+import Icon from '../components/icon'
+import theme from '../style/theme'
+import { scaleOnHover } from '../style/animate'
 
 const style = {
   container: css`

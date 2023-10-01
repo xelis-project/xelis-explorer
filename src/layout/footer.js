@@ -1,5 +1,5 @@
 import { css } from 'goober'
-import packageJSON from '../../../package.json'
+import packageJSON from '../../package.json'
 
 const style = {
   container: css`

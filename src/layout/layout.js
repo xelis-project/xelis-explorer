@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router'
 import { css } from 'goober'
 
-import Header from './components/header'
-import Footer from './components/footer'
-import NodeStatus from './components/nodeStatus'
-import theme from './style/theme'
+import Header from './header'
+import Footer from './footer'
+import NodeStatus from '../layout/node_status'
+import theme from '../style/theme'
 
 const style = {
   background: css`
