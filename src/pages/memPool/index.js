@@ -4,6 +4,7 @@ import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'
 import { formatXelis, reduceText } from '../../utils'
@@ -47,9 +48,8 @@ function MemPool() {
   }, [loadMemPool])
 
   useNodeSocketSubscribe({
-    event: `TransactionAddedInMempool`,
+    event: RPCEvent.TransactionAddedInMempool,
     onData: (_, data) => {
-      data.timestamp = new Date().getTime()
       setMemPool((pool) => [data, ...pool])
     }
   }, [])
@@ -147,7 +147,7 @@ function TxExecuted(props) {
   }, [nodeSocket])
 
   useNodeSocketSubscribe({
-    event: `TransactionExecuted`,
+    event: RPCEvent.TransactionExecuted,
     onData: (_, data) => {
       // remove from mempool and add tx to data
       setMemPool((pool) => {
@@ -169,7 +169,7 @@ function TxExecuted(props) {
   }, [])
 
   useNodeSocketSubscribe({
-    event: `NewBlock`,
+    event: RPCEvent.NewBlock,
     onData: async () => {
       // remove txs with blocks lower than the first tx block
       const [err, topoheight] = await to(nodeSocket.daemon.getTopoHeight())

@@ -2,7 +2,8 @@ import to from 'await-to-js'
 import prettyMs from 'pretty-ms'
 import { css } from 'goober'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { formatHashRate, formatXelis } from '../../utils'
 import theme from '../../style/theme'
@@ -164,12 +165,13 @@ export function NetworkStats(props) {
     loadInfo()
   }, [loadInfo, blocks])
 
-  /*
   useNodeSocketSubscribe({
-    event: `NewBlock`,
-    onConnected: loadInfo,
-    onData: loadInfo
-  }, [])*/
+    event: RPCEvent.TransactionAddedInMempool,
+    onData: () => {
+      info.mempool_size++
+      setInfo({ ...info })
+    }
+  }, [])
 
   const stats = useMemo(() => {
     const data = info || {}
@@ -203,7 +205,7 @@ export function NetworkStats(props) {
       { title: `Mined`, render: () => `${mined}%` },
       { title: `Block Count`, render: () => (data.topoheight || 0).toLocaleString() },
       { title: `Block Reward`, render: () => formatXelis(data.block_reward, { withSuffix: false }) },
-      { title: `Tx Pool`, render: () => `${data.mempool_size} tx` },
+      { title: `Mempool`, render: () => `${data.mempool_size} tx` },
       {
         title: `Difficulty`, render: () => {
           return <div>

@@ -7,6 +7,7 @@ import { BoxGeometry, MeshBasicMaterial } from 'three'
 import { css } from 'goober'
 import prettyMs from 'pretty-ms'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
@@ -476,7 +477,7 @@ function DAG() {
   }, [loadBlocks])
 
   useNodeSocketSubscribe({
-    event: `NewBlock`,
+    event: RPCEvent.NewBlock,
     onData: (_, newBlock) => {
       loadInfo()
       if (!offCanvasTable.paused) {
@@ -496,7 +497,7 @@ function DAG() {
   }, [offCanvasTable.paused])
 
   useNodeSocketSubscribe({
-    event: `BlockOrdered`,
+    event: RPCEvent.BlockOrdered,
     onData: (_, data) => {
       if (offCanvasTable.paused) return
       const { topoheight, block_hash, block_type } = data
