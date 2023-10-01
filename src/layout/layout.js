@@ -13,7 +13,7 @@ const style = {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: ${theme.apply({ xelis: `url('/img/bg_xelis.jpg')`, dark: `url('/img/bg_xelis_dark.jpg')`, light: `url('/img/bg_xelis_light.jpg')`})};
+    background-image: ${theme.apply({ xelis: `url('/img/bg_xelis.jpg')`, dark: `url('/img/bg_xelis_dark.jpg')`, light: `url('/img/bg_xelis_light.jpg')` })};
     background-repeat: no-repeat;
     background-size: cover;
     background-position: top center;
@@ -87,9 +87,17 @@ const style = {
     max-width: 1000px;
     padding: 0 2em;
     position: relative;
+    height: 100%;
 
     ${theme.query.minLarge} {
       max-width: 1400px;
+    }
+
+    .layout-flex {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
     }
 
     .node-status {
@@ -128,9 +136,13 @@ function Layout() {
       <div className="node-status">
         <NodeStatus />
       </div>
-      <Header />
-      <Outlet />
-      <Footer />
+      <div className="layout-flex">
+        <div>
+          <Header />
+          <Outlet />
+        </div>
+        <Footer />
+      </div>
     </div>
   </>
 }

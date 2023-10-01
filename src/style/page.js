@@ -29,6 +29,12 @@ glob`
     transition: all .25s;
     min-width: 320px;
     font-size: 16px;
+    height: 100%;
+  }
+
+  #app {
+    /* important 100% on html,body,#app */
+    height: 100%;
   }
 
   button {

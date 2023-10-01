@@ -3,7 +3,7 @@ import packageJSON from '../../package.json'
 
 const style = {
   container: css`
-    margin: 2em 0 3em 0;
+    padding: 2em 0 3em 0;
     color: var(--muted-color);
   `
 }
