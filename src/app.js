@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/useTheme'
 import useSettings, { SettingsProvider } from './context/useSettings'
 import { OverlayProvider } from './context/useOverlay'
 import Layout from './layout'
+
 import Block from './pages/block'
 import Blocks from './pages/blocks'
 import Home from './pages/home'
@@ -15,6 +16,7 @@ import DAG from './pages/dag'
 import MemPool from './pages/memPool'
 import Settings from './pages/settings'
 import Account from './pages/account'
+import Accounts from './pages/accounts'
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,10 @@ const router = createBrowserRouter([
           {
             path: '/blocks/:id',
             element: <Block />
+          },
+          {
+            path: '/accounts',
+            element: <Accounts />
           },
           {
             path: '/accounts/:addr',

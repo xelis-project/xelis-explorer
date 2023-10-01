@@ -17,7 +17,7 @@
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@supabase/supabase-js": "^2.10.0",
-    "@xelis/sdk": "^0.2.0",
+    "@xelis/sdk": "^0.3.0",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
     "bytes": "^3.1.2",

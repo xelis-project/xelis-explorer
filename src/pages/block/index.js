@@ -176,7 +176,7 @@ function Block() {
           },
           {
             key: 'topoheight',
-            title: 'Topoheight',
+            title: 'Topo Height',
           },
           {
             key: 'height',

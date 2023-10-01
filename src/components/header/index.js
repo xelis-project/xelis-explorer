@@ -132,6 +132,7 @@ function useMenuLinks() {
       { path: `/blocks`, title: `Blocks`, className: isActive, icon: 'boxes-stacked' },
       { path: `/mempool`, title: `Mempool`, className: isActive, icon: 'square-poll-horizontal' },
       { path: `/dag`, title: `DAG`, className: isActive, icon: 'network-wired' },
+      { path: `/accounts`, title: `Accounts`, className: isActive, icon: 'user-group' },
       { path: `/settings`, title: `Settings`, className: isActive, icon: 'gear' }
     ]
   }, [])

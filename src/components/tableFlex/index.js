@@ -3,6 +3,7 @@ import { css } from 'goober'
 import DotLoading from '../dotLoading'
 import theme from '../../style/theme'
 import { displayError } from '../../utils'
+import { useCallback } from 'react'
 
 export const style = {
   container: css`
@@ -92,10 +93,22 @@ function TableFlex(props) {
   const loadingStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
   const colSpan = headers.length
 
+  const getRowKeyValue = useCallback((item) => {
+    let key = ``
+    if (typeof item === 'object') {
+      if (typeof rowKey === 'function') key = rowKey(item)
+      if (typeof rowKey === 'string') key = item[rowKey]
+    }
+
+    if (typeof item === 'string') key = item
+
+    return key || 0
+  }, [rowKey])
+
   return <div className={style.container}>
     <div className="table-mobile">
       {data.map((item, dataIndex) => {
-        const key = item[rowKey] || 0
+        const key = getRowKeyValue(item)
         return <div key={key}>
           {headers.map((header, headerIndex) => {
             let value = item[header.key]
@@ -149,7 +162,7 @@ function TableFlex(props) {
             })}
           </>}
           {data.length > 1 && data.map((item, dataIndex) => {
-            const key = item[rowKey] || 0
+            const key = getRowKeyValue(item)
             return <tr key={key}>
               {headers.map((header, headerIndex) => {
                 let value = item[header.key]

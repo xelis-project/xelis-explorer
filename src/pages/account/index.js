@@ -56,12 +56,9 @@ function Account() {
     setLoading(false)
   }, [addr, nodeSocket])
 
-
-
   useEffect(() => {
     load()
   }, [load])
-
 
   return <div className={style.container}>
     <Helmet>
@@ -79,9 +76,16 @@ function Account() {
       {
         key: "balance",
         title: "Balance",
-        render: (value, item) => {
+        render: (_, item) => {
           const { balance } = item.balance || {}
           return balance && formatXelis(balance)
+        }
+      },
+      {
+        key: "topoheight",
+        title: "Topo Height",
+        render: (value) => {
+          return <Link to={`/blocks/${value}`}>{value}</Link>
         }
       }
     ]} data={[account]} />
@@ -112,6 +116,7 @@ function History(props) {
 
     const max = 5
     let topoheight = account.balance.previous_topoheight
+    if (!topoheight) return resErr(null)
 
     const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(account.topoheight))
     if (err) return resErr(err)
@@ -143,6 +148,7 @@ function History(props) {
   return <div>
     <h2>History</h2>
     <TableFlex loading={loading} err={err} rowKey="topoheight"
+      emptyText="No history"
       headers={[
         {
           key: "topoheight",

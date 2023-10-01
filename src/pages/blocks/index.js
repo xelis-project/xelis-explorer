@@ -80,6 +80,7 @@ function Blocks() {
     <TableFlex
       err={err}
       loading={loading}
+      emptyText="No blocks"
       headers={[
         {
           key: 'topoheight',
