@@ -87,6 +87,10 @@ export function ExplorerSearch() {
     const searchValue = formData.get(`search`)
     if (searchValue === ``) return
 
+    if (searchValue.length === 65) {
+      return navigate(`/accounts/${searchValue}`)
+    }
+
     if (searchValue.length === 64) {
       const [err, block] = await to(nodeSocket.daemon.getBlockByHash(searchValue))
       if (block) {

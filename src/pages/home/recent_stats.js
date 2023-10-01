@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { css } from 'goober'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
+import { Link } from 'react-router-dom'
 
 const style = {
   title: css`
@@ -171,7 +172,9 @@ function MinersDistribution(props) {
     {distribution.map((item, index) => {
       const percentage = item.minedBlock * 100 / distribution[0].minedBlock
       return <div key={item.miner}>
-        <div title={item.miner}>{reduceText(item.miner, 0, 5)}</div>
+        <div title={item.miner}>
+          <Link to={`/accounts/${item.miner}`}>{reduceText(item.miner, 0, 5)}</Link>
+        </div>
         <div title={`${item.minedBlock} mined blocks`}
           style={{ width: `${percentage}%`, backgroundColor: colors[index] }}>
           {item.minedBlock}

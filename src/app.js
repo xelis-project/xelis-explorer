@@ -14,6 +14,7 @@ import Transaction from './pages/transaction'
 import DAG from './pages/dag'
 import MemPool from './pages/memPool'
 import Settings from './pages/settings'
+import Account from './pages/account'
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
           {
             path: '/blocks/:id',
             element: <Block />
+          },
+          {
+            path: '/accounts/:addr',
+            element: <Account />
           },
           {
             path: '/mempool',

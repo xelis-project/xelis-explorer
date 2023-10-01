@@ -94,16 +94,16 @@ function TableFlex(props) {
 
   return <div className={style.container}>
     <div className="table-mobile">
-      {data.map((item) => {
+      {data.map((item, dataIndex) => {
         const key = item[rowKey] || 0
         return <div key={key}>
-          {headers.map((header, index) => {
+          {headers.map((header, headerIndex) => {
             let value = item[header.key]
             if (typeof (header.render) === 'function') {
-              value = header.render(value, item)
+              value = header.render(value, item, dataIndex)
             }
 
-            return <div key={index}>
+            return <div key={headerIndex}>
               <div>{header.title}</div>
               <div>{value}</div>
             </div>
@@ -139,7 +139,7 @@ function TableFlex(props) {
               const item = data[0]
               let value = item[header.key]
               if (typeof (header.render) === 'function') {
-                value = header.render(value, item)
+                value = header.render(value, item, 0)
               }
 
               return <tr key={index}>
@@ -148,15 +148,15 @@ function TableFlex(props) {
               </tr>
             })}
           </>}
-          {data.length > 1 && data.map((item) => {
+          {data.length > 1 && data.map((item, dataIndex) => {
             const key = item[rowKey] || 0
             return <tr key={key}>
-              {headers.map((header, index) => {
+              {headers.map((header, headerIndex) => {
                 let value = item[header.key]
                 if (typeof (header.render) === 'function') {
-                  value = header.render(value, item)
+                  value = header.render(value, item, dataIndex)
                 }
-                return <td key={index}>{value}</td>
+                return <td key={headerIndex}>{value}</td>
               })}
             </tr>
           })}

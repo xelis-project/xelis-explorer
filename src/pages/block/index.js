@@ -185,6 +185,9 @@ function Block() {
           {
             key: 'miner',
             title: 'Miner',
+            render: (value) => {
+              return <Link to={`/accounts/${value}`}>{value}</Link>
+            }
           },
           {
             key: 'total_fees',

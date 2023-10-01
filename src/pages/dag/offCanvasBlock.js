@@ -125,7 +125,9 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>Miner</div>
-          <div>{block.miner}</div>
+          <div>
+            <Link to={`/accounts/${block.miner}`}>{block.miner}</Link>
+          </div>
         </div>
         <div>
           <div>Reward</div>

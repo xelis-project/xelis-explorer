@@ -78,7 +78,9 @@ function MemPool() {
                 <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
               </td>
               <td>{transfers.length}</td>
-              <td>{reduceText(item.owner, 0, 7)}</td>
+              <td>
+                <Link to={`/accounts/${item.owner}`}>{reduceText(item.owner, 0, 7)}</Link>
+              </td>
               <td>{formatXelis(item.fee)}</td>
               <td>
                 <Age timestamp={(item.first_seen || 0) * 1000} update format={{ secondsDecimalDigits: 0 }} />
@@ -214,7 +216,9 @@ function TxExecuted(props) {
                 <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
               </td>
               <td>{transfers.length}</td>
-              <td>{reduceText(tx.owner)}</td>
+              <td>
+                <Link to={`/accounts/${tx.owner}`}>{reduceText(tx.owner, 0, 7)}</Link>
+              </td>
               <td>{formatXelis(tx.fee)}</td>
               <td>
                 <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />

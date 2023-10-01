@@ -114,7 +114,9 @@ function Blocks() {
         {
           key: 'miner',
           title: 'Miner',
-          render: (value) => reduceText(value, 0, 7)
+          render: (value) => {
+            return <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
+          }
         },
         {
           key: 'reward',
