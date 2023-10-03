@@ -18,7 +18,6 @@ function useRecentBlocks() {
     return [{}, {}, {}, {}, {}, {}, {}]
   })
 
-
   const loadRecentBlocks = useCallback(async () => {
     if (!nodeSocket.connected) return
 

@@ -31,7 +31,7 @@ function Account() {
 
   const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [account, setAccount] = useState({})
 
@@ -100,7 +100,7 @@ function History(props) {
 
   const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [history, setHistory] = useState([])
 

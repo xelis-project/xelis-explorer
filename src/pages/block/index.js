@@ -75,7 +75,7 @@ function Block() {
   const nodeSocket = useNodeSocket()
 
   const [err, setErr] = useState()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [block, setBlock] = useState({})
   const [topoheight, setTopoheight] = useState()
 

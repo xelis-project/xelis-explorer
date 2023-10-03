@@ -1,95 +1,56 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { createElement } from 'react'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { NodeSocketProvider } from '@xelis/sdk/react/context'
+import { setup } from 'goober'
 
 import { ThemeProvider } from './context/useTheme'
-import useSettings, { SettingsProvider } from './context/useSettings'
+import useSettings, { SettingsProvider, settingsKeys } from './context/useSettings'
 import { OverlayProvider } from './context/useOverlay'
-import Layout from './layout/layout'
+import { ServerProvider } from './context/useServer'
 
-import Block from './pages/block'
-import Blocks from './pages/blocks'
-import Home from './pages/home'
-import NotFound from './pages/notFound'
-import Transaction from './pages/transaction'
-import DAG from './pages/dag'
-import MemPool from './pages/memPool'
-import Settings from './pages/settings'
-import Account from './pages/account'
-import Accounts from './pages/accounts'
+import "reset-css"
 
-const router = createBrowserRouter([
-  {
-    children: [
-      {
-        element: <Layout />,
-        children: [
-          {
-            path: '/',
-            element: <Home />,
-          },
-          {
-            path: '/blocks',
-            element: <Blocks />,
-          },
-          {
-            path: '/blocks/:id',
-            element: <Block />
-          },
-          {
-            path: '/accounts',
-            element: <Accounts />
-          },
-          {
-            path: '/accounts/:addr',
-            element: <Account />
-          },
-          {
-            path: '/mempool',
-            element: <MemPool />
-          },
-          {
-            path: `/txs/:hash`,
-            element: <Transaction />
-          },
-          {
-            path: `/settings`,
-            element: <Settings />
-          },
-          {
-            path: '*',
-            element: <NotFound />
-          }
-        ]
-      },
-      {
-        path: `/dag`,
-        element: <DAG />
-      }
-    ]
-  }
-])
+import './style/theme'
+import './style/page'
+import './style/scrollbar'
 
-function Routes() {
+export let helmetContext = {}
+
+setup(createElement)
+
+function App(props) {
+  const { children, serverContext } = props
+
+  return <HelmetProvider context={helmetContext}>
+    <Helmet titleTemplate="%s · XELIS Explorer">
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="/public/client.css" />
+      <link rel="icon" href="/public/favicon.ico" />
+    </Helmet>
+    <ServerProvider context={serverContext}>
+      <ThemeProvider>
+        <SettingsProvider>
+          <SubApp>
+            {children}
+          </SubApp>
+        </SettingsProvider>
+      </ThemeProvider>
+    </ServerProvider>
+  </HelmetProvider>
+}
+
+function SubApp(props) {
+  const { children } = props
+
   const { settings } = useSettings()
-  const endpoint = settings['node_ws_endpoint']
+  const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
 
   return <NodeSocketProvider endpoint={endpoint}>
     <OverlayProvider>
-      <RouterProvider router={router} />
+      {children}
     </OverlayProvider>
   </NodeSocketProvider>
-}
-
-function App() {
-  return <HelmetProvider>
-    <Helmet titleTemplate="%s · XELIS Explorer" />
-    <SettingsProvider>
-      <ThemeProvider>
-        <Routes />
-      </ThemeProvider>
-    </SettingsProvider>
-  </HelmetProvider>
 }
 
 export default App

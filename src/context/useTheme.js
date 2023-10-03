@@ -1,23 +1,31 @@
-import { createContext, useCallback, useContext, useLayoutEffect, useState } from 'react'
-import useSettings, { settingsKeys } from './useSettings'
+import { createContext, useContext, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
+
+import useCookie from './useCookie'
 
 const Context = createContext()
+
+const validateTheme = (theme) => {
+  if ([`xelis`, `dark`, `light`].indexOf(theme) !== -1) {
+    return theme
+  }
+
+  return `xelis`
+}
 
 export const ThemeProvider = (props) => {
   const { children } = props
 
-  const { settings, setValue  } = useSettings()
-  const theme = settings[settingsKeys.THEME]
+  const [cookieTheme, setTheme] = useCookie('theme')
 
-  const setTheme = useCallback((value) => {
-    setValue(settingsKeys.THEME, value)
-  }, [])
+  let theme = validateTheme(cookieTheme)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     document.body.setAttribute('data-theme', theme)
   }, [theme])
 
   return <Context.Provider value={{ theme, setTheme }}>
+    <Helmet bodyAttributes={{ 'data-theme': theme }} />
     {children}
   </Context.Provider>
 }

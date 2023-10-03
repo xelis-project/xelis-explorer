@@ -26,7 +26,7 @@ const style = {
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [accounts, setAccounts] = useState([])
 

@@ -31,11 +31,7 @@ const style = {
       display: block;
       background-size: contain;
       background-repeat: no-repeat;
-      background-image: ${theme.apply({
-    xelis: `url('/img/white_background_black_logo.svg')`,
-    light: `url('/img/black_background_white_logo.svg')`,
-    dark: `url('/img/white_background_black_logo.svg')`,
-  })};
+      background-image: ${theme.apply({ xelis: `url('/public/img/white_background_black_logo.svg')`, light: `url('/public/img/black_background_white_logo.svg')`, dark: `url('/public/img/white_background_black_logo.svg')`, })};
     }
   `,
   menu: css`
