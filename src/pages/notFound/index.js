@@ -1,7 +1,9 @@
 import { css } from 'goober'
 import { Helmet } from 'react-helmet-async'
+
 import Button from '../../components/button'
 import useServer from '../../context/useServer'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -45,6 +47,7 @@ const style = {
       border: none;
       cursor: pointer;
       text-decoration: none;
+      ${scaleOnHover}
     }
   `
 }

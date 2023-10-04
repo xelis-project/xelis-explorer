@@ -1,4 +1,4 @@
-import { createBrowserRouter, createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, createMemoryRouter, RouterProvider, ScrollRestoration } from 'react-router-dom'
 
 import Layout from './layout/layout'
 

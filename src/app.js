@@ -1,3 +1,5 @@
+import { setup } from 'goober'
+import { createElement } from 'react'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { NodeSocketProvider } from '@xelis/sdk/react/context'
 
@@ -12,6 +14,8 @@ import "reset-css/reset.css"
 import './style/theme'
 import './style/page'
 import './style/scrollbar'
+
+setup(createElement) // not really if this is needed
 
 function App(props) {
   const { children, css, serverContext, helmetContext, serverDataContext = getServerDataContext() } = props

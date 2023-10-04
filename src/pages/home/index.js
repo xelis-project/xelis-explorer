@@ -8,15 +8,16 @@ import { ExplorerSearch } from './explorer_search'
 import { RecentBlocks } from './recent_blocks'
 import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
+import { loadBlocks_SSR } from '../blocks'
 
 function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
+  const serverResult = loadBlocks_SSR({ limit: 20 })
+
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
-  const [blocks, setBlocks] = useState(() => {
-    return [{}, {}, {}, {}, {}, {}, {}]
-  })
+  const [blocks, setBlocks] = useState(serverResult.blocks)
 
   const loadRecentBlocks = useCallback(async () => {
     if (!nodeSocket.connected) return

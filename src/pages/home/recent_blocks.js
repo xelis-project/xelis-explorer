@@ -119,7 +119,7 @@ export function RecentBlocks(props) {
             <div className="miner">{reduceText(block.miner, 0, 7) || '--'}</div>
             <div className="time">
               {block.timestamp ?
-                <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+                <Age ssrId={key} timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
                 : '--'}
             </div>
           </Link>

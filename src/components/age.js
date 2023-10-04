@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import prettyMs from 'pretty-ms'
 
-function Age(props) {
-  const { timestamp, ms = 1000, format = { compact: true }, update = false } = props
+import { useServerData } from '../context/useServerData'
 
-  const [age, setAge] = useState(() => {
+function Age(props) {
+  const { ssrId, timestamp, ms = 1000, format = { compact: true }, update = false } = props
+
+  // this is important to use server timestamp and avoid timestamp mismatch with hydration
+  const serverTimestamp = useServerData(`component:age:${ssrId}`, () => {
     return new Date().getTime() - (timestamp || 0)
-  })
+  }, 0)
+
+  const [age, setAge] = useState(serverTimestamp)
 
   useEffect(() => {
     if (!timestamp) return

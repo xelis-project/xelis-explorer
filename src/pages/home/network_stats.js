@@ -11,6 +11,9 @@ import Icon from '../../components/icon'
 import { scaleOnHover } from '../../style/animate'
 import Chart from '../../components/chart'
 import { useTheme } from '../../context/useTheme'
+import { useServerData } from '../../context/useServerData'
+import { daemonRPC } from '../../ssr/nodeRPC'
+import useFirstRender from '../../context/useFirstRender'
 
 theme.xelis`
   --stats-bg-color: rgb(14 30 32 / 70%);
@@ -144,32 +147,65 @@ function MiniChart(props) {
   return <Chart config={chartConfig} className="chart" />
 }
 
+function loadSSR() {
+  const defaultResult = { err: null, info: {}, loaded: false }
+  return useServerData(`network_stats`, async () => {
+    const result = Object.assign({}, defaultResult)
+    const [err, res1] = await to(daemonRPC.getInfo())
+    result.err = err
+    if (err) return
+
+    result.info = res1.result
+    result.loaded = true
+    return result
+  }, defaultResult)
+}
+
 export function NetworkStats(props) {
   const { blocks = [] } = props
   const nodeSocket = useNodeSocket()
 
-  const [info, setInfo] = useState()
+  const serverResult = loadSSR()
+
+  const firstRender = useFirstRender()
+  const [info, setInfo] = useState(serverResult.info)
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
   const { theme: currentTheme } = useTheme()
 
   const loadInfo = useCallback(async () => {
+    const resErr = (err) => {
+      setInfo({})
+      setErr(err)
+      setLoading(false)
+    }
+
     setLoading(true)
     const [err, info] = await to(nodeSocket.daemon.getInfo())
-    if (err) return setErr(err)
+    if (err) return resErr(err)
     setInfo(info)
     setLoading(false)
   }, [nodeSocket])
 
+  // load if ssr didn't load
   useEffect(() => {
+    if (serverResult.loaded) return
     loadInfo()
-  }, [loadInfo, blocks])
+  }, [loadInfo])
+
+  // reload info stats every new block
+  useEffect(() => {
+    if (firstRender) return
+    loadInfo()
+  }, [blocks])
 
   useNodeSocketSubscribe({
     event: RPCEvent.TransactionAddedInMempool,
     onData: () => {
-      info.mempool_size++
-      setInfo({ ...info })
+      setInfo((info) => {
+        info.mempool_size++
+        return { ...info }
+      })
     }
   }, [])
 

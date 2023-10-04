@@ -1,5 +1,3 @@
-import { html_beautify } from 'js-beautify'
-
 import ssr from './ssr'
 
 export default {
@@ -20,6 +18,7 @@ export default {
       }
     }
 
-    return new Response(html_beautify(html, { unformatted: [`style`, `script`] }), init)
+    // Do not use html beautify. React hydration won't be able to match markup.
+    return new Response(html, init)
   }
 }

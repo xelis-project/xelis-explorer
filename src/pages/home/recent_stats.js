@@ -79,9 +79,8 @@ const defaultStats = {
 
 export function RecentStats(props) {
   const { blocks } = props
-  const [stats, setStats] = useState(defaultStats)
 
-  useEffect(() => {
+  const stats = useMemo(() => {
     let stats = Object.assign({}, defaultStats)
     let miners = {}
     blocks.forEach(block => {
@@ -99,7 +98,7 @@ export function RecentStats(props) {
       }
     })
 
-    setStats({ ...stats, miners })
+    return { ...stats, miners }
   }, [blocks])
 
   return <div>

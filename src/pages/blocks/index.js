@@ -28,34 +28,32 @@ const style = {
   `
 }
 
-const defaultResult = { count: 0, blocks: [], err: null, loaded: false }
+export function loadBlocks_SSR({ limit }) {
+  const defaultResult = { totalBlocks: 0, blocks: [], err: null, loaded: false }
 
-const fetchBlocksSSR = async () => {
-  const result = Object.assign({}, defaultResult)
-  const [err, res1] = await to(daemonRPC.getTopoHeight())
-  result.err = err
-  if (err) return result
+  return useServerData(`func:loadBlocks`, async () => {
+    const result = Object.assign({}, defaultResult)
+    const [err, res1] = await to(daemonRPC.getTopoHeight())
+    result.err = err
+    if (err) return result
 
-  const topoheight = res1.result
-  // reverse pager range
-  let pagination = getPaginationRange({ page: 1, size: 20 })
-  let startTopoheight = topoheight - pagination.end
-  if (startTopoheight < 0) startTopoheight = 0
-  let endTopoheight = topoheight - pagination.start
-  console.log(pagination, startTopoheight, endTopoheight)
-  const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
-    start_topoheight: startTopoheight,
-    end_topoheight: endTopoheight
-  }))
-  result.err = err2
-  if (err2) return result
+    const topoheight = res1.result
 
-  console.log(res2.result.length)
-  result.count = topoheight + 1
-  result.blocks = res2.result.reverse()
-  result.loaded = true
+    let startTopoheight = topoheight - limit + 1
+    let endTopoheight = topoheight
+    const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
+      start_topoheight: startTopoheight,
+      end_topoheight: endTopoheight
+    }))
+    result.err = err2
+    if (err2) return result
 
-  return result
+    result.totalBlocks = topoheight + 1
+    result.blocks = res2.result.reverse()
+    result.loaded = true
+
+    return result
+  }, defaultResult)
 }
 
 function Blocks() {
@@ -64,11 +62,9 @@ function Blocks() {
   const [loading, setLoading] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
 
-  const serverResult = useServerData(`result`, async () => {
-    return await fetchBlocksSSR()
-  }, defaultResult)
-
-  const [result, setResult] = useState(serverResult)
+  const serverResult = loadBlocks_SSR({ limit: 20 })
+  const [blockCount, setBlockCount] = useState(serverResult.totalBlocks)
+  const [blocks, setBlocks] = useState(serverResult.blocks)
   const nodeSocket = useNodeSocket()
 
   const loadBlocks = useCallback(async () => {
@@ -78,7 +74,8 @@ function Blocks() {
     setLoading(true)
 
     const resErr = (err) => {
-      setResult({ count: 0, blocks: [] })
+      setBlocks([])
+      setBlockCount(0)
       setErr(err)
       setLoading(false)
     }
@@ -99,7 +96,8 @@ function Blocks() {
     }))
     if (err2) return resErr(err2)
 
-    setResult({ count: topoheight + 1, blocks: blocks.reverse() })
+    setBlockCount(topoheight + 1)
+    setBlocks(blocks.reverse())
     setLoading(false)
   }, [pageState, nodeSocket])
 
@@ -109,21 +107,21 @@ function Blocks() {
       // don't add new block if we're not on first page
       if (pageState.page > 1) return
 
-      setResult((result) => {
-        result.blocks.unshift(block)
-        if (result.blocks.length > pageState.size) {
-          result.blocks.pop()
+      setBlocks((blocks) => {
+        blocks.unshift(block)
+        if (blocks.length > pageState.size) {
+          blocks.pop()
         }
 
-        result.count++
-        return Object.assign({}, result)
+        return [...blocks]
       })
+      setCount((count) => count + 1)
     }
   }, [pageState])
 
   // load if ssr didn't load
   useEffect(() => {
-    if (!firstRender || result.loaded) return
+    if (!firstRender || serverResult.loaded) return
     loadBlocks()
   }, [loadBlocks])
 
@@ -132,8 +130,6 @@ function Blocks() {
     if (firstRender) return
     loadBlocks()
   }, [pageState])
-
-  const { count, blocks } = result
 
   return <div className={style.container}>
     <Helmet>
@@ -186,7 +182,7 @@ function Blocks() {
         }
       ]}
     />
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={count} />
+    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
   </div>
 }
 

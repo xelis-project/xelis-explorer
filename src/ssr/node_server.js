@@ -1,7 +1,6 @@
 import url from 'node:url'
 import path from 'path'
 import express from 'express'
-import { html_beautify } from 'js-beautify'
 
 import ssr from './ssr'
 
@@ -15,7 +14,7 @@ app.use(`*`, async (req, res) => {
   const html = await ssr(serverContext, parsedUrl.pathname || '/')
 
   res.writeHead(serverContext.statusCode, { 'Content-Type': 'text/html;charset=UTF-8' })
-  res.end(html_beautify(html, { unformatted: [`style`, `script`] }))
+  res.end(html)
 })
 
 const hostname = '127.0.0.1'
