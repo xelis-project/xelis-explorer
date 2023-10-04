@@ -6,6 +6,9 @@ import { Link } from 'react-router-dom'
 import { css } from 'goober'
 
 import TableFlex from '../../components/tableFlex'
+import { useServerData } from '../../context/useServerData'
+import { daemonRPC } from '../../ssr/nodeRPC'
+import useFirstRender from '../../context/useFirstRender'
 
 const style = {
   container: css`
@@ -23,14 +26,29 @@ const style = {
   `
 }
 
+function loadAccounts_SSR({ limit }) {
+  const defaultResult = { accounts: [], loaded: false }
+  return useServerData(`func:loadAccounts`, async () => {
+    let result = Object.assign({}, defaultResult)
+    const [err, res] = await to(daemonRPC.getAccounts({ maximum: limit }))
+    result.err = err
+    if (err) return result
+
+    result.loaded = true
+    result.accounts = res.result
+    return result
+  }, defaultResult)
+}
+
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
+  const serverResult = loadAccounts_SSR({ limit: 20 })
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
-  const [accounts, setAccounts] = useState([])
+  const [accounts, setAccounts] = useState(serverResult.accounts)
 
-  const load = useCallback(async () => {
+  const loadAccounts = useCallback(async () => {
     if (!nodeSocket.connected) return
 
     setLoading(true)
@@ -40,7 +58,7 @@ function Accounts() {
       setLoading(false)
     }
 
-    const [err, accounts] = await to(nodeSocket.daemon.getAccounts({}))
+    const [err, accounts] = await to(nodeSocket.daemon.getAccounts({ maximum: 20 }))
     if (err) return resErr(err)
 
     setAccounts(accounts)
@@ -48,15 +66,17 @@ function Accounts() {
   }, [nodeSocket])
 
   useEffect(() => {
-    load()
-  }, [load])
+    if (serverResult.loaded) return
+
+    loadAccounts()
+  }, [loadAccounts])
 
   return <div className={style.container}>
     <Helmet>
       <title>Accounts</title>
     </Helmet>
     <h1>Accounts</h1>
-    <TableFlex loading={loading} err={err}
+    <TableFlex loading={loading} err={err} emptyText="No accounts"
       headers={[
         {
           key: 'address',

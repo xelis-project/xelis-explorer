@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom'
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
+import { useServerData } from '../../context/useServerData'
+import { daemonRPC } from '../../ssr/nodeRPC'
 
 const style = {
   container: css`
@@ -26,16 +28,34 @@ const style = {
   `
 }
 
+function loadAccount_SSR({ addr }) {
+  const defaultResult = { loaded: false, err: null, account: {} }
+  return useServerData(`func:loadAccount`, async () => {
+    const result = Object.assign({}, defaultResult)
+    const [err, res] = await to(daemonRPC.getLastBalance({
+      address: addr,
+      asset: XELIS_ASSET,
+    }))
+    result.err = err
+    if (err) return result
+    
+    result.account = res.result
+    return result
+  }, defaultResult)
+}
+
 function Account() {
   const { addr } = useParams()
 
   const nodeSocket = useNodeSocket()
 
+  const serverResult = loadAccount_SSR({ addr })
+
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
-  const [account, setAccount] = useState({})
+  const [account, setAccount] = useState(serverResult.account)
 
-  const load = useCallback(async () => {
+  const loadAccount = useCallback(async () => {
     if (!nodeSocket.connected) return
 
     setErr(null)
@@ -57,8 +77,9 @@ function Account() {
   }, [addr, nodeSocket])
 
   useEffect(() => {
-    load()
-  }, [load])
+    if (serverResult.loaded) return
+    loadAccount()
+  }, [loadAccount])
 
   return <div className={style.container}>
     <Helmet>
@@ -79,13 +100,6 @@ function Account() {
         render: (_, item) => {
           const { balance } = item.balance || {}
           return balance && formatXelis(balance)
-        }
-      },
-      {
-        key: "topoheight",
-        title: "Topo Height",
-        render: (value) => {
-          return <Link to={`/blocks/${value}`}>{value}</Link>
         }
       }
     ]} data={[account]} />

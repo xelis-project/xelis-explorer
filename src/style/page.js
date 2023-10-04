@@ -45,6 +45,10 @@ glob`
     color: var(--link-color);
   }
 
+  strong {
+    font-weight: bold;
+  }
+
   ${theme.query.minLarge} {
     html, body {
       font-size: 18px;

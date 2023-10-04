@@ -24,9 +24,9 @@ theme.xelis`
   --scrollbar-width: 6px;
   --scrollbar-height: 6px;
   --scrollbar-track-bg: inherit;
-  --scrollbar-thumb-bg: rgb(50 110 92 / 50%);
+  --scrollbar-thumb-bg: rgb(93 227 179);
   --scrollbar-thumb-border-radius: 15px;
-  --scrollbar-thumb-bg-hover: rgb(50 110 92);
+  --scrollbar-thumb-bg-hover: rgb(86 185 150);
 `
 
 glob`

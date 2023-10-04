@@ -14,6 +14,8 @@ import theme from '../../style/theme'
 import { scaleOnHover } from '../../style/animate'
 import TableFlex from '../../components/tableFlex'
 import Age from '../../components/age'
+import { useServerData } from '../../context/useServerData'
+import { daemonRPC } from '../../ssr/nodeRPC'
 
 const style = {
   container: css`
@@ -37,7 +39,7 @@ const style = {
       gap: 1em;
 
       > :nth-child(1) {
-        color: var(--muted-color);
+        line-height: 1.3em;
       }
 
       ${theme.query.minDesktop} {
@@ -73,17 +75,53 @@ const style = {
   `
 }
 
+function isHash(id) {
+  return (/[a-z]/i.test(id))
+}
+
+function loadBlock_SSR({ id }) {
+  const defaultResult = { loaded: false, err: null, block: {}, topoheight: 0 }
+  return useServerData(`func:loadBlock`, async () => {
+    const result = Object.assign({}, defaultResult)
+
+    const [err1, res2] = await to(daemonRPC.getTopoHeight())
+    result.err = err1
+    if (err1) return result
+
+    result.topoheight = res2.result
+
+    if (isHash(id)) {
+      const [err1, res1] = await to(daemonRPC.getBlockByHash(id))
+      result.err = err1
+      if (err1) return result
+
+      result.block = res1.result
+    } else {
+      const [err1, res1] = await to(daemonRPC.getBlockAtTopoHeight(parseInt(id)))
+      result.err = err1
+      if (err1) return result
+
+      result.block = res1.result
+    }
+
+    result.loaded = true
+    return result
+  }, defaultResult)
+}
+
 function Block() {
   const { id } = useParams()
 
   const nodeSocket = useNodeSocket()
 
+  const serverResult = loadBlock_SSR({ id })
+
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(false)
-  const [block, setBlock] = useState({})
-  const [topoheight, setTopoheight] = useState()
+  const [block, setBlock] = useState(serverResult.block)
+  const [topoheight, setTopoheight] = useState(serverResult.topoheight)
 
-  const load = useCallback(async () => {
+  const loadBlock = useCallback(async () => {
     if (!nodeSocket.connected) return
 
     setErr(null)
@@ -94,29 +132,28 @@ function Block() {
       setLoading(false)
     }
 
-    if (/[a-z]/i.test(id)) {
-      // by hash
-      const [err, blockData] = await to(nodeSocket.daemon.getBlockByHash(id))
-      if (err) return resErr(err)
-      setBlock(blockData)
-    } else {
-      // by height
-      const height = parseInt(id);
-      const [err, blockData] = await to(nodeSocket.daemon.getBlockAtTopoHeight(height))
-      if (err) return resErr(err)
-      setBlock(blockData)
-    }
-
-    const [err, currentTopoheight] = await to(nodeSocket.daemon.getTopoHeight())
+    const [err, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
     if (err) return resErr(err)
-    setTopoheight(currentTopoheight)
+    setTopoheight(topoheight)
+
+    if (isHash(id)) {
+      const [err, block] = await to(nodeSocket.daemon.getBlockByHash(id))
+      if (err) return resErr(err)
+      setBlock(block)
+    } else {
+      const height = parseInt(id)
+      const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(height))
+      if (err) return resErr(err)
+      setBlock(block)
+    }
 
     setLoading(false)
   }, [id, nodeSocket])
 
   useEffect(() => {
-    load()
-  }, [load])
+    if (serverResult.loaded) return
+    loadBlock()
+  }, [loadBlock])
 
   const formatBlock = useMemo(() => {
     if (!block) return {}
@@ -127,17 +164,15 @@ function Block() {
     <PageLoading loading={loading} />
     <div>
       <Helmet>
-        <title>Block {(block.topoheight || -1).toString()}</title>
+        <title>Block {(block.topoheight || ``).toString()}</title>
       </Helmet>
       <h1>Block {block.topoheight}</h1>
       {err && <div className="error">{displayError(err)}</div>}
       {!err && <div className="controls">
         <div>
-          {!loading && <>
-            This block was mined on {formatBlock.date} by {formatBlock.miner}.
-            It currently has {formatBlock.confirmations} confirmations.
-            The miner of this block earned {formatBlock.reward}.
-          </>}
+          This block was mined by <strong>{formatBlock.miner}</strong>.
+          It currently has <strong>{formatBlock.confirmations} confirmations</strong>.
+          The miner of this block earned <strong>{formatBlock.reward}</strong>.
         </div>
         <div className="buttons">
           <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>
@@ -145,7 +180,7 @@ function Block() {
             <div>Previous Block</div>
           </Button>}
           {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="arrow-right" iconLocation="right">
-            <div> Next Block</div>
+            <div>Next Block</div>
           </Button>}
         </div>
       </div>}
@@ -163,12 +198,14 @@ function Block() {
           {
             key: 'timestamp',
             title: 'Timestamp',
-            render: (value) => value && `${formatBlock.date} (${block.timestamp})`
+            //render: (value) => value && `${formatBlock.date} (${block.timestamp})`
           },
           {
             key: 'age',
             title: 'Age',
-            render: (_, item) => <Age timestamp={item.timestamp} update  format={{ secondsDecimalDigits: 0 }} />
+            render: (_, item) => {
+              return <Age ssrId="blockAge" timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+            }
           },
           {
             key: 'confirmations',

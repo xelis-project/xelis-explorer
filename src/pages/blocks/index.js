@@ -28,8 +28,8 @@ const style = {
   `
 }
 
-export function loadBlocks_SSR({ limit }) {
-  const defaultResult = { totalBlocks: 0, blocks: [], err: null, loaded: false }
+export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
+  const defaultResult = { totalBlocks: 0, blocks: defaultBlocks, err: null, loaded: false }
 
   return useServerData(`func:loadBlocks`, async () => {
     const result = Object.assign({}, defaultResult)
@@ -121,7 +121,7 @@ function Blocks() {
 
   // load if ssr didn't load
   useEffect(() => {
-    if (!firstRender || serverResult.loaded) return
+    if (serverResult.loaded) return
     loadBlocks()
   }, [loadBlocks])
 

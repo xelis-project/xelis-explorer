@@ -104,7 +104,7 @@ export function RecentStats(props) {
   return <div>
     <div className={style.title}>
       Recent Stats
-      <div>From last {blocks.length} blocks</div>
+      <div>Last {blocks.length} blocks</div>
     </div>
     <div className={style.stats}>
       <div className="items">
@@ -127,7 +127,7 @@ export function RecentStats(props) {
       </div>
       <div className={style.title}>
         Miners Distribution
-        <div>From last {blocks.length} blocks</div>
+        <div>Last {blocks.length} blocks</div>
       </div>
       <div className="distribution">
         <MinersDistribution miners={stats.miners} />

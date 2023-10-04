@@ -13,7 +13,7 @@ import { loadBlocks_SSR } from '../blocks'
 function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
-  const serverResult = loadBlocks_SSR({ limit: 20 })
+  const serverResult = loadBlocks_SSR({ limit: 20, defaultBlocks: [{}, {}, {}, {}, {}, {}, {}, {}, {}] })
 
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()

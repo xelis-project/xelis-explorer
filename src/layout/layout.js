@@ -17,6 +17,7 @@ const style = {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: top center;
+    z-index: -1;
   `,
   // Lagging when resizing so I converted to jpg
   /*
