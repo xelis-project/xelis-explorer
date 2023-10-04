@@ -11,7 +11,7 @@ export function getPaginationRange(pageState) {
 
 export const style = css`
   display: flex;
-  gap: .5em;
+  gap: .7em;
   align-items: center;
   flex-wrap: wrap;
 
@@ -31,11 +31,17 @@ export const style = css`
     padding: .5em 1em;
     font-weight: bold;
     transition: .25s all;
+    background: none;
+    color: var(--text-color);
 
     &.active {
       background-color: var(--text-color);
       color: var(--bg-color);
     }
+  }
+
+  .count {
+    color: var(--muted-color);
   }
 `
 
@@ -97,6 +103,7 @@ function Pagination(props) {
         return items
       })()}
       {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
+      <div className="count">{`${count} ${countText}`}</div>
   </div>
 }
 

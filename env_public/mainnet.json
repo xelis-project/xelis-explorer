@@ -1,4 +1,0 @@
-{
-  "ENV": "mainnet",
-  "NODE_WS_ENDPOINT": "wss://node.xelis.io/ws"
-}

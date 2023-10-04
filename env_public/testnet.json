@@ -1,4 +1,0 @@
-{
-  "ENV": "testnet",
-  "NODE_WS_ENDPOINT": "wss://testnet-node.xelis.io/ws"
-}

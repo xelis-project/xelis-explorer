@@ -9,7 +9,16 @@ export default function useCookie(key, initialValue) {
 
   const [storedValue, setStoredValue] = useState(() => {
     if (server) {
-      const cookieHeader = server.req.headers['cookie'] || ''
+      let cookieHeader = ''
+      const headers = server.req.headers
+      if (typeof headers.get === `function`) {
+        // cf worker https://developers.cloudflare.com/workers/examples/extract-cookie-value
+        cookieHeader = server.req.headers.get('Cookie') || ''
+      } else {
+        // node
+        cookieHeader = server.req.headers['cookie'] || ''
+      }
+
       const cookies = HeaderCookie.parse(cookieHeader || '')
       const data = cookies[key]
       if (data === undefined) return initialValue

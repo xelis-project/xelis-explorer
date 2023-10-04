@@ -126,11 +126,13 @@ function Layout() {
   return <>
     <div className={style.background}>
       <div className="bg" />
-      <div className="noise" />
-      <div className="bg bgl" />
-      <div className="bg bgc" />
-      <div className="bg bgt" />
-      <div className="bg bgbr" />
+      {/*
+        <div className="noise" />
+        <div className="bg bgl" />
+        <div className="bg bgc" />
+        <div className="bg bgt" />
+        <div className="bg bgbr" />
+      */}
     </div>
     <div className={style.container}>
       <div className="node-status">

@@ -2,14 +2,17 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { css } from 'goober'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet-async'
-import TableBody, { style as tableStyle } from '../../components/tableBody'
 import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
+import { daemonRPC } from '../../ssr/nodeRPC'
+import { useServerData } from '../../context/useServerData'
+import useFirstRender from '../../context/useFirstRender'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 const style = {
   container: css`
@@ -25,13 +28,47 @@ const style = {
   `
 }
 
+const defaultResult = { count: 0, blocks: [], err: null, loaded: false }
+
+const fetchBlocksSSR = async () => {
+  const result = Object.assign({}, defaultResult)
+  const [err, res1] = await to(daemonRPC.getTopoHeight())
+  result.err = err
+  if (err) return result
+
+  const topoheight = res1.result
+  // reverse pager range
+  let pagination = getPaginationRange({ page: 1, size: 20 })
+  let startTopoheight = topoheight - pagination.end
+  if (startTopoheight < 0) startTopoheight = 0
+  let endTopoheight = topoheight - pagination.start
+  console.log(pagination, startTopoheight, endTopoheight)
+  const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
+    start_topoheight: startTopoheight,
+    end_topoheight: endTopoheight
+  }))
+  result.err = err2
+  if (err2) return result
+
+  console.log(res2.result.length)
+  result.count = topoheight + 1
+  result.blocks = res2.result.reverse()
+  result.loaded = true
+
+  return result
+}
+
 function Blocks() {
+  const firstRender = useFirstRender()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
-  const [blocks, setBlocks] = useState([])
-  const [count, setCount] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
 
+  const serverResult = useServerData(`result`, async () => {
+    return await fetchBlocksSSR()
+  }, defaultResult)
+
+  const [result, setResult] = useState(serverResult)
   const nodeSocket = useNodeSocket()
 
   const loadBlocks = useCallback(async () => {
@@ -41,7 +78,7 @@ function Blocks() {
     setLoading(true)
 
     const resErr = (err) => {
-      setBlocks([])
+      setResult({ count: 0, blocks: [] })
       setErr(err)
       setLoading(false)
     }
@@ -51,11 +88,10 @@ function Blocks() {
     const [err1, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
     if (err1) return resErr(err1)
 
-    const count = topoheight + 1
     // reverse pager range
-    let startTopoheight = count - pagination.end - 1
+    let startTopoheight = topoheight - pagination.end
     if (startTopoheight < 0) startTopoheight = 0
-    let endTopoheight = count - pagination.start - 1
+    let endTopoheight = topoheight - pagination.start
 
     const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
@@ -63,24 +99,48 @@ function Blocks() {
     }))
     if (err2) return resErr(err2)
 
-    setCount(count)
+    setResult({ count: topoheight + 1, blocks: blocks.reverse() })
     setLoading(false)
-    setBlocks(blocks.reverse())
   }, [pageState, nodeSocket])
 
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: (_, block) => {
+      // don't add new block if we're not on first page
+      if (pageState.page > 1) return
+
+      setResult((result) => {
+        result.blocks.unshift(block)
+        if (result.blocks.length > pageState.size) {
+          result.blocks.pop()
+        }
+
+        result.count++
+        return Object.assign({}, result)
+      })
+    }
+  }, [pageState])
+
+  // load if ssr didn't load
   useEffect(() => {
+    if (!firstRender || result.loaded) return
     loadBlocks()
   }, [loadBlocks])
+
+  // load on pagination change
+  useEffect(() => {
+    if (firstRender) return
+    loadBlocks()
+  }, [pageState])
+
+  const { count, blocks } = result
 
   return <div className={style.container}>
     <Helmet>
       <title>Blocks</title>
     </Helmet>
     <h1>Blocks</h1>
-    <TableFlex
-      err={err}
-      loading={loading}
-      emptyText="No blocks"
+    <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
       headers={[
         {
           key: 'topoheight',
@@ -125,8 +185,6 @@ function Blocks() {
           render: (value) => formatXelis(value)
         }
       ]}
-      data={blocks}
-      rowKey={'topoheight'}
     />
     <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={count} />
   </div>

@@ -9,14 +9,13 @@ const app = express()
 
 app.use(`/public`, express.static(path.join(__dirname, 'public')))
 
-app.use(`*`, (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html;charset=UTF-8' })
-
+app.use(`*`, async (req, res) => {
   const parsedUrl = url.parse(req.baseUrl)
-  let statusCode = 200
-  const html = ssr(req, statusCode, parsedUrl.pathname || '/')
-  res.status(statusCode)
-  res.end(html_beautify(html, { unformatted: [`style`] }))
+  const serverContext = { req, statusCode: 200 }
+  const html = await ssr(serverContext, parsedUrl.pathname || '/')
+
+  res.writeHead(serverContext.statusCode, { 'Content-Type': 'text/html;charset=UTF-8' })
+  res.end(html_beautify(html, { unformatted: [`style`, `script`] }))
 })
 
 const hostname = '127.0.0.1'

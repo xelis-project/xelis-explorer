@@ -7,12 +7,12 @@ const storeSettings = store.namespace(`settings`)
 
 export const settingsKeys = {
   NODE_WS_ENDPOINT: 'node_ws_endpoint',
-  THEME: 'theme'
+  NODE_RPC_ENDPOINT: 'node_rpc_endpoint'
 }
 
 export const defaultSettings = {
   [settingsKeys.NODE_WS_ENDPOINT]: NODE_WS_ENDPOINT,
-  [settingsKeys.THEME]: 'xelis'
+  [settingsKeys.NODE_RPC_ENDPOINT]: NODE_RPC_ENDPOINT
 }
 
 export function SettingsProvider(props) {

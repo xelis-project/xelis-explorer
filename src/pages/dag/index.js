@@ -19,6 +19,7 @@ import useTheme from '../../context/useTheme'
 import BottomInfo from './bottomInfo'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
+import Age from '../../components/age'
 
 const style = {
   container: css`
@@ -31,7 +32,7 @@ const style = {
       overflow: hidden;
       background-color: var(--bg-color);
       opacity: 1;
-      --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef'})};
+      --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef' })};
       background-image:  linear-gradient(var(--bg-line-color) 1px, transparent 1px), linear-gradient(to right, var(--bg-line-color) 1px, var(--bg-color) 1px);
       background-size: 20px 20px;
     }
@@ -380,37 +381,6 @@ function CanvasFrame() {
   return null
 }
 
-
-function LastBlockTime(props) {
-  const { blocks, paused } = props
-  const [lastBlockTime, setLastBlockTime] = useState(0)
-
-  useEffect(() => {
-    if (paused) return
-
-    const intervalId = setInterval(() => {
-      setLastBlockTime(v => v += 1000)
-    }, [1000])
-
-    let last = 0
-    if (blocks && blocks.length > 0) {
-      last = new Date().getTime() - blocks[0].timestamp
-    }
-
-    setLastBlockTime(last)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [blocks, paused])
-
-  if (paused) return <div>Paused</div>
-
-  return <div>
-    Last block {prettyMs(lastBlockTime, { secondsDecimalDigits: 0 })} ago
-  </div>
-}
-
 function DAG() {
   const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
@@ -598,7 +568,12 @@ function DAG() {
     <div className="status">
       <NodeStatus />
       <div>
-        {blocks.length > 0 && <LastBlockTime blocks={blocks} paused={offCanvasTable.paused} />}
+        {(blocks.length > 0 && !offCanvasTable.paused) && <>
+          Last block&nbsp;
+          <Age timestamp={blocks[0].timestamp} update format={{ secondsDecimalDigits: 0 }} />
+          &nbsp;ago
+        </>}
+        {offCanvasTable.paused && `Paused`}
       </div>
     </div>
     <div className="controls">

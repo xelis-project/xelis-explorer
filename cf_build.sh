@@ -1,3 +1,3 @@
 # !/bin/bash
 
-npm run build:$CF_PAGES_BRANCH
+npm run build-cf:$CF_PAGES_BRANCH

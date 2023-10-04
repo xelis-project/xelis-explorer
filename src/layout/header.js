@@ -57,9 +57,9 @@ const style = {
       gap: .25em;
       z-index: 1;
       font-size: 1.2em;
+      opacity: 0;
+      transform: translateY(-100%);
       transition: all .25s;
-      transform: translateY(0);
-      opacity: 1;
       box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
 
       ${theme.query.minDesktop} {
@@ -69,9 +69,9 @@ const style = {
         left: inherit;
       }
 
-      &.closed {
-        opacity: 0;
-        transform: translateY(-100%);
+      &.opened {
+        transform: translateY(0);
+        opacity: 1;
       }
 
       .item {
@@ -164,7 +164,7 @@ function Header(props) {
       <button className="button" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
         <Icon name="bars" />
       </button>
-      <div className={`container ${menuOpen ? `` : `closed`}`}>
+      <div className={`container ${menuOpen ? `opened` : ``}`}>
         {links.map((item) => {
           return <NavLink key={item.path} to={item.path}
             className={item.className}>

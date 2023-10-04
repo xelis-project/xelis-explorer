@@ -1,4 +1,0 @@
-{
-  "ENV": "dev",
-  "NODE_WS_ENDPOINT": "wss://dev-node.xelis.io/ws"
-}

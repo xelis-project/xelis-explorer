@@ -17,12 +17,17 @@ const style = {
 
     .form-input {
       display: flex;
-      gap: 1em;
       flex-direction: column;
 
       label {
         font-weight: bold;
         font-size: 1.2em;
+        margin-bottom: 0.25em;
+      }
+
+      span {
+        color: var(--muted-color);
+        margin-bottom: 0.5em;
       }
 
       input {
@@ -34,6 +39,7 @@ const style = {
         background-color: ${theme.apply({ xelis: `var(--text-color)`, dark: `var(--text-color)`, light: `var(--bg-color)` })};
         color: ${theme.apply({ xelis: `var(--bg-color)`, dark: `var(--bg-color)`, light: `var(--text-color)` })};
         box-shadow: inset 3px 3px 5px 0px #a5a5a5;
+        margin-bottom: 1em;
       }
 
       .buttons {
@@ -76,6 +82,7 @@ function Settings() {
     <h1>Settings</h1>
     <div className="form-input">
       <label>Node Endpoint</label>
+      <span>Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.</span>
       <input type="text" value={nodeEnpoint} onChange={(e) => {
         setNodeEndpoint(e.target.value)
       }} placeholder="wss://127.0.0.1/ws" />

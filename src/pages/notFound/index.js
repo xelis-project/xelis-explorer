@@ -1,6 +1,7 @@
 import { css } from 'goober'
 import { Helmet } from 'react-helmet-async'
 import Button from '../../components/button'
+import useServer from '../../context/useServer'
 
 const style = {
   container: css`
@@ -29,7 +30,7 @@ const style = {
     }
 
     p {
-      margin: 1em 0;
+      margin: 1em 0 2em 0;
       color: var(--muted-color);
     }
 
@@ -49,6 +50,11 @@ const style = {
 }
 
 function NotFound() {
+  const server = useServer()
+  if (server) {
+    server.statusCode = 400
+  }
+
   return <div className={style.container}>
     <Helmet>
       <title>404 | Page not found</title>

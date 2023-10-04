@@ -1,4 +1,5 @@
 import { css, glob } from 'goober'
+
 import theme from './theme'
 
 export const typography = css`
@@ -26,7 +27,6 @@ glob`
     overflow-x: hidden;
     background: var(--bg-color);
     color: var(--text-color);
-    transition: all .25s;
     min-width: 320px;
     font-size: 16px;
     height: 100%;

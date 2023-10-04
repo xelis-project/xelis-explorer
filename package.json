@@ -3,29 +3,29 @@
   "version": "0.2.0",
   "description": "Official Explorer for XELIS Blockchain.",
   "scripts": {
-    "start": "concurrently \"npm run build:local_dev\" \"npm run serve\"",
-    "start:testnet": "concurrently \"npm run build:local_testnet\" \"npm run serve\"",
-    "serve": "live-server ./public --port=9999 --entry-file=index.html",
-    "build-dev:index": "node bundle.js -b index --env=local_dev --watch --sourcemap",
-    "build-dev:cf": "node bundle.js -b cf_worker --env=local_dev --watch --sourcemap",
-    "build-dev:node": "node bundle.js -b node_server --env=local_dev --watch --sourcemap",
-    "build:dev": "node bundle.js --env=dev --sourcemap",
-    "build:local_testnet": "node bundle.js --env=testnet --watch --sourcemap",
-    "build:testnet": "node bundle.js --env=testnet --minify",
-    "build:mainnet": "node bundle.js --env=mainnet --minify"
+    "build-dev:index": "node bundle.js -b index --watch --sourcemap",
+    "start-dev:index": "live-server ./dist/index --port=3001 --entry-file=index.html",
+    "build-dev:cf": "node bundle.js -b cf_worker --watch --sourcemap",
+    "start-dev:cf": "npx wrangler pages dev ./dist/cf --port=3000 --live-reload",
+    "build-dev:node": "node bundle.js -b node_server --watch --sourcemap",
+    "start-dev:node": "node-dev ./dist/node_server/node_server.js --notify=false",
+    "build-prod:index": "node bundle.js -b index --minify",
+    "build-prod:node": "node bundle.js -b node_server --minify",
+    "build-prod:cf": "node bundle.js -b cf_worker --minify",
+    "build-cf:dev-pages": "npm run build-prod:cf -- --env ./cf_env/dev.json",
+    "build-cf:testnet-pages": "npm run build-prod:cf -- --env ./cf_env/testnet.json",
+    "build-cf:mainnet-pages": "npm run build-prod:cf -- --env ./cf_env/mainnet.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
-    "@supabase/supabase-js": "^2.10.0",
     "@xelis/sdk": "^0.3.0",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
     "bytes": "^3.1.2",
     "chart.js": "^4.2.1",
     "classnames": "^2.3.2",
-    "concurrently": "^7.6.0",
     "cookie": "^0.5.0",
     "express": "^4.18.2",
     "framer-motion-3d": "^10.1.0",
@@ -42,17 +42,16 @@
     "react-router-dom": "^6.7.0",
     "reset-css": "^5.0.1",
     "store2": "^2.14.2",
-    "three": "^0.150.1",
-    "wrangler": "^3.10.1"
+    "three": "^0.150.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.13",
     "esbuild": "^0.17.10",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-style-plugin": "^1.6.1",
+    "node-dev": "^8.0.0",
     "postcss": "^8.4.21",
-    "postcss-import": "^15.1.0",
-    "serve": "^14.2.0",
+    "wrangler": "^3.10.1",
     "yargs": "^17.7.0"
   }
 }

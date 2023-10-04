@@ -4,7 +4,10 @@ import prettyMs from 'pretty-ms'
 function Age(props) {
   const { timestamp, ms = 1000, format = { compact: true }, update = false } = props
 
-  const [age, setAge] = useState(0)
+  const [age, setAge] = useState(() => {
+    return new Date().getTime() - (timestamp || 0)
+  })
+
   useEffect(() => {
     if (!timestamp) return
 

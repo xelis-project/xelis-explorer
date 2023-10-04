@@ -29,7 +29,8 @@ const argv = yargs(process.argv)
   })
   .option(`env`, {
     alias: `e`,
-    type: `string`
+    type: `string`,
+    default: `./env.json`
   }).parse()
 
 const sourcemap = argv.sourcemap ? `inline` : false
@@ -79,7 +80,7 @@ const copyIndexHtml = () => {
 }
 
 const defineEnv = () => {
-  const envData = fs.readFileSync(`./env_public/${argv.env}.json`, { encoding: `utf-8` })
+  const envData = fs.readFileSync(argv.env, { encoding: `utf-8` })
   const env = JSON.parse(envData)
   Object.keys(env).forEach((key) => {
     const value = env[key]
@@ -100,7 +101,7 @@ const build = async (options) => {
     })
 
     // save bundle to analyze here https://esbuild.github.io/analyze/
-    fs.writeFileSync(path.join(outdir, 'meta.json'), JSON.stringify(result.metafile))
+    fs.writeFileSync(path.join(options.outdir, 'meta.json'), JSON.stringify(result.metafile))
   }
 }
 

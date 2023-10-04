@@ -36,6 +36,10 @@ const style = {
       margin-bottom: 2em;
       gap: 1em;
 
+      > :nth-child(1) {
+        color: var(--muted-color);
+      }
+
       ${theme.query.minDesktop} {
         flex-direction: row;
         align-items: start;

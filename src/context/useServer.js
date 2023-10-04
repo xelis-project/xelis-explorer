@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-const Context = createContext(null) // { req, statusCode }
+const Context = createContext() // { req, statusCode }
 
 export default () => useContext(Context)
 
