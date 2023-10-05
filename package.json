@@ -12,9 +12,9 @@
     "build-prod:index": "node bundle.js -b index --minify",
     "build-prod:node": "node bundle.js -b node_server --minify",
     "build-prod:cf": "node bundle.js -b cf_worker --minify",
-    "build-cf:dev-pages": "npm run build-dev:cf -- --env ./env/dev.json",
-    "build-cf:testnet-pages": "npm run build-prod:cf -- --env ./env/testnet.json",
-    "build-cf:mainnet-pages": "npm run build-prod:cf -- --env ./env/mainnet.json",
+    "build-cf:dev-pages": "npm run build-dev:cf -- --env ./env/cf_dev.json",
+    "build-cf:testnet-pages": "npm run build-prod:cf -- --env ./env/cf_testnet.json",
+    "build-cf:mainnet-pages": "npm run build-prod:cf -- --env ./env/cf_mainnet.json",
     "build": "npm run build-dev:cf",
     "start": "npm run start-dev:cf"
   },
