@@ -2,23 +2,41 @@
 
 Official Explorer for XELIS Blockchain.
 
-- Realtime statistics with web sockets
-- Navigate all blocks of the entire blockchain
-- Live mempool
-- BlockDAG viewer
-
 <https://explorer.xelis.io>  
-<https://testnet-explorer.xelis.io>  
-<https://dev-explorer.xelis.io>  
 
-## Scripts
+- Realtime statistics with WebSockets.
+- Navigate all blocks of the entire blockchain (if node isn't pruned).
+- Live mempool.
+- BlockDAG viewer.
 
-`npm start`  
-Use this for development.  
-Run http server, watch and build files automatically.  
+Testnet: <https://testnet-explorer.xelis.io>  
+Dev: <https://dev-explorer.xelis.io>  
 
-`npm run build:local_dev`  
-Build js, css files to `/public/dist` with esbuild.  
-Use `npm run build:dev` for cf dev branch (keeps sourcemap).  
-Use `npm run build:testnet` for cf testnet branch (keeps sourcemap).  
-Use `npm run build:mainnet` for cf mainnet branch (remove sourcemaps and minify code).  
+## Development
+
+Open two terminal and run package scripts.
+
+`npm run build` and `npm start` (defaults to wrangler, check other ways below)
+
+This will start a http server, watch and build files automatically.  
+For environment variables, it will create a `env.json` file and default to XELIS daemon on localhost. Modify it to point to your specific endpoints.  
+
+Using cloudflare wrangler:  
+`npm run build-dev:cf` and `npm run start-cf:node`
+
+Using node server:  
+`npm run build-dev:node` and `npm run start-dev:node`
+
+Using index (no ssr, use browser to load html):  
+`npm run build-dev:index` and `npm run start-dev:index`
+
+## Production
+
+Pushing branch `dev-pages`, `testnet-pages` or `mainnet-pages`
+will automatically build and deploy to cloudflare.
+
+Build for your own node server:  
+`npm run build-prod:node` and run `node ./dist/node_server/node_server.js`.
+
+Build the single page app (no ssr):  
+`npm run build-prod:index` and check the `./dist/index` folder the `index.html` file.

@@ -6,6 +6,8 @@ const autoprefixer = require('autoprefixer')
 const path = require('path')
 const { copy } = require('esbuild-plugin-copy')
 
+const localDevEnvPath = `./env.json`
+
 const argv = yargs(process.argv)
   .option(`build`, {
     alias: `b`,
@@ -30,7 +32,7 @@ const argv = yargs(process.argv)
   .option(`env`, {
     alias: `e`,
     type: `string`,
-    default: `./env.json`
+    default: localDevEnvPath
   }).parse()
 
 const sourcemap = argv.sourcemap ? `inline` : false
@@ -77,6 +79,16 @@ const copyIndexHtml = () => {
     },
     watch: argv.watch,
   })
+}
+
+const createLocalDevEnv = () => {
+  if (argv.env === localDevEnvPath) {
+    if (!fs.existsSync(localDevEnvPath)) {
+      const sourceEnvData = fs.readFileSync(`./env/local_dev.json`, { encoding: `utf-8` })
+      fs.writeFileSync(argv.env, sourceEnvData, `utf-8`)
+      console.log(`The local env file was created.`)
+    }
+  }
 }
 
 const defineEnv = () => {
@@ -223,6 +235,8 @@ const buildIndex = () => {
 }
 
 const main = async () => {
+  createLocalDevEnv()
+
   if (argv.build === `index`) {
     buildIndex()
   }

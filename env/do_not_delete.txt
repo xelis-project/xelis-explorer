@@ -1,0 +1,1 @@
+These environment variables are public and should not include any sensitive information.
