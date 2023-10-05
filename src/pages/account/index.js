@@ -38,8 +38,9 @@ function loadAccount_SSR({ addr }) {
     }))
     result.err = err
     if (err) return result
-    
+
     result.account = res.result
+    result.loaded = true
     return result
   }, defaultResult)
 }

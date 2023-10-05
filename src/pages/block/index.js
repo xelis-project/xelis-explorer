@@ -272,13 +272,18 @@ function Block() {
           {
             key: 'tips',
             title: 'Tips',
-            render: (value) => <>
-              {(value || []).map((tip, index) => {
-                return <div key={tip}>
-                  {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
-                </div>
-              })}
-            </>
+            render: (value) => {
+              const tips = value || []
+              if (tips.length === 0) return 'No tips. This is most likely the genesis block.'
+
+              return <>
+                {tips.map((tip, index) => {
+                  return <div key={tip}>
+                    {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
+                  </div>
+                })}
+              </>
+            }
           },
         ]}
         data={[block]}

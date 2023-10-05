@@ -23,7 +23,7 @@ const style = {
       cursor: pointer;
     }
 
-    table .topoheight {
+    table .height {
       font-size: .7em;
     }
   `,
@@ -82,13 +82,13 @@ const style = {
 }
 
 function HeightRangeInput(props) {
-  const { height, inputHeight, setInputHeight, paused } = props
+  const { height, inputHeight, setInputHeight } = props
   const [_value, setValue] = useState()
 
   let value = _value ? _value : inputHeight || 0
 
   return <div>
-    <div>Height: {value}</div>
+    <div>Height: {value}</div> 
     <input type="range" value={value} step={1}
       onChange={(e) => setValue(e.target.valueAsNumber)}
       onMouseUp={() => {
@@ -162,7 +162,7 @@ function useOffCanvasTable(props) {
       <table>
         <thead>
           <tr>
-            <th>Height</th>
+            <th>Topo Height</th>
             <th>Type</th>
             <th>Hash</th>
             <th>Txs</th>
@@ -175,8 +175,8 @@ function useOffCanvasTable(props) {
             const blockType = getBlockType(block, stableHeight)
             return <tr key={block.hash} onClick={() => onBlockClick(block)}>
               <td>
-                <span title="Height">{block.height}</span>&nbsp;
-                {block.topoheight && <span title="Topo Height" className="topoheight">({block.topoheight})</span>}
+                <span>{block.topoheight}</span>&nbsp;
+                <span title="Height" className="height">({block.height})</span>&nbsp;
               </td>
               <td style={{ color: blockColor.value(currentTheme, blockType) }}>
                 {blockType}

@@ -39,8 +39,9 @@ export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
 
     const topoheight = res1.result
 
-    let startTopoheight = topoheight - limit + 1
+    let startTopoheight = Math.max(0, topoheight - limit + 1)
     let endTopoheight = topoheight
+
     const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight
@@ -86,8 +87,7 @@ function Blocks() {
     if (err1) return resErr(err1)
 
     // reverse pager range
-    let startTopoheight = topoheight - pagination.end
-    if (startTopoheight < 0) startTopoheight = 0
+    let startTopoheight = Math.max(0, topoheight - pagination.end)
     let endTopoheight = topoheight - pagination.start
 
     const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
