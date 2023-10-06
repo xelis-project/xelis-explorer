@@ -11,7 +11,7 @@ import Pagination, { getPaginationRange, style as paginationStyle } from '../../
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
-import useFirstRender from '../../context/useFirstRender'
+import { usePageLoad } from '../../context/usePageLoad'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 const style = {
@@ -58,7 +58,7 @@ export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
 }
 
 function Blocks() {
-  const firstRender = useFirstRender()
+  const { firstPageLoad } = usePageLoad()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
@@ -119,15 +119,19 @@ function Blocks() {
     }
   }, [pageState])
 
-  // load if ssr didn't load
-  useEffect(() => {
-    if (serverResult.loaded) return
-    loadBlocks()
-  }, [loadBlocks])
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: (_, block) => {
+      console.log('newblock')
+    }
+  }, [pageState])
 
-  // load on pagination change
   useEffect(() => {
-    if (firstRender) return
+    if (firstPageLoad && serverResult.loaded) return
+    loadBlocks()
+  }, [loadBlocks, firstPageLoad])
+
+  useEffect(() => {
     loadBlocks()
   }, [pageState])
 

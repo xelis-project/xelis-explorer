@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
+import { useMemo } from 'react'
 
 import Age from '../../components/age'
-import { formatSize, formatXelis, reduceText } from '../../utils'
+import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
 import { bounceIn, slideRight } from '../../style/animate'
 
@@ -103,26 +104,30 @@ const style = {
 }
 
 export function RecentBlocks(props) {
-  const { blocks } = props
+  const { blocks, newBlock } = props
 
-  const animateBlock = ''
+  const newBlockHash = useMemo(() => {
+    if (newBlock) return newBlock.hash
+    return ``
+  }, [newBlock])
+
   return <div>
     <div className={style.title}>Recent Blocks</div>
-    <div className={`${style.items} ${!animateBlock ? `no-animation` : ``}`}>
+    <div className={`${style.items} ${!newBlockHash ? `no-animation` : ``}`}>
       {blocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
-        return <Link to={`/blocks/${block.hash}`} key={key} className={`item ${animateBlock == block.hash ? `animate` : ``}`}>
-            <div className="title">Block {block.topoheight}</div>
-            <div className="value">{txCount} txs | {size}</div>
-            <div className="miner">{reduceText(block.miner, 0, 7) || '--'}</div>
-            <div className="time">
-              {block.timestamp ?
-                <Age ssrId={key} timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
-                : '--'}
-            </div>
-          </Link>
+        return <Link to={`/blocks/${block.hash}`} key={key} className={`item ${newBlockHash == block.hash ? `animate` : ``}`}>
+          <div className="title">Block {block.topoheight}</div>
+          <div className="value">{txCount} txs | {size}</div>
+          <div className="miner">{reduceText(block.miner, 0, 7) || '--'}</div>
+          <div className="time">
+            {block.timestamp ?
+              <Age ssrId={key} timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+              : '--'}
+          </div>
+        </Link>
       })}
     </div>
   </div>

@@ -8,7 +8,7 @@ import { css } from 'goober'
 import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
-import useFirstRender from '../../context/useFirstRender'
+import { usePageLoad } from '../../context/usePageLoad'
 
 const style = {
   container: css`
@@ -43,6 +43,7 @@ function loadAccounts_SSR({ limit }) {
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
+  const { firstPageLoad } = usePageLoad()
   const serverResult = loadAccounts_SSR({ limit: 20 })
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
@@ -66,10 +67,9 @@ function Accounts() {
   }, [nodeSocket])
 
   useEffect(() => {
-    if (serverResult.loaded) return
-
+    if (firstPageLoad && serverResult.loaded) return
     loadAccounts()
-  }, [loadAccounts])
+  }, [loadAccounts, firstPageLoad])
 
   return <div className={style.container}>
     <Helmet>
