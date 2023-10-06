@@ -67,6 +67,7 @@ const style = {
           overflow: hidden;
           font-weight: bold;
           white-space: nowrap;
+          transition: all .25s;
         }
       }
     }

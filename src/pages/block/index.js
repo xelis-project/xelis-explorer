@@ -16,6 +16,7 @@ import TableFlex from '../../components/tableFlex'
 import Age from '../../components/age'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
+import { usePageLoad } from '../../context/usePageLoad'
 
 const style = {
   container: css`
@@ -114,6 +115,7 @@ function Block() {
 
   const nodeSocket = useNodeSocket()
 
+  const { firstPageLoad } = usePageLoad()
   const serverResult = loadBlock_SSR({ id })
 
   const [err, setErr] = useState()
@@ -151,9 +153,9 @@ function Block() {
   }, [id, nodeSocket])
 
   useEffect(() => {
-    if (serverResult.loaded) return
+    if (firstPageLoad && serverResult.loaded) return
     loadBlock()
-  }, [loadBlock])
+  }, [loadBlock, firstPageLoad])
 
   const formatBlock = useMemo(() => {
     if (!block) return {}

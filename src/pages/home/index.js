@@ -18,6 +18,7 @@ function useRecentBlocks() {
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
   const [blocks, setBlocks] = useState(serverResult.blocks)
+  const [newBlock, setNewBlock] = useState()
 
   const loadRecentBlocks = useCallback(async () => {
     if (!nodeSocket.connected) return
@@ -53,7 +54,7 @@ function useRecentBlocks() {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
         return [newBlock, ...blocks]
       })
-      //setAnimateBlock(newBlock.hash)
+      setNewBlock(newBlock)
     }
   }, [])
 
@@ -78,18 +79,18 @@ function useRecentBlocks() {
     }
   }, [blocks])
 
-  return { err, loading, blocks }
+  return { err, loading, blocks, newBlock }
 }
 
 function Home() {
-  const { blocks } = useRecentBlocks()
+  const { blocks, newBlock } = useRecentBlocks()
 
   return <div>
     <Helmet>
       <title>Home</title>
     </Helmet>
     <ExplorerSearch />
-    <RecentBlocks blocks={blocks} />
+    <RecentBlocks blocks={blocks} newBlock={newBlock} />
     <RecentStats blocks={blocks} />
     <NetworkStats blocks={blocks} />
   </div>

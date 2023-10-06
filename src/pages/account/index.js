@@ -11,6 +11,7 @@ import { XELIS_ASSET, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
+import { usePageLoad } from '../../context/usePageLoad'
 
 const style = {
   container: css`
@@ -50,6 +51,7 @@ function Account() {
 
   const nodeSocket = useNodeSocket()
 
+  const { firstPageLoad } = usePageLoad()
   const serverResult = loadAccount_SSR({ addr })
 
   const [loading, setLoading] = useState(false)
@@ -78,7 +80,7 @@ function Account() {
   }, [addr, nodeSocket])
 
   useEffect(() => {
-    if (serverResult.loaded) return
+    if (firstPageLoad && serverResult.loaded) return
     loadAccount()
   }, [loadAccount])
 

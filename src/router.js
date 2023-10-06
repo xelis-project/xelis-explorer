@@ -1,5 +1,6 @@
-import { createBrowserRouter, createMemoryRouter, RouterProvider, ScrollRestoration } from 'react-router-dom'
+import { createBrowserRouter, createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
 
+import { PageLoadProvider } from './context/usePageLoad'
 import Layout from './layout/layout'
 
 import Block from './pages/block'
@@ -15,6 +16,9 @@ import Accounts from './pages/accounts'
 
 const routes = [
   {
+    element: <PageLoadProvider>
+      <Outlet />
+    </PageLoadProvider>,
     children: [
       {
         element: <Layout />,

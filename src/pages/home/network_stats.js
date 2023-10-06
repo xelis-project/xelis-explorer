@@ -13,7 +13,6 @@ import Chart from '../../components/chart'
 import { useTheme } from '../../context/useTheme'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
-import useFirstRender from '../../context/useFirstRender'
 
 theme.xelis`
   --stats-bg-color: rgb(14 30 32 / 70%);
@@ -147,9 +146,9 @@ function MiniChart(props) {
   return <Chart config={chartConfig} className="chart" />
 }
 
-function loadSSR() {
+function loadNetworkStats_SSR() {
   const defaultResult = { err: null, info: {}, loaded: false }
-  return useServerData(`network_stats`, async () => {
+  return useServerData(`func:loadNetworkStats`, async () => {
     const result = Object.assign({}, defaultResult)
     const [err, res1] = await to(daemonRPC.getInfo())
     result.err = err
@@ -162,18 +161,19 @@ function loadSSR() {
 }
 
 export function NetworkStats(props) {
-  const { blocks = [] } = props
+  const { blocks } = props
   const nodeSocket = useNodeSocket()
 
-  const serverResult = loadSSR()
+  const serverResult = loadNetworkStats_SSR()
 
-  const firstRender = useFirstRender()
   const [info, setInfo] = useState(serverResult.info)
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
   const { theme: currentTheme } = useTheme()
 
   const loadInfo = useCallback(async () => {
+    if (!nodeSocket.connected) return
+
     const resErr = (err) => {
       setInfo({})
       setErr(err)
@@ -187,17 +187,9 @@ export function NetworkStats(props) {
     setLoading(false)
   }, [nodeSocket])
 
-  // load if ssr didn't load
   useEffect(() => {
-    if (serverResult.loaded) return
     loadInfo()
-  }, [loadInfo])
-
-  // reload info stats every new block
-  useEffect(() => {
-    if (firstRender) return
-    loadInfo()
-  }, [blocks])
+  }, [blocks, loadInfo])
 
   useNodeSocketSubscribe({
     event: RPCEvent.TransactionAddedInMempool,
