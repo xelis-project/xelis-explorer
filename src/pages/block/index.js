@@ -82,7 +82,7 @@ function isHash(id) {
 
 function loadBlock_SSR({ id }) {
   const defaultResult = { loaded: false, err: null, block: {}, topoheight: 0 }
-  return useServerData(`func:loadBlock`, async () => {
+  return useServerData(`func:loadBlock(${id})`, async () => {
     const result = Object.assign({}, defaultResult)
 
     const [err1, res2] = await to(daemonRPC.getTopoHeight())

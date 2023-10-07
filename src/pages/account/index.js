@@ -7,11 +7,12 @@ import { css } from 'goober'
 import { Link } from 'react-router-dom'
 
 import TableFlex from '../../components/tableFlex'
-import { XELIS_ASSET, formatXelis, reduceText } from '../../utils'
+import { XELIS_ASSET, formatAsset, formatAssetName, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
+import Icon from '../../components/icon'
 
 const style = {
   container: css`
@@ -26,12 +27,17 @@ const style = {
       font-weight: bold;
       font-size: 1.5em;
     }
+
+    .data-info {
+      margin-top: 1em;
+      color: var(--muted-color);
+    }
   `
 }
 
 function loadAccount_SSR({ addr }) {
   const defaultResult = { loaded: false, err: null, account: {} }
-  return useServerData(`func:loadAccount`, async () => {
+  return useServerData(`func:loadAccount(${addr})`, async () => {
     const result = Object.assign({}, defaultResult)
     const [err, res] = await to(daemonRPC.getLastBalance({
       address: addr,
@@ -119,9 +125,14 @@ function History(props) {
 
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
-  const [history, setHistory] = useState([])
+  const [minedBlocks, setMinedBlocks] = useState([])
+  const [transactions, setTransactions] = useState([])
+  const [transfers, setTransfers] = useState([])
 
-  const loadHistory = useCallback(async () => {
+  const max = 5
+
+  const loadData = useCallback(async () => {
+    if (!nodeSocket.connected) return
     if (!account.balance) return
 
     setLoading(true)
@@ -131,17 +142,14 @@ function History(props) {
       setLoading(false)
     }
 
-    const max = 5
-    let topoheight = account.balance.previous_topoheight
-    if (!topoheight) return resErr(null)
+    const minedBlocks = []
+    const transactions = []
+    const transfers = []
+    let topoheight = account.topoheight
 
-    const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({ 
-      topoheight: account.topoheight
-    }))
-    if (err) return resErr(err)
-
-    const history = [{ balance: account.balance.balance, topoheight: account.topoheight, block }]
     for (let i = 0; i < max; i++) {
+      if (!topoheight) break
+
       const [err, result] = await to(nodeSocket.daemon.getBalanceAtTopoHeight({
         address: addr,
         asset: XELIS_ASSET,
@@ -150,26 +158,58 @@ function History(props) {
       if (err) return resErr(err)
 
       const [err2, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
-        topoheight: topoheight
+        topoheight: topoheight,
+        include_txs: true
       }))
       if (err2) return resErr(err2)
 
       topoheight = result.previous_topoheight
-      history.push({ balance: result.balance, topoheight, block })
+
+      if (block.miner === addr) {
+        minedBlocks.push(block)
+      }
+
+      if (block.txs_hashes.length > 0) {
+        const [err3, txs] = await to(nodeSocket.daemon.getTransactions(block.txs_hashes))
+        if (err3) return resErr(err3)
+
+        txs.forEach((tx) => {
+          const txTransfers = tx.data.transfers || []
+
+          if (tx.owner === addr) {
+            transactions.push({ tx, block })
+
+            txTransfers.forEach((transfer => {
+              transfers.push({ tx, block, transfer, type: 'send' })
+            }))
+          } else {
+            txTransfers.forEach((transfer => {
+              if (transfer.to === addr) {
+                transfers.push({ tx, block, transfer, type: 'receive' })
+              }
+            }))
+          }
+        })
+      }
     }
 
-    setHistory(history)
+    setMinedBlocks(minedBlocks)
+    setTransactions(transactions)
+    setTransfers(transfers)
     setLoading(false)
-  }, [addr, account])
+  }, [addr, account, nodeSocket])
 
   useEffect(() => {
-    loadHistory()
-  }, [loadHistory])
+    loadData()
+  }, [loadData])
 
   return <div>
-    <h2>History</h2>
+    <div className="data-info">
+      The data below is from the last {max} blocks with account balance changes.
+    </div>
+    <h2>Mined Blocks</h2>
     <TableFlex loading={loading} err={err} rowKey="topoheight"
-      emptyText="No history"
+      emptyText="No mined blocks"
       headers={[
         {
           key: "topoheight",
@@ -181,42 +221,68 @@ function History(props) {
         {
           key: "hash",
           title: "Hash",
-          render: (_, item) => {
-            const { block } = item
-            return <Link to={`/blocks/${block.hash}`}>
-              {reduceText(block.hash)}
+          render: (value) => {
+            return <Link to={`/blocks/${value}`}>
+              {reduceText(value)}
             </Link>
           }
         },
         {
-          key: "balance",
-          title: "Balance",
-          render: (value, _, index) => {
-            let previousBalance = null
-            if (history[index + 1]) {
-              previousBalance = history[index + 1].balance
-            }
-
-            let diff = ``
-            if (previousBalance) {
-              if (value > previousBalance) {
-                diff = `+${formatXelis(value - previousBalance, { withSuffix: false })}`
-              }
-
-              if (value < previousBalance) {
-                diff = `-${formatXelis(previousBalance - value, { withSuffix: false })}`
-              }
-            }
-
-            return `${formatXelis(value)} ${diff} `
+          key: "reward",
+          title: "Reward",
+          render: (value) => {
+            return `${formatXelis(value)}`
           }
         },
         {
-          key: "miner",
-          title: "Miner",
+          key: "timestamp",
+          title: "Age",
+          render: (value) => {
+            return <Age timestamp={value} />
+          }
+        }
+      ]} data={minedBlocks} />
+    <h2>Transactions</h2>
+    <TableFlex loading={loading} err={err} rowKey={({ tx }) => tx.hash}
+      emptyText="No transactions"
+      headers={[
+        {
+          key: "topoheight",
+          title: "Topo Height",
           render: (_, item) => {
             const { block } = item
-            return block.miner === addr ? `Yes` : `No`
+            return <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
+          }
+        },
+        {
+          key: "hash",
+          title: "Hash",
+          render: (_, item) => {
+            const { tx } = item
+            return <Link to={`/txs/${tx.hash}`}>
+              {reduceText(tx.hash)}
+            </Link>
+          }
+        },
+        {
+          key: "transfer",
+          title: "Transfers / Burns",
+          render: (_, item) => {
+            const { tx } = item
+
+            const transfers = tx.data.transfers || []
+            let burns = []
+            if (tx.data.burn) burns = [tx.data.burn]
+
+            return `${transfers.length} / ${burns.length}`
+          }
+        },
+        {
+          key: "fee",
+          title: "Fee",
+          render: (_, item) => {
+            const { tx } = item
+            return formatXelis(tx.fee)
           }
         },
         {
@@ -227,6 +293,61 @@ function History(props) {
             return <Age timestamp={block.timestamp} />
           }
         }
-      ]} data={history} />
+      ]} data={transactions} />
+    <h2>Transfers</h2>
+    <TableFlex loading={loading} err={err} rowKey={({ tx }) => tx.hash}
+      emptyText="No transfers"
+      headers={[
+        {
+          key: "type",
+          title: "Type",
+          render: (value) => {
+            switch (value) {
+              case "send":
+                return <><Icon name="arrow-up" />&nbsp;&nbsp;SEND</>
+              case "receive":
+                return <><Icon name="arrow-down" />&nbsp;&nbsp;RECEIVE</>
+              default:
+                return null
+            }
+          }
+        },
+        {
+          key: "hash",
+          title: "Hash",
+          render: (_, item) => {
+            const { tx } = item
+            return <Link to={`/txs/${tx.hash}`}>
+              {reduceText(tx.hash)}
+            </Link>
+          }
+        },
+        {
+          key: "recipient",
+          title: "Recipient",
+          render: (_, item) => {
+            const { transfer } = item
+            return <Link to={`/accounts/${transfer.to}`}>
+              {reduceText(transfer.to)}
+            </Link>
+          }
+        },
+        {
+          key: "asset",
+          title: "Asset",
+          render: (_, item) => {
+            const { transfer } = item
+            return formatAssetName(transfer.asset)
+          }
+        },
+        {
+          key: "amount",
+          title: "Amount",
+          render: (_, item) => {
+            const { transfer } = item
+            return formatAsset(transfer.amount, transfer.asset)
+          }
+        },
+      ]} data={transfers} />
   </div>
 }

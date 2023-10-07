@@ -31,7 +31,7 @@ const style = {
 export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
   const defaultResult = { totalBlocks: 0, blocks: defaultBlocks, err: null, loaded: false }
 
-  return useServerData(`func:loadBlocks`, async () => {
+  return useServerData(`func:loadBlocks(${limit})`, async () => {
     const result = Object.assign({}, defaultResult)
     const [err, res1] = await to(daemonRPC.getTopoHeight())
     result.err = err
@@ -44,7 +44,7 @@ export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
 
     const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
-      end_topoheight: endTopoheight
+      end_topoheight: endTopoheight,
     }))
     result.err = err2
     if (err2) return result
