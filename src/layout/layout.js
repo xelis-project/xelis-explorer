@@ -1,10 +1,11 @@
-import { Outlet } from 'react-router'
+import { Outlet, useLocation } from 'react-router'
 import { css } from 'goober'
 
 import Header from './header'
 import Footer from './footer'
 import NodeStatus from '../layout/node_status'
 import theme from '../style/theme'
+import { opacity } from '../style/animate'
 
 const style = {
   background: css`
@@ -99,6 +100,10 @@ const style = {
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
+
+      .outlet {
+        ${opacity()}
+      }
     }
 
     .node-status {
@@ -124,6 +129,8 @@ const style = {
 }
 
 function Layout() {
+  const location = useLocation()
+
   return <>
     <div className={style.background}>
       <div className="bg" />
@@ -142,7 +149,9 @@ function Layout() {
       <div className="layout-flex">
         <div>
           <Header />
-          <Outlet />
+          <div className="outlet" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
+            <Outlet />
+          </div>
         </div>
         <Footer />
       </div>

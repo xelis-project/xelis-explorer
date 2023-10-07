@@ -92,7 +92,9 @@ export function ExplorerSearch() {
     }
 
     if (searchValue.length === 64) {
-      const [err, block] = await to(nodeSocket.daemon.getBlockByHash(searchValue))
+      const [err, block] = await to(nodeSocket.daemon.getBlockByHash({
+        hash: searchValue
+      }))
       if (block) {
         return navigate(`/blocks/${searchValue}`)
       } else {

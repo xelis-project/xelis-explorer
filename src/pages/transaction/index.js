@@ -10,6 +10,9 @@ import TableBody, { style as tableStyle } from '../../components/tableBody'
 import { formatXelis, formatAsset, formatAssetName, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
+import { useServerData } from '../../context/useServerData'
+import { daemonRPC } from '../../ssr/nodeRPC'
+import { usePageLoad } from '../../context/usePageLoad'
 
 const style = {
   container: css`
@@ -34,14 +37,31 @@ const style = {
   `
 }
 
+function loadTransaction_SSR({ hash }) {
+  const defaultResult = { loaded: false, err: null, tx: {} }
+  return useServerData(`func:loadTransaction(${hash})`, async () => {
+    const result = Object.assign({}, defaultResult)
+    const [err, res] = await to(daemonRPC.getTransaction(hash))
+    result.err = err
+    if (err) return result
+
+    result.tx = res.result
+    result.loaded = true
+    return result
+  }, defaultResult)
+}
+
 function Transaction() {
   const { hash } = useParams()
 
   const nodeSocket = useNodeSocket()
 
+  const { firstPageLoad } = usePageLoad()
+  const serverResult = loadTransaction_SSR({ hash })
+
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
-  const [tx, setTx] = useState({})
+  const [tx, setTx] = useState(serverResult.tx)
 
   const loadTx = useCallback(async () => {
     if (!nodeSocket.connected) return
@@ -62,6 +82,7 @@ function Transaction() {
   }, [hash, nodeSocket])
 
   useEffect(() => {
+    if (firstPageLoad && serverResult.loaded) return
     loadTx()
   }, [loadTx])
 
@@ -79,7 +100,7 @@ function Transaction() {
     <h1>Transaction {reduceText(tx.hash, 4, 4)}</h1>
     {err && <div className="error">{displayError(err)}</div>}
     <div>
-      <TableFlex 
+      <TableFlex
         headers={[
           {
             key: 'hash',
@@ -88,6 +109,11 @@ function Transaction() {
           {
             key: 'owner',
             title: 'Signer',
+            render: (value) => {
+              return <Link to={`/accounts/${value}`}>
+                {value}
+              </Link>
+            }
           },
           {
             key: 'in_mempool',
@@ -153,7 +179,11 @@ function Transfers(props) {
             return <tr key={index}>
               <td>{formatAssetName(asset)}</td>
               <td>{formatAsset(amount, asset)}</td>
-              <td>{to}</td>
+              <td>
+                <Link to={`/accounts/${to}`}>
+                  {to}
+                </Link>
+              </td>
             </tr>
           }}
         />
@@ -210,7 +240,9 @@ function InBlocks(props) {
     const blocks = []
     for (let i = 0; i < (tx.blocks || []).length; i++) {
       const hash = tx.blocks[i]
-      const [err, data] = await to(nodeSocket.daemon.getBlockByHash(hash))
+      const [err, data] = await to(nodeSocket.daemon.getBlockByHash({
+        hash: hash
+      }))
       if (err) return resErr(err)
       blocks.push(data)
     }

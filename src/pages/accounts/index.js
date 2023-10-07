@@ -28,7 +28,7 @@ const style = {
 
 function loadAccounts_SSR({ limit }) {
   const defaultResult = { accounts: [], loaded: false }
-  return useServerData(`func:loadAccounts`, async () => {
+  return useServerData(`func:loadAccounts(${limit})`, async () => {
     let result = Object.assign({}, defaultResult)
     const [err, res] = await to(daemonRPC.getAccounts({ maximum: limit }))
     result.err = err

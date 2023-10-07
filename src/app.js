@@ -15,7 +15,7 @@ import './style/theme'
 import './style/page'
 import './style/scrollbar'
 
-setup(createElement) // not really if this is needed
+setup(createElement) // not really sure if this is needed
 
 function App(props) {
   const { children, css, serverContext, helmetContext, serverDataContext = getServerDataContext() } = props

@@ -88,10 +88,16 @@ function Transactions(props) {
             return <React.Fragment key={item.hash}>
               <tr>
                 <td>
-                  <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
+                  <Link to={`/txs/${item.hash}`}>
+                    {reduceText(item.hash)}
+                  </Link>
                 </td>
                 <td>{transfers.length} / {burns.length}</td>
-                <td>{reduceText(item.owner, 0, 7)}</td>
+                <td>
+                  <Link to={`/accounts/${item.owner}`}>
+                    {reduceText(item.owner, 0, 7)}
+                  </Link>
+                </td>
                 <td>{formatXelis(item.fee)}</td>
               </tr>
             </React.Fragment>
