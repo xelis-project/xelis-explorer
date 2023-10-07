@@ -92,13 +92,17 @@ function loadBlock_SSR({ id }) {
     result.topoheight = res2.result
 
     if (isHash(id)) {
-      const [err1, res1] = await to(daemonRPC.getBlockByHash(id))
+      const [err1, res1] = await to(daemonRPC.getBlockByHash({
+        hash: id
+      }))
       result.err = err1
       if (err1) return result
 
       result.block = res1.result
     } else {
-      const [err1, res1] = await to(daemonRPC.getBlockAtTopoHeight(parseInt(id)))
+      const [err1, res1] = await to(daemonRPC.getBlockAtTopoHeight({
+        topoheight: parseInt(id)
+      }))
       result.err = err1
       if (err1) return result
 
@@ -139,12 +143,15 @@ function Block() {
     setTopoheight(topoheight)
 
     if (isHash(id)) {
-      const [err, block] = await to(nodeSocket.daemon.getBlockByHash(id))
+      const [err, block] = await to(nodeSocket.daemon.getBlockByHash({
+        hash: id
+      }))
       if (err) return resErr(err)
       setBlock(block)
     } else {
-      const height = parseInt(id)
-      const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(height))
+      const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+        topoheight: parseInt(id)
+      }))
       if (err) return resErr(err)
       setBlock(block)
     }

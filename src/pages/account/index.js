@@ -135,7 +135,9 @@ function History(props) {
     let topoheight = account.balance.previous_topoheight
     if (!topoheight) return resErr(null)
 
-    const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(account.topoheight))
+    const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({ 
+      topoheight: account.topoheight
+    }))
     if (err) return resErr(err)
 
     const history = [{ balance: account.balance.balance, topoheight: account.topoheight, block }]
@@ -147,7 +149,9 @@ function History(props) {
       }))
       if (err) return resErr(err)
 
-      const [err2, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(topoheight))
+      const [err2, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+        topoheight: topoheight
+      }))
       if (err2) return resErr(err2)
 
       topoheight = result.previous_topoheight

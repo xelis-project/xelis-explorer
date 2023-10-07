@@ -156,7 +156,9 @@ function TxExecuted(props) {
         let filteredPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.tx_hash) {
-            const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight(data.topoheight))
+            const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+              topoheight: data.topoheight
+            }))
             if (err) return setErr(err)
 
             setExecutedTxs((executedTxs) => [{ tx, block }, ...executedTxs])

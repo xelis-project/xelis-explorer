@@ -80,7 +80,9 @@ function useOffCanvasBlock(props) {
 
   const loadBlock = useCallback(async (topoheight) => {
     if (!nodeSocket.connected) return
-    const [err, blockData] = await to(nodeSocket.daemon.getBlockAtTopoHeight(topoheight))
+    const [err, blockData] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+      topoheight: topoheight
+    }))
     if (err) return setErr(err)
     setBlock(blockData)
   }, [nodeSocket])

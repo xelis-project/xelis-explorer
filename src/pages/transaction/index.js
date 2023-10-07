@@ -210,7 +210,9 @@ function InBlocks(props) {
     const blocks = []
     for (let i = 0; i < (tx.blocks || []).length; i++) {
       const hash = tx.blocks[i]
-      const [err, data] = await to(nodeSocket.daemon.getBlockByHash(hash))
+      const [err, data] = await to(nodeSocket.daemon.getBlockByHash({
+        hash: hash
+      }))
       if (err) return resErr(err)
       blocks.push(data)
     }
