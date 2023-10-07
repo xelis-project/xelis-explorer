@@ -21,9 +21,25 @@ const slideRightKeyframes = (from, to) => keyframes`
 `
 
 export const slideRight = (props) => {
-  let { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
+  const { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
   return `
     animation: ${slideRightKeyframes(from, to)} ${duration} linear both;
+  `
+}
+
+const opacityKeyframes = (from, to) => keyframes`
+  0% {
+    opacity: ${from};
+  }
+  100% {
+    opacity: ${to};
+  }
+`
+
+export const opacity = (props) => {
+  const { from = 0, to = 1, duration = `.25s` } = props || {}
+  return `
+    animation: ${opacityKeyframes(from, to)} ${duration} linear both;
   `
 }
 
