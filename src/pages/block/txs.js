@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import { formatXelis, reduceText } from '../../utils'
 import TableBody, { style as tableStyle } from '../../components/tableBody'

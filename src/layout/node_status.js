@@ -1,5 +1,5 @@
 import { css } from 'goober'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import DotLoading from '../components/dotLoading'
 

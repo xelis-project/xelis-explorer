@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
-import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
 

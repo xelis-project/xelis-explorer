@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router'
-import useNodeSocket from '@xelis/sdk/react/context'
+import useNodeSocket from '@xelis/sdk/react/daemon'
 import { useState, useCallback, useEffect } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'

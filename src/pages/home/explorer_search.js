@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCallback } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import Icon from '../../components/icon'
 import Button from '../../components/button'

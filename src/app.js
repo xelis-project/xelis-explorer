@@ -1,7 +1,7 @@
 import { setup } from 'goober'
 import { createElement } from 'react'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
-import { NodeSocketProvider } from '@xelis/sdk/react/context'
+import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
 
 import { ThemeProvider } from './context/useTheme'
 import useSettings, { SettingsProvider, settingsKeys } from './context/useSettings'
