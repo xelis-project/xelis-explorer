@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { css } from 'goober'
-import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
@@ -12,7 +13,6 @@ import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
 import { usePageLoad } from '../../context/usePageLoad'
-import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 const style = {
   container: css`

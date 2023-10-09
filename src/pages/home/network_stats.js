@@ -2,7 +2,7 @@ import to from 'await-to-js'
 import prettyMs from 'pretty-ms'
 import { css } from 'goober'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { formatHashRate, formatXelis } from '../../utils'

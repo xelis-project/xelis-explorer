@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock } from '../../utils'
 import PageLoading from '../../components/pageLoading'

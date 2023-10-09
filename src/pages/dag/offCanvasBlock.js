@@ -3,7 +3,7 @@ import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
 
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formattedBlock } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'

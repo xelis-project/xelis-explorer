@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
-import { useNodeSocket } from '@xelis/sdk/react/context'
+import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { css } from 'goober'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'

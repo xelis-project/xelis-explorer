@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState } from 'react'
 import { css } from 'goober'
-import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/context'
+import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'
