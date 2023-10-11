@@ -41,7 +41,7 @@ const style = {
 }
 
 function loadAccounts_SSR({ limit }) {
-  const defaultResult = { accounts: [], loaded: false }
+  const defaultResult = { accounts: {}, loaded: false }
   return useServerData(`func:loadAccounts(${limit})`, async () => {
     let result = Object.assign({}, defaultResult)
     const [err, res] = await to(daemonRPC.getAccounts({ maximum: limit }))
@@ -60,7 +60,7 @@ function loadAccounts_SSR({ limit }) {
     }
 
     result.loaded = true
-    result.accounts = accounts
+    result.accounts[1] = accounts
     return result
   }, defaultResult)
 }
@@ -75,9 +75,7 @@ function Accounts() {
   const serverResult = loadAccounts_SSR({ limit: pageSize })
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
-  const [accounts, setAccounts] = useState({
-    1: serverResult.accounts
-  })
+  const [accounts, setAccounts] = useState(serverResult.accounts)
 
   const loadAccounts = useCallback(async () => {
     if (!nodeSocket.connected) return
