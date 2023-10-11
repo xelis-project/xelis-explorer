@@ -219,7 +219,6 @@ function History(props) {
     let topoheight = topoheightRef.current
     const addr = account.addr
 
-    console.log('load')
     for (let i = 0; i < pageSize; i++) {
       if (!topoheight) break
 
@@ -235,7 +234,7 @@ function History(props) {
         include_txs: true
       }))
       if (err2) return resErr(err2)
-      console.log(result)
+
       topoheight = result.previous_topoheight
 
       if (block.miner === addr) {
