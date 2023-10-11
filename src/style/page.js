@@ -43,6 +43,10 @@ glob`
 
   a {
     color: var(--link-color);
+
+    &:hover {
+      color: var(--link-hover-color);
+    }
   }
 
   strong {

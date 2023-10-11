@@ -119,13 +119,6 @@ function Blocks() {
     }
   }, [pageState])
 
-  useNodeSocketSubscribe({
-    event: RPCEvent.NewBlock,
-    onData: (_, block) => {
-      console.log('newblock')
-    }
-  }, [pageState])
-
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
     loadBlocks()
