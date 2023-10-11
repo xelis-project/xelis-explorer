@@ -10,6 +10,7 @@ import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
 import Button from '../../components/button'
+import { XELIS_ASSET, formatXelis } from '../../utils'
 
 const style = {
   container: css`
@@ -47,8 +48,19 @@ function loadAccounts_SSR({ limit }) {
     result.err = err
     if (err) return result
 
+    const accounts = []
+    const addresses = res.result || []
+    for (let i = 0; i < addresses.length; i++) {
+      const addr = addresses[i]
+      const [err, res] = await to(daemonRPC.getLastBalance({
+        address: addr,
+        asset: XELIS_ASSET
+      }))
+      accounts.push({ addr, balance: (res || {}).result })
+    }
+
     result.loaded = true
-    result.accounts = res.result
+    result.accounts = accounts
     return result
   }, defaultResult)
 }
@@ -78,11 +90,22 @@ function Accounts() {
       setLoading(false)
     }
 
-    const [err, list] = await to(nodeSocket.daemon.getAccounts({
+    const [err, result] = await to(nodeSocket.daemon.getAccounts({
       skip: (page - 1) * pageSize,
       maximum: pageSize
     }))
     if (err) return resErr(err)
+
+    const list = []
+    const addresses = result || []
+    for (let i = 0; i < addresses.length; i++) {
+      const addr = addresses[i]
+      const [err, balance] = await to(nodeSocket.daemon.getLastBalance({
+        address: addr,
+        asset: XELIS_ASSET
+      }))
+      list.push({ addr, balance })
+    }
 
     accounts[page] = list
     setAccounts(Object.assign({}, accounts))
@@ -105,13 +128,30 @@ function Accounts() {
       <title>Accounts</title>
     </Helmet>
     <h1>Accounts</h1>
-    <TableFlex loading={loading} err={err} emptyText="No accounts"
+    <TableFlex loading={loading} err={err}
+      emptyText="No accounts" rowKey="addr"
       headers={[
         {
-          key: 'address',
+          key: 'addr',
           title: 'Address',
+          render: (value) => {
+            return <Link to={`/accounts/${value}`}>{value}</Link>
+          }
+        },
+        {
+          key: 'topoheight',
+          title: 'Last Topoheight',
           render: (_, item) => {
-            return <Link to={`/accounts/${item}`}>{item}</Link>
+            const { topoheight } = item.balance || {}
+            return topoheight ? topoheight : `--`
+          }
+        },
+        {
+          key: 'balance',
+          title: 'Balance',
+          render: (_, item) => {
+            const { balance } = item.balance || {}
+            return balance ? formatXelis(balance.balance) : `--`
           }
         }
       ]} data={list} />
