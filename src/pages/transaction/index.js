@@ -7,7 +7,7 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { css } from 'goober'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'
-import { formatXelis, formatAsset, formatAssetName, reduceText, displayError, formatSize } from '../../utils'
+import { formatXelis, formatAsset, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
@@ -177,7 +177,7 @@ function Transfers(props) {
           onItem={(item, index) => {
             const { amount, asset, to } = item
             return <tr key={index}>
-              <td>{formatAssetName(asset)}</td>
+              <td>{reduceText(asset)}</td>
               <td>{formatAsset(amount, asset)}</td>
               <td>
                 <Link to={`/accounts/${to}`}>
@@ -208,7 +208,7 @@ function Burns(props) {
           onItem={(item, index) => {
             const { amount, asset } = item
             return <tr key={index}>
-              <td>{formatAssetName(asset)}</td>
+              <td>{reduceText(asset)}</td>
               <td>{formatAsset(amount, asset)}</td>
             </tr>
           }}
