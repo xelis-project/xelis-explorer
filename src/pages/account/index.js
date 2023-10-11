@@ -41,26 +41,29 @@ const style = {
 
       > :nth-child(1) {
         flex: 1;
-        background-color: var(--table-td-bg-color);
-        padding: 1em;
-        border-top: 3px solid var(--table-th-bg-color);
-        display: flex;
-        gap: 1em;
-        flex-direction: column;
         min-width: 200px;
 
         > div {
           display: flex;
-          gap: .5em;
+          gap: 1em;
           flex-direction: column;
 
-          > :nth-child(1) {
-            color: var(--muted-color);
-            font-size: 1em;
-          }
+          background-color: var(--table-td-bg-color);
+          padding: 1em;
+          border-top: 3px solid var(--table-th-bg-color);
+          > div {
+            display: flex;
+            gap: .5em;
+            flex-direction: column;
 
-          > :nth-child(2) {
-            font-size: 1.4em;
+            > :nth-child(1) {
+              color: var(--muted-color);
+              font-size: 1em;
+            }
+  
+            > :nth-child(2) {
+              font-size: 1.4em;
+            }
           }
         }
       }
@@ -164,16 +167,18 @@ function Account() {
     <div className="page">
       <div>
         <div>
-          <div>Address</div>
-          <div style={{ wordBreak: `break-all` }}>{addr}</div>
-        </div>
-        <div>
-          <div>Balance</div>
-          <div>{formatXelis(balance)}</div>
-        </div>
-        <div>
-          <div>Nonce</div>
-          <div>{nonce}</div>
+          <div>
+            <div>Address</div>
+            <div style={{ wordBreak: `break-all` }}>{addr}</div>
+          </div>
+          <div>
+            <div>Balance</div>
+            <div>{formatXelis(balance)}</div>
+          </div>
+          <div>
+            <div>Nonce</div>
+            <div>{nonce}</div>
+          </div>
         </div>
       </div>
       <div>
@@ -219,7 +224,6 @@ function History(props) {
     let topoheight = topoheightRef.current
     const addr = account.addr
 
-    console.log('load')
     for (let i = 0; i < pageSize; i++) {
       if (!topoheight) break
 
@@ -235,7 +239,7 @@ function History(props) {
         include_txs: true
       }))
       if (err2) return resErr(err2)
-      console.log(result)
+
       topoheight = result.previous_topoheight
 
       if (block.miner === addr) {

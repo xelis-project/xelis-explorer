@@ -64,6 +64,7 @@ light`
   --error-color: red;
   --success-color: green;
   --link-color: #1870cb;
+  --link-hover-color: #3889ff;
   --warning-color: #dfde32;
 `
 
@@ -75,6 +76,7 @@ dark`
   --error-color: red;
   --success-color: green;
   --link-color: #1870cb;
+  --link-hover-color: #3889ff;
   --warning-color: #dfde32;
 `
 
@@ -86,5 +88,6 @@ xelis`
   --error-color: red;
   --success-color: green;
   --link-color: #326e5c;
+  --link-hover-color: #309979;
   --warning-color: #dfde32;
 `
