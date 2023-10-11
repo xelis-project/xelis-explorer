@@ -26,21 +26,12 @@ export const formatAsset = (value, asset) => {
     case XELIS_ASSET:
       return formatXelis(value)
     default:
-      return value
+      return `${value} (${reduceText(asset)})`
   }
 }
 
 export const formatSize = (value, options = { unitSeparator: ` ` }) => {
   return bytes.format(value, options)
-}
-
-export const formatAssetName = (asset) => {
-  switch (asset) {
-    case XELIS_ASSET:
-      return `XEL (${reduceText(XELIS_ASSET)})`
-    default:
-      return value
-  }
 }
 
 export const groupBy = (list, getKey) => {
