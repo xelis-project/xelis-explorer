@@ -9,6 +9,7 @@ import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
+import Button from '../../components/button'
 
 const style = {
   container: css`
@@ -18,10 +19,22 @@ const style = {
       font-size: 2em;
     }
 
-    h2 {
-      margin: 1em 0 .5em 0;
-      font-weight: bold;
-      font-size: 1.5em;
+    .pager {
+      display: flex;
+      gap: .5em;
+      margin-top: .5em;
+
+      > button {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+        border-radius: 25px;
+        border: none;
+        background-color: var(--text-color);
+        cursor: pointer;
+        padding: 0.5em 1em;
+        font-weight: bold;
+      }
     }
   `
 }
@@ -43,14 +56,20 @@ function loadAccounts_SSR({ limit }) {
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
+  const pageSize = 10
+  const [page, setPage] = useState(1)
+
   const { firstPageLoad } = usePageLoad()
-  const serverResult = loadAccounts_SSR({ limit: 20 })
+  const serverResult = loadAccounts_SSR({ limit: pageSize })
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
-  const [accounts, setAccounts] = useState(serverResult.accounts)
+  const [accounts, setAccounts] = useState({
+    1: serverResult.accounts
+  })
 
   const loadAccounts = useCallback(async () => {
     if (!nodeSocket.connected) return
+    if (accounts[page]) return
 
     setLoading(true)
     setErr(null)
@@ -59,17 +78,27 @@ function Accounts() {
       setLoading(false)
     }
 
-    const [err, accounts] = await to(nodeSocket.daemon.getAccounts({ maximum: 20 }))
+    const [err, list] = await to(nodeSocket.daemon.getAccounts({
+      skip: (page - 1) * pageSize,
+      maximum: pageSize
+    }))
     if (err) return resErr(err)
 
-    setAccounts(accounts)
+    accounts[page] = list
+    setAccounts(Object.assign({}, accounts))
     setLoading(false)
-  }, [nodeSocket])
+  }, [accounts, page, nodeSocket])
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
     loadAccounts()
   }, [loadAccounts, firstPageLoad])
+
+  useEffect(() => {
+    loadAccounts()
+  }, [page])
+
+  const list = accounts[page] || accounts[page - 1] || []
 
   return <div className={style.container}>
     <Helmet>
@@ -85,7 +114,22 @@ function Accounts() {
             return <Link to={`/accounts/${item}`}>{item}</Link>
           }
         }
-      ]} data={accounts} />
+      ]} data={list} />
+    <div className="pager">
+      <Button icon="arrow-left" onClick={() => {
+        if (page <= 1) return
+        setPage(page - 1)
+      }}>
+        Previous
+      </Button>
+      <Button icon="arrow-right" iconLocation="right"
+        onClick={() => {
+          if (list.length === 0) return
+          setPage(page + 1)
+        }}>
+        Next
+      </Button>
+    </div>
   </div>
 }
 
