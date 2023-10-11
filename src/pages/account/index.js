@@ -264,7 +264,6 @@ function History(props) {
                 type: 'SEND',
                 amount: transfer.amount,
                 asset: transfer.asset,
-                recipient: transfer.to,
                 timestamp: block.timestamp
               })
             }
@@ -276,6 +275,7 @@ function History(props) {
                 type: 'RECEIVE',
                 amount: transfer.amount,
                 asset: transfer.asset,
+                from: tx.owner,
                 timestamp: block.timestamp
               })
             }
@@ -351,6 +351,22 @@ function History(props) {
           title: "Amount",
           render: (value, item) => {
             return formatAsset(value, item.asset)
+          }
+        },
+        {
+          key: "from",
+          title: "From",
+          render: (_, item) => {
+            switch (item.type) {
+              case "RECEIVE":
+                return <Link to={`/accounts/${item.recipient}`}>
+                  {reduceText(item.from)}
+                </Link>
+              case "MINING":
+                return `Coinbase`
+              default:
+                return `--`
+            }
           }
         },
         {
