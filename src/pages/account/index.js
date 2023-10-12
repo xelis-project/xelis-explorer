@@ -105,7 +105,9 @@ function loadAccount_SSR({ addr }) {
     result.err = err
     if (err) return result
 
-    const [err2, res2] = await to(daemonRPC.getNonce(addr))
+    const [err2, res2] = await to(daemonRPC.getNonce({
+      address: addr,
+    }))
     result.err = err2
     if (err2) return result2
 
@@ -144,7 +146,9 @@ function Account() {
     }))
     if (err) return resErr(err)
 
-    const [err2, result2] = await to(nodeSocket.daemon.getNonce(addr))
+    const [err2, result2] = await to(nodeSocket.daemon.getNonce({
+      address: addr
+    }))
     if (err2) return resErr(err2)
 
     setAccount({ addr, balance: result, nonce: result2 })
