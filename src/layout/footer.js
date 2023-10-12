@@ -12,6 +12,11 @@ const style = {
     background-color: ${theme.apply({ xelis: `rgb(14 30 32 / 40%)`, dark: `rgb(0 0 0 / 10%)`, light: `rgb(255 255 255 / 10%)` })};
     margin-top: 5em;
 
+    a {
+      text-decoration: none;
+      color: var(--link-hover-color);
+    }
+
     > div {
       display: grid;
       gap: 2em;
@@ -98,7 +103,7 @@ function Footer() {
       <div>
         <div>LINKS</div>
         <div>
-          <a href="https://xelis.io" target="_blank">XELIS.io</a>
+          <a href="https://xelis.io" target="_blank">xelis.io</a>
           <a href="https://stats.xelis.io" target="_blank">Statistics</a>
           <a href="https://docs.xelis.io" target="_blank">Documentation</a>
           <a href="https://github.com/xelis-project" target="_blank">Github</a>

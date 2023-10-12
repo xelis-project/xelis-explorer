@@ -9,7 +9,7 @@ import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
-import Button from '../../components/button'
+import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
 import { XELIS_ASSET, formatXelis } from '../../utils'
 
 const style = {
@@ -20,36 +20,28 @@ const style = {
       font-size: 2em;
     }
 
-    .pager {
-      display: flex;
-      gap: .5em;
-      margin-top: .5em;
-
-      > button {
-        display: flex;
-        gap: .5em;
-        align-items: center;
-        border-radius: 25px;
-        border: none;
-        background-color: var(--text-color);
-        cursor: pointer;
-        padding: 0.5em 1em;
-        font-weight: bold;
-      }
+    > :nth-child(2) {
+      margin-bottom: 1em;
     }
   `
 }
 
 function loadAccounts_SSR({ limit }) {
-  const defaultResult = { accounts: {}, loaded: false }
+  const defaultResult = { accounts: [], totalAccounts: 0, loaded: false }
   return useServerData(`func:loadAccounts(${limit})`, async () => {
     let result = Object.assign({}, defaultResult)
-    const [err, res] = await to(daemonRPC.getAccounts({ maximum: limit }))
-    result.err = err
-    if (err) return result
+
+    const [err1, res1] = await to(daemonRPC.countAccounts())
+    result.err = err1
+    if (err1) return result
+    result.totalAccounts = res1.result
+
+    const [err2, res2] = await to(daemonRPC.getAccounts({ maximum: limit }))
+    result.err = err2
+    if (err2) return result
+    const addresses = res2.result || []
 
     const accounts = []
-    const addresses = res.result || []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
       const [err, res] = await to(daemonRPC.getLastBalance({
@@ -59,8 +51,9 @@ function loadAccounts_SSR({ limit }) {
       accounts.push({ addr, balance: (res || {}).result })
     }
 
+
     result.loaded = true
-    result.accounts[1] = accounts
+    result.accounts = accounts
     return result
   }, defaultResult)
 }
@@ -68,47 +61,54 @@ function loadAccounts_SSR({ limit }) {
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
-  const pageSize = 10
-  const [page, setPage] = useState(1)
+  const [pageState, setPageState] = useState({ page: 1, size: 20 })
 
   const { firstPageLoad } = usePageLoad()
-  const serverResult = loadAccounts_SSR({ limit: pageSize })
+  const serverResult = loadAccounts_SSR({ limit: 20 })
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [accounts, setAccounts] = useState(serverResult.accounts)
+  const [accountCount, setAccountCount] = useState(serverResult.totalAccounts)
 
   const loadAccounts = useCallback(async () => {
     if (!nodeSocket.connected) return
-    if (accounts[page]) return
 
     setLoading(true)
     setErr(null)
+
     const resErr = (err) => {
+      setAccounts([])
+      setAccountCount(0)
       setErr(err)
       setLoading(false)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getAccounts({
-      skip: (page - 1) * pageSize,
-      maximum: pageSize
-    }))
-    if (err) return resErr(err)
+    const [err1, result1] = await to(nodeSocket.daemon.countAccounts())
+    if (err1) return resErr(err)
 
-    const list = []
-    const addresses = result || []
+    let pagination = getPaginationRange(pageState)
+
+    const [err2, result2] = await to(nodeSocket.daemon.getAccounts({
+      skip: Math.max(0, pagination.start - 1),
+      maximum: pageState.size
+    }))
+    if (err2) return resErr(err2)
+
+    const accounts = []
+    const addresses = result2 || []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
       const [err, balance] = await to(nodeSocket.daemon.getLastBalance({
         address: addr,
         asset: XELIS_ASSET
       }))
-      list.push({ addr, balance })
+      accounts.push({ addr, balance })
     }
 
-    accounts[page] = list
-    setAccounts(Object.assign({}, accounts))
+    setAccounts(accounts)
+    setAccountCount(result1)
     setLoading(false)
-  }, [accounts, page, nodeSocket])
+  }, [pageState, nodeSocket])
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
@@ -117,9 +117,7 @@ function Accounts() {
 
   useEffect(() => {
     loadAccounts()
-  }, [page])
-
-  const list = accounts[page] || accounts[page - 1] || []
+  }, [pageState])
 
   return <div className={style.container}>
     <Helmet>
@@ -152,22 +150,8 @@ function Accounts() {
             return balance ? formatXelis(balance.balance) : `--`
           }
         }
-      ]} data={list} />
-    <div className="pager">
-      <Button icon="arrow-left" onClick={() => {
-        if (page <= 1) return
-        setPage(page - 1)
-      }}>
-        Previous
-      </Button>
-      <Button icon="arrow-right" iconLocation="right"
-        onClick={() => {
-          if (list.length === 0) return
-          setPage(page + 1)
-        }}>
-        Next
-      </Button>
-    </div>
+      ]} data={accounts} />
+    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="accounts" count={accountCount} />
   </div>
 }
 
