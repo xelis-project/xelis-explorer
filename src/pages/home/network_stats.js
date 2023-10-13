@@ -205,7 +205,7 @@ export function NetworkStats(props) {
     const data = info || {}
 
     const maxSupply = 1840000000000
-    const mined = (data.native_supply * 100 / maxSupply).toFixed(2)
+    const mined = ((data.native_supply || 0) * 100 / maxSupply).toFixed(2)
 
     const labels = []
     const difficultyHistory = []
@@ -233,7 +233,7 @@ export function NetworkStats(props) {
       { title: `Mined`, render: () => `${mined}%` },
       { title: `Block Count`, render: () => (data.topoheight || 0).toLocaleString() },
       { title: `Block Reward`, render: () => formatXelis(data.block_reward, { withSuffix: false }) },
-      { title: `Mempool`, render: () => `${data.mempool_size} tx` },
+      { title: `Mempool`, render: () => `${data.mempool_size || 0} tx` },
       {
         title: `Difficulty`, render: () => {
           return <div>
@@ -243,7 +243,7 @@ export function NetworkStats(props) {
         }
       },
       {
-        title: `Hashrate`, render: () => formatHashRate(data.difficulty / 15)
+        title: `Hashrate`, render: () => formatHashRate((data.difficulty || 0) / 15)
       },
       {
         title: `Avg Block Time`, render: () => prettyMs((data.average_block_time || 0), { compact: true })
