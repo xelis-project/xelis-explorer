@@ -80,7 +80,8 @@ export function ExplorerSearch() {
   const nodeSocket = useNodeSocket()
 
   const search = useCallback(async (e) => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     e.preventDefault()
     const formData = new FormData(e.target)

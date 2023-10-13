@@ -7,7 +7,7 @@ import NodeStatus from '../layout/node_status'
 import theme from '../style/theme'
 import { opacity } from '../style/animate'
 
-const style = {
+export const style = {
   background: css`
     position: fixed;
     top: 0;
@@ -85,15 +85,8 @@ const style = {
     }
   `,*/
   container: css`
-    margin: 0 auto;
-    max-width: 1000px;
-    padding: 0 2em;
     position: relative;
     height: 100%;
-
-    ${theme.query.minLarge} {
-      max-width: 1400px;
-    }
 
     .layout-flex {
       display: flex;
@@ -101,7 +94,7 @@ const style = {
       justify-content: space-between;
       height: 100%;
 
-      .outlet {
+      .page-opacity {
         ${opacity()}
       }
     }
@@ -117,12 +110,23 @@ const style = {
       ${theme.query.maxMobile} {
         margin-top:-2px;
 
-        > div {
+        > div > :nth-child(1) {
           border-radius: 10px;
           border-top-left-radius: 0;
           border-top-right-radius: 0;
           transform: scale(.9);
         }
+      }
+    }
+
+    .layout-max-width {
+      margin: 0 auto;
+      max-width: 1000px;
+      width: 100%;
+      padding: 0 2em;
+  
+      ${theme.query.minLarge} {
+        max-width: 1400px;
       }
     }
   `
@@ -147,9 +151,9 @@ function Layout() {
         <NodeStatus />
       </div>
       <div className="layout-flex">
-        <div>
+        <div className="layout-max-width">
           <Header />
-          <div className="outlet" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
+          <div className="page-opacity" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>
         </div>

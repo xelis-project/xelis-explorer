@@ -27,7 +27,8 @@ function MemPool() {
   const nodeSocket = useNodeSocket()
 
   const loadMemPool = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)
@@ -104,7 +105,8 @@ function TxExecuted(props) {
   const [topoheight, setTopoheight] = useState()
 
   const loadExecutedTxs = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setLoading(true)
     setErr(null)

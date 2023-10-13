@@ -1,26 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
+
+const SPACE_UNICODE = `\u00A0`
 
 function DotLoading(props) {
   const { delay = 500, max = 3 } = props
-  const [dots, setDots] = useState(() => {
-    let start = ``
+
+  const cursorRef = useRef(max)
+  const content = useMemo(() => {
+    let content = []
+
     for (let i = 0; i < max; i++) {
-      start += `.`
+      content.push(`.`)
     }
-    return start
-  })
+
+    return content
+  }, [max])
+
+  const [dots, setDots] = useState(content)
 
   useEffect(() => {
     let intervalId = setInterval(() => {
-      setDots(dots => {
-        if (dots.length === max) return ``
-        return dots + `.`
+      cursorRef.current++
+
+      if (cursorRef.current > max) {
+        cursorRef.current = 0
+      }
+
+      const newContent = content.map((_, index) => {
+        if (index < cursorRef.current) {
+          return `.`
+        }
+        return SPACE_UNICODE
       })
+
+      setDots(newContent)
     }, delay)
     return () => clearInterval(intervalId)
-  }, [delay, max])
+  }, [delay, content, max])
 
-  return dots
+  return dots.join(``)
 }
 
 export default DotLoading
