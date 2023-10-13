@@ -407,14 +407,16 @@ function DAG() {
   })
 
   const loadInfo = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
     const [err, info] = await to(nodeSocket.daemon.getInfo())
     if (err) return setErr(err)
     setInfo(info)
   }, [nodeSocket])
 
   const loadBlocks = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
     const inputHeight = offCanvasTable.inputHeight
     if (!inputHeight) return
 

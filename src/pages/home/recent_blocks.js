@@ -103,6 +103,7 @@ const style = {
   `,
 }
 
+
 export function RecentBlocks(props) {
   const { blocks, newBlock } = props
 
@@ -111,10 +112,13 @@ export function RecentBlocks(props) {
     return ``
   }, [newBlock])
 
+  let recentBlocks = blocks
+  if (recentBlocks.length === 0) recentBlocks = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+
   return <div>
     <div className={style.title}>Recent Blocks</div>
     <div className={`${style.items} ${!newBlockHash ? `no-animation` : ``}`}>
-      {blocks.map((block, index) => {
+      {recentBlocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)

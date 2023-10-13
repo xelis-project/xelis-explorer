@@ -130,7 +130,8 @@ function Account() {
   const [account, setAccount] = useState(serverResult.account)
 
   const loadAccount = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)
@@ -208,7 +209,8 @@ function History(props) {
   const pageSize = 10
 
   const loadData = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
     if (!account.balance) return
     if (history[page]) return
 

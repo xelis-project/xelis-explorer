@@ -13,7 +13,7 @@ import { loadBlocks_SSR } from '../blocks'
 function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
-  const serverResult = loadBlocks_SSR({ limit: 20, defaultBlocks: [{}, {}, {}, {}, {}, {}, {}, {}, {}] })
+  const serverResult = loadBlocks_SSR({ limit: 20 })
 
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
@@ -21,7 +21,7 @@ function useRecentBlocks() {
   const [newBlock, setNewBlock] = useState()
 
   const loadRecentBlocks = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
 
     setLoading(true)
 

@@ -69,7 +69,8 @@ function Blocks() {
   const nodeSocket = useNodeSocket()
 
   const loadBlocks = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)

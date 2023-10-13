@@ -128,7 +128,8 @@ function Block() {
   const [topoheight, setTopoheight] = useState(serverResult.topoheight)
 
   const loadBlock = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)

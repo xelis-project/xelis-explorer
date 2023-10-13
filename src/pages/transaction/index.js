@@ -64,7 +64,8 @@ function Transaction() {
   const [tx, setTx] = useState(serverResult.tx)
 
   const loadTx = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)
@@ -227,7 +228,8 @@ function InBlocks(props) {
   const [blocks, setBlocks] = useState([])
 
   const loadTxBlocks = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setLoading(true)
     setErr(null)

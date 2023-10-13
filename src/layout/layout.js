@@ -110,7 +110,7 @@ export const style = {
       ${theme.query.maxMobile} {
         margin-top:-2px;
 
-        > div {
+        > div > :nth-child(1) {
           border-radius: 10px;
           border-top-left-radius: 0;
           border-top-right-radius: 0;

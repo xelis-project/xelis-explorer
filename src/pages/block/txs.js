@@ -37,7 +37,8 @@ function Transactions(props) {
   const [pageState, setPageState] = useState({ page: 1, size: 5 })
 
   const load = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setErr(null)
     setLoading(true)

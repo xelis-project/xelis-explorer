@@ -172,7 +172,8 @@ export function NetworkStats(props) {
   const { theme: currentTheme } = useTheme()
 
   const loadInfo = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     const resErr = (err) => {
       setInfo({})

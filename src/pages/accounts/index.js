@@ -71,7 +71,8 @@ function Accounts() {
   const [accountCount, setAccountCount] = useState(serverResult.totalAccounts)
 
   const loadAccounts = useCallback(async () => {
-    if (!nodeSocket.connected) return
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
 
     setLoading(true)
     setErr(null)
