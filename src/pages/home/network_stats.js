@@ -217,6 +217,9 @@ export function NetworkStats(props) {
       difficultyHistory.push(b.difficulty)
     })
 
+    labels.push(labels.length)
+    difficultyHistory.push(data.difficulty)
+
     const difficultyChartData = {
       labels: labels,
       datasets: [{
