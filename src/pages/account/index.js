@@ -241,8 +241,7 @@ function History(props) {
       if (err) return resErr(err)
 
       const [err2, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
-        topoheight: topoheight,
-        include_txs: true
+        topoheight: topoheight
       }))
       if (err2) return resErr(err2)
 
@@ -260,37 +259,43 @@ function History(props) {
       }
 
       if (block.txs_hashes.length > 0) {
-        const [err3, txs] = await to(nodeSocket.daemon.getTransactions(block.txs_hashes))
-        if (err3) return resErr(err3)
+        const batch = 20
+        for (let t = 0; t < block.txs_hashes.length; t += batch) {
+          let end = t + batch
+          const hashes = block.txs_hashes.slice(t, end)
 
-        txs.forEach((tx) => {
-          const transfers = tx.data.transfers || []
+          const [err3, txs] = await to(nodeSocket.daemon.getTransactions(hashes))
+          if (err3) return resErr(err3)
 
-          transfers.forEach((transfer) => {
-            if (tx.owner === addr) {
-              list.push({
-                hash: tx.hash,
-                topoheight: block.topoheight,
-                type: 'SEND',
-                amount: transfer.amount,
-                asset: transfer.asset,
-                timestamp: block.timestamp
-              })
-            }
+          txs.forEach((tx) => {
+            const transfers = tx.data.transfers || []
 
-            if (transfer.to === addr) {
-              list.push({
-                hash: tx.hash,
-                topoheight: block.topoheight,
-                type: 'RECEIVE',
-                amount: transfer.amount,
-                asset: transfer.asset,
-                from: tx.owner,
-                timestamp: block.timestamp
-              })
-            }
+            transfers.forEach((transfer) => {
+              if (tx.owner === addr) {
+                list.push({
+                  hash: tx.hash,
+                  topoheight: block.topoheight,
+                  type: 'SEND',
+                  amount: transfer.amount,
+                  asset: transfer.asset,
+                  timestamp: block.timestamp
+                })
+              }
+
+              if (transfer.to === addr) {
+                list.push({
+                  hash: tx.hash,
+                  topoheight: block.topoheight,
+                  type: 'RECEIVE',
+                  amount: transfer.amount,
+                  asset: transfer.asset,
+                  from: tx.owner,
+                  timestamp: block.timestamp
+                })
+              }
+            })
           })
-        })
+        }
       }
     }
 
