@@ -7,7 +7,6 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formattedBlock } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
-import { style as tableStyle } from '../../components/tableBody'
 import { getBlockType } from './index'
 
 const style = {

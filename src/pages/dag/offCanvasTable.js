@@ -12,6 +12,7 @@ import Icon from '../../components/icon'
 import blockColor from './blockColor'
 import useTheme from '../../context/useTheme'
 import { scaleOnHover } from '../../style/animate'
+import Switch from '../../components/switch'
 
 const style = {
   container: css`
@@ -34,6 +35,12 @@ const style = {
       justify-content: end;
       align-items: center;
       padding: 1em;
+
+      > :nth-child(1) {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+      }
 
       button {
         border: none;
@@ -88,7 +95,7 @@ function HeightRangeInput(props) {
   let value = _value ? _value : inputHeight || 0
 
   return <div>
-    <div>Height: {value}</div> 
+    <div>Height: {value}</div>
     <input type="range" value={value} step={1}
       onChange={(e) => setValue(e.target.valueAsNumber)}
       onMouseUp={() => {
@@ -134,7 +141,7 @@ function useOffCanvasTable(props) {
     <div className={style.controls}>
       <div className="start-buttons">
         <div>
-          <input type="checkbox" checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
+          <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
           <label>Hide Orphaned</label>
         </div>
         <Button onClick={() => {
