@@ -32,11 +32,11 @@ const style = {
     .start-buttons {
       display: flex;
       gap: 1em;
-      justify-content: end;
+      justify-content: space-between;
       align-items: center;
       padding: 1em;
 
-      > :nth-child(1) {
+      > div {
         display: flex;
         gap: .5em;
         align-items: center;
@@ -144,14 +144,16 @@ function useOffCanvasTable(props) {
           <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
           <label>Hide Orphaned</label>
         </div>
-        <Button onClick={() => {
-          setPaused(!paused)
-          if (paused) setInputHeight(height)
-        }}>
-          {paused && <Icon name="play" />}
-          {!paused && <Icon name="pause" />}
-        </Button>
-        <Button onClick={() => setOpened(false)} icon="close" />
+        <div>
+          <Button onClick={() => {
+            setPaused(!paused)
+            if (paused) setInputHeight(height)
+          }}>
+            {paused && <Icon name="play" />}
+            {!paused && <Icon name="pause" />}
+          </Button>
+          <Button onClick={() => setOpened(false)} icon="close" />
+        </div>
       </div>
       {paused && <div className="edit-buttons">
         <HeightRangeInput height={height}

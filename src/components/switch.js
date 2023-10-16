@@ -13,9 +13,9 @@ const style = css`
 
   > div {
     background-color: var(--bg-color);
-    width: 50%;
+    width: 55%;
     border-radius: 50%;
-    height: 100%;
+    height: 105%;
     transition: all .25s;
     display: flex;
     justify-content: center;
@@ -23,7 +23,7 @@ const style = css`
     position: relative;
 
     &.on {
-      transform: translate(1em, 0);
+      transform: translate(.95em, 0);
     }
 
     > i {

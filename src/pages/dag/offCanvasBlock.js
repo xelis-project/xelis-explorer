@@ -24,7 +24,7 @@ const style = {
 
       button {
         border: none;
-        border-radius: 15px;
+        border-radius: 30px;
         padding: .5em 1em;
         background-color: var(--text-color);
         color: var(--bg-color);
@@ -32,6 +32,7 @@ const style = {
         display: flex;
         gap: .5em;
         align-items: center;
+        font-size: .9em;
       }
     }
 

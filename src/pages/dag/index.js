@@ -3,10 +3,11 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Text, Segment, Segments, Instance, Instances } from '@react-three/drei'
-import { BoxGeometry, MeshBasicMaterial } from 'three'
+import { BoxGeometry, MeshBasicMaterial, Vector3 } from 'three'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
+import TWEEN from '@tweenjs/tween.js'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
@@ -259,7 +260,7 @@ function InstancedLines(props) {
 }
 
 function InstancedBlocks(props) {
-  const { blocks = [], setHoveredBlock, offCanvasBlock, stableHeight } = props
+  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight } = props
 
   const { theme: currentTheme } = useTheme()
   const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
@@ -302,7 +303,7 @@ function InstancedBlocks(props) {
 
     setHoveredBlock(block)
     document.body.style.setProperty('cursor', 'pointer')
-    e.eventObject.scale.set(1.3, 1.3, 1.3)
+    //e.eventObject.scale.set(1.3, 1.3, 1.3)
   }, [pointerDown])
 
   const onPointerLeave = useCallback((e) => {
@@ -312,20 +313,53 @@ function InstancedBlocks(props) {
 
     setHoveredBlock(null)
     document.body.style.removeProperty('cursor')
-    e.eventObject.scale.set(1, 1, 1)
+    //e.eventObject.scale.set(1, 1, 1)
   }, [pointerDown])
 
   const onClick = useCallback((block) => {
     offCanvasBlock.open(block.data)
   }, [offCanvasBlock])
 
+
+  const [scale, setScale] = useState({})
+  useEffect(() => {
+    if (!newBlock) return
+
+    const animateBlock = async () => {
+      const hash = newBlock.hash
+      let values = { x: 2 }
+      new TWEEN.Tween(values).to({ x: 1 }, 1000)
+        .easing(TWEEN.Easing.Bounce.Out)
+        .onUpdate(() => {
+          setScale((scale) => {
+            scale[hash] = values.x
+            return { ...scale }
+          })
+        })
+        .onComplete(() => {
+          setScale((scale) => {
+            Reflect.deleteProperty(scale, hash)
+            return { ...scale }
+          })
+        }).start()
+    }
+
+    animateBlock()
+  }, [newBlock])
+
   return <Instances material={material} geometry={geometry}>
     {blocks.map((block) => {
       const { x, y, data } = block
       const blockType = getBlockType(data, stableHeight)
+
+      let scaleValue = scale[data.hash] || 1
+      if (hoveredBlock && data.hash === hoveredBlock.data.hash) scaleValue = 1.3
+      let boxScale = new Vector3(scaleValue, scaleValue, scaleValue)
+
       return <Instance key={data.hash} position={[x, y, 2]} color={blockColor.value(currentTheme, blockType)}
         onPointerOver={(e) => onPointerEnter(block, e)}
         onPointerOut={onPointerLeave}
+        scale={boxScale}
         onClick={() => onClick(block)}
       >
         <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .8, 0]}>
@@ -340,6 +374,18 @@ function InstancedBlocks(props) {
   </Instances>
 }
 
+function CanvasFrame() {
+  useFrame(({ gl, scene, camera }) => {
+    TWEEN.update()
+    gl.render(scene, camera)
+  }, 1)
+
+  return null
+}
+
+/*
+// Old canvas frame with fps drop to reduce cpu usage
+// I don't use this anymore because animation on block popup will be jittery
 function CanvasFrame() {
   const previousTimeRef = useRef(0)
 
@@ -367,22 +413,24 @@ function CanvasFrame() {
   }, [])
 
   useFrame(({ gl, scene, camera, clock }) => {
+    TWEEN.update()
     const currentTime = clock.getElapsedTime()
     const delta = currentTime - previousTimeRef.current
     const fps = 1 / fpsRef.current
-
+    gl.render(scene, camera)
     if (delta > fps) {
-      gl.render(scene, camera)
+      //gl.render(scene, camera)
       previousTimeRef.current = currentTime - (delta % fps)
     }
   }, 1)
 
   return null
-}
+}*/
 
 function DAG() {
   const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
+  const [newBlock, setNewBlock] = useState()
   //const [blocks, setBlocks] = useState(dagMock.reverse())
 
   const [loading, setLoading] = useState()
@@ -452,6 +500,7 @@ function DAG() {
     onData: (_, newBlock) => {
       loadInfo()
       if (!offCanvasTable.paused) {
+        setNewBlock(newBlock)
         setBlocks((blocks) => {
           const entries = [...groupBy(blocks, (b) => b.height).entries()]
           entries.sort((a, b) => a[0] - b[0])
@@ -552,7 +601,7 @@ function DAG() {
       <Canvas>
         <CanvasFrame />
         <CameraWithControls camRef={cameraRef} flat />
-        <InstancedBlocks stableHeight={stableHeight} blocks={blocksToRender} setHoveredBlock={setHoveredBlock} offCanvasBlock={offCanvasBlock} />
+        <InstancedBlocks stableHeight={stableHeight} newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock} hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
         <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
         {heightsText.map((text) => {
           const { height, x, y } = text
