@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import Age from '../../components/age'
 import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
-import { bounceIn, slideRight } from '../../style/animate'
+import { bounceIn, slideX } from '../../style/animate'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -60,7 +60,7 @@ const style = {
       display: block;
       user-select: none;
       cursor: pointer;
-      ${slideRight({ from: `-100%`, to: `0%`, duration: `.25s` })}
+      ${slideX({ from: `-100%`, to: `0%`, duration: `.25s` })}
 
       ${theme.query.minDesktop} {
         border-top: 3px solid var(--block-border-color);

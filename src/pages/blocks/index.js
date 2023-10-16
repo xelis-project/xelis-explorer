@@ -13,6 +13,7 @@ import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
 import { usePageLoad } from '../../context/usePageLoad'
+import { slideX } from '../../style/animate'
 
 const style = {
   container: css`
@@ -25,6 +26,9 @@ const style = {
     .table-mobile, .table-desktop {
       margin-bottom: 1em;
     }
+  `,
+  animate: css`
+    ${slideX({ from: `100%`, to: `0%` })}
   `
 }
 
@@ -67,10 +71,10 @@ function Blocks() {
   const [blockCount, setBlockCount] = useState(serverResult.totalBlocks)
   const [blocks, setBlocks] = useState(serverResult.blocks)
   const nodeSocket = useNodeSocket()
+  const [newBlock, setNewBlock] = useState()
 
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
 
     setErr(null)
     setLoading(true)
@@ -108,6 +112,7 @@ function Blocks() {
       // don't add new block if we're not on first page
       if (pageState.page > 1) return
 
+      setNewBlock(block)
       setBlocks((blocks) => {
         blocks.unshift(block)
         if (blocks.length > pageState.size) {
@@ -135,6 +140,10 @@ function Blocks() {
     </Helmet>
     <h1>Blocks</h1>
     <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
+      rowClassName={(block) => {
+        if (newBlock && block.hash === newBlock.hash) return style.animate
+        return null
+      }}
       headers={[
         {
           key: 'topoheight',

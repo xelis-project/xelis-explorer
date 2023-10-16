@@ -1,4 +1,4 @@
-import { css, keyframes } from "goober"
+import { keyframes } from 'goober'
 
 export const scaleOnHover = (props) => {
   let { scale = '.98', duration = '.25s' } = props || {}
@@ -11,7 +11,7 @@ export const scaleOnHover = (props) => {
   `
 }
 
-const slideRightKeyframes = (from, to) => keyframes`
+const slideXKeyframes = (from, to) => keyframes`
   0% {
     transform: translateX(${from});
   }
@@ -20,10 +20,26 @@ const slideRightKeyframes = (from, to) => keyframes`
   }
 `
 
-export const slideRight = (props) => {
+export const slideX = (props) => {
   const { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
   return `
-    animation: ${slideRightKeyframes(from, to)} ${duration} linear both;
+    animation: ${slideXKeyframes(from, to)} ${duration} linear both;
+  `
+}
+
+const slideYKeyframes = (from, to) => keyframes`
+  0% {
+    transform: translateY(${from});
+  }
+  100% {
+    transform: translateY(${to});
+  }
+`
+
+export const slideY = (props) => {
+  const { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
+  return `
+    animation: ${slideYKeyframes(from, to)} ${duration} linear both;
   `
 }
 
