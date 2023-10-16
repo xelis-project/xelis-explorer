@@ -12,6 +12,7 @@ import Icon from '../../components/icon'
 import blockColor from './blockColor'
 import useTheme from '../../context/useTheme'
 import { scaleOnHover } from '../../style/animate'
+import Switch from '../../components/switch'
 
 const style = {
   container: css`
@@ -31,9 +32,15 @@ const style = {
     .start-buttons {
       display: flex;
       gap: 1em;
-      justify-content: end;
+      justify-content: space-between;
       align-items: center;
       padding: 1em;
+
+      > div {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+      }
 
       button {
         border: none;
@@ -88,7 +95,7 @@ function HeightRangeInput(props) {
   let value = _value ? _value : inputHeight || 0
 
   return <div>
-    <div>Height: {value}</div> 
+    <div>Height: {value}</div>
     <input type="range" value={value} step={1}
       onChange={(e) => setValue(e.target.valueAsNumber)}
       onMouseUp={() => {
@@ -134,17 +141,19 @@ function useOffCanvasTable(props) {
     <div className={style.controls}>
       <div className="start-buttons">
         <div>
-          <input type="checkbox" checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
+          <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
           <label>Hide Orphaned</label>
         </div>
-        <Button onClick={() => {
-          setPaused(!paused)
-          if (paused) setInputHeight(height)
-        }}>
-          {paused && <Icon name="play" />}
-          {!paused && <Icon name="pause" />}
-        </Button>
-        <Button onClick={() => setOpened(false)} icon="close" />
+        <div>
+          <Button onClick={() => {
+            setPaused(!paused)
+            if (paused) setInputHeight(height)
+          }}>
+            {paused && <Icon name="play" />}
+            {!paused && <Icon name="pause" />}
+          </Button>
+          <Button onClick={() => setOpened(false)} icon="close" />
+        </div>
       </div>
       {paused && <div className="edit-buttons">
         <HeightRangeInput height={height}

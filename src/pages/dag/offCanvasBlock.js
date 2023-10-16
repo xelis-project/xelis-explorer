@@ -7,7 +7,6 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formattedBlock } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
-import { style as tableStyle } from '../../components/tableBody'
 import { getBlockType } from './index'
 
 const style = {
@@ -25,7 +24,7 @@ const style = {
 
       button {
         border: none;
-        border-radius: 15px;
+        border-radius: 30px;
         padding: .5em 1em;
         background-color: var(--text-color);
         color: var(--bg-color);
@@ -33,6 +32,7 @@ const style = {
         display: flex;
         gap: .5em;
         align-items: center;
+        font-size: .9em;
       }
     }
 

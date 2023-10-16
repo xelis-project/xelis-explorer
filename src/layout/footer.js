@@ -5,6 +5,7 @@ import packageJSON from '../../package.json'
 import theme from '../style/theme'
 import useTheme from '../context/useTheme'
 import { scaleOnHover } from '../style/animate'
+import Icon from '../components/icon'
 
 const style = {
   container: css`
@@ -49,6 +50,12 @@ const style = {
           flex-direction: column;
           gap: .5em;
           color: var(--muted-color);
+
+          > div {
+            display: flex;
+            align-items: center;
+            gap: .5em;
+          }
         }
   
         button {
@@ -104,10 +111,22 @@ function Footer() {
         <div>LINKS</div>
         <div>
           <a href="https://xelis.io" target="_blank">xelis.io</a>
-          <a href="https://stats.xelis.io" target="_blank">Statistics</a>
-          <a href="https://docs.xelis.io" target="_blank">Documentation</a>
-          <a href="https://github.com/xelis-project" target="_blank">Github</a>
-          <a href="https://discord.gg/z543umPUdj" target="_blank">Discord</a>
+          <div>
+            <a href="https://stats.xelis.io" target="_blank">Statistics</a>
+            <Icon name="chart-simple" />
+          </div>
+          <div>
+            <a href="https://docs.xelis.io" target="_blank">Documentation</a>
+            <Icon name="book" />
+          </div>
+          <div>
+            <a href="https://github.com/xelis-project" target="_blank">Github</a>
+            <Icon name="github" type="brands" />
+          </div>
+          <div>
+            <a href="https://discord.gg/z543umPUdj" target="_blank">Discord</a>
+            <Icon name="discord" type="brands" />
+          </div>
         </div>
       </div>
     </div>

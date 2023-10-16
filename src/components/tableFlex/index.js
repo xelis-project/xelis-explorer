@@ -101,7 +101,7 @@ export const style = {
 }
 
 function TableFlex(props) {
-  const { headers = [], data = [], rowKey, loading, err, emptyText = `No items`, keepTableDisplay = false } = props
+  const { headers = [], data = [], rowClassName, rowKey, loading, err, emptyText = `No items`, keepTableDisplay = false } = props
 
   const loadingStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
   const colSpan = headers.length
@@ -117,7 +117,7 @@ function TableFlex(props) {
 
     return key || 0
   }, [rowKey])
-  
+
   let displayTable = data.length > 1
   if (keepTableDisplay) displayTable = true
 
@@ -179,7 +179,12 @@ function TableFlex(props) {
           </>}
           {displayTable && data.map((item, dataIndex) => {
             const key = getRowKeyValue(item, dataIndex)
-            return <tr key={key}>
+            let className = null
+            if (typeof rowClassName === `function`) {
+              className = rowClassName(item, dataIndex)
+            }
+
+            return <tr key={key} className={className}>
               {headers.map((header, headerIndex) => {
                 let value = item[header.key]
                 if (typeof (header.render) === 'function') {

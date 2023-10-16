@@ -22,6 +22,7 @@
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
+    "@tweenjs/tween.js": "^21.0.0",
     "@xelis/sdk": "^0.5.4",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
