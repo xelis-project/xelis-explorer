@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { css } from 'goober'
+import { Link } from 'react-router-dom'
+import useNodeSocket from '@xelis/sdk/react/daemon'
+import { useCallback } from 'react'
+import to from 'await-to-js'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
-import { Link } from 'react-router-dom'
 
 const style = {
   title: css`
@@ -81,6 +84,21 @@ const defaultStats = {
 export function RecentStats(props) {
   const { blocks } = props
 
+  const nodeSocket = useNodeSocket()
+  const [p2pStatus, setP2PStatus] = useState({})
+
+  const loadP2PStatus = useCallback(async () => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
+    if (err) return
+    setP2PStatus(res)
+  }, [nodeSocket])
+
+  useEffect(() => {
+    loadP2PStatus()
+  }, [loadP2PStatus, blocks]) // keep blocks has dependencies to update on new block
+
   const stats = useMemo(() => {
     let stats = Object.assign({}, defaultStats)
     let miners = {}
@@ -124,6 +142,10 @@ export function RecentStats(props) {
         <div>
           <div>Reward</div>
           <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
+        </div>
+        <div>
+          <div>Peers</div>
+          <div>{p2pStatus.peer_count || 0}</div>
         </div>
       </div>
       <div className={style.title}>
