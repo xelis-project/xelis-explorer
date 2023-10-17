@@ -28,7 +28,7 @@ theme.light`
 
 const style = {
   container: css`
-    margin-bottom: 3em;
+    margin: 5em 0 3em 0;
 
     ${theme.query.minDesktop} {
       padding: 4em;

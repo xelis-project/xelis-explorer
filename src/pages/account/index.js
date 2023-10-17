@@ -30,6 +30,16 @@ const style = {
       font-size: 1.5em;
     }
 
+    select {
+      width: 100%;
+      padding: 0.5em;
+      border: none;
+      border-radius: 10px;
+      font-size: .7em;
+      outline: none;
+      cursor: pointer;
+    }
+
     .page {
       display: flex;
       gap: 1em;
@@ -94,6 +104,9 @@ const style = {
   `
 }
 
+/*
+// removed ssr for the time being
+
 function loadAccount_SSR({ addr }) {
   const defaultResult = { loaded: false, err: null, account: {} }
   return useServerData(`func:loadAccount(${addr})`, async () => {
@@ -116,6 +129,7 @@ function loadAccount_SSR({ addr }) {
     return result
   }, defaultResult)
 }
+*/
 
 function Account() {
   const { addr } = useParams()
@@ -123,15 +137,16 @@ function Account() {
   const nodeSocket = useNodeSocket()
 
   const { firstPageLoad } = usePageLoad()
-  const serverResult = loadAccount_SSR({ addr })
+  //const serverResult = loadAccount_SSR({ addr })
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
-  const [account, setAccount] = useState(serverResult.account)
+  const [account, setAccount] = useState({})
+  const [accountAssets, setAccountAssets] = useState([])
+  const [asset, setAsset] = useState(XELIS_ASSET)
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
 
     setErr(null)
     setLoading(true)
@@ -143,23 +158,33 @@ function Account() {
 
     const [err, result] = await to(nodeSocket.daemon.getLastBalance({
       address: addr,
-      asset: XELIS_ASSET,
+      asset: asset,
     }))
     if (err) return resErr(err)
 
     const [err2, result2] = await to(nodeSocket.daemon.getNonce({
-      address: addr
+      address: addr,
     }))
     if (err2) return resErr(err2)
 
+
+    const [err3, result3] = await to(nodeSocket.daemon.getAccountAssets(addr))
+    if (err3) return resErr(err3)
+
     setAccount({ addr, balance: result, nonce: result2 })
+    setAccountAssets(result3)
     setLoading(false)
-  }, [addr, nodeSocket])
+  }, [asset, addr, nodeSocket])
 
   useEffect(() => {
-    if (firstPageLoad && serverResult.loaded) return
+    //if (firstPageLoad && serverResult.loaded) return
     loadAccount()
   }, [loadAccount])
+
+  const onAssetChange = useCallback((e) => {
+    const newAsset = e.target.value
+    setAsset(newAsset)
+  }, [])
 
   const balance = account.balance ? account.balance.balance.balance : 0
   const nonce = account.nonce ? account.nonce.nonce : `--`
@@ -177,6 +202,18 @@ function Account() {
             <div style={{ wordBreak: `break-all` }}>{addr}</div>
           </div>
           <div>
+            <div>Assets</div>
+            <div>
+              <select onChange={onAssetChange} value={asset}>
+                {accountAssets.map((asset) => {
+                  return <option value={asset} key={asset}>
+                    {`${reduceText(asset)}${asset === XELIS_ASSET ? ` (XEL)` : ``}`}
+                  </option>
+                })}
+              </select>
+            </div>
+          </div>
+          <div>
             <div>Balance</div>
             <div>{formatXelis(balance)}</div>
           </div>
@@ -187,7 +224,7 @@ function Account() {
         </div>
       </div>
       <div>
-        <History account={account} />
+        <History addr={addr} asset={asset} />
       </div>
     </div>
   </div>
@@ -195,24 +232,36 @@ function Account() {
 
 export default Account
 
+/*
+function loadAccountHistory_SSR() {
+  const defaultResult = { err: null, history: [], loaded: false }
+  return useServerData(`func:loadAccountHistory`, async () => {
+    let result = Object.assign({}, defaultResult)
+
+    const [err, res] = await to(daemonRPC.getAccountHistory({
+      address
+    }))
+    result.err = err
+    if (err) return result
+
+    result.history = res.result
+    result.loaded = true
+    return result
+  }, [])
+}
+*/
+
 function History(props) {
-  const { account } = props
+  const { asset, addr } = props
 
   const nodeSocket = useNodeSocket()
 
-  const topoheightRef = useRef()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
-  const [history, setHistory] = useState({})
-
-  const [page, setPage] = useState(1)
-  const pageSize = 10
+  const [history, setHistory] = useState([])
 
   const loadData = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-    if (!account.balance) return
-    if (history[page]) return
 
     setLoading(true)
     setErr(null)
@@ -221,86 +270,28 @@ function History(props) {
       setLoading(false)
     }
 
-    const list = []
+    const [err, result] = await to(nodeSocket.daemon.getAccountHistory({
+      address: addr,
+      asset: asset,
+    }))
+    if (err) return resErr(err)
 
-    if (!topoheightRef.current) {
-      topoheightRef.current = account.balance.topoheight
-    }
-
-    let topoheight = topoheightRef.current
-    const addr = account.addr
-
-    for (let i = 0; i < pageSize; i++) {
-      if (!topoheight) break
-
-      const [err, result] = await to(nodeSocket.daemon.getBalanceAtTopoHeight({
-        address: addr,
-        asset: XELIS_ASSET,
-        topoheight: topoheight
-      }))
-      if (err) return resErr(err)
-
-      const [err2, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
-        topoheight: topoheight,
-        include_txs: true
-      }))
-      if (err2) return resErr(err2)
-
-      topoheight = result.previous_topoheight
-
-      if (block.miner === addr) {
-        list.push({
-          hash: block.hash,
-          topoheight: block.topoheight,
-          type: 'MINING',
-          amount: block.reward,
-          asset: XELIS_ASSET,
-          timestamp: block.timestamp
-        })
-      }
-
-      block.transactions.forEach((tx, i) => {
-        const transfers = tx.data.transfers || []
-        const hash = block.txs_hashes[i]
-
-        transfers.forEach((transfer) => {
-          if (tx.owner === addr) {
-            list.push({
-              hash,
-              topoheight: block.topoheight,
-              type: 'SEND',
-              amount: transfer.amount,
-              asset: transfer.asset,
-              timestamp: block.timestamp
-            })
-          }
-
-          if (transfer.to === addr) {
-            list.push({
-              hash,
-              topoheight: block.topoheight,
-              type: 'RECEIVE',
-              amount: transfer.amount,
-              asset: transfer.asset,
-              from: tx.owner,
-              timestamp: block.timestamp
-            })
-          }
-        })
-      })
-    }
-
-    history[page] = list
-    setHistory(Object.assign({}, history))
+    setHistory(result)
     setLoading(false)
-    topoheightRef.current = topoheight
-  }, [history, page, account, nodeSocket])
+  }, [asset, addr, nodeSocket])
 
   useEffect(() => {
     loadData()
   }, [loadData])
 
-  const list = history[page] || history[page - 1] || []
+  const getType = useCallback((item) => {
+    if (item.mining) return `MINING`
+    if (item.burn) return `BURN`
+    if (item.outgoing) return `OUTGOING`
+    if (item.incoming) return `INCOMING`
+    return ``
+  }, [])
+
 
   return <div>
     <TableFlex loading={loading} err={err} rowKey={(item, index) => {
@@ -322,12 +313,13 @@ function History(props) {
           title: "Hash",
           render: (value, item) => {
             let link = ``
+            const itemType = getType(item)
 
-            if (item.type === "SEND" || item.type === "RECEIVE") {
+            if (itemType === 'INCOMING' || itemType === 'OUTGOING' || itemType === 'BURN') {
               link = `/txs/${value}`
             }
 
-            if (item.type === "MINING") {
+            if (itemType === 'MINING') {
               link = `/blocks/${value}`
             }
 
@@ -339,14 +331,17 @@ function History(props) {
         {
           key: "type",
           title: "Type",
-          render: (value) => {
-            switch (value) {
-              case "SEND":
+          render: (_, item) => {
+            const itemType = getType(item)
+            switch (itemType) {
+              case "OUTGOING":
                 return <><Icon name="arrow-up" />&nbsp;&nbsp;SEND</>
-              case "RECEIVE":
+              case "INCOMING":
                 return <><Icon name="arrow-down" />&nbsp;&nbsp;RECEIVE</>
               case "MINING":
                 return <><Icon name="microchip" />&nbsp;&nbsp;MINING</>
+              case "BURN":
+                return <><Icon name="fire" />&nbsp;&nbsp;BURN</>
               default:
                 return null
             }
@@ -355,19 +350,33 @@ function History(props) {
         {
           key: "amount",
           title: "Amount",
-          render: (value, item) => {
-            return formatAsset(value, item.asset)
+          render: (_, item) => {
+            const itemType = getType(item)
+            const { outgoing, incoming, mining, burn } = item
+            switch (itemType) {
+              case "OUTGOING":
+                return formatAsset(outgoing.amount, asset)
+              case "INCOMING":
+                return formatAsset(incoming.amount, asset)
+              case "MINING":
+                return formatAsset(mining.reward, asset)
+              case "BURN":
+                return formatAsset(burn.amount, asset)
+              default:
+                return null
+            }
           }
         },
         {
           key: "from",
           title: "From",
           render: (_, item) => {
-            switch (item.type) {
-              case "RECEIVE":
-                return <Link to={`/accounts/${item.recipient}`}>
-                  {reduceText(item.from)}
-                </Link>
+            const itemType = getType(item)
+            switch (itemType) {
+              case "INCOMING":
+              /*return <Link to={`/accounts/${item.recipient}`}>
+                {reduceText(item.from)}
+              </Link>*/
               case "MINING":
                 return `Coinbase`
               default:
@@ -376,27 +385,12 @@ function History(props) {
           }
         },
         {
-          key: "timestamp",
+          key: "block_timestamp",
           title: "Age",
           render: (value) => {
             return <Age timestamp={value} update />
           }
         }
-      ]} data={list} />
-    <div className="pager">
-      <Button icon="arrow-left" onClick={() => {
-        if (page <= 1) return
-        setPage(page - 1)
-      }}>
-        Previous
-      </Button>
-      <Button icon="arrow-right" iconLocation="right"
-        onClick={() => {
-          if (!topoheightRef.current) return
-          setPage(page + 1)
-        }}>
-        Next
-      </Button>
-    </div>
+      ]} data={history} />
   </div>
 }
