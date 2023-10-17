@@ -96,6 +96,7 @@ function Footer() {
           <Link to="/mempool">Mempool</Link>
           <Link to="/dag">DAG</Link>
           <Link to="/accounts">Accounts</Link>
+          <Link to="/peers">Peers</Link>
           <Link to="/settings">Settings</Link>
         </div>
       </div>
@@ -110,7 +111,10 @@ function Footer() {
       <div>
         <div>LINKS</div>
         <div>
-          <a href="https://xelis.io" target="_blank">xelis.io</a>
+          <div>
+            <a href="https://xelis.io" target="_blank">Home</a>
+            <Icon name="home" />
+          </div>
           <div>
             <a href="https://stats.xelis.io" target="_blank">Statistics</a>
             <Icon name="chart-simple" />
@@ -120,7 +124,7 @@ function Footer() {
             <Icon name="book" />
           </div>
           <div>
-            <a href="https://github.com/xelis-project" target="_blank">Github</a>
+            <a href="https://github.com/xelis-project" target="_blank">GitHub</a>
             <Icon name="github" type="brands" />
           </div>
           <div>
