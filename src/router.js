@@ -13,6 +13,7 @@ import MemPool from './pages/memPool'
 import Settings from './pages/settings'
 import Account from './pages/account'
 import Accounts from './pages/accounts'
+import Peers from './pages/peers'
 
 const routes = [
   {
@@ -54,6 +55,10 @@ const routes = [
           {
             path: `/settings`,
             element: <Settings />
+          },
+          {
+            path: `/peers`,
+            element: <Peers />
           },
           {
             path: '*',
