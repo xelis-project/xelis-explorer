@@ -43,7 +43,8 @@ const loader = {
   '.woff2': 'file',
   '.svg': 'file',
   '.ttf': 'file',
-  '.eot': 'file'
+  '.eot': 'file',
+  '.png': 'file'
 }
 
 const external = [`*.svg`]
