@@ -1,9 +1,11 @@
 import { useEffect, useCallback, useState } from 'react'
 import useNodeSocket from '@xelis/sdk/react/daemon'
 import to from 'await-to-js'
-import TableFlex from '../../components/tableFlex'
 import { Helmet } from 'react-helmet-async'
 import { css } from 'goober'
+import 'leaflet/dist/leaflet.css'
+
+import TableFlex from '../../components/tableFlex'
 import { reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 
@@ -20,6 +22,16 @@ const style = {
         margin-top: .2em;
         font-weight: normal;
       }
+    }
+  `,
+  map: css`
+    margin-bottom: 2em;
+
+    .leaflet-container {
+      width: 100%; 
+      height: 40em; 
+      outline: none;
+      background-color: var(--bg-color);
     }
   `
 }
@@ -87,6 +99,7 @@ function Peers() {
       Peers
       <div>{peers.length} beautiful peers</div>
     </h1>
+    <Map peers={peers} geoLocation={geoLocation} />
     <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
       rowKey="id"
       headers={[
@@ -149,3 +162,56 @@ function Peers() {
 }
 
 export default Peers
+
+function Map(props) {
+  const { peers, geoLocation } = props
+
+  const [leaflet, setLeaflet] = useState()
+  const [map, setMap] = useState()
+
+  useEffect(() => {
+    const load = async () => {
+      // load here (client side only) to avoid ssr loading leaflet
+      const react = await import('react-leaflet')
+      // const { Simple }  = await import('leaflet/src/geo/crs/CRS.Simple')
+      setLeaflet({ react })
+    }
+
+    load()
+  }, [])
+
+  useEffect(() => {
+    if (!leaflet) return
+
+    const { MapContainer, TileLayer, CircleMarker, Popup } = leaflet.react
+
+    // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
+    const map = <MapContainer zoom={2} preferCanvas center={[0, 0]}>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      />
+      {peers.map((peer) => {
+        const ip = getIP(peer)
+        const location = geoLocation[ip]
+        if (!location) return null
+
+        const { latitude, longitude } = location
+        return <CircleMarker key={ip} radius={10} center={[latitude, longitude]}
+          color="green"
+        >
+          <Popup>
+            <div>{peer.addr}</div>
+            <div>{location.country} / {location.region}</div>
+          </Popup>
+        </CircleMarker>
+      })}
+    </MapContainer>
+
+    setMap(map)
+  }, [leaflet, peers, geoLocation])
+
+  return <div className={style.map}>
+    {map}
+  </div>
+}
