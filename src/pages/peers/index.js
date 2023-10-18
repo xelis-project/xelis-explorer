@@ -5,6 +5,7 @@ import TableFlex from '../../components/tableFlex'
 import { Helmet } from 'react-helmet-async'
 import { css } from 'goober'
 import { reduceText } from '../../utils'
+import DotLoading from '../../components/dotLoading'
 
 const style = {
   container: css`
@@ -32,11 +33,13 @@ function Peers() {
   const nodeSocket = useNodeSocket()
   const [loading, setLoading] = useState(true)
   const [peers, setPeers] = useState([])
+  const [geoLoading, setGeoLoading] = useState(true)
   const [geoLocation, setGeoLocation] = useState({})
   const [err, setErr] = useState()
 
   const loadPeers = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
+    setLoading(true)
 
     const resErr = (err) => {
       setLoading(false)
@@ -52,15 +55,20 @@ function Peers() {
 
   const loadGeoLocation = useCallback(async () => {
     if (peers.length === 0) return
+    setGeoLoading(true)
 
     const ips = peers.map((peer) => getIP(peer))
     const query = `?ips=${ips.join(`,`)}`
 
     const [err, res] = await to(fetch(`https://geoip.xelis.io${query}`))
-    if (err) return console.log(err)
+    if (err) {
+      setGeoLoading(false)
+      console.log(err)
+    }
 
     const data = await res.json()
     setGeoLocation(data)
+    setGeoLoading(false)
   }, [peers])
 
   useEffect(() => {
@@ -98,6 +106,11 @@ function Peers() {
             if (data && data.country && data.region) {
               return `${data.country} / ${data.region}`
             }
+
+            if (geoLoading) {
+              return <DotLoading />
+            }
+
             return `--`
           }
         },

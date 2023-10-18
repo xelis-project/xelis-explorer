@@ -18,6 +18,11 @@ const style = {
   container: css`
     overflow-y: auto;
 
+    :nth-child(2) {
+      padding-bottom: 0;
+      overflow: hidden;
+    }
+
     table tr:hover td {
       background-color: var(--table-hover-bg-color);
       color: var(--table-hover-text-color);
