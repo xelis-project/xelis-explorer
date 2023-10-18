@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { Canvas, useThree, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { Text, Segment, Segments, Instance, Instances } from '@react-three/drei'
+import { Text, Segment, Segments, Instance, Instances, MapControls } from '@react-three/drei'
 import { BoxGeometry, MeshBasicMaterial, Vector3 } from 'three'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
@@ -90,139 +90,6 @@ export function getBlockType(block, stableHeight) {
   return block.block_type
 }
 
-function CameraWithControls(props) {
-  const { flat = true, camRef, ...restProps } = props
-  const [canMove, _setCanMove] = useState(false)
-  const { camera, gl } = useThree()
-  const lastPosition = useRef()
-  const lastDistance = useRef()
-
-  // don't select text when moving out of canvas
-  const setCanMove = useCallback((value) => {
-    _setCanMove(value)
-    if (value) document.body.style.setProperty('user-select', 'none')
-    else document.body.style.removeProperty('user-select')
-  }, [])
-
-  useEffect(() => {
-    if (flat) {
-      camera.zoom = 140
-      camera.position.z = 1000
-    } else {
-      camera.position.z = 6
-      camera.zoom = 1
-    }
-
-    camera.updateProjectionMatrix()
-  }, [flat])
-
-  useEffect(() => {
-    let touchMoveTimeoutId
-    const updatePosition = (x, y) => {
-      const [lastX, lastY] = lastPosition.current
-      const deltaX = x - lastX
-      const deltaY = y - lastY
-
-      camera.position.x -= deltaX / camera.zoom // use camera.zoom to change move speed :)
-      camera.position.y += deltaY / camera.zoom // * 0.015
-
-      lastPosition.current = [x, y]
-      camera.updateProjectionMatrix()
-    }
-
-    const updateZoom = (deltaY, speed) => {
-      const _speed = camera.zoom / speed
-      camera.zoom += deltaY > 0 ? -_speed : +_speed
-      //camera.zoom = Math.max(5, Math.min(camera.zoom, 140))
-      camera.updateProjectionMatrix()
-    }
-
-    const handleMouseDown = (event) => {
-      //event.preventDefault()
-      setCanMove(true)
-      lastPosition.current = [event.clientX, event.clientY]
-    }
-
-    const handleTouchDown = (event) => {
-      const touches = event.touches
-      if (touches.length === 1) {
-        setCanMove(true)
-        lastPosition.current = [touches[0].clientX, touches[0].clientY]
-      }
-
-      if (touches.length === 2) {
-        const dx = touches[0].clientX - touches[1].clientX
-        const dy = touches[0].clientY - touches[1].clientY
-        lastDistance.current = Math.sqrt(dx * dx + dy * dy)
-      }
-    }
-
-    const handleMouseUp = (event) => {
-      //event.preventDefault()
-      setCanMove(false)
-    }
-
-    const handleTouchEnd = (event) => {
-      setCanMove(false)
-    }
-
-    const handleMouseMove = (event) => {
-      //event.preventDefault()
-      if (!canMove) return
-      updatePosition(event.clientX, event.clientY)
-    }
-
-    const handleTouchMove = (event) => {
-      //event.preventDefault()
-      const touches = event.touches
-
-      if (canMove && touches.length === 1) {
-        updatePosition(touches[0].clientX, touches[0].clientY)
-      }
-
-      if (touches.length === 2) {
-        if (touchMoveTimeoutId) clearTimeout(touchMoveTimeoutId)
-        const dx = touches[0].clientX - touches[1].clientX
-        const dy = touches[0].clientY - touches[1].clientY
-        let distance = Math.sqrt(dx * dx + dy * dy)
-        touchMoveTimeoutId = setTimeout(() => lastDistance.current = distance, 100)
-        updateZoom(-(distance - lastDistance.current), 50)
-      }
-    }
-
-    const handleZoom = (event) => {
-      updateZoom(event.deltaY, 5)
-    }
-
-    gl.domElement.addEventListener('wheel', handleZoom, { passive: true })
-    gl.domElement.addEventListener('mousedown', handleMouseDown, { passive: true })
-    gl.domElement.addEventListener('mouseup', handleMouseUp, { passive: true })
-    gl.domElement.addEventListener('mousemove', handleMouseMove, { passive: true })
-    gl.domElement.addEventListener('mouseout', handleMouseUp, { passive: true })
-    gl.domElement.addEventListener('touchmove', handleTouchMove, { passive: true })
-    gl.domElement.addEventListener('touchstart', handleTouchDown, { passive: true })
-    gl.domElement.addEventListener('touchend', handleTouchEnd, { passive: true })
-
-    return () => {
-      gl.domElement.removeEventListener('wheel', handleZoom)
-      gl.domElement.removeEventListener('mousedown', handleMouseDown, { passive: true })
-      gl.domElement.removeEventListener('mouseup', handleMouseUp, { passive: true })
-      gl.domElement.removeEventListener('mousemove', handleMouseMove, { passive: true })
-      gl.domElement.removeEventListener('mouseout', handleMouseUp, { passive: true })
-      gl.domElement.removeEventListener('touchmove', handleTouchMove, { passive: true }) // can't passive because we need preventDefault()
-      gl.domElement.removeEventListener('touchstart', handleTouchDown, { passive: true })
-      gl.domElement.removeEventListener('touchend', handleTouchEnd, { passive: true }) // don't preventDefault here it will cancel onClick event for block info
-    }
-  }, [canMove, camera, gl])
-
-  return <orthographicCamera
-    ref={camRef}
-    {...restProps}
-  >
-    <primitive object={camera} />
-  </orthographicCamera>
-}
-
 function InstancedLines(props) {
   const { blocks = [], hoveredBlock } = props
 
@@ -260,7 +127,7 @@ function InstancedLines(props) {
 }
 
 function InstancedBlocks(props) {
-  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight } = props
+  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor } = props
 
   const { theme: currentTheme } = useTheme()
   const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
@@ -302,8 +169,7 @@ function InstancedBlocks(props) {
     if (e.object.name === 'hash') return
 
     setHoveredBlock(block)
-    document.body.style.setProperty('cursor', 'pointer')
-    //e.eventObject.scale.set(1.3, 1.3, 1.3)
+    setCursor('pointer')
   }, [pointerDown])
 
   const onPointerLeave = useCallback((e) => {
@@ -312,8 +178,7 @@ function InstancedBlocks(props) {
     if (e.object.name === 'hash') return
 
     setHoveredBlock(null)
-    document.body.style.removeProperty('cursor')
-    //e.eventObject.scale.set(1, 1, 1)
+    setCursor('grab')
   }, [pointerDown])
 
   const onClick = useCallback((block) => {
@@ -383,50 +248,6 @@ function CanvasFrame() {
   return null
 }
 
-/*
-// Old canvas frame with fps drop to reduce cpu usage
-// I don't use this anymore because animation on block popup will be jittery
-function CanvasFrame() {
-  const previousTimeRef = useRef(0)
-
-  const fpsRef = useRef(50)
-  const fpsDropTimeout = 2000
-
-  // lower fps if mouse is not moving - reduce cpu usage
-  useEffect(() => {
-    let timeoutId = null
-    const pointerMove = () => {
-      if (timeoutId) clearTimeout(timeoutId)
-      fpsRef.current = 50
-
-      timeoutId = setTimeout(() => {
-        fpsRef.current = 1
-      }, fpsDropTimeout)
-    }
-
-    window.addEventListener('wheel', pointerMove)
-    window.addEventListener('pointermove', pointerMove)
-    return () => {
-      window.removeEventListener('wheel', pointerMove)
-      window.removeEventListener('pointermove', pointerMove)
-    }
-  }, [])
-
-  useFrame(({ gl, scene, camera, clock }) => {
-    TWEEN.update()
-    const currentTime = clock.getElapsedTime()
-    const delta = currentTime - previousTimeRef.current
-    const fps = 1 / fpsRef.current
-    gl.render(scene, camera)
-    if (delta > fps) {
-      //gl.render(scene, camera)
-      previousTimeRef.current = currentTime - (delta % fps)
-    }
-  }, 1)
-
-  return null
-}*/
-
 function DAG() {
   const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
@@ -438,8 +259,6 @@ function DAG() {
   const [err, setErr] = useState()
 
   const stableHeight = info.stableheight
-
-  const cameraRef = useRef()
 
   const fetchMaxBlockHeight = 20
   const displayMaxBlockHeight = 20
@@ -536,12 +355,6 @@ function DAG() {
   const [heightsText, setHeightsText] = useState([])
 
   useEffect(() => {
-    if (cameraRef.current) {
-      // use fixed value of 38 instead of calculating last block position on page load
-      // this avoid flickering and seeing block moving from left to right
-      cameraRef.current.position.x = 38
-    }
-
     let filteredBlocks = blocks
     if (offCanvasTable.hideOrphaned) {
       filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
@@ -592,24 +405,39 @@ function DAG() {
   }, [blocks, offCanvasTable.hideOrphaned])
 
   const [hoveredBlock, setHoveredBlock] = useState(null)
+  const [cursor, setCursor] = useState(`grab`)
 
   return <div className={style.container}>
     <Helmet>
       <title>DAG</title>
     </Helmet>
     <div className="canvas">
-      <Canvas>
+      <Canvas style={{ cursor }} orthographic
+        camera={{ position: [0, 0, 10], zoom: 100, up: [0, 0, 1], far: 10000 }}
+        onMouseDown={() => {
+          setCursor('grabbing')
+          document.body.style.setProperty('user-select', 'none')
+        }}
+        onMouseUp={() => {
+          setCursor('grab')
+          document.body.style.removeProperty('user-select')
+        }}
+      >
         <CanvasFrame />
-        <CameraWithControls camRef={cameraRef} flat />
-        <InstancedBlocks stableHeight={stableHeight} newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock} hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
-        <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
-        {heightsText.map((text) => {
-          const { height, x, y } = text
-          return <Text key={height} color="white" anchorX="center"
-            anchorY="middle" fontSize={.20} position={[x, y + 0.25, 4]}>
-            {height.toLocaleString()}
-          </Text>
-        })}
+        <MapControls maxZoom={200} minZoom={10} enableDamping={false} enableRotate={false} />
+        <group position={[-34, 0, 0]}>
+          <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight}
+            newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock}
+            hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
+          <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
+          {heightsText.map((text) => {
+            const { height, x, y } = text
+            return <Text key={height} color="white" anchorX="center"
+              anchorY="middle" fontSize={.20} position={[x, y + 0.25, 4]}>
+              {height.toLocaleString()}
+            </Text>
+          })}
+        </group>
       </Canvas>
     </div>
     {offCanvasTable.render}

@@ -28,7 +28,7 @@ const style = {
     }
   `,
   animate: css`
-    ${slideX({ from: `100%`, to: `0%` })}
+    ${slideX({ from: `100%`, to: `0%`, duration: `0.4s` })}
   `
 }
 
