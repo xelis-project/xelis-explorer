@@ -28,8 +28,6 @@ function MemPool() {
 
   const loadMemPool = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-
     setErr(null)
     setLoading(true)
 
@@ -106,8 +104,6 @@ function TxExecuted(props) {
 
   const loadExecutedTxs = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-
     setLoading(true)
     setErr(null)
 

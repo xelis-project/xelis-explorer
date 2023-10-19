@@ -286,13 +286,14 @@ function DAG() {
 
     const inputHeight = offCanvasTable.inputHeight
     if (!inputHeight) return
+    setLoading(true)
+    setErr(null)
 
     const resErr = (err) => {
       setLoading(false)
       setErr(err)
     }
 
-    setLoading(true)
     let start = Math.max(0, inputHeight - (fetchMaxBlockHeight - 1))
     let end = inputHeight
     const [err, newBlocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
