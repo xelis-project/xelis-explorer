@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css'
 import TableFlex from '../../components/tableFlex'
 import { parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
+import useTheme from '../../context/useTheme'
 
 const style = {
   container: css`
@@ -33,6 +34,17 @@ const style = {
       outline: none;
       background-color: var(--bg-color);
     }
+
+    .leaflet-popup-content {
+      > :nth-child(1) {
+        font-weight: bold;
+        padding-bottom: .5em;
+      }
+
+      > :nth-child(2), > :nth-child(3) {
+        font-size: .9em;
+      }
+    }
   `
 }
 
@@ -47,6 +59,7 @@ function Peers() {
   const loadPeers = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
     setLoading(true)
+    setErr(null)
 
     const resErr = (err) => {
       setLoading(false)
@@ -143,6 +156,13 @@ function Table(props) {
         }
       },
       {
+        key: 'height',
+        title: 'Height',
+        render: (value) => {
+          return value
+        }
+      },
+      {
         key: 'topoheight',
         title: 'Topoheight',
         render: (value) => {
@@ -151,7 +171,7 @@ function Table(props) {
       },
       {
         key: 'pruned_topoheight',
-        title: 'Pruned Topoheight',
+        title: 'Pruned Topo',
         render: (value) => {
           return value || `--`
         }
@@ -170,6 +190,7 @@ function Table(props) {
 function Map(props) {
   const { peers, geoLocation } = props
 
+  const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
   const [map, setMap] = useState()
 
@@ -189,11 +210,16 @@ function Map(props) {
 
     const { MapContainer, TileLayer, CircleMarker, Popup } = leaflet.react
 
+    let tileLayerUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`
+    if (theme === `light`) {
+      tileLayerUrl = `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png`
+    }
+
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
     const map = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        url={tileLayerUrl}
       />
       {peers.map((peer) => {
         const { ip } = peer
@@ -205,6 +231,7 @@ function Map(props) {
           color="green"
         >
           <Popup>
+            <div>{peer.tag ? peer.tag : `No tag`}</div>
             <div>{peer.addr}</div>
             <div>{location.country} / {location.region}</div>
           </Popup>
@@ -213,7 +240,7 @@ function Map(props) {
     </MapContainer>
 
     setMap(map)
-  }, [leaflet, peers, geoLocation])
+  }, [leaflet, peers, geoLocation, theme])
 
   return <div className={style.map}>
     {map}

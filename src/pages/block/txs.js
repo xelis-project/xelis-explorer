@@ -38,8 +38,6 @@ function Transactions(props) {
 
   const load = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-
     setErr(null)
     setLoading(true)
 

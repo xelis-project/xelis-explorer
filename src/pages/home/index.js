@@ -22,7 +22,7 @@ function useRecentBlocks() {
 
   const loadRecentBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
+    setErr(null)
     setLoading(true)
 
     const resErr = (err) => {
