@@ -122,3 +122,19 @@ export const displayError = (err) => {
   console.error(err)
   return 'An error occured. Check console log.'
 }
+
+export const parseAddressWithPort = (addr) => {
+  // ipv4
+  const ipv4_matches = /^([0-9.]+):(\d+)$/.exec(addr)
+  if (ipv4_matches) {
+    return { ip: ipv4_matches[1], port: ipv4_matches[2], family: `ipv4` }
+  }
+
+  // ipv6
+  const ipv6_matches = /^\[([0-9a-f:]+)\]:(\d+)$/i.exec(addr)
+  if (ipv6_matches) {
+    return { ip: ipv6_matches[1], port: ipv6_matches[2], family: `ipv6` }
+  }
+
+  return null
+}

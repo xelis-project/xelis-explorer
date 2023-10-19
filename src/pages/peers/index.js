@@ -6,7 +6,7 @@ import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
 
 import TableFlex from '../../components/tableFlex'
-import { reduceText } from '../../utils'
+import { parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 
 const style = {
@@ -36,11 +36,6 @@ const style = {
   `
 }
 
-const getIP = (peer) => {
-  const addr = (peer.addr || '').split(':') // TODO ipv4 only need to support ipv6
-  return addr[0]
-}
-
 function Peers() {
   const nodeSocket = useNodeSocket()
   const [loading, setLoading] = useState(true)
@@ -61,7 +56,11 @@ function Peers() {
     const [err, result] = await to(nodeSocket.daemon.getPeers())
     if (err) return resErr(err)
 
-    setPeers(result)
+    setPeers(result.map((peer) => {
+      const addr = parseAddressWithPort(peer.addr)
+      if (addr) peer.ip = addr.ip
+      return peer
+    }))
     setLoading(false)
   }, [nodeSocket])
 
@@ -69,7 +68,7 @@ function Peers() {
     if (peers.length === 0) return
     setGeoLoading(true)
 
-    const ips = peers.map((peer) => getIP(peer))
+    const ips = peers.map((peer) => peer.ip)
     const query = `?ips=${ips.join(`,`)}`
 
     const [err, res] = await to(fetch(`https://geoip.xelis.io${query}`))
@@ -100,68 +99,73 @@ function Peers() {
       <div>{peers.length} beautiful peers</div>
     </h1>
     <Map peers={peers} geoLocation={geoLocation} />
-    <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
-      rowKey="id"
-      headers={[
-        {
-          key: 'addr',
-          title: 'Address',
-          render: (value) => {
-            return value
-          }
-        },
-        {
-          key: 'location',
-          title: 'Location',
-          render: (_, item) => {
-            const ip = getIP(item)
-            const data = geoLocation[ip]
-            if (data && data.country && data.region) {
-              return `${data.country} / ${data.region}`
-            }
-
-            if (geoLoading) {
-              return <DotLoading />
-            }
-
-            return `--`
-          }
-        },
-        {
-          key: 'tag',
-          title: 'Tag',
-          render: (value) => {
-            if (value) return reduceText(value, 20, 0)
-            return `--`
-          }
-        },
-        {
-          key: 'topoheight',
-          title: 'Topoheight',
-          render: (value) => {
-            return value
-          }
-        },
-        {
-          key: 'pruned_topoheight',
-          title: 'Pruned Topoheight',
-          render: (value) => {
-            return value || `--`
-          }
-        },
-        {
-          key: 'version',
-          title: 'Version',
-          render: (value) => {
-            return value
-          }
-        },
-      ]}
-    />
+    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} />
   </div>
 }
 
 export default Peers
+
+function Table(props) {
+  const { loading, err, peers, geoLocation, geoLoading } = props
+
+  return <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
+    rowKey="id"
+    headers={[
+      {
+        key: 'addr',
+        title: 'Address',
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'location',
+        title: 'Location',
+        render: (_, item) => {
+          const data = geoLocation[item.ip]
+          if (data && data.country && data.region) {
+            return `${data.country} / ${data.region}`
+          }
+
+          if (geoLoading) {
+            return <DotLoading />
+          }
+
+          return `--`
+        }
+      },
+      {
+        key: 'tag',
+        title: 'Tag',
+        render: (value) => {
+          if (value) return reduceText(value, 20, 0)
+          return `--`
+        }
+      },
+      {
+        key: 'topoheight',
+        title: 'Topoheight',
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'pruned_topoheight',
+        title: 'Pruned Topoheight',
+        render: (value) => {
+          return value || `--`
+        }
+      },
+      {
+        key: 'version',
+        title: 'Version',
+        render: (value) => {
+          return value
+        }
+      },
+    ]}
+  />
+}
 
 function Map(props) {
   const { peers, geoLocation } = props
@@ -186,13 +190,13 @@ function Map(props) {
     const { MapContainer, TileLayer, CircleMarker, Popup } = leaflet.react
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const map = <MapContainer zoom={2} preferCanvas center={[0, 0]}>
+    const map = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       />
       {peers.map((peer) => {
-        const ip = getIP(peer)
+        const { ip } = peer
         const location = geoLocation[ip]
         if (!location) return null
 
