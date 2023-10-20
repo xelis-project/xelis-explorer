@@ -1,6 +1,7 @@
 import { css } from 'goober'
 import { useCallback, useMemo } from 'react'
 import theme from '../../style/theme'
+import Dropdown from '../dropdown'
 
 export function getPaginationRange(pageState) {
   const { page, size } = pageState
@@ -55,8 +56,8 @@ function Pagination(props) {
     return 1
   }, [state, count])
 
-  const changeSize = useCallback((e) => {
-    const size = parseInt(e.target.value)
+  const changeSize = useCallback((item) => {
+    const size = parseInt(item.key)
     setState({ size, page: 1 })
   }, [])
 
@@ -75,35 +76,40 @@ function Pagination(props) {
   const canFirstPage = state.page !== 1
   const canLastPage = state.page !== pageCount
 
+  const dropdownSizes = useMemo(() => {
+    return sizes.map((size) => ({
+      key: size,
+      text: size
+    }))
+  }, [sizes])
+
   return <div {...restProps}>
-      <select value={state.size} onChange={changeSize}>
-        {sizes.map((v) => <option key={v} value={v}>{v}</option>)}
-      </select>
-      <button onClick={setFirstPage} disabled={!canFirstPage} className={!canFirstPage ? `active` : ``}>1</button>
-      {(() => {
-        const items = []
+    <Dropdown items={dropdownSizes} onChange={changeSize} defaultKey={state.size} />
+    <button onClick={setFirstPage} disabled={!canFirstPage} className={!canFirstPage ? `active` : ``}>1</button>
+    {(() => {
+      const items = []
 
-        const start = Math.max(2, state.page - 2)
-        const end = Math.min(pageCount, state.page + 2)
+      const start = Math.max(2, state.page - 2)
+      const end = Math.min(pageCount, state.page + 2)
 
-        if (start - 1 > 1) {
-          items.push(<div key={1}>...</div>)
-        }
+      if (start - 1 > 1) {
+        items.push(<div key={1}>...</div>)
+      }
 
-        for (let i = start; i < end; i++) {
-          items.push(<button key={i} onClick={() => setPage(i)} className={i == state.page ? `active` : ``}>
-            {i}
-          </button>)
-        }
+      for (let i = start; i < end; i++) {
+        items.push(<button key={i} onClick={() => setPage(i)} className={i == state.page ? `active` : ``}>
+          {i}
+        </button>)
+      }
 
-        if (end < pageCount) {
-          items.push(<div key={pageCount}>...</div>)
-        }
+      if (end < pageCount) {
+        items.push(<div key={pageCount}>...</div>)
+      }
 
-        return items
-      })()}
-      {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
-      <div className="count">{`${count} ${countText}`}</div>
+      return items
+    })()}
+    {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
+    <div className="count">{`${count} ${countText}`}</div>
   </div>
 }
 
