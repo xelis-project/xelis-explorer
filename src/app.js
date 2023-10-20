@@ -5,7 +5,6 @@ import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
 
 import { ThemeProvider } from './context/useTheme'
 import useSettings, { SettingsProvider, settingsKeys } from './context/useSettings'
-import { OverlayProvider } from './context/useOverlay'
 import { ServerProvider } from './context/useServer'
 import { ServerDataProvider, getServerDataContext } from './context/useServerData'
 
@@ -49,9 +48,7 @@ function SubApp(props) {
   const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
 
   return <NodeSocketProvider endpoint={endpoint}>
-    <OverlayProvider>
-      {children}
-    </OverlayProvider>
+    {children}
   </NodeSocketProvider>
 }
 

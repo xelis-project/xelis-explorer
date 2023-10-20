@@ -22,7 +22,7 @@ const style = css`
     align-items: center;
     position: relative;
 
-    &.on {
+    &[data-checked="true"] {
       transform: translate(.95em, 0);
     }
 
@@ -40,7 +40,7 @@ function Switch(props) {
     setChecked(!checked)
     if (typeof props.onChange === `function`) props.onChange(!checked)
   }}>
-    <div className={checked ? `on` : ``}>
+    <div data-checked={checked}>
       <Icon name={checked ? `check` : `close`} />
     </div>
   </div>

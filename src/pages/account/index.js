@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, formatAsset, formatXelis, reduceText } from '../../utils'
@@ -14,7 +15,7 @@ import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
 import Icon from '../../components/icon'
 import theme from '../../style/theme'
-import Button from '../../components/button'
+import Dropdown from '../../components/dropdown'
 
 const style = {
   container: css`
@@ -142,7 +143,7 @@ function Account() {
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
   const [account, setAccount] = useState({})
-  const [accountAssets, setAccountAssets] = useState([])
+  const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
   const [asset, setAsset] = useState(XELIS_ASSET)
 
   const loadAccount = useCallback(async () => {
@@ -181,10 +182,18 @@ function Account() {
     loadAccount()
   }, [loadAccount])
 
-  const onAssetChange = useCallback((e) => {
-    const newAsset = e.target.value
-    setAsset(newAsset)
+  const onAssetChange = useCallback((item) => {
+    setAsset(item.key)
   }, [])
+
+  const dropdownAssets = useMemo(() => {
+    return accountAssets.map((asset) => {
+      return {
+        key: asset,
+        text: `${reduceText(asset)}${asset === XELIS_ASSET ? ` (XEL)` : ``}`
+      }
+    })
+  }, [accountAssets])
 
   const balance = account.balance ? account.balance.balance.balance : 0
   const nonce = account.nonce ? account.nonce.nonce : `--`
@@ -204,13 +213,8 @@ function Account() {
           <div>
             <div>Assets</div>
             <div>
-              <select onChange={onAssetChange} value={asset}>
-                {accountAssets.map((asset) => {
-                  return <option value={asset} key={asset}>
-                    {`${reduceText(asset)}${asset === XELIS_ASSET ? ` (XEL)` : ``}`}
-                  </option>
-                })}
-              </select>
+              <Dropdown items={dropdownAssets} onChange={onAssetChange}
+                size={.8} defaultKey={XELIS_ASSET} />
             </div>
           </div>
           <div>

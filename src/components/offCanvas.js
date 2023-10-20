@@ -5,27 +5,6 @@ import theme from '../style/theme'
 
 const style = {
   container: css`
-    .backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(2px);
-      z-index: 1;
-      opacity: 0;
-      transition: opacity .3s ease-in-out;
-    }
-
-    .backdrop.opened {
-      opacity: 1;
-    }
-
-    .backdrop.closed {
-      opacity: 0;
-    }
-
     .offcanvas {
       position: fixed;
       top: 0;
@@ -40,31 +19,31 @@ const style = {
     .offcanvas.right {
       translate: 100%;
       right: 0;
+
+      &[data-open="true"] {
+        translate: 0;
+        opacity: 1;
+      }
+
+      &[data-open="false"] {
+        translate: 100%;
+        opacity: 0;
+      }
     }
 
     .offcanvas.left {
       translate: 0;
       left: 0;
-    }
 
-    .offcanvas.right.opened {
-      translate: 0;
-      opacity: 1;
-    }
+      &[data-open="true"] {
+        translate: 0;
+        opacity: 1;
+      }
 
-    .offcanvas.right.closed {
-      translate: 100%;
-      opacity: 0;
-    }
-
-    .offcanvas.left.opened {
-      translate: 0;
-      opacity: 1;
-    }
-
-    .offcanvas.left.closed {
-      translate: -100%;
-      opacity: 0;
+      &[data-open="false"] {
+        translate: -100%;
+        opacity: 0;
+      }
     }
 
     ${theme.query.minDesktop} {
@@ -78,7 +57,6 @@ const style = {
 function OffCanvas(props) {
   const { children, position, maxWidth, opened, className = `` } = props
 
-  const openedClassname = opened ? `opened` : `closed`
   const [divStyle, setDivStyle] = useState({ maxWidth, transition: `none` }) // transition: none = don't animate on page load
 
   useEffect(() => {
@@ -86,7 +64,7 @@ function OffCanvas(props) {
   }, [opened])
 
   return <div className={style.container}>
-    <div className={`offcanvas ${position} ${openedClassname} ${className}`} style={divStyle}>
+    <div data-open={opened} className={`offcanvas ${position} ${className}`} style={divStyle}>
       {children}
     </div>
   </div>
