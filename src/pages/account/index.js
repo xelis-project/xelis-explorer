@@ -16,6 +16,7 @@ import { usePageLoad } from '../../context/usePageLoad'
 import Icon from '../../components/icon'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
+import Button from '../../components/button'
 
 const style = {
   container: css`
@@ -264,6 +265,9 @@ function History(props) {
   const [err, setErr] = useState()
   const [history, setHistory] = useState([])
 
+  const [pages, setPages] = useState([])
+  const [page, setPage] = useState(-1)
+
   const loadData = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
@@ -274,15 +278,21 @@ function History(props) {
       setLoading(false)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getAccountHistory({
+    const params = {
       address: addr,
       asset: asset,
-    }))
+    }
+
+    if (pages[page]) {
+      params.maximum_topoheight = pages[page]
+    }
+
+    const [err, result] = await to(nodeSocket.daemon.getAccountHistory(params))
     if (err) return resErr(err)
 
     setHistory(result)
     setLoading(false)
-  }, [asset, addr, nodeSocket])
+  }, [asset, addr, nodeSocket, pages, page])
 
   useEffect(() => {
     loadData()
@@ -396,5 +406,25 @@ function History(props) {
           }
         }
       ]} data={history} />
+    <div className="pager">
+      {pages.length > 0 && <Button icon="arrow-left" onClick={() => {
+        const newPage = page - 1
+        if (newPage < 0) {
+          setPages([])
+          setPage(-1)
+        } else {
+          setPage(newPage)
+        }
+      }}>
+        Previous
+      </Button>}
+      <Button icon="arrow-right" iconLocation="right" onClick={() => {
+        const item = history[history.length - 1]
+        setPages([...pages, item.topoheight - 1])
+        setPage(page + 1)
+      }}>
+        Next
+      </Button>
+    </div>
   </div>
 }
