@@ -30,11 +30,7 @@ const style = {
       ${theme.query.minDesktop} {
         grid-template-columns: 3fr 1fr 1fr 1fr;
       }
-  
-      > :nth-child(1) {
-        flex: .7;
-      }
-  
+
       > div {
         > :nth-child(1) {
           font-weight: bold;
@@ -43,33 +39,61 @@ const style = {
           border-bottom: 3px solid var(--table-th-bg-color);
           padding-bottom: .5em;
         }
-  
+      }
+
+      > :nth-child(1) {
+        flex: .7;
+
+        > :nth-child(2) {
+          color: var(--muted-color);
+          display: flex;
+          gap: .5em;
+          flex-direction: column;
+        }
+      }
+
+      > :nth-child(2) {
+        > :nth-child(2) {
+          display: grid;
+          gap: .5em;
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      > :nth-child(3) {
         > :nth-child(2) {
           display: flex;
-          align-items: baseline;
-          flex-direction: column;
           gap: .5em;
-          color: var(--muted-color);
+          flex-wrap: wrap;
+          flex-direction: row;
+        }
+      }
+
+      > :nth-child(4) {
+        > :nth-child(2) {
+          display: flex;
+          gap: .5em;
+          flex-direction: column;
 
           > div {
             display: flex;
-            align-items: center;
             gap: .5em;
+            align-items: center;
           }
         }
-  
-        button {
-          font-weight: bold;
-          border: none;
-          padding: .5em .7em;
-          cursor: pointer;
-          color: var(--bg-color);
-          background-color: var(--text-color);
-          transition: .25s all;
-          border-radius: 5px;
-          text-align:left;
-          ${scaleOnHover({ scale: .93 })}
-        }
+      }
+      
+      button {
+        font-weight: bold;
+        border: none;
+        padding: .5em .7em;
+        cursor: pointer;
+        color: var(--bg-color);
+        background-color: var(--text-color);
+        transition: .25s all;
+        border-radius: 5px;
+        text-align:left;
+        ${scaleOnHover({ scale: .93 })}
       }
     }
   `
@@ -91,7 +115,6 @@ function Footer() {
       <div>
         <div>PAGES</div>
         <div>
-          <Link to="/">Home</Link>
           <Link to="/blocks">Blocks</Link>
           <Link to="/mempool">Mempool</Link>
           <Link to="/dag">DAG</Link>
