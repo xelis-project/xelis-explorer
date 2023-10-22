@@ -88,37 +88,6 @@ export const style = {
     position: relative;
     height: 100%;
 
-    .layout-flex {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-
-      .page-opacity {
-        ${opacity()}
-      }
-    }
-
-    .node-status {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      margin-top: 1em;
-      transition: .25s all;
-
-      ${theme.query.maxMobile} {
-        margin-top:-2px;
-
-        > div > :nth-child(1) {
-          border-radius: 10px;
-          border-top-left-radius: 0;
-          border-top-right-radius: 0;
-          transform: scale(.9);
-        }
-      }
-    }
-
     .layout-max-width {
       margin: 0 auto;
       max-width: 1000px;
@@ -127,6 +96,35 @@ export const style = {
   
       ${theme.query.minLarge} {
         max-width: 1400px;
+      }
+    }
+  `,
+  layoutFlex: css`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    [data-page="opacity"] {
+      ${opacity()}
+    }
+  `,
+  nodeStatus: css`
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    margin-top: 1em;
+    transition: .25s all;
+
+    ${theme.query.maxMobile} {
+      margin-top:-2px;
+
+      > div > :nth-child(1) {
+        border-radius: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        transform: scale(.9);
       }
     }
   `
@@ -147,13 +145,13 @@ function Layout() {
       */}
     </div>
     <div className={style.container}>
-      <div className="node-status">
+      <div className={style.nodeStatus}>
         <NodeStatus />
       </div>
-      <div className="layout-flex">
+      <div className={style.layoutFlex}>
         <div className="layout-max-width">
           <Header />
-          <div className="page-opacity" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
+          <div data-page="opacity" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>
         </div>

@@ -176,7 +176,7 @@ function useOffCanvasTable(props) {
       <table>
         <thead>
           <tr>
-            <th>Topo Height</th>
+            <th>Topoheight</th>
             <th>Type</th>
             <th>Hash</th>
             <th>Txs</th>
