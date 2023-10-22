@@ -141,7 +141,7 @@ function TxsHistoryChart(props) {
   const chartConfig = useMemo(() => {
     const lastBlocks = Object.assign([], blocks).reverse()
     const labels = lastBlocks.map((block) => {
-      return prettyMs(new Date().getTime() - block.timestamp, { compact: true })
+      return prettyMs(new Date().getTime() - block.timestamp, { secondsDecimalDigits: 0 })
     })
 
     const data = lastBlocks.map((block) => {

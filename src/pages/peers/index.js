@@ -148,6 +148,13 @@ function Table(props) {
         }
       },
       {
+        key: 'peers',
+        title: 'Peers',
+        render: (value) => {
+          return (value || []).length
+        }
+      },
+      {
         key: 'tag',
         title: 'Tag',
         render: (value) => {
@@ -164,7 +171,7 @@ function Table(props) {
       },
       {
         key: 'topoheight',
-        title: 'Topoheight',
+        title: 'Topo',
         render: (value) => {
           return value
         }
