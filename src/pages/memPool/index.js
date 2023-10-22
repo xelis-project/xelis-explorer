@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
@@ -111,6 +111,15 @@ function MemPool() {
     }
   }, [])
 
+  const filteredMempool = useMemo(() => {
+    if (!filterTx) return memPool
+    return memPool.filter((tx) => {
+      if (tx.hash.indexOf(filterTx) !== -1) return true
+      if (tx.owner.indexOf(filterTx) !== -1) return true
+      return false
+    })
+  }, [memPool, filterTx])
+
   return <div className={style.container}>
     <Helmet>
       <title>Mempool</title>
@@ -122,15 +131,14 @@ function MemPool() {
         setFilterTx(e.target.value)
       }} />
       <div>
-        <PendingTxs memPool={memPool} err={err} loading={loading} />
-        <ExecutedTxs setMemPool={setMemPool} />
+        <PendingTxs memPool={filteredMempool} err={err} loading={loading} />
+        <ExecutedTxs filterTx={filterTx} setMemPool={setMemPool} />
       </div>
     </div>
   </div>
 }
 
 function TxsHistoryChart(props) {
-  //const { data } = props
   const { blocks } = useRecentBlocks()
   const { theme: currentTheme } = useTheme()
 
@@ -138,10 +146,12 @@ function TxsHistoryChart(props) {
     return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
   }, [blocks])
 
+  const chartRef = useRef()
+
   const chartConfig = useMemo(() => {
     const lastBlocks = Object.assign([], blocks).reverse()
     const labels = lastBlocks.map((block) => {
-      return prettyMs(new Date().getTime() - block.timestamp, { secondsDecimalDigits: 0 })
+      return block.timestamp
     })
 
     const data = lastBlocks.map((block) => {
@@ -157,6 +167,10 @@ function TxsHistoryChart(props) {
       }]
     }
 
+    const formatTimestamp = (timestamp) => {
+      return prettyMs(new Date().getTime() - timestamp, { secondsDecimalDigits: 0 })
+    }
+
     return {
       type: 'bar',
       data: chartData,
@@ -169,6 +183,14 @@ function TxsHistoryChart(props) {
           legend: {
             display: false
           },
+          tooltip: {
+            callbacks: {
+              title: function (context) {
+                const timestamp = context[0].label
+                return formatTimestamp(timestamp)
+              }
+            }
+          }
         },
         scales: {
           y: {
@@ -180,7 +202,11 @@ function TxsHistoryChart(props) {
           },
           x: {
             ticks: {
-              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`
+              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+              callback: function (value, index, ticks) {
+                const timestamp = this.getLabelForValue(value)
+                return formatTimestamp(timestamp)
+              }
             }
           }
         }
@@ -188,9 +214,19 @@ function TxsHistoryChart(props) {
     }
   }, [blocks, currentTheme])
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // update callback ticks to display elapsed time every second
+      chartRef.current.update()
+    }, 1000)
+    return () => {
+      return clearInterval(intervalId)
+    }
+  }, [])
+
   return <div>
     <h2>Last 20 blocks ({totalTxs} txs)</h2>
-    <Chart config={chartConfig} className="chart" />
+    <Chart chartRef={chartRef} config={chartConfig} className="chart" />
   </div>
 }
 
@@ -205,20 +241,17 @@ function PendingTxs(props) {
         <thead>
           <tr>
             <th>Hash</th>
-            <th title="Transfers">T</th>
             <th>Signer</th>
             <th>Fees</th>
             <th>Age</th>
           </tr>
         </thead>
-        <TableBody list={memPool} loading={loading} err={err} colSpan={5} emptyText="No transactions"
+        <TableBody list={memPool} loading={loading} err={err} colSpan={4} emptyText="No transactions"
           onItem={(item) => {
-            const transfers = item.data.transfers || []
             return <tr key={item.hash}>
               <td title={item.hash}>
                 <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
               </td>
-              <td>{transfers.length}</td>
               <td>
                 <Link to={`/accounts/${item.owner}`}>{reduceText(item.owner, 0, 7)}</Link>
               </td>
@@ -235,7 +268,7 @@ function PendingTxs(props) {
 }
 
 function ExecutedTxs(props) {
-  const { setMemPool } = props
+  const { filterTx, setMemPool } = props
 
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
@@ -330,6 +363,15 @@ function ExecutedTxs(props) {
     loadExecutedTxs()
   }, [loadExecutedTxs])
 
+  const filteredExecutedTxs = useMemo(() => {
+    if (!filterTx) return executedTxs
+    return executedTxs.filter(({ tx }) => {
+      if (tx.hash.indexOf(filterTx) !== -1) return true
+      if (tx.owner.indexOf(filterTx) !== -1) return true
+      return false
+    })
+  }, [executedTxs, filterTx])
+
   return <div>
     <h2>Executed Transactions ({executedTxs.length})</h2>
     <div className={tableStyle}>
@@ -338,17 +380,15 @@ function ExecutedTxs(props) {
           <tr>
             <th>Topo</th>
             <th>Hash</th>
-            <th title="Transfers">T</th>
             <th>Signer</th>
             <th>Fees</th>
             <th>Age</th>
           </tr>
         </thead>
-        <TableBody list={executedTxs} loading={loading} err={err} colSpan={6}
+        <TableBody list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
           emptyText="No transactions"
           onItem={(item) => {
             const { tx, block } = item
-            const transfers = tx.data.transfers || []
             return <tr key={tx.hash}>
               <td>
                 <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
@@ -357,7 +397,6 @@ function ExecutedTxs(props) {
               <td>
                 <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
               </td>
-              <td>{transfers.length}</td>
               <td>
                 <Link to={`/accounts/${tx.owner}`}>{reduceText(tx.owner, 0, 7)}</Link>
               </td>

@@ -1,23 +1,25 @@
 import { useEffect, useRef } from 'react'
-import { Chart } from 'chart.js/auto'
+import { Chart as ChartJS } from 'chart.js/auto'
 
 function ReactChart(props) {
-  const { config, style, ...restProps } = props
+  const { chartRef, config, style, ...restProps } = props
 
-  const chartRef = useRef()
+  const canvasRef = useRef()
 
   useEffect(() => {
-    const ctx = chartRef.current.getContext(`2d`)
-    const _chart = new Chart(ctx, config)
-    _chart.update()
+    const ctx = canvasRef.current.getContext(`2d`)
+    const chart = new ChartJS(ctx, config)
+    chart.update()
+
+    if (chartRef) chartRef.current = chart
 
     return () => {
-      return _chart.destroy()
+      return chart.destroy()
     }
   }, [config])
 
   return <div style={{ position: `relative`, ...style }} {...restProps}>
-    <canvas ref={chartRef} style={{ maxWidth: `100%` }} />
+    <canvas ref={canvasRef} style={{ maxWidth: `100%` }} />
   </div>
 }
 
