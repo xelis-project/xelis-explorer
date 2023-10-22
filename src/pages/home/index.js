@@ -10,7 +10,7 @@ import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
 
-function useRecentBlocks() {
+export function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
   const serverResult = loadBlocks_SSR({ limit: 20 })

@@ -86,7 +86,7 @@ function BottomInfo(props) {
       </div>
       <div>
         <div>{(info.topoheight || 0).toLocaleString()}</div>
-        <div>Topo Height</div>
+        <div>Topoheight</div>
       </div>
       <div>
         <div>{(info.stableheight || 0).toLocaleString()}</div>

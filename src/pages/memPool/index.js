@@ -1,21 +1,78 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
+import prettyMs from 'pretty-ms'
 
 import TableBody, { style as tableStyle } from '../../components/tableBody'
 import { formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
+import Chart from '../../components/chart'
+import theme from '../../style/theme'
+import { useRecentBlocks } from '../../pages/home'
+import useTheme from '../../context/useTheme'
 
 const style = {
   container: css`
-    h1, h2 {
+    h1 {
       margin: 1.5em 0 .5em 0;
       font-weight: bold;
       font-size: 2em;
+    }
+
+    h2 {
+      margin: 1.5em 0 .5em 0;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    input {
+      padding: 0.7em;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1.2em;
+      background-color: ${theme.apply({ xelis: `rgb(0 0 0 / 20%)`, light: `rgb(255 255 255 / 20%)`, dark: `rgb(0 0 0 / 20%)` })};
+      color: var(--text-color);
+      width: 100%;
+      border: thin solid ${theme.apply({ xelis: `#7afad3`, light: `#cbcbcb`, dark: `#373737` })};
+
+      &::placeholder {
+        color: ${theme.apply({ xelis: `rgb(255 255 255 / 20%)`, light: `rgb(0 0 0 / 30%)`, dark: `rgb(255 255 255 / 20%)` })};
+        opacity: 1;
+      }
+    }
+
+    .chart {
+      max-height: 200px;
+      margin-bottom: 1em;
+    }
+
+    > div > :nth-child(3) {
+      display: grid;
+      gap: 1em;
+      grid-template-columns: 1fr;
+      overflow-x: auto;
+      padding-bottom: 1em;
+
+      ${theme.query.minLarge} {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      > div > div {
+        overflow-y: auto;
+        max-height: 30em;
+        
+        table {
+          thead tr th {
+            position: sticky;
+            top: 0;
+          }
+        }
+      }
     }
   `
 }
@@ -25,6 +82,7 @@ function MemPool() {
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
   const nodeSocket = useNodeSocket()
+  const [filterTx, setFilterTx] = useState()
 
   const loadMemPool = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -58,12 +116,96 @@ function MemPool() {
       <title>Mempool</title>
     </Helmet>
     <h1>Mempool</h1>
+    <div>
+      <TxsHistoryChart />
+      <input type="text" placeholder="Type your account address or transaction hash to filter the list below." onChange={(e) => {
+        setFilterTx(e.target.value)
+      }} />
+      <div>
+        <PendingTxs memPool={memPool} err={err} loading={loading} />
+        <ExecutedTxs setMemPool={setMemPool} />
+      </div>
+    </div>
+  </div>
+}
+
+function TxsHistoryChart(props) {
+  //const { data } = props
+  const { blocks } = useRecentBlocks()
+  const { theme: currentTheme } = useTheme()
+
+  const totalTxs = useMemo(() => {
+    return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
+  }, [blocks])
+
+  const chartConfig = useMemo(() => {
+    const lastBlocks = Object.assign([], blocks).reverse()
+    const labels = lastBlocks.map((block) => {
+      return prettyMs(new Date().getTime() - block.timestamp, { compact: true })
+    })
+
+    const data = lastBlocks.map((block) => {
+      return block.txs_hashes.length
+    })
+
+    const chartData = {
+      labels,
+      datasets: [{
+        label: 'Txs',
+        data,
+        backgroundColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+      }]
+    }
+
+    return {
+      type: 'bar',
+      data: chartData,
+      options: {
+        animation: {
+          duration: 0
+        },
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+        },
+        scales: {
+          y: {
+            ticks: {
+              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+              beginAtZero: true,
+              precision: 0
+            }
+          },
+          x: {
+            ticks: {
+              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`
+            }
+          }
+        }
+      }
+    }
+  }, [blocks, currentTheme])
+
+  return <div>
+    <h2>Last 20 blocks ({totalTxs} txs)</h2>
+    <Chart config={chartConfig} className="chart" />
+  </div>
+}
+
+
+function PendingTxs(props) {
+  const { memPool, loading, err } = props
+
+  return <div>
+    <h2>Pending Transactions ({memPool.length})</h2>
     <div className={tableStyle}>
       <table>
         <thead>
           <tr>
             <th>Hash</th>
-            <th>Transfers</th>
+            <th title="Transfers">T</th>
             <th>Signer</th>
             <th>Fees</th>
             <th>Age</th>
@@ -89,11 +231,10 @@ function MemPool() {
         />
       </table>
     </div>
-    <TxExecuted setMemPool={setMemPool} />
   </div>
 }
 
-function TxExecuted(props) {
+function ExecutedTxs(props) {
   const { setMemPool } = props
 
   const [loading, setLoading] = useState()
@@ -137,6 +278,7 @@ function TxExecuted(props) {
       if (err3) return resErr(err3)
 
       txs.forEach((tx) => {
+        if (!tx) return
         const block = txBlockMap.get(tx.hash)
         recentExecuted.push({ tx, block })
       })
@@ -189,21 +331,21 @@ function TxExecuted(props) {
   }, [loadExecutedTxs])
 
   return <div>
-    <h2>Executed Transactions</h2>
+    <h2>Executed Transactions ({executedTxs.length})</h2>
     <div className={tableStyle}>
       <table>
         <thead>
           <tr>
-            <th>Topo Height</th>
+            <th>Topo</th>
             <th>Hash</th>
-            <th>Transfers</th>
+            <th title="Transfers">T</th>
             <th>Signer</th>
             <th>Fees</th>
             <th>Age</th>
           </tr>
         </thead>
         <TableBody list={executedTxs} loading={loading} err={err} colSpan={6}
-          emptyText="No tx executed from last 20 blocks."
+          emptyText="No transactions"
           onItem={(item) => {
             const { tx, block } = item
             const transfers = tx.data.transfers || []

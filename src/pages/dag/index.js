@@ -252,7 +252,7 @@ function DAG() {
   const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
   const [newBlock, setNewBlock] = useState()
-  //const [blocks, setBlocks] = useState(dagMock.reverse())
+  //const [blocks, setBlocks] = useState(mock.dag.reverse())
 
   const [loading, setLoading] = useState()
   const [info, setInfo] = useState({})
