@@ -1,14 +1,16 @@
 import { useEffect, useCallback, useState } from 'react'
-import useNodeSocket from '@xelis/sdk/react/daemon'
+import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
 import { Helmet } from 'react-helmet-async'
 import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
 
 import TableFlex from '../../components/tableFlex'
-import { parseAddressWithPort, reduceText } from '../../utils'
+import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 import useTheme from '../../context/useTheme'
+import Switch from '../../components/switch'
 
 const style = {
   container: css`
@@ -26,6 +28,7 @@ const style = {
     }
   `,
   map: css`
+    position: relative;
     margin-bottom: 2em;
 
     .leaflet-container {
@@ -44,6 +47,23 @@ const style = {
       > :nth-child(2), > :nth-child(3) {
         font-size: .9em;
       }
+    }
+  `,
+  mapControls: css`
+    position: absolute;
+    right: 0;
+    z-index: 99999;
+    padding: 1em;
+    display: flex;
+    gap: .5em;
+    flex-direction: column;
+
+    > div {
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+      font-weight: bold;
+      font-size: .9em;
     }
   `
 }
@@ -81,17 +101,30 @@ function Peers() {
     if (peers.length === 0) return
     setGeoLoading(true)
 
-    const ips = peers.map((peer) => peer.ip)
-    const query = `?ips=${ips.join(`,`)}`
+    let geoLocation = {}
+    const ipList = []
+    for (let i = 0; i < peers.length; i++) {
+      const peer = peers[i]
+      ipList.push(peer.ip)
 
-    const [err, res] = await to(fetch(`https://geoip.xelis.io${query}`))
-    if (err) {
-      setGeoLoading(false)
-      console.log(err)
+      peer.peers.forEach((pAddr) => {
+        const addr = parseAddressWithPort(pAddr)
+        if (ipList.indexOf(addr.ip) === -1) {
+          ipList.push(addr.ip)
+        }
+      })
     }
 
-    const data = await res.json()
-    setGeoLocation(data)
+    // max 50 ips per fetch
+    const batch = 50
+    for (let i = 0; i < ipList.length; i += batch) {
+      const ips = ipList.slice(i, batch)
+      const [err, data] = await to(fetchGeoLocation(ips))
+      if (err) console.log(err)
+      geoLocation = { ...geoLocation, ...data }
+    }
+
+    setGeoLocation(geoLocation)
     setGeoLoading(false)
   }, [peers])
 
@@ -102,6 +135,23 @@ function Peers() {
   useEffect(() => {
     loadGeoLocation()
   }, [loadGeoLocation])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.PeerConnected,
+    onData: async (_, peer) => {
+      const addr = parseAddressWithPort(peer.addr)
+      const [err, data] = await to(fetchGeoLocation([addr.ip]))
+      if (err) console.log(err)
+
+      peer.ip = addr.ip
+      setGeoLocation((geo) => ({ ...geo, ...data }))
+      setPeers((peers) => {
+        const exists = peers.find((p) => p.addr === peer.addr)
+        if (!exists) return [...peers, peer]
+        return peers
+      })
+    }
+  }, [])
 
   return <div className={style.container}>
     <Helmet>
@@ -194,12 +244,35 @@ function Table(props) {
   />
 }
 
+function MapControls(props) {
+  const { controls, setControls } = props
+  const { showConnections, showPeers } = controls
+
+  const setControlValue = useCallback((key, value) => {
+    setControls((controls) => {
+      return { ...controls, [key]: value }
+    })
+  }, [setControls])
+
+  return <div className={style.mapControls}>
+    <div>
+      <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
+      Peers
+    </div>
+    <div>
+      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
+      Connections
+    </div>
+  </div>
+}
+
 function Map(props) {
   const { peers, geoLocation } = props
 
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
   const [map, setMap] = useState()
+  const [controls, setControls] = useState({ showConnections: true, showPeers: true })
 
   useEffect(() => {
     const load = async () => {
@@ -215,12 +288,41 @@ function Map(props) {
   useEffect(() => {
     if (!leaflet) return
 
-    const { MapContainer, TileLayer, CircleMarker, Popup } = leaflet.react
+    const { MapContainer, TileLayer, CircleMarker, Popup, Polyline } = leaflet.react
 
     let tileLayerUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`
     if (theme === `light`) {
       tileLayerUrl = `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png`
     }
+
+    const connectionLines = {}
+    const peerDots = {}
+    peers.forEach((peer) => {
+      const peerLocation = geoLocation[peer.ip]
+      if (!peerLocation) return
+
+      const dotPosition = [peerLocation.latitude, peerLocation.longitude]
+      const dotKey = peerLocation.latitude + peerLocation.longitude
+
+      if (peerDots[dotKey]) {
+        // another peer with the same location
+        peerDots[dotKey].peers.push(peer)
+      } else {
+        peerDots[dotKey] = { peers: [peer], location: peerLocation, position: dotPosition }
+      }
+
+      // handle sub peers
+      peer.peers.forEach((pAddr) => {
+        const addr = parseAddressWithPort(pAddr)
+        const subPeerLocation = geoLocation[addr.ip]
+        if (!subPeerLocation) return
+        const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
+        const lineKey = peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude
+
+        // keep only one line and overwrite if key exists
+        connectionLines[lineKey] = linePositions
+      })
+    })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
     const map = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]}>
@@ -228,28 +330,34 @@ function Map(props) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
       />
-      {peers.map((peer) => {
-        const { ip } = peer
-        const location = geoLocation[ip]
-        if (!location) return null
-
-        const { latitude, longitude } = location
-        return <CircleMarker key={ip} radius={10} center={[latitude, longitude]}
-          color="green"
-        >
-          <Popup>
-            <div>{peer.tag ? peer.tag : `No tag`}</div>
-            <div>{peer.addr}</div>
-            <div>{location.country} / {location.region}</div>
-          </Popup>
-        </CircleMarker>
-      })}
+      <>
+        {controls.showPeers && <>
+          {Object.keys(peerDots).map((key) => {
+            const { peers, position, location } = peerDots[key]
+            return <CircleMarker key={key} radius={6} pathOptions={{ opacity: 1, weight: 3 }} center={position} color="green">
+              <Popup>
+                <div>{location.country} / {location.region}</div>
+                {peers.map((peer) => {
+                  return <div key={peer.addr}>{peer.addr} {peer.tag ? `(${peer.tag})` : ``}</div>
+                })}
+              </Popup>
+            </CircleMarker>
+          })}
+        </>}
+        {controls.showConnections && <>
+          {Object.keys(connectionLines).map((key) => {
+            const positions = connectionLines[key]
+            return <Polyline key={key} pathOptions={{ color: `green`, opacity: 0.5, weight: 2, dashArray: `0 6 0` }} positions={positions} />
+          })}
+        </>}
+      </>
     </MapContainer>
 
     setMap(map)
-  }, [leaflet, peers, geoLocation, theme])
+  }, [leaflet, peers, geoLocation, theme, controls])
 
   return <div className={style.map}>
+    {map && <MapControls controls={controls} setControls={setControls} />}
     {map}
   </div>
 }

@@ -138,3 +138,14 @@ export const parseAddressWithPort = (addr) => {
 
   return null
 }
+
+export const fetchGeoLocation = async (ips) => {
+  try {
+    const query = `?ips=${ips.join(`,`)}`
+    const res = await fetch(`https://geoip.xelis.io${query}`)
+    const data = await res.json()
+    return Promise.resolve(data)
+  } catch (e) {
+    return Promise.reject(e)
+  }
+}
