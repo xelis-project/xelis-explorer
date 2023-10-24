@@ -414,6 +414,7 @@ function DAG() {
   return <div>
     <Helmet>
       <title>DAG</title>
+      <meta name="description" content="XELIS BlockDAG inspector. Visualize a section of the network's blocks in 2D." />
     </Helmet>
     <div className={style.canvas}>
       <Canvas style={{ cursor }} orthographic

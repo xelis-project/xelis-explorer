@@ -88,6 +88,7 @@ function Home() {
   return <div>
     <Helmet>
       <title>Home</title>
+      <meta name="description" content="Dive into the XELIS Explorer. Navigate the blockchain, verify transactions, and access specific metadata." />
     </Helmet>
     <ExplorerSearch />
     <RecentBlocks blocks={blocks} newBlock={newBlock} />

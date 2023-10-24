@@ -1,4 +1,3 @@
-import url from 'node:url'
 import path from 'path'
 import express from 'express'
 
@@ -9,9 +8,9 @@ const app = express()
 app.use(`/public`, express.static(path.join(__dirname, 'public')))
 
 app.use(`*`, async (req, res) => {
-  const parsedUrl = url.parse(req.baseUrl)
+  const url = new URL(req.baseUrl)
   const serverContext = { req, statusCode: 200 }
-  const html = await ssr(serverContext, parsedUrl.pathname || '/')
+  const html = await ssr(serverContext, url.pathname || '/')
 
   res.writeHead(serverContext.statusCode, { 'Content-Type': 'text/html;charset=UTF-8' })
   res.end(html)

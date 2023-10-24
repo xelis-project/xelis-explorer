@@ -156,6 +156,7 @@ function Peers() {
   return <div className={style.container}>
     <Helmet>
       <title>Peers</title>
+      <meta name="description" content="Map with list of network peers. Monitor connected peers, network status and geo location." />
     </Helmet>
     <h1>
       Peers

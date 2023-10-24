@@ -123,6 +123,7 @@ function Accounts() {
   return <div className={style.container}>
     <Helmet>
       <title>Accounts</title>
+      <meta name="description" content="List of registered accounts. Check addresses and more." />
     </Helmet>
     <h1>Accounts</h1>
     <TableFlex loading={loading} err={err}
