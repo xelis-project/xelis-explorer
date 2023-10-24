@@ -4,19 +4,17 @@ import { css } from 'goober'
 import theme from '../style/theme'
 
 const style = {
-  container: css`
-    .offcanvas {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      box-shadow: none;
-      height: 100%;
-      background-color: var(--bg-color);
-      transition: all .3s ease-in-out;
-      z-index: 9999;
-    }
+  offcanvas: css`
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    height: 100%;
+    background-color: var(--bg-color);
+    transition: all .3s ease-in-out;
+    z-index: 9999;
 
-    .offcanvas.right {
+    &[data-position="right"] {
       translate: 100%;
       right: 0;
 
@@ -31,7 +29,7 @@ const style = {
       }
     }
 
-    .offcanvas.left {
+    &[data-position="left"] {
       translate: 0;
       left: 0;
 
@@ -47,9 +45,7 @@ const style = {
     }
 
     ${theme.query.minDesktop} {
-      .offcanvas {
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      }
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
   `
 }
@@ -63,8 +59,8 @@ function OffCanvas(props) {
     setDivStyle({ maxWidth })
   }, [opened])
 
-  return <div className={style.container}>
-    <div data-open={opened} className={`offcanvas ${position} ${className}`} style={divStyle}>
+  return <div>
+    <div data-open={opened} data-position={position} className={`${style.offcanvas} ${className}`} style={divStyle}>
       {children}
     </div>
   </div>

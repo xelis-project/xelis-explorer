@@ -13,6 +13,7 @@ import blockColor from './blockColor'
 import useTheme from '../../context/useTheme'
 import { scaleOnHover } from '../../style/animate'
 import Switch from '../../components/switch'
+import Dropdown from '../../components/dropdown'
 
 const style = {
   container: css`
@@ -34,60 +35,66 @@ const style = {
     }
   `,
   controls: css`
-    .start-buttons {
-      display: flex;
-      gap: 1em;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1em;
+    display: flex;
+    gap: 1em;
+    padding: 1em;
+    flex-direction: column;
 
-      > div {
+    > :nth-child(1) > div {
+      width: 100%;
+    }
+
+    > :nth-child(2) {
+      display: flex;
+      justify-content: space-between;
+      gap: 1em;
+
+      div {
         display: flex;
         gap: .5em;
         align-items: center;
-      }
-
-      button {
-        border: none;
-        background-color: var(--text-color);
-        color: var(--bg-color);
-        border-radius: 50%;
-        height: 40px;
-        width: 40px;
-        font-size: 1em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        ${scaleOnHover({ scale: .9 })}
       }
     }
 
-    .edit-buttons {
-      padding: 0 1em 1em 1em;
+    button {
+      border: none;
+      background-color: var(--text-color);
+      color: var(--bg-color);
+      border-radius: 50%;
+      height: 40px;
+      width: 40px;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      ${scaleOnHover({ scale: .9 })}
+    }
+  `,
+  navControls: css`
+    margin: 0 1em 1em 1em;
 
-      > :nth-child(1) {
-        margin-bottom: .5em;
+    > :nth-child(1) {
+      margin-bottom: .5em;
 
-        input {
-          width: 100%;
-          accent-color: var(--text-color);
-        }
+      input {
+        width: 100%;
+        accent-color: var(--text-color);
       }
+    }
 
-      > :nth-child(2) {
-        display: flex;
-        gap: .5em;
+    > :nth-child(2) {
+      display: flex;
+      gap: .5em;
 
-        button {
-          border: none;
-          border-radius: 15px;
-          padding: .5em 1em;
-          background-color: var(--text-color);
-          color: var(--bg-color);
-          cursor: pointer;
-          ${scaleOnHover}
-        }
+      button {
+        border: none;
+        border-radius: 15px;
+        padding: .5em 1em;
+        background-color: var(--text-color);
+        color: var(--bg-color);
+        cursor: pointer;
+        ${scaleOnHover}
       }
     }
   `
@@ -98,7 +105,7 @@ function HeightRangeInput(props) {
   const [_value, setValue] = useState()
 
   let value = _value ? _value : inputHeight || 0
-
+  const min = Math.max(0, height - 1000)
   return <div>
     <div>Height: {value}</div>
     <input type="range" value={value} step={1}
@@ -107,7 +114,7 @@ function HeightRangeInput(props) {
         setValue(null)
         setInputHeight(value)
       }}
-      min={0} max={height}
+      min={min} max={height}
     />
   </div>
 }
@@ -132,6 +139,7 @@ function useOffCanvasTable(props) {
   const [paused, setPaused] = useState(searchHeight ? true : false)
   const [hideOrphaned, setHideOrphaned] = useState(false)
   const [inputHeight, setInputHeight] = useState(searchHeight)
+  const [maxHeights, setMaxHeights] = useState(20)
 
   useEffect(() => {
     if (!inputHeight) setInputHeight(height)
@@ -142,30 +150,45 @@ function useOffCanvasTable(props) {
     return blocks.sort((a, b) => b.height - a.height)
   }, [hideOrphaned, blocks])
 
+  const dagMaxHeightList = useMemo(() => {
+    return [
+      { key: 20, text: `20` },
+      { key: 50, text: `50` },
+      { key: 100, text: `100` }
+    ]
+  })
+
   const render = <OffCanvas opened={opened} maxWidth={500} position="right" className={style.container}>
-    <div className={style.controls}>
-      <div className="start-buttons">
+    <div>
+      <div className={style.controls}>
         <div>
-          <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
-          <label>Hide Orphaned</label>
+          <Dropdown items={dagMaxHeightList} defaultKey={maxHeights} onChange={(item) => {
+            if (!paused) setInputHeight(height)
+            setMaxHeights(item.key)
+          }} prefix="Max Heights: " />
         </div>
         <div>
-          <Button onClick={() => {
-            setPaused(!paused)
-            if (paused) setInputHeight(height)
-          }}>
-            {paused && <Icon name="play" />}
-            {!paused && <Icon name="pause" />}
-          </Button>
-          <Button onClick={() => setOpened(false)} icon="close" />
+          <div>
+            <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
+            <label>Hide Orphaned</label>
+          </div>
+          <div>
+            <Button onClick={() => {
+              setPaused(!paused)
+              if (paused) setInputHeight(height)
+            }}>
+              {paused && <Icon name="play" />}
+              {!paused && <Icon name="pause" />}
+            </Button>
+            <Button onClick={() => setOpened(false)} icon="close" />
+          </div>
         </div>
       </div>
-      {paused && <div className="edit-buttons">
-        <HeightRangeInput height={height}
-          inputHeight={inputHeight} setInputHeight={setInputHeight} />
-        <div className="table-buttons">
+      {paused && <div className={style.navControls}>
+        <HeightRangeInput height={height} inputHeight={inputHeight} setInputHeight={setInputHeight} />
+        <div>
           <button onClick={() => setInputHeight(inputHeight - 1)}>Previous</button>
-          <button onClick={() => setInputHeight(inputHeight - 10)}> Previous (10)</button>
+          <button onClick={() => setInputHeight(inputHeight - 10)}>Previous (10)</button>
           <button onClick={() => setInputHeight(inputHeight + 10)}>Next (10)</button>
           <button onClick={() => setInputHeight(inputHeight + 1)}>Next</button>
           <button onClick={() => setInputHeight(height)}>Reset</button>
@@ -207,7 +230,7 @@ function useOffCanvasTable(props) {
     </div>
   </OffCanvas>
 
-  return { render, setOpened, paused, inputHeight, hideOrphaned }
+  return { render, setOpened, paused, inputHeight, hideOrphaned, maxHeights }
 }
 
 export default useOffCanvasTable

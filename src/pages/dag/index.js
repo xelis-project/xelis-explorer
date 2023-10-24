@@ -22,62 +22,58 @@ import theme from '../../style/theme'
 import Age from '../../components/age'
 
 const style = {
-  container: css`
-    .canvas {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 0;
-      overflow: hidden;
-      background-color: var(--bg-color);
-      opacity: 1;
-      --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef' })};
-      background-image:  linear-gradient(var(--bg-line-color) 1px, transparent 1px), linear-gradient(to right, var(--bg-line-color) 1px, var(--bg-color) 1px);
-      background-size: 20px 20px;
-    }
+  canvas: css`
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    opacity: 1;
+    --bg-line-color: ${theme.apply({ xelis: '#21423d', dark: '#191919', light: '#efefef' })};
+    background-image:  linear-gradient(var(--bg-line-color) 1px, transparent 1px), linear-gradient(to right, var(--bg-line-color) 1px, var(--bg-color) 1px);
+    background-size: 20px 20px;
+  `,
+  controls: css`
+    position: fixed;
+    right: 0;
+    padding: 1em;
+    display: flex;
+    gap: 1em;
+    flex-direction: column;
+    align-items: center;
+    top: 0;
 
-    .controls {
-      position: fixed;
-      right: 0;
-      padding: 1em;
+    button, a {
+      background-color: var(--text-color);
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: block;
+      height: 50px;
+      width: 50px;
+      font-size: 1.2em;
       display: flex;
-      gap: 1em;
-      flex-direction: column;
       align-items: center;
-      top: 0;
-  
-      button, a {
-        background-color: var(--text-color);
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        display: block;
-        height: 50px;
-        width: 50px;
-        font-size: 1.2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--bg-color);
-        ${scaleOnHover({ scale: .9 })}
-      }
+      justify-content: center;
+      color: var(--bg-color);
+      ${scaleOnHover({ scale: .9 })}
     }
+  `,
+  status: css`
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 1em;
+    display: flex;
+    gap: .5em;
+    flex-direction: column;
 
-    .status {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 1em;
-      display: flex;
-      gap: .5em;
-      flex-direction: column;
-
-      > :nth-child(2) {
-        font-size: .8em;
-        text-align: center;
-        position: relative;
-      }
+    > :nth-child(2) {
+      font-size: .8em;
+      text-align: center;
+      position: relative;
     }
   `
 }
@@ -260,8 +256,9 @@ function DAG() {
 
   const stableHeight = info.stableheight
 
-  const fetchMaxBlockHeight = 20
-  const displayMaxBlockHeight = 20
+  //const fetchMaxBlockHeight = 20
+  //const maxHeights = 100
+  //const displayMaxBlockHeight = 20
 
   const offCanvasBlock = useOffCanvasBlock({ info })
 
@@ -294,17 +291,23 @@ function DAG() {
       setErr(err)
     }
 
-    let start = Math.max(0, inputHeight - (fetchMaxBlockHeight - 1))
-    let end = inputHeight
-    const [err, newBlocks] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
-      start_height: start,
-      end_height: end
-    }))
-    if (err) return resErr(err)
+    let newBlocks = []
+    const batch = 20
+    let start = Math.max(0, inputHeight - offCanvasTable.maxHeights)
+    for (let i = start; i <= inputHeight; i += batch) {
+      let end = i + batch - 1
+      if (end > inputHeight) end = inputHeight
+      const [err, data] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
+        start_height: i,
+        end_height: end
+      }))
+      if (err) return resErr(err)
+      newBlocks = [...newBlocks, ...data]
+    }
 
     setBlocks(newBlocks)
     setLoading(false)
-  }, [offCanvasTable.inputHeight, nodeSocket])
+  }, [offCanvasTable.inputHeight, offCanvasTable.maxHeights, nodeSocket])
 
   useEffect(() => {
     if (offCanvasTable.paused) return
@@ -324,7 +327,7 @@ function DAG() {
         setBlocks((blocks) => {
           const entries = [...groupBy(blocks, (b) => b.height).entries()]
           entries.sort((a, b) => a[0] - b[0])
-          if (entries.length >= displayMaxBlockHeight) {
+          if (entries.length >= offCanvasTable.maxHeights) {
             const height = entries[0][0]
             blocks = blocks.filter(b => b.height !== height)
           }
@@ -334,7 +337,7 @@ function DAG() {
         })
       }
     }
-  }, [offCanvasTable.paused])
+  }, [offCanvasTable.paused, offCanvasTable.maxHeights])
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrdered,
@@ -408,11 +411,11 @@ function DAG() {
   const [hoveredBlock, setHoveredBlock] = useState(null)
   const [cursor, setCursor] = useState(`grab`)
 
-  return <div className={style.container}>
+  return <div>
     <Helmet>
       <title>DAG</title>
     </Helmet>
-    <div className="canvas">
+    <div className={style.canvas}>
       <Canvas style={{ cursor }} orthographic
         camera={{ position: [0, 0, 10], zoom: 100, up: [0, 0, 1], far: 10000 }}
         onMouseDown={() => {
@@ -426,7 +429,7 @@ function DAG() {
       >
         <CanvasFrame />
         <MapControls maxZoom={200} minZoom={10} enableDamping={false} enableRotate={false} />
-        <group position={[-34, 0, 0]}>
+        <group position={[-((offCanvasTable.maxHeights*2)-2), 0, 0]}>
           <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight}
             newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock}
             hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
@@ -444,7 +447,7 @@ function DAG() {
     {offCanvasTable.render}
     {offCanvasBlock.render}
     <BottomInfo info={info} />
-    <div className="status">
+    <div className={style.status}>
       <NodeStatus />
       <div>
         {(blocks.length > 0 && !offCanvasTable.paused) && <>
@@ -455,11 +458,11 @@ function DAG() {
         {offCanvasTable.paused && `Paused`}
       </div>
     </div>
-    <div className="controls">
+    <div className={style.controls}>
       <Button icon="house" link="/" />
       <Button icon="table-list" onClick={() => offCanvasTable.setOpened(true)} />
     </div>
-  </div>
+  </div >
 }
 
 export default DAG
