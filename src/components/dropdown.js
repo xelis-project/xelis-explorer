@@ -1,5 +1,5 @@
 import { css } from 'goober'
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 
 import Icon from './icon'
 import theme from '../style/theme'
@@ -75,6 +75,7 @@ function Dropdown(props) {
     return items.find((item) => item.key === defaultKey)
   })
   const [open, setOpen] = useState(false)
+  const dropdownRef = useRef()
 
   const onSelect = useCallback((item) => {
     setSelected(item)
@@ -90,7 +91,22 @@ function Dropdown(props) {
     return text
   }, [selected])
 
-  return <div className={style} style={{ fontSize: `${size}em` }}>
+  useEffect(() => {
+    // close dropdown if we click outside the dropdown
+    const onClick = (e) => {
+      const outsideClick = !dropdownRef.current.contains(e.target)
+      if (outsideClick) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener(`click`, onClick)
+    return () => {
+      return document.removeEventListener(`click`, onClick)
+    }
+  }, [])
+
+  return <div ref={dropdownRef} className={style} style={{ fontSize: `${size}em` }}>
     <div onClick={() => setOpen(!open)}>
       <div>{prefix}{selectedText}</div>
       <Icon name={open ? `arrow-up` : `arrow-down`} />

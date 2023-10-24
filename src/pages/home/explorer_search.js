@@ -112,7 +112,7 @@ export function ExplorerSearch() {
       <div className="form">
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />
-        <Button type="submit">
+        <Button type="submit" aria-label="Search">
           <Icon name="search" />
           <span>Search</span>
         </Button>
