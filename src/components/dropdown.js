@@ -49,6 +49,7 @@ const style = css`
     border-top: none;
     border-bottom-left-radius: 15px;
     transform-origin: top;
+    z-index: 1;
 
     > div {
       user-select: none;
@@ -68,7 +69,7 @@ const style = css`
 `
 
 function Dropdown(props) {
-  const { items = [], onChange, defaultKey, size = 1, notSelectedText = `Choose an option` } = props
+  const { items = [], onChange, defaultKey, size = 1, notSelectedText = `Choose an option`, prefix = `` } = props
 
   const [selected, setSelected] = useState(() => {
     return items.find((item) => item.key === defaultKey)
@@ -91,7 +92,7 @@ function Dropdown(props) {
 
   return <div className={style} style={{ fontSize: `${size}em` }}>
     <div onClick={() => setOpen(!open)}>
-      <div>{selectedText}</div>
+      <div>{prefix}{selectedText}</div>
       <Icon name={open ? `arrow-up` : `arrow-down`} />
     </div>
     <div data-open={open}>

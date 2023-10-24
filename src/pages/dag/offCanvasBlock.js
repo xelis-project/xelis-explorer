@@ -38,7 +38,7 @@ const style = {
 
     .info {
       padding: 1em;
-      background-color: var(--table-td-bg-color);
+      background-color: var(--bg-color);
       
       > div {
         margin-bottom: 1.5em;
