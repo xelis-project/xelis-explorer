@@ -78,6 +78,7 @@ function Settings() {
   return <div className={style.container}>
     <Helmet>
       <title>Settings</title>
+      <meta name="description" content="Set your preferences, manage notifications and other controls." />
     </Helmet>
     <h1>Settings</h1>
     <div className="form-input">

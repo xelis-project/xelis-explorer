@@ -13,6 +13,7 @@ import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
+import { useMemo } from 'react'
 
 const style = {
   container: css`
@@ -93,10 +94,19 @@ function Transaction() {
   let burns = []
   if (tx.data && tx.data.burn) burns = [tx.data.burn]
 
+  const description = useMemo(() => {
+    return `
+      Transaction ${tx.hash}.
+      Signed by ${reduceText(tx.owner)}.
+      ${tx.executed_in_block ? `Executed in block ${reduceText(tx.executed_in_block)}.` : `Discarded or not executed yet.`}
+    `
+  }, [tx])
+
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <Helmet>
       <title>Transaction {tx.hash || ''}</title>
+      <meta name="description" content={description} />
     </Helmet>
     <h1>Transaction {reduceText(tx.hash, 4, 4)}</h1>
     {err && <div className="error">{displayError(err)}</div>}

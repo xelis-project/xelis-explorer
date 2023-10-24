@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
-import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock } from '../../utils'
+import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock, reduceText } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
@@ -170,11 +170,20 @@ function Block() {
     return formattedBlock(block, topoheight || 0)
   }, [block, topoheight])
 
+  const description = useMemo(() => {
+    return `
+      Block ${block.topoheight} (${reduceText(block.hash)}) with ${formatBlock.confirmations} confirmations.
+      The block reward was ${formatBlock.reward} and mined by ${formatBlock.miner}.
+      It contains ${(block.txs_hashes || 0).length} transactions.
+    `
+  }, [block, formatBlock])
+
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <div>
       <Helmet>
         <title>Block {(block.topoheight || ``).toString()}</title>
+        <meta name="description" content={description} />
       </Helmet>
       <h1>Block {block.topoheight}</h1>
       {err && <div className="error">{displayError(err)}</div>}

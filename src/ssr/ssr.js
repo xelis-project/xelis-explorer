@@ -36,8 +36,8 @@ const template = ({ html, helmetContext, serverDataContext }) => {
     <html lang="en">
 
     <head ${helmet.htmlAttributes.toString()}>
-      ${helmet.meta.toString()}
       ${helmet.title.toString()}
+      ${helmet.meta.toString()}
       ${helmet.link.toString()}
       ${helmet.style.toString()}
     </head>

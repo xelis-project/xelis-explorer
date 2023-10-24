@@ -162,7 +162,7 @@ function Header(props) {
       <span>XELIS</span>
     </Link>
     <div className={style.menu}>
-      <button className="button" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
+      <button className="button" aria-label="Menu" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
         <Icon name="bars" />
       </button>
       <div className={`container ${menuOpen ? `opened` : ``}`}>

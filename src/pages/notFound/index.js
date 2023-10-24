@@ -61,6 +61,7 @@ function NotFound() {
   return <div className={style.container}>
     <Helmet>
       <title>404 | Page not found</title>
+      <meta name="description" content="The page you are looking for does not exists or was deleted." />
     </Helmet>
     <h1>404</h1>
     <h2>Page not found</h2>

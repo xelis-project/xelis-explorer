@@ -123,6 +123,7 @@ function MemPool() {
   return <div className={style.container}>
     <Helmet>
       <title>Mempool</title>
+      <meta name="description" content="View pending transactions and network congestion. Verify if your transaction was executed." />
     </Helmet>
     <h1>Mempool</h1>
     <div>

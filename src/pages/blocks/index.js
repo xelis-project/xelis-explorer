@@ -137,6 +137,7 @@ function Blocks() {
   return <div className={style.container}>
     <Helmet>
       <title>Blocks</title>
+      <meta name="description" content="List of mined blocks. Access block heights, timestamps and transaction counts." />
     </Helmet>
     <h1>Blocks</h1>
     <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"

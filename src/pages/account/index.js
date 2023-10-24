@@ -199,9 +199,14 @@ function Account() {
   const balance = account.balance ? account.balance.balance.balance : 0
   const nonce = account.nonce ? account.nonce.nonce : `--`
 
+  const description = useMemo(() => {
+    return `Account history of ${addr}.`
+  }, [addr])
+
   return <div className={style.container}>
     <Helmet>
       <title>Account {addr || ''}</title>
+      <meta name="description" content={description} />
     </Helmet>
     <h1>Account {reduceText(addr)}</h1>
     <div className="page">
