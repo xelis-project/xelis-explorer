@@ -23,11 +23,11 @@ const style = {
       font-size: 2em;
     }
 
-    .table-mobile, .table-desktop {
+    > :nth-child(2) {
       margin-bottom: 1em;
     }
   `,
-  animate: css`
+  animateBlock: css`
     ${slideX({ from: `100%`, to: `0%`, duration: `0.4s` })}
   `
 }
@@ -142,7 +142,7 @@ function Blocks() {
     <h1>Blocks</h1>
     <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
       rowClassName={(block) => {
-        if (newBlock && block.hash === newBlock.hash) return style.animate
+        if (newBlock && block.hash === newBlock.hash) return style.animateBlock
         return null
       }}
       headers={[

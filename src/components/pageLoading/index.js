@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { css } from 'goober'
 
-import DotLoading from '../dotLoading'
 import Icon from '../icon'
 
 const style = {
@@ -48,7 +47,7 @@ function PageLoading(props) {
 
   return <div className={style.container}>
     <div>
-      <Icon name="spinner" />
+      <Icon name="spinner" className="fa-spin" />
       <div>loading</div>
     </div>
   </div>

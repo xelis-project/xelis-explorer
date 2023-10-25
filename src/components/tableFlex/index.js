@@ -21,82 +21,78 @@ theme.light`
 `
 
 export const style = {
-  container: css`
-    .table-mobile {
+  mobile: css`
+    display: flex;
+    gap: 2em;
+    flex-direction: column;
+
+    > div {
+      width: 100%;
       display: flex;
-      gap: 2em;
+      gap: 1em;
       flex-direction: column;
+      background-color: var(--table-td-bg-color);
+      padding: 1em;
+      border-top: 5px solid var(--table-th-bg-color);
 
       > div {
-        width: 100%;
-        display: flex;
-        gap: 1em;
-        flex-direction: column;
-        background-color: var(--table-td-bg-color);
-        padding: 1em;
-        border-top: 5px solid var(--table-th-bg-color);
+        > :nth-child(1) {
+          font-size: 1.2em;
+          font-weight: bold;
+          margin-bottom: .5em;
+        }
 
-        > div {
-          > :nth-child(1) {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: .5em;
-          }
-  
-          > :nth-child(2) {
-            word-break: break-all;
-            color: var(--muted-color);
-          }
+        > :nth-child(2) {
+          word-break: break-all;
+          color: var(--muted-color);
         }
       }
-
-      ${theme.query.minDesktop} {
-        display: none;
-      }
     }
 
-    .table-desktop {
-      overflow: auto;
+    ${theme.query.minDesktop} {
       display: none;
-
-      ${theme.query.minDesktop} {
-        display: block;
-      }
-
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        white-space: nowrap;
-
-        --table-hover-bg-color: ${theme.apply({ xelis: 'black', dark: '#373737', light: '#cbcbcb' })};
-        --table-hover-text-color: var(--text-color);
-      }
-
-      table th {
-        font-weight: bold;
-        padding: .8em 1em;
-        text-align: left;
-        background-color: var(--table-th-bg-color);
-        color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
-      }
-
-      table td {
-        border-bottom: thin solid ${theme.apply({ xelis: '#232323', dark: '#2b2b2b', light: '#cbcbcb' })};
-        background-color: var(--table-td-bg-color);
-        padding: .8em 1em;
-        color: var(--muted-color);
-      }
-
-      table tbody.td-100 td {
-        width: 100%;
-        word-break: break-all;
-        white-space: pre-wrap;
-      }
-
-      table .error {
-        color: red;
-      }
     }
+  `,
+  desktop: css`
+    overflow: auto;
+    display: none;
+
+    ${theme.query.minDesktop} {
+      display: block;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      white-space: nowrap;
+
+      --table-hover-bg-color: ${theme.apply({ xelis: 'black', dark: '#373737', light: '#cbcbcb' })};
+      --table-hover-text-color: var(--text-color);
+    }
+
+    table th {
+      font-weight: bold;
+      padding: .8em 1em;
+      text-align: left;
+      background-color: var(--table-th-bg-color);
+      color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
+    }
+
+    table td {
+      border-bottom: thin solid ${theme.apply({ xelis: '#232323', dark: '#2b2b2b', light: '#cbcbcb' })};
+      background-color: var(--table-td-bg-color);
+      padding: .8em 1em;
+      color: var(--muted-color);
+    }
+
+    table tbody.td-100 td {
+      width: 100%;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+  `,
+  errorText: css`
+    color: red !important;
   `
 }
 
@@ -121,8 +117,8 @@ function TableFlex(props) {
   let displayTable = data.length > 1
   if (keepTableDisplay) displayTable = true
 
-  return <div className={style.container}>
-    <div className="table-mobile">
+  return <div>
+    <div className={style.mobile}>
       {data.map((item, dataIndex) => {
         const key = getRowKeyValue(item, dataIndex)
         return <div key={key}>
@@ -139,10 +135,19 @@ function TableFlex(props) {
           })}
         </div>
       })}
+      {loading && <div>
+        loading<DotLoading />
+      </div>}
+      {err && <div className={style.errorText}>
+        {displayError(err)}
+      </div>}
+      {!err && !loading && data.length === 0 && <div>
+        {emptyText}
+      </div>}
     </div>
-    <div className="table-desktop">
+    <div className={style.desktop}>
       <table>
-        {displayTable && <thead>
+        {data.length !== 1 && <thead>
           <tr>
             {headers.map((header, index) => {
               return <th key={index}>{header.title}</th>
@@ -154,7 +159,7 @@ function TableFlex(props) {
             {loading && <td colSpan={colSpan}>
               loading<DotLoading />
             </td>}
-            {err && <td colSpan={colSpan} className="error">
+            {err && <td colSpan={colSpan} className={style.errorText}>
               {displayError(err)}
             </td>}
             {!err && !loading && data.length === 0 && <td colSpan={colSpan}>
