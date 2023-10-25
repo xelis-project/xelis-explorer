@@ -27,6 +27,17 @@ const style = {
         font-weight: normal;
       }
     }
+
+    table button {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 15px;
+      padding: 0.3em 0.6em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 1em;
+    }
   `,
   map: css`
     position: relative;
@@ -165,6 +176,8 @@ function Peers() {
     }
   }, [])
 
+  const mapRef = useRef()
+
   return <div className={style.container}>
     <Helmet>
       <title>Peers</title>
@@ -174,15 +187,15 @@ function Peers() {
       Peers
       <div>{peers.length} beautiful peers</div>
     </h1>
-    <Map peers={peers} geoLocation={geoLocation} />
-    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} />
+    <Map mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
+    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
   </div>
 }
 
 export default Peers
 
 function Table(props) {
-  const { loading, err, peers, geoLocation, geoLoading } = props
+  const { loading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   return <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
     rowKey="id"
@@ -200,7 +213,13 @@ function Table(props) {
         render: (_, item) => {
           const data = geoLocation[item.ip]
           if (data && data.country && data.region) {
-            return `${data.country} / ${data.region}`
+            return <div>
+              <span>{data.country} / {data.region}</span>
+              <button onClick={() => {
+                const position = [data.latitude, data.longitude]
+                mapRef.current.flyTo(position, 6)
+              }}>Fly To</button>
+            </div>
           }
 
           if (geoLoading) {
@@ -258,7 +277,7 @@ function Table(props) {
 }
 
 function MapControls(props) {
-  const { controls, setControls, map } = props
+  const { controls, setControls, mapRef } = props
   const { showConnections, showPeers } = controls
 
   const setControlValue = useCallback((key, value) => {
@@ -268,7 +287,7 @@ function MapControls(props) {
   }, [setControls])
 
   const reset = useCallback(() => {
-    map.current.setView([0, 0], 2)
+    mapRef.current.setView([0, 0], 2)
   }, [])
 
   return <div className={style.mapControls}>
@@ -287,12 +306,11 @@ function MapControls(props) {
 }
 
 function Map(props) {
-  const { peers, geoLocation } = props
+  const { mapRef, peers, geoLocation } = props
 
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
   const [mapContainer, setMapContainer] = useState()
-  const map = useRef()
   const [controls, setControls] = useState({ showConnections: true, showPeers: true })
 
   useEffect(() => {
@@ -346,7 +364,7 @@ function Map(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={map}>
+    const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={mapRef}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
@@ -378,7 +396,7 @@ function Map(props) {
   }, [leaflet, peers, geoLocation, theme, controls])
 
   return <div className={style.map}>
-    {mapContainer && <MapControls controls={controls} setControls={setControls} map={map} />}
+    {mapContainer && <MapControls controls={controls} setControls={setControls} mapRef={mapRef} />}
     {mapContainer}
   </div>
 }
