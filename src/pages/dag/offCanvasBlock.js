@@ -17,7 +17,7 @@ const style = {
       word-break: break-all;
     }
 
-    .buttons {
+    > :nth-child(1) {
       padding: 1em;
       gap: 1em;
       display: flex;
@@ -36,7 +36,7 @@ const style = {
       }
     }
 
-    .info {
+    > :nth-child(2) {
       padding: 1em;
       background-color: var(--bg-color);
       
@@ -82,16 +82,16 @@ function useOffCanvasBlock(props) {
   const loadBlock = useCallback(async (topoheight) => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    const [err, blockData] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+    const [err, data] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
       topoheight: topoheight
     }))
     if (err) return setErr(err)
-    setBlock(blockData)
+    setBlock(data)
   }, [nodeSocket])
 
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
-    {block && <div>
-      <div className="buttons">
+    {block && <>
+      <div>
         <Button onClick={() => setOpened(false)} icon="close" />
         {formatBlock.hasPreviousBlock && <Button onClick={() => loadBlock(block.topoheight - 1)} icon="arrow-left">
           Previous Block
@@ -100,7 +100,7 @@ function useOffCanvasBlock(props) {
           Next Block
         </Button>}
       </div>
-      <div className="info">
+      <div>
         <div>
           <div>Hash</div>
           <div>
@@ -176,7 +176,7 @@ function useOffCanvasBlock(props) {
           </div>
         </div>
       </div>
-    </div>}
+    </>}
   </OffCanvas>
 
   return { render, open }

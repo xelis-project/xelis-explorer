@@ -1,17 +1,14 @@
 import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router'
 import useNodeSocket from '@xelis/sdk/react/daemon'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, formatAsset, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
-import { useServerData } from '../../context/useServerData'
-import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
 import Icon from '../../components/icon'
 import theme from '../../style/theme'
@@ -42,7 +39,7 @@ const style = {
       cursor: pointer;
     }
 
-    .page {
+    > :nth-child(2) {
       display: flex;
       gap: 1em;
       flex-direction: column;
@@ -83,23 +80,23 @@ const style = {
       > :nth-child(2) {
         overflow: auto;
         flex: 3;
-      }
 
-      .pager {
-        display: flex;
-        gap: .5em;
-        margin-top: .5em;
-
-        > button {
+        > :nth-child(2) {
           display: flex;
           gap: .5em;
-          align-items: center;
-          border-radius: 25px;
-          border: none;
-          background-color: var(--text-color);
-          cursor: pointer;
-          padding: 0.5em 1em;
-          font-weight: bold;
+          margin-top: .5em;
+  
+          > button {
+            display: flex;
+            gap: .5em;
+            align-items: center;
+            border-radius: 25px;
+            border: none;
+            background-color: var(--text-color);
+            cursor: pointer;
+            padding: 0.5em 1em;
+            font-weight: bold;
+          }
         }
       }
     }
@@ -209,7 +206,7 @@ function Account() {
       <meta name="description" content={description} />
     </Helmet>
     <h1>Account {reduceText(addr)}</h1>
-    <div className="page">
+    <div>
       <div>
         <div>
           <div>
@@ -233,9 +230,7 @@ function Account() {
           </div>
         </div>
       </div>
-      <div>
-        <History addr={addr} asset={asset} />
-      </div>
+      <History addr={addr} asset={asset} />
     </div>
   </div>
 }
@@ -411,7 +406,7 @@ function History(props) {
           }
         }
       ]} data={history} />
-    <div className="pager">
+    <div>
       {pages.length > 0 && <Button icon="arrow-left" onClick={() => {
         const newPage = page - 1
         if (newPage < 0) {

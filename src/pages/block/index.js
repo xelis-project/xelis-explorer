@@ -130,7 +130,6 @@ function Block() {
   const loadBlock = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-
     setErr(null)
     setLoading(true)
 

@@ -8,7 +8,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet-async'
-import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
@@ -190,7 +190,7 @@ function Blocks() {
         }
       ]}
     />
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
+    <Pagination state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
   </div>
 }
 

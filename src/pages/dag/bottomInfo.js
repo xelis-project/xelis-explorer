@@ -22,37 +22,37 @@ const style = {
       justify-content: space-between;
     }
 
-    .legend {
+    > :nth-child(1) {
       display: flex;
       flex-wrap: wrap;
       gap: .5em;
   
-      > * {
+      > div {
         display: flex;
         align-items: center;
         gap: .5em;
         background-color: rgb(0 0 0 / 20%);
         padding: .5em;
   
-        :nth-child(2) {
+        > :nth-child(2) {
           width: 12px;
           height: 12px;
         }
       }
     }
 
-    .info {
+    > :nth-child(2) {
       display: flex;
       flex-wrap: wrap;
       gap: 1.5em;
 
-      > * {
-        :nth-child(1) {
+      > div {
+        > :nth-child(1) {
           font-size: 1.2em;
           margin-bottom: .2em;
         }
   
-        :nth-child(2) {
+        > :nth-child(2) {
           font-size: .8em;
           color: var(--muted-color);
         }
@@ -67,7 +67,7 @@ function BottomInfo(props) {
   const { theme: currentTheme } = useTheme()
 
   return <div className={style.container}>
-    <div className="legend">
+    <div>
       {blockColor.types.map((key) => {
         return <div key={key}>
           <div>{key}</div>
@@ -75,7 +75,7 @@ function BottomInfo(props) {
         </div>
       })}
     </div>
-    <div className="info">
+    <div>
       <div>
         <div>{prettyMs((info.average_block_time || 0), { compact: true })}</div>
         <div>Block Time</div>

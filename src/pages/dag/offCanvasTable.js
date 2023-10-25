@@ -5,7 +5,7 @@ import { css } from 'goober'
 
 import OffCanvas from '../../components/offCanvas'
 import Age from '../../components/age'
-import TableBody, { style as tableStyle } from '../../components/tableBody'
+import Table from '../../components/table'
 import { getBlockType } from './index'
 import Button from '../../components/button'
 import Icon from '../../components/icon'
@@ -19,7 +19,7 @@ const style = {
   container: css`
     overflow-y: auto;
 
-    :nth-child(2) {
+    > :nth-child(2) {
       padding-bottom: 0;
       overflow: hidden;
     }
@@ -30,7 +30,7 @@ const style = {
       cursor: pointer;
     }
 
-    table .height {
+    table tr td:first-child > :nth-child(2) {
       font-size: .7em;
     }
   `,
@@ -195,39 +195,27 @@ function useOffCanvasTable(props) {
         </div>
       </div>}
     </div>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Topoheight</th>
-            <th>Type</th>
-            <th>Hash</th>
-            <th>Txs</th>
-            <th>Age</th>
-          </tr>
-        </thead>
-        <TableBody list={filteredBlocks} emptyText="No blocks" colSpan={5}
-          onItem={(block, index) => {
-            const txCount = block.txs_hashes.length
-            const blockType = getBlockType(block, stableHeight)
-            return <tr key={block.hash} onClick={() => onBlockClick(block)}>
-              <td>
-                <span>{block.topoheight}</span>&nbsp;
-                <span title="Height" className="height">({block.height})</span>&nbsp;
-              </td>
-              <td style={{ color: blockColor.value(currentTheme, blockType) }}>
-                {blockType}
-              </td>
-              <td>{block.hash.slice(-6).toUpperCase()}</td>
-              <td>{txCount}</td>
-              <td>
-                <Age timestamp={block.timestamp} update />
-              </td>
-            </tr>
-          }}>
-        </TableBody>
-      </table>
-    </div>
+    <Table
+      headers={[`Topoheight`, `Type`, `Hash`, `Txs`, `Age`]}
+      list={filteredBlocks} emptyText="No blocks" colSpan={5}
+      onItem={(block, index) => {
+        const txCount = block.txs_hashes.length
+        const blockType = getBlockType(block, stableHeight)
+        return <tr key={block.hash} onClick={() => onBlockClick(block)}>
+          <td>
+            <span>{block.topoheight}</span>&nbsp;
+            <span title="Height">({block.height})</span>&nbsp;
+          </td>
+          <td style={{ color: blockColor.value(currentTheme, blockType) }}>
+            {blockType}
+          </td>
+          <td>{block.hash.slice(-6).toUpperCase()}</td>
+          <td>{txCount}</td>
+          <td>
+            <Age timestamp={block.timestamp} update />
+          </td>
+        </tr>
+      }} />
   </OffCanvas>
 
   return { render, setOpened, paused, inputHeight, hideOrphaned, maxHeights }

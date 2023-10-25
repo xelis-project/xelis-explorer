@@ -28,15 +28,15 @@ const style = {
         height: 10px;
         border-radius: 15px;
   
-        &.alive {
+        &[data-status="connected"] {
           background-color: var(--success-color);
         }
   
-        &.loading {
+        &[data-status="connecting"] {
           background-color: var(--bg-color);
         }
   
-        &.error {
+        &[data-status="error"] {
           background-color: var(--error-color);
         }
       }
@@ -85,7 +85,7 @@ function NodeStatus() {
         }
 
         return <div>
-          <div className="loading" />
+          <div data-status="connecting" />
           <div>{text}<DotLoading /></div>
         </div>
       }
@@ -93,7 +93,7 @@ function NodeStatus() {
       if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
         return <>
           <div onClick={() => location.reload()} style={{ cursor: 'pointer' }} title="Click to reload">
-            <div className="error" />
+            <div data-status="error" />
             <div>Disconnected</div>
           </div>
           {connectionTries >= maxConnectionTries && <div>
@@ -104,7 +104,7 @@ function NodeStatus() {
       }
 
       return <div>
-        <div className="alive" />
+        <div data-status="connected" />
         <div>Connected</div>
       </div>
     })()}

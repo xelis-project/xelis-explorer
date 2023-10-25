@@ -56,7 +56,7 @@ const style = {
       ${scaleOnHover}
     }
 
-    .title {
+    > :nth-child(1) {
       margin-bottom: 1em;
       font-weight: bold;
       font-size: 1.5em;
@@ -71,7 +71,7 @@ const style = {
       }
     }
 
-    .items {
+    > :nth-child(2) {
       display: grid;
       grid-template-columns: 1fr;
       gap: 2em;
@@ -100,7 +100,7 @@ const style = {
       }
     }
 
-    .chart {
+    .mini-chart {
       height: 3em;
       padding: 0.25em;
       margin-top: 0.5em;
@@ -143,7 +143,7 @@ function MiniChart(props) {
     }
   }, [data])
 
-  return <Chart config={chartConfig} className="chart" />
+  return <Chart config={chartConfig} className="mini-chart" />
 }
 
 function loadNetworkStats_SSR() {
@@ -256,8 +256,8 @@ export function NetworkStats(props) {
   }, [info, blocks, currentTheme])
 
   return <div className={style.container}>
-    <div className="title">Network Stats</div>
-    <div className="items">
+    <div>Network Stats</div>
+    <div>
       {stats.map((item) => {
         let value = null
         if (typeof item.render === 'function') value = item.render()

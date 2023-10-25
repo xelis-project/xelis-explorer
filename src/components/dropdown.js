@@ -4,7 +4,8 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import Icon from './icon'
 import theme from '../style/theme'
 
-const style = css`
+const defaultStyle = {
+  dropdown: css`
   --dropdown-bg-color: ${theme.apply({ xelis: '#101010', dark: 'var(--bg-color)', light: 'var(--bg-color)' })};
   --dropdown-text-color: var(--text-color);
   position: relative;
@@ -65,11 +66,12 @@ const style = css`
       transform: scaleY(1);
       opacity: 1;
     }
-  }
-`
+  }`
+}
 
 function Dropdown(props) {
-  const { items = [], onChange, defaultKey, size = 1, notSelectedText = `Choose an option`, prefix = `` } = props
+  const { items = [], onChange, defaultKey, size = 1,
+    notSelectedText = `Choose an option`, prefix = ``, styling = defaultStyle, ...restProps } = props
 
   const [selected, setSelected] = useState(() => {
     return items.find((item) => item.key === defaultKey)
@@ -106,7 +108,7 @@ function Dropdown(props) {
     }
   }, [])
 
-  return <div ref={dropdownRef} className={style} style={{ fontSize: `${size}em` }}>
+  return <div ref={dropdownRef} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
     <div onClick={() => setOpen(!open)}>
       <div>{prefix}{selectedText}</div>
       <Icon name={open ? `arrow-up` : `arrow-down`} />

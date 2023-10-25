@@ -3,7 +3,7 @@ import { css } from 'goober'
 
 import Icon from '../icon'
 
-const style = {
+const defaultStyle = {
   container: css`
     position: fixed;
     top: 0;
@@ -29,7 +29,7 @@ const style = {
 }
 
 function PageLoading(props) {
-  const { loading, visibleAfter = 250 } = props
+  const { loading, visibleAfter = 250, styling = defaultStyle, ...restProps } = props
 
   const [visible, setVisible] = useState(false)
 
@@ -45,9 +45,9 @@ function PageLoading(props) {
 
   if (!visible) return null
 
-  return <div className={style.container}>
+  return <div className={styling.container} {...restProps}>
     <div>
-      <Icon name="spinner" className="fa-spin" />
+      <Icon name="circle-notch" className="fa-spin" />
       <div>loading</div>
     </div>
   </div>

@@ -9,7 +9,7 @@ import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
-import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 import { XELIS_ASSET, formatXelis } from '../../utils'
 
 const style = {
@@ -153,7 +153,7 @@ function Accounts() {
           }
         }
       ]} data={accounts} />
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="accounts" count={accountCount} />
+    <Pagination state={pageState} setState={setPageState} countText="accounts" count={accountCount} />
   </div>
 }
 

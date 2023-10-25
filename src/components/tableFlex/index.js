@@ -1,9 +1,9 @@
 import { css } from 'goober'
+import { useCallback } from 'react'
 
 import DotLoading from '../dotLoading'
 import theme from '../../style/theme'
 import { displayError } from '../../utils'
-import { useCallback } from 'react'
 
 theme.xelis`
   --table-th-bg-color: rgb(122 250 211);
@@ -20,7 +20,7 @@ theme.light`
   --table-td-bg-color: #f5f5f5;
 `
 
-export const style = {
+export const defaultStyle = {
   mobile: css`
     display: flex;
     gap: 2em;
@@ -97,7 +97,8 @@ export const style = {
 }
 
 function TableFlex(props) {
-  const { headers = [], data = [], rowClassName, rowKey, loading, err, emptyText = `No items`, keepTableDisplay = false } = props
+  const { headers = [], data = [], rowClassName, rowKey, loading, err,
+    emptyText = `No items`, keepTableDisplay = false, styling = defaultStyle } = props
 
   const loadingStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
   const colSpan = headers.length
@@ -118,7 +119,7 @@ function TableFlex(props) {
   if (keepTableDisplay) displayTable = true
 
   return <div>
-    <div className={style.mobile}>
+    <div className={styling.mobile}>
       {data.map((item, dataIndex) => {
         const key = getRowKeyValue(item, dataIndex)
         return <div key={key}>
@@ -138,14 +139,14 @@ function TableFlex(props) {
       {loading && <div>
         loading<DotLoading />
       </div>}
-      {err && <div className={style.errorText}>
+      {err && <div className={styling.errorText}>
         {displayError(err)}
       </div>}
       {!err && !loading && data.length === 0 && <div>
         {emptyText}
       </div>}
     </div>
-    <div className={style.desktop}>
+    <div className={styling.desktop}>
       <table>
         {data.length !== 1 && <thead>
           <tr>
@@ -159,7 +160,7 @@ function TableFlex(props) {
             {loading && <td colSpan={colSpan}>
               loading<DotLoading />
             </td>}
-            {err && <td colSpan={colSpan} className={style.errorText}>
+            {err && <td colSpan={colSpan} className={styling.errorText}>
               {displayError(err)}
             </td>}
             {!err && !loading && data.length === 0 && <td colSpan={colSpan}>
