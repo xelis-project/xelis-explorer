@@ -22,7 +22,7 @@ const style = css`
     justify-content: space-between;
     align-items: center;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     font-weight: bold;
 
     > :nth-child(1) {

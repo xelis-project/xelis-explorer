@@ -303,7 +303,7 @@ function Map(props) {
       if (!peerLocation) return
 
       const dotPosition = [peerLocation.latitude, peerLocation.longitude]
-      const dotKey = peerLocation.latitude + peerLocation.longitude
+      const dotKey = (peerLocation.latitude + peerLocation.longitude).toFixed(4)
 
       if (peerDots[dotKey]) {
         // another peer with the same location
@@ -318,7 +318,7 @@ function Map(props) {
         const subPeerLocation = geoLocation[addr.ip]
         if (!subPeerLocation) return
         const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
-        const lineKey = peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude
+        const lineKey = (peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude).toFixed(4)
 
         // keep only one line and overwrite if key exists
         connectionLines[lineKey] = linePositions
