@@ -3,7 +3,7 @@ import { css } from 'goober'
 
 import theme from '../style/theme'
 
-const style = {
+const defaultStyle = {
   offcanvas: css`
     position: fixed;
     top: 0;
@@ -51,7 +51,7 @@ const style = {
 }
 
 function OffCanvas(props) {
-  const { children, position, maxWidth, opened, className = `` } = props
+  const { children, position, maxWidth, opened, styling = defaultStyle, className } = props
 
   const [divStyle, setDivStyle] = useState({ maxWidth, transition: `none` }) // transition: none = don't animate on page load
 
@@ -59,10 +59,8 @@ function OffCanvas(props) {
     setDivStyle({ maxWidth })
   }, [opened])
 
-  return <div>
-    <div data-open={opened} data-position={position} className={`${style.offcanvas} ${className}`} style={divStyle}>
-      {children}
-    </div>
+  return <div data-open={opened} data-position={position} className={`${styling.offcanvas} ${className}`} style={divStyle}>
+    {children}
   </div>
 }
 

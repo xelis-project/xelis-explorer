@@ -11,6 +11,7 @@ import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 import useTheme from '../../context/useTheme'
 import Switch from '../../components/switch'
+import { useRef } from 'react'
 
 const style = {
   container: css`
@@ -25,6 +26,17 @@ const style = {
         margin-top: .2em;
         font-weight: normal;
       }
+    }
+
+    table button {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 15px;
+      padding: 0.3em 0.6em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 1em;
     }
   `,
   map: css`
@@ -64,6 +76,17 @@ const style = {
       align-items: center;
       font-weight: bold;
       font-size: .9em;
+      justify-content: right;
+    }
+
+    button {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 15px;
+      padding: 0.3em 0.6em;
+      font-weight: bold;
+      cursor: pointer;
     }
   `
 }
@@ -153,6 +176,8 @@ function Peers() {
     }
   }, [])
 
+  const mapRef = useRef()
+
   return <div className={style.container}>
     <Helmet>
       <title>Peers</title>
@@ -162,15 +187,15 @@ function Peers() {
       Peers
       <div>{peers.length} beautiful peers</div>
     </h1>
-    <Map peers={peers} geoLocation={geoLocation} />
-    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} />
+    <Map mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
+    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
   </div>
 }
 
 export default Peers
 
 function Table(props) {
-  const { loading, err, peers, geoLocation, geoLoading } = props
+  const { loading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   return <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
     rowKey="id"
@@ -188,7 +213,13 @@ function Table(props) {
         render: (_, item) => {
           const data = geoLocation[item.ip]
           if (data && data.country && data.region) {
-            return `${data.country} / ${data.region}`
+            return <div>
+              <span>{data.country} / {data.region}</span>
+              <button onClick={() => {
+                const position = [data.latitude, data.longitude]
+                mapRef.current.flyTo(position, 6)
+              }}>Fly To</button>
+            </div>
           }
 
           if (geoLoading) {
@@ -246,7 +277,7 @@ function Table(props) {
 }
 
 function MapControls(props) {
-  const { controls, setControls } = props
+  const { controls, setControls, mapRef } = props
   const { showConnections, showPeers } = controls
 
   const setControlValue = useCallback((key, value) => {
@@ -255,24 +286,31 @@ function MapControls(props) {
     })
   }, [setControls])
 
+  const reset = useCallback(() => {
+    mapRef.current.setView([0, 0], 2)
+  }, [])
+
   return <div className={style.mapControls}>
     <div>
-      <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
       Peers
+      <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
     </div>
     <div>
-      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
       Connections
+      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
+    </div>
+    <div>
+      <button onClick={reset}>Reset</button>
     </div>
   </div>
 }
 
 function Map(props) {
-  const { peers, geoLocation } = props
+  const { mapRef, peers, geoLocation } = props
 
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
-  const [map, setMap] = useState()
+  const [mapContainer, setMapContainer] = useState()
   const [controls, setControls] = useState({ showConnections: true, showPeers: true })
 
   useEffect(() => {
@@ -303,7 +341,7 @@ function Map(props) {
       if (!peerLocation) return
 
       const dotPosition = [peerLocation.latitude, peerLocation.longitude]
-      const dotKey = peerLocation.latitude + peerLocation.longitude
+      const dotKey = (peerLocation.latitude + peerLocation.longitude).toFixed(4)
 
       if (peerDots[dotKey]) {
         // another peer with the same location
@@ -318,7 +356,7 @@ function Map(props) {
         const subPeerLocation = geoLocation[addr.ip]
         if (!subPeerLocation) return
         const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
-        const lineKey = peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude
+        const lineKey = (peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude).toFixed(4)
 
         // keep only one line and overwrite if key exists
         connectionLines[lineKey] = linePositions
@@ -326,7 +364,7 @@ function Map(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const map = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]}>
+    const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={mapRef}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
@@ -354,11 +392,11 @@ function Map(props) {
       </>
     </MapContainer>
 
-    setMap(map)
+    setMapContainer(mapContainer)
   }, [leaflet, peers, geoLocation, theme, controls])
 
   return <div className={style.map}>
-    {map && <MapControls controls={controls} setControls={setControls} />}
-    {map}
+    {mapContainer && <MapControls controls={controls} setControls={setControls} mapRef={mapRef} />}
+    {mapContainer}
   </div>
 }

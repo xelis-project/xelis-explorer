@@ -7,7 +7,7 @@ import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import prettyMs from 'pretty-ms'
 
-import TableBody, { style as tableStyle } from '../../components/tableBody'
+import Table from '../../components/table'
 import { formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import Chart from '../../components/chart'
@@ -46,9 +46,10 @@ const style = {
       }
     }
 
-    .chart {
-      max-height: 200px;
-      margin-bottom: 1em;
+    > :nth-child(2) {
+      > :nth-child(1) {
+        margin-bottom: 2em;
+      }
     }
 
     > div > :nth-child(3) {
@@ -227,44 +228,33 @@ function TxsHistoryChart(props) {
 
   return <div>
     <h2>Last 20 blocks ({totalTxs} txs)</h2>
-    <Chart chartRef={chartRef} config={chartConfig} className="chart" />
+    <Chart chartRef={chartRef} config={chartConfig} />
   </div>
 }
-
 
 function PendingTxs(props) {
   const { memPool, loading, err } = props
 
   return <div>
     <h2>Pending Transactions ({memPool.length})</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Hash</th>
-            <th>Signer</th>
-            <th>Fees</th>
-            <th>Age</th>
-          </tr>
-        </thead>
-        <TableBody list={memPool} loading={loading} err={err} colSpan={4} emptyText="No transactions"
-          onItem={(item) => {
-            return <tr key={item.hash}>
-              <td title={item.hash}>
-                <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
-              </td>
-              <td>
-                <Link to={`/accounts/${item.owner}`}>{reduceText(item.owner, 0, 7)}</Link>
-              </td>
-              <td>{formatXelis(item.fee)}</td>
-              <td>
-                <Age timestamp={(item.first_seen || 0) * 1000} update format={{ secondsDecimalDigits: 0 }} />
-              </td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
+    <Table
+      headers={[`Hash`, `Signer`, `Fees`, `Age`]}
+      list={memPool} loading={loading} err={err} colSpan={4} emptyText="No transactions"
+      onItem={(item) => {
+        return <tr key={item.hash}>
+          <td title={item.hash}>
+            <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
+          </td>
+          <td>
+            <Link to={`/accounts/${item.owner}`}>{reduceText(item.owner, 0, 7)}</Link>
+          </td>
+          <td>{formatXelis(item.fee)}</td>
+          <td>
+            <Age timestamp={(item.first_seen || 0) * 1000} update format={{ secondsDecimalDigits: 0 }} />
+          </td>
+        </tr>
+      }}
+    />
   </div>
 }
 
@@ -375,41 +365,30 @@ function ExecutedTxs(props) {
 
   return <div>
     <h2>Executed Transactions ({executedTxs.length})</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Topo</th>
-            <th>Hash</th>
-            <th>Signer</th>
-            <th>Fees</th>
-            <th>Age</th>
-          </tr>
-        </thead>
-        <TableBody list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
-          emptyText="No transactions"
-          onItem={(item) => {
-            const { tx, block } = item
-            return <tr key={tx.hash}>
-              <td>
-                <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
-                &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
-              </td>
-              <td>
-                <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
-              </td>
-              <td>
-                <Link to={`/accounts/${tx.owner}`}>{reduceText(tx.owner, 0, 7)}</Link>
-              </td>
-              <td>{formatXelis(tx.fee)}</td>
-              <td>
-                <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
-              </td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
+    <Table
+      headers={[`Topo`, `Hash`, `Signer`, `Fees`, `Age`]}
+      list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
+      emptyText="No transactions"
+      onItem={(item) => {
+        const { tx, block } = item
+        return <tr key={tx.hash}>
+          <td>
+            <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
+            &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
+          </td>
+          <td>
+            <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
+          </td>
+          <td>
+            <Link to={`/accounts/${tx.owner}`}>{reduceText(tx.owner, 0, 7)}</Link>
+          </td>
+          <td>{formatXelis(tx.fee)}</td>
+          <td>
+            <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+          </td>
+        </tr>
+      }}
+    />
   </div>
 }
 

@@ -8,7 +8,7 @@ import Icon from '../components/icon'
 import theme from '../style/theme'
 import { scaleOnHover } from '../style/animate'
 
-const style = {
+const headerStyle = {
   container: css`
     display: flex;
     justify-content: space-between;
@@ -25,7 +25,7 @@ const style = {
     color: var(--text-color);
     font-weight: bold;
 
-    .logo {
+    > :nth-child(1) {
       width: 30px;
       height: 30px;
       display: block;
@@ -33,85 +33,86 @@ const style = {
       background-repeat: no-repeat;
       background-image: ${theme.apply({ xelis: `url('/public/img/white_background_black_logo.svg')`, light: `url('/public/img/black_background_white_logo.svg')`, dark: `url('/public/img/white_background_black_logo.svg')`, })};
     }
+  `
+}
+
+const menuStyle = {
+  button: css`
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 1.5em;
   `,
-  menu: css`
+  container: css`
     --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#dddddd', dark: '#212121' })};
 
-    .button {
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-      font-size: 1.5em;
-    }
-
-    .container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 1em;
-      display: flex;
-      flex-direction: column;
-      background-color: var(--bg-color);
-      gap: .25em;
-      z-index: 1;
-      font-size: 1.2em;
-      opacity: 0;
-      transform: translateY(-100%);
-      transition: all .25s;
-      box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
-
-      ${theme.query.minDesktop} {
-        max-width: 225px;
-        position: absolute;
-        right: 0;
-        left: inherit;
-      }
-
-      &.opened {
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      .item {
-        text-decoration: none;
-        color: var(--header-nav-color);
-        user-select: none;
-        cursor: pointer;
-        background-color: var(--bg-color);
-        padding: 0.5em 0.7em;
-        display: flex;
-        gap: 0.5em;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 5px;
-
-        &:hover, &.active {
-          background-color: var(--header-nav-active-color);
-        }
-      }
-    }
-  `,
-  themeButtons: css`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1em;
     display: flex;
-    gap: .5em;
-    margin-top: .5em;
+    flex-direction: column;
+    background-color: var(--bg-color);
+    gap: .25em;
+    z-index: 1;
+    font-size: 1.2em;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all .25s;
+    box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
 
     ${theme.query.minDesktop} {
-      justify-content: space-evenly;
+      max-width: 225px;
+      position: absolute;
+      right: 0;
+      left: inherit;
     }
 
-    button {
-      font-weight: bold;
-      border: none;
-      padding: .5em .7em;
+    &[data-open="true"] {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    > :nth-child(1) > a {
+      text-decoration: none;
+      color: var(--header-nav-color);
+      user-select: none;
       cursor: pointer;
-      color: var(--bg-color);
-      background-color: var(--text-color);
-      transition: .25s all;
+      background-color: var(--bg-color);
+      padding: 0.5em 0.7em;
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+      justify-content: space-between;
       border-radius: 5px;
-      ${scaleOnHover({ scale: .93 })}
+  
+      &:hover, &.active {
+        background-color: var(--header-nav-active-color);
+      }
+    }
+
+    > :nth-child(2) {
+      display: flex;
+      gap: .5em;
+      margin-top: .5em;
+  
+      ${theme.query.minDesktop} {
+        justify-content: space-evenly;
+      }
+  
+      button {
+        font-weight: bold;
+        border: none;
+        padding: .5em .7em;
+        cursor: pointer;
+        color: var(--bg-color);
+        background-color: var(--text-color);
+        transition: .25s all;
+        border-radius: 5px;
+        ${scaleOnHover({ scale: .93 })}
+      }
     }
   `
 }
@@ -156,24 +157,25 @@ function Header(props) {
     }
   }, [menuOpen])
 
-  return <div className={style.container} {...props}>
-    <Link to="/" className={style.logo}>
-      <span className="logo" />
-      <span>XELIS</span>
+  return <div className={headerStyle.container} {...props}>
+    <Link to="/" className={headerStyle.logo}>
+      <div>{/* LOGO */}</div>
+      <div>XELIS</div>
     </Link>
-    <div className={style.menu}>
-      <button className="button" aria-label="Menu" ref={headerMenuRef} onClick={() => setMenuOpen(!menuOpen)}>
+    <div>
+      <button ref={headerMenuRef} className={menuStyle.button} aria-label="Menu" onClick={() => setMenuOpen(!menuOpen)}>
         <Icon name="bars" />
       </button>
-      <div className={`container ${menuOpen ? `opened` : ``}`}>
-        {links.map((item) => {
-          return <NavLink key={item.path} to={item.path}
-            className={item.className}>
-            <div>{item.title}</div>
-            <Icon name={item.icon} />
-          </NavLink>
-        })}
-        <div className={style.themeButtons}>
+      <div data-open={menuOpen} className={menuStyle.container}>
+        <div>
+          {links.map((item) => {
+            return <NavLink key={item.path} to={item.path}>
+              <div>{item.title}</div>
+              <Icon name={item.icon} />
+            </NavLink>
+          })}
+        </div>
+        <div>
           <button onClick={() => setTheme('xelis')}>Default</button>
           <button onClick={() => setTheme('dark')}>Dark</button>
           <button onClick={() => setTheme('light')}>Light</button>

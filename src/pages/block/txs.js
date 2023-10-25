@@ -5,8 +5,8 @@ import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import { formatXelis, reduceText } from '../../utils'
-import TableBody, { style as tableStyle } from '../../components/tableBody'
-import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
+import Table from '../../components/table'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 
 const style = {
   container: css`
@@ -66,45 +66,35 @@ function Transactions(props) {
 
   return <div className={style.container}>
     <h2>Transactions</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
+    <Table
+      headers={[`Hash`, `Transfers / Burns`, `Signer`, `Fees`]}
+      list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={4}
+      onItem={(item) => {
+        const transfers = item.data.transfers || []
+
+        // only one burn per tx for now but I expect multiple burns per tx later
+        let burns = []
+        if (item.data.burn) burns = [item.data.burn]
+
+        return <React.Fragment key={item.hash}>
           <tr>
-            <th>Hash</th>
-            <th>Transfers / Burns</th>
-            <th>Signer</th>
-            <th>Fees</th>
+            <td>
+              <Link to={`/txs/${item.hash}`}>
+                {reduceText(item.hash)}
+              </Link>
+            </td>
+            <td>{transfers.length} / {burns.length}</td>
+            <td>
+              <Link to={`/accounts/${item.owner}`}>
+                {reduceText(item.owner, 0, 7)}
+              </Link>
+            </td>
+            <td>{formatXelis(item.fee)}</td>
           </tr>
-        </thead>
-        <TableBody list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={4}
-          onItem={(item) => {
-            const transfers = item.data.transfers || []
-
-            // only one burn per tx for now but I expect multiple burns per tx later
-            let burns = []
-            if (item.data.burn) burns = [item.data.burn]
-
-            return <React.Fragment key={item.hash}>
-              <tr>
-                <td>
-                  <Link to={`/txs/${item.hash}`}>
-                    {reduceText(item.hash)}
-                  </Link>
-                </td>
-                <td>{transfers.length} / {burns.length}</td>
-                <td>
-                  <Link to={`/accounts/${item.owner}`}>
-                    {reduceText(item.owner, 0, 7)}
-                  </Link>
-                </td>
-                <td>{formatXelis(item.fee)}</td>
-              </tr>
-            </React.Fragment>
-          }}
-        />
-      </table>
-    </div>
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="txs" count={txCount} />
+        </React.Fragment>
+      }}
+    />
+    <Pagination state={pageState} setState={setPageState} countText="txs" count={txCount} />
   </div>
 }
 

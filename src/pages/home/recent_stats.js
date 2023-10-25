@@ -8,22 +8,21 @@ import to from 'await-to-js'
 import { formatSize, formatXelis, reduceText } from '../../utils'
 
 const style = {
-  title: css`
-    margin-bottom: 1em;
-    font-weight: bold;
-    font-size: 1.5em;
-
-    > div {
-      font-size: .6em;
-      opacity: .7;
-      font-weight: normal;
-      margin-top: 5px;
+  container: css`
+    > :nth-child(1), > :nth-child(3) {
+      margin-bottom: 1em;
+      font-weight: bold;
+      font-size: 1.5em;
+  
+      > div {
+        font-size: .6em;
+        opacity: .7;
+        font-weight: normal;
+        margin-top: 5px;
+      }
     }
-  `,
-  stats: css`
-    margin-bottom: 2em;
 
-    .items {
+    > :nth-child(2) {
       display: flex;
       gap: 1em;
       margin-bottom: 1em;
@@ -48,7 +47,7 @@ const style = {
       }
     }
 
-    .distribution {
+    > :nth-child(4) {
       display: flex;
       flex-direction: column;
       border-left: 3px solid var(--block-border-color);
@@ -120,53 +119,39 @@ export function RecentStats(props) {
     return { ...stats, miners }
   }, [blocks])
 
-  return <div>
-    <div className={style.title}>
+  return <div className={style.container}>
+    <div>
       Recent Stats
       <div>Last {blocks.length} blocks</div>
     </div>
-    <div className={style.stats}>
-      <div className="items">
-        <div>
-          <div>Txs</div>
-          <div>{stats.txs}</div>
-        </div>
-        <div>
-          <div>Size</div>
-          <div>{formatSize(stats.size)}</div>
-        </div>
-        <div>
-          <div>Fees</div>
-          <div>{formatXelis(stats.fees, { withSuffix: false })}</div>
-        </div>
-        <div>
-          <div>Reward</div>
-          <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
-        </div>
-        <div>
-          <div>Peers</div>
-          <div>{p2pStatus.peer_count || 0}</div>
-        </div>
+    <div>
+      <div>
+        <div>Txs</div>
+        <div>{stats.txs}</div>
       </div>
-      <div className={style.title}>
-        Miners Distribution
-        <div>Last {blocks.length} blocks</div>
+      <div>
+        <div>Size</div>
+        <div>{formatSize(stats.size)}</div>
       </div>
-      <div className="distribution">
-        <MinersDistribution miners={stats.miners} />
+      <div>
+        <div>Fees</div>
+        <div>{formatXelis(stats.fees, { withSuffix: false })}</div>
+      </div>
+      <div>
+        <div>Reward</div>
+        <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
+      </div>
+      <div>
+        <div>Peers</div>
+        <div>{p2pStatus.peer_count || 0}</div>
       </div>
     </div>
+    <div>
+      Miners Distribution
+      <div>Last {blocks.length} blocks</div>
+    </div>
+    <MinersDistribution miners={stats.miners} />
   </div>
-}
-
-const minersMock = {
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k1": 45,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k2": 31,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k3": 5,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k4": 12,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k5": 22,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k6": 5,
-  "xet1qqqyvh9vgkcurtj2la0e4jspnfsq7vkaqm863zcfdnej92xg4mpzz3suf96k7": 2,
 }
 
 const colors = [
@@ -176,7 +161,6 @@ const colors = [
   'rgba(137, 237, 104, 0.4)', 'rgba(117, 237, 87, 0.4)', 'rgba(196, 98, 7, 0.4)', 'rgba(28, 100, 119, 0.4)',
   'rgba(22, 164, 247, 0.4)', 'rgba(183, 119, 36, 0.4)', 'rgba(80, 3, 127, 0.4)', 'rgba(62, 165, 28, 0.4)',
 ]
-
 
 function MinersDistribution(props) {
   const { miners } = props
@@ -190,7 +174,7 @@ function MinersDistribution(props) {
     return values
   }, [miners])
 
-  return <>
+  return <div>
     {distribution.map((item, index) => {
       const percentage = item.minedBlock * 100 / distribution[0].minedBlock
       return <div key={item.miner}>
@@ -203,5 +187,5 @@ function MinersDistribution(props) {
         </div>
       </div>
     })}
-  </>
+  </div>
 }

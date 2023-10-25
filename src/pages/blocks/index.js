@@ -8,7 +8,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
 import { Helmet } from 'react-helmet-async'
-import Pagination, { getPaginationRange, style as paginationStyle } from '../../components/pagination'
+import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
@@ -23,11 +23,11 @@ const style = {
       font-size: 2em;
     }
 
-    .table-mobile, .table-desktop {
+    > :nth-child(2) {
       margin-bottom: 1em;
     }
   `,
-  animate: css`
+  animateBlock: css`
     ${slideX({ from: `100%`, to: `0%`, duration: `0.4s` })}
   `
 }
@@ -142,7 +142,7 @@ function Blocks() {
     <h1>Blocks</h1>
     <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
       rowClassName={(block) => {
-        if (newBlock && block.hash === newBlock.hash) return style.animate
+        if (newBlock && block.hash === newBlock.hash) return style.animateBlock
         return null
       }}
       headers={[
@@ -190,7 +190,7 @@ function Blocks() {
         }
       ]}
     />
-    <Pagination className={paginationStyle} state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
+    <Pagination state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
   </div>
 }
 

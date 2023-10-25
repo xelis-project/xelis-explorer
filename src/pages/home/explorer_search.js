@@ -13,14 +13,14 @@ const style = {
   container: css`
     margin: 5em 0;
 
-    .title {
+    > :nth-child(1) {
       font-size: 3em;
       font-weight: bold;
       margin-bottom: 1em;
       text-align: center;
     }
 
-    .form {
+    > :nth-child(2) {
       position: relative;
 
       input {
@@ -108,8 +108,8 @@ export function ExplorerSearch() {
 
   return <form onSubmit={search}>
     <div className={style.container}>
-      <div className="title">XELIS Explorer</div>
-      <div className="form">
+      <div>XELIS Explorer</div>
+      <div>
         <input type="text" name="search" placeholder="Search block, transaction or address"
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit" aria-label="Search">

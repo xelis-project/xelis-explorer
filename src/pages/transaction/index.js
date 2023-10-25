@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
@@ -6,14 +6,13 @@ import { Link } from 'react-router-dom'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { css } from 'goober'
 
-import TableBody, { style as tableStyle } from '../../components/tableBody'
+import Table from '../../components/table'
 import { formatXelis, formatAsset, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
-import { useMemo } from 'react'
 
 const style = {
   container: css`
@@ -34,6 +33,16 @@ const style = {
       color: white;
       font-weight: bold;
       background-color: var(--error-color);
+    }
+
+    .extra {
+      padding: 1em;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1em;
+      opacity: .5;
+      max-height: 30em;
+      overflow: auto;
     }
   `
 }
@@ -151,8 +160,10 @@ function Transaction() {
           {
             key: 'executed_in_block',
             title: 'Executed In',
-            render: (value) => {
-              return <Link to={`/blocks/${value}`}>{value}</Link>
+            render: (value, item) => {
+              if (value) return <Link to={`/blocks/${value}`}>{value}</Link>
+              if (item.in_mempool) return `Not executed yet.`
+              return ``
             }
           },
         ]}
@@ -162,12 +173,18 @@ function Transaction() {
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <InBlocks tx={tx} />
-      <h2>Extra</h2>
-      <div>
-        {!tx.extra_data && <div>No extra data</div>}
-        {tx.extra_data && JSON.stringify(tx.extra_data, null, 2)}
-      </div>
+      <h2>Extra Data</h2>
+      <ExtraData tx={tx} />
     </div>
+  </div>
+}
+
+function ExtraData(props) {
+  const { tx } = props
+
+  return <div className="extra">
+    {!tx.extra_data && <div>This transaction does not contain extra information.</div>}
+    {tx.extra_data && <pre>{JSON.stringify(tx.extra_data, null, 2)}</pre>}
   </div>
 }
 
@@ -175,31 +192,22 @@ function Transfers(props) {
   const { transfers } = props
   return <div>
     <h2>Transfers</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th>Amount</th>
-            <th>Recipient</th>
-          </tr>
-        </thead>
-        <TableBody list={transfers} emptyText="No transfers" colSpan={3}
-          onItem={(item, index) => {
-            const { amount, asset, to } = item
-            return <tr key={index}>
-              <td>{reduceText(asset)}</td>
-              <td>{formatAsset(amount, asset)}</td>
-              <td>
-                <Link to={`/accounts/${to}`}>
-                  {to}
-                </Link>
-              </td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
+    <Table
+      headers={[`Asset`, `Amount`, `Recipient`]}
+      list={transfers} emptyText="No transfers" colSpan={3}
+      onItem={(item, index) => {
+        const { amount, asset, to } = item
+        return <tr key={index}>
+          <td>{reduceText(asset)}</td>
+          <td>{formatAsset(amount, asset)}</td>
+          <td>
+            <Link to={`/accounts/${to}`}>
+              {to}
+            </Link>
+          </td>
+        </tr>
+      }}
+    />
   </div>
 }
 
@@ -207,25 +215,17 @@ function Burns(props) {
   const { burns } = props
   return <div>
     <h2>Burns</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <TableBody list={burns} emptyText="No burns" colSpan={2}
-          onItem={(item, index) => {
-            const { amount, asset } = item
-            return <tr key={index}>
-              <td>{reduceText(asset)}</td>
-              <td>{formatAsset(amount, asset)}</td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
+    <Table
+      headers={[`Asset`, `Amount`]}
+      list={burns} emptyText="No burns" colSpan={2}
+      onItem={(item, index) => {
+        const { amount, asset } = item
+        return <tr key={index}>
+          <td>{reduceText(asset)}</td>
+          <td>{formatAsset(amount, asset)}</td>
+        </tr>
+      }}
+    />
   </div>
 }
 
@@ -269,36 +269,23 @@ function InBlocks(props) {
 
   return <div>
     <h2>In Blocks</h2>
-    <div className={tableStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th>Topoheight</th>
-            <th>Hash</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Fees</th>
-            <th>Timestamp</th>
-            <th>Txs</th>
-          </tr>
-        </thead>
-        <TableBody list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={7}
-          onItem={(item, index) => {
-            const size = formatSize(item.total_size_in_bytes)
-            const time = new Date(item.timestamp).toLocaleString()
-            return <tr key={item.hash}>
-              <td><Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link></td>
-              <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
-              <td>{item.block_type}</td>
-              <td>{size}</td>
-              <td>{formatXelis(item.total_fees)}</td>
-              <td>{time}</td>
-              <td>{item.txs_hashes.length}</td>
-            </tr>
-          }}
-        />
-      </table>
-    </div>
+    <Table
+      headers={[`Topoheight`, `Hash`, `Type`, `Size`, `Fees`, `Timestamp`, `Txs`]}
+      list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={7}
+      onItem={(item, index) => {
+        const size = formatSize(item.total_size_in_bytes)
+        const time = new Date(item.timestamp).toLocaleString()
+        return <tr key={item.hash}>
+          <td><Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link></td>
+          <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
+          <td>{item.block_type}</td>
+          <td>{size}</td>
+          <td>{formatXelis(item.total_fees)}</td>
+          <td>{time}</td>
+          <td>{item.txs_hashes.length}</td>
+        </tr>
+      }}
+    />
   </div>
 }
 

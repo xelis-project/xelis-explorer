@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import prettyMs from 'pretty-ms'
 
 import { useServerData } from '../context/useServerData'

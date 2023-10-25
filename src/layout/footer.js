@@ -15,7 +15,6 @@ const style = {
 
     a {
       text-decoration: none;
-      color: var(--link-hover-color);
     }
 
     > div {
