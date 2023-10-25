@@ -11,6 +11,7 @@ import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 import useTheme from '../../context/useTheme'
 import Switch from '../../components/switch'
+import { useRef } from 'react'
 
 const style = {
   container: css`
@@ -64,6 +65,17 @@ const style = {
       align-items: center;
       font-weight: bold;
       font-size: .9em;
+      justify-content: right;
+    }
+
+    button {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 15px;
+      padding: 0.3em 0.6em;
+      font-weight: bold;
+      cursor: pointer;
     }
   `
 }
@@ -246,7 +258,7 @@ function Table(props) {
 }
 
 function MapControls(props) {
-  const { controls, setControls } = props
+  const { controls, setControls, map } = props
   const { showConnections, showPeers } = controls
 
   const setControlValue = useCallback((key, value) => {
@@ -255,14 +267,21 @@ function MapControls(props) {
     })
   }, [setControls])
 
+  const reset = useCallback(() => {
+    map.current.setView([0, 0], 2)
+  }, [])
+
   return <div className={style.mapControls}>
     <div>
-      <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
       Peers
+      <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
     </div>
     <div>
-      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
       Connections
+      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
+    </div>
+    <div>
+      <button onClick={reset}>Reset</button>
     </div>
   </div>
 }
@@ -272,7 +291,8 @@ function Map(props) {
 
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
-  const [map, setMap] = useState()
+  const [mapContainer, setMapContainer] = useState()
+  const map = useRef()
   const [controls, setControls] = useState({ showConnections: true, showPeers: true })
 
   useEffect(() => {
@@ -326,7 +346,7 @@ function Map(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const map = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]}>
+    const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={map}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
@@ -354,11 +374,11 @@ function Map(props) {
       </>
     </MapContainer>
 
-    setMap(map)
+    setMapContainer(mapContainer)
   }, [leaflet, peers, geoLocation, theme, controls])
 
   return <div className={style.map}>
-    {map && <MapControls controls={controls} setControls={setControls} />}
-    {map}
+    {mapContainer && <MapControls controls={controls} setControls={setControls} map={map} />}
+    {mapContainer}
   </div>
 }
