@@ -8,6 +8,7 @@ import { scaleOnHover } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import Dropdown from '../../components/dropdown'
 import { useMemo } from 'react'
+import useTheme from '../../context/useTheme'
 
 const style = {
   container: css`
@@ -85,6 +86,7 @@ const style = {
 
 function Settings() {
   const { settings, setValue } = useSettings()
+  const { theme: currentTheme, setTheme } = useTheme()
 
   const [nodeEnpoint, setNodeEndpoint] = useState(() => {
     return settings[settingsKeys.NODE_WS_ENDPOINT]
@@ -97,6 +99,14 @@ function Settings() {
       { key: `es`, text: `Spanish` }
     ]
   }, [])
+
+  const themes = useMemo(() => {
+    return [
+      { key: `xelis`, text: `Default` },
+      { key: `dark`, text: `Dark` },
+      { key: `light`, text: `Light` }
+    ]
+  })
 
   return <div className={style.container}>
     <PageTitle title="Settings" subtitle="This page allows you to change explorer settings."
@@ -119,8 +129,15 @@ function Settings() {
       </div>
       <div className="form-input">
         <label>Language</label>
-        <span>Select your prefered language.</span>
+        <span>Select your preferred language.</span>
         <Dropdown items={languages} defaultKey={`en`} size={1.2} />
+      </div>
+      <div className="form-input">
+        <label>Theme</label>
+        <span>Select your preferred theme.</span>
+        <Dropdown items={themes} defaultKey={currentTheme} size={1.2} onChange={(item) => {
+          setTheme(item.key)
+        }} />
       </div>
     </div>
   </div>

@@ -165,7 +165,7 @@ function Transaction() {
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <InBlocks tx={tx} />
-      <h2>Extra Data</h2>
+      <h2>Extra</h2>
       <ExtraData tx={tx} />
     </div>
   </div>
