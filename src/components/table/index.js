@@ -58,7 +58,7 @@ function Table(props) {
           {loading && <td colSpan={colSpan}>
             loading<DotLoading />
           </td>}
-          {err && <td colSpan={colSpan} className={style.errorText}>
+          {err && <td colSpan={colSpan} className={styling.errorText}>
             {displayError(err)}
           </td>}
           {!err && !loading && list.length === 0 && <td colSpan={colSpan}>
