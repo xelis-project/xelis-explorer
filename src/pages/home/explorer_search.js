@@ -26,12 +26,13 @@ const style = {
       input {
         width: 100%;
         padding: 1em 1.5em;
-        font-size: 1em;
+        font-size: 1.1em;
         border-radius: 30px;
         outline: none;
         color: var(--text-color);
         background-color: var(--bg-color);
         border: thin solid var(--border-color);
+        font-weight: bold;
       }
   
       button {
@@ -44,7 +45,7 @@ const style = {
         color: var(--bg-color);
         border-radius: 50%;
         height: 76%;
-        min-width: 42px;
+        min-width: 46px;
         border: none;
         display: flex;
         align-items: center;
@@ -110,7 +111,7 @@ export function ExplorerSearch() {
     <div className={style.container}>
       <div>XELIS Explorer</div>
       <div>
-        <input type="text" name="search" placeholder="Search block, transaction or address"
+        <input type="text" name="search" placeholder="Search block, transaction or account address."
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit" aria-label="Search">
           <Icon name="search" />

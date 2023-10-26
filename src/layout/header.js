@@ -43,6 +43,7 @@ const menuStyle = {
     background: transparent;
     color: var(--text-color);
     font-size: 1.5em;
+    ${scaleOnHover({ scale: `.94` })};
   `,
   container: css`
     --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#dddddd', dark: '#212121' })};
@@ -80,7 +81,6 @@ const menuStyle = {
       color: var(--header-nav-color);
       user-select: none;
       cursor: pointer;
-      background-color: var(--bg-color);
       padding: 0.5em 0.7em;
       display: flex;
       gap: 0.5em;

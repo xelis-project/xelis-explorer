@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
-import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
@@ -17,15 +16,10 @@ import Age from '../../components/age'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     .error {
       padding: 1em;
       color: white;
@@ -180,11 +174,9 @@ function Block() {
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <div>
-      <Helmet>
-        <title>Block {(block.topoheight || ``).toString()}</title>
-        <meta name="description" content={description} />
-      </Helmet>
-      <h1>Block {block.topoheight}</h1>
+      <PageTitle title={`Block ${block.topoheight || ``}`}
+        metaDescription={description}
+      />
       {err && <div className="error">{displayError(err)}</div>}
       {!err && <div className="controls">
         <div>

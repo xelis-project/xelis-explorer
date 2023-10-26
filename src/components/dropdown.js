@@ -23,7 +23,6 @@ const defaultStyle = {
     justify-content: space-between;
     align-items: center;
     position: relative;
-    z-index: 2;
     font-weight: bold;
 
     > :nth-child(1) {

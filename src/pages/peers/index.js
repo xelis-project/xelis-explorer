@@ -2,7 +2,6 @@ import { useEffect, useCallback, useState } from 'react'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
-import { Helmet } from 'react-helmet-async'
 import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
 
@@ -12,22 +11,10 @@ import DotLoading from '../../components/dotLoading'
 import useTheme from '../../context/useTheme'
 import Switch from '../../components/switch'
 import { useRef } from 'react'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-
-      div {
-        color: var(--muted-color);
-        font-size: .5em;
-        margin-top: .2em;
-        font-weight: normal;
-      }
-    }
-
     table button {
       background: var(--text-color);
       color: var(--bg-color);
@@ -179,14 +166,8 @@ function Peers() {
   const mapRef = useRef()
 
   return <div className={style.container}>
-    <Helmet>
-      <title>Peers</title>
-      <meta name="description" content="Map with list of network peers. Monitor connected peers, network status and geo location." />
-    </Helmet>
-    <h1>
-      Peers
-      <div>{peers.length} beautiful peers</div>
-    </h1>
+    <PageTitle title="Peers" subtitle={`${peers.length} beautiful peers`}
+      metaDescription="Map with list of network peers. Monitor connected peers, network status and geo location." />
     <Map mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
     <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
   </div>

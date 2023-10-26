@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async'
 import useNodeSocket from '@xelis/sdk/react/daemon'
 import { useState, useCallback, useEffect } from 'react'
 import to from 'await-to-js'
@@ -11,15 +10,10 @@ import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import { XELIS_ASSET, formatXelis } from '../../utils'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     > :nth-child(2) {
       margin-bottom: 1em;
     }
@@ -121,11 +115,8 @@ function Accounts() {
   }, [pageState])
 
   return <div className={style.container}>
-    <Helmet>
-      <title>Accounts</title>
-      <meta name="description" content="List of registered accounts. Check addresses and more." />
-    </Helmet>
-    <h1>Accounts</h1>
+    <PageTitle title="Accounts" subtitle={`${accountCount.toLocaleString()} registered accounts`}
+      metaDescription="List of registered accounts. Check addresses and more." />
     <TableFlex loading={loading} err={err}
       emptyText="No accounts" rowKey="addr"
       headers={[

@@ -7,13 +7,13 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Age from '../../components/age'
-import { Helmet } from 'react-helmet-async'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { useServerData } from '../../context/useServerData'
 import { usePageLoad } from '../../context/usePageLoad'
 import { slideX } from '../../style/animate'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
@@ -121,7 +121,7 @@ function Blocks() {
 
         return [...blocks]
       })
-      setCount((count) => count + 1)
+      setBlockCount((count) => count + 1)
     }
   }, [pageState])
 
@@ -135,11 +135,8 @@ function Blocks() {
   }, [pageState])
 
   return <div className={style.container}>
-    <Helmet>
-      <title>Blocks</title>
-      <meta name="description" content="List of mined blocks. Access block heights, timestamps and transaction counts." />
-    </Helmet>
-    <h1>Blocks</h1>
+    <PageTitle title="Blocks" subtitle={`${blockCount.toLocaleString()} mined blocks`}
+      metaDescription="List of mined blocks. Access block heights, timestamps and transaction counts." />
     <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
       rowClassName={(block) => {
         if (newBlock && block.hash === newBlock.hash) return style.animateBlock

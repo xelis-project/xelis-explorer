@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router'
-import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
@@ -13,15 +12,10 @@ import TableFlex from '../../components/tableFlex'
 import { useServerData } from '../../context/useServerData'
 import { daemonRPC } from '../../ssr/nodeRPC'
 import { usePageLoad } from '../../context/usePageLoad'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     h2 {
       margin: 1em 0 .5em 0;
       font-weight: bold;
@@ -113,11 +107,9 @@ function Transaction() {
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
-    <Helmet>
-      <title>Transaction {tx.hash || ''}</title>
-      <meta name="description" content={description} />
-    </Helmet>
-    <h1>Transaction {reduceText(tx.hash, 4, 4)}</h1>
+    <PageTitle title={`Transaction ${reduceText(tx.hash, 4, 4)}`}
+      metaTitle={`Transaction ${tx.hash || ''}`}
+      metaDescription={description} />
     {err && <div className="error">{displayError(err)}</div>}
     <div>
       <TableFlex
@@ -173,7 +165,7 @@ function Transaction() {
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <InBlocks tx={tx} />
-      <h2>Extra Data</h2>
+      <h2>Extra</h2>
       <ExtraData tx={tx} />
     </div>
   </div>
