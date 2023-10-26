@@ -110,7 +110,7 @@ function Pagination(props) {
       return items
     })()}
     {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
-    <div className={styling.count}>{`${count} ${countText}`}</div>
+    <div className={styling.count}>{`${(count || 0).toLocaleString()} ${countText}`}</div>
   </div>
 }
 

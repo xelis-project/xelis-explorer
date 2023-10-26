@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router'
 import useNodeSocket from '@xelis/sdk/react/daemon'
 import { useState, useCallback, useEffect, useMemo } from 'react'
@@ -14,15 +13,10 @@ import Icon from '../../components/icon'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     h2 {
       margin: 0 0 .5em 0;
       font-weight: bold;
@@ -201,11 +195,9 @@ function Account() {
   }, [addr])
 
   return <div className={style.container}>
-    <Helmet>
-      <title>Account {addr || ''}</title>
-      <meta name="description" content={description} />
-    </Helmet>
-    <h1>Account {reduceText(addr)}</h1>
+    <PageTitle title={`Account ${reduceText(addr)}`}
+      metaTitle={`Account ${addr || ''}`}
+      metaDescription={description} />
     <div>
       <div>
         <div>

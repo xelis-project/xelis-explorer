@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { css } from 'goober'
@@ -14,15 +13,10 @@ import Chart from '../../components/chart'
 import theme from '../../style/theme'
 import { useRecentBlocks } from '../../pages/home'
 import useTheme from '../../context/useTheme'
+import PageTitle from '../../layout/page_title'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     h2 {
       margin: 1.5em 0 .5em 0;
       font-weight: bold;
@@ -122,11 +116,8 @@ function MemPool() {
   }, [memPool, filterTx])
 
   return <div className={style.container}>
-    <Helmet>
-      <title>Mempool</title>
-      <meta name="description" content="View pending transactions and network congestion. Verify if your transaction was executed." />
-    </Helmet>
-    <h1>Mempool</h1>
+    <PageTitle title="Mempool" subtitle="Past, pending and executed transactions."
+      metaDescription="View pending transactions and network congestion. Verify if your transaction was executed." />
     <div>
       <TxsHistoryChart />
       <input type="text" placeholder="Type your account address or transaction hash to filter the list below." onChange={(e) => {
@@ -371,10 +362,11 @@ function ExecutedTxs(props) {
       emptyText="No transactions"
       onItem={(item) => {
         const { tx, block } = item
+        const blockCount = topoheight - block.topoheight
         return <tr key={tx.hash}>
           <td>
             <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
-            &nbsp;<span title="Number of blocks from topo height">({topoheight - block.topoheight})</span>
+            &nbsp;<span title={`${blockCount} block${blockCount > 1 ? `s` : ``} ago`}>({blockCount})</span>
           </td>
           <td>
             <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
