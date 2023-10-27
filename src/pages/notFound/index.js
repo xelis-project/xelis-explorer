@@ -55,7 +55,7 @@ const style = {
 function NotFound() {
   const server = useServer()
   if (server) {
-    server.statusCode = 400
+    server.statusCode = 404
   }
 
   return <div className={style.container}>

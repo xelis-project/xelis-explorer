@@ -29,6 +29,10 @@ const defaultStyle = {
       overflow: hidden;
       user-select: none;
     }
+
+    > :nth-child(2) {
+      transition: .25s all;
+    }
   }
 
   > :nth-child(2) {
@@ -60,12 +64,20 @@ const defaultStyle = {
         color: black;
       }
     }
+  }
+  
+  &[data-open="true"] {
+    > :nth-child(1) > :nth-child(2) {
+      transform: rotate(180deg);
+    }
 
-    &[data-open="true"] {
+    > :nth-child(2) {
       transform: scaleY(1);
       opacity: 1;
     }
-  }`
+  }
+
+  `
 }
 
 function Dropdown(props) {
@@ -107,12 +119,12 @@ function Dropdown(props) {
     }
   }, [])
 
-  return <div ref={dropdownRef} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
+  return <div ref={dropdownRef} data-open={open} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
     <div onClick={() => setOpen(!open)}>
       <div>{prefix}{selectedText}</div>
-      <Icon name={open ? `arrow-up` : `arrow-down`} />
+      <Icon name="arrow-down" />
     </div>
-    <div data-open={open}>
+    <div>
       {items.map((item) => {
         return <div key={item.key} onClick={() => onSelect(item)}>{item.text}</div>
       })}
