@@ -1,7 +1,7 @@
 import { css } from 'goober'
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
+import Icon from 'g45-react/components/fontawesome_icon'
 
-import Icon from './icon'
 import theme from '../style/theme'
 
 const defaultStyle = {
@@ -84,25 +84,15 @@ function Dropdown(props) {
   const { items = [], onChange, defaultKey, size = 1,
     notSelectedText = `Choose an option`, prefix = ``, styling = defaultStyle, ...restProps } = props
 
-  const [selected, setSelected] = useState(() => {
-    return items.find((item) => item.key === defaultKey)
-  })
+  const [selectedKey, setSelectedKey] = useState(defaultKey)
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef()
 
   const onSelect = useCallback((item) => {
-    setSelected(item)
+    setSelectedKey(item.key)
     setOpen(false)
     if (typeof onChange === `function`) onChange(item)
   }, [onChange])
-
-  let selectedText = useMemo(() => {
-    let text = notSelectedText
-    if (selected) {
-      text = selected.text
-    }
-    return text
-  }, [selected])
 
   useEffect(() => {
     // close dropdown if we click outside the dropdown
@@ -118,6 +108,12 @@ function Dropdown(props) {
       return document.removeEventListener(`click`, onClick)
     }
   }, [])
+
+  const selectedText = useMemo(() => {
+    const item = items.find((item) => item.key === selectedKey)
+    if (item) return item.text
+    return notSelectedText
+  }, [selectedKey, items])
 
   return <div ref={dropdownRef} data-open={open} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
     <div onClick={() => setOpen(!open)}>

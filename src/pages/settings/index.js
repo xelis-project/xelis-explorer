@@ -1,14 +1,17 @@
 import { css } from 'goober'
 import { useState } from 'react'
+import { useLang } from 'g45-react/hooks/useLang'
+import Icon from 'g45-react/components/fontawesome_icon'
 
-import useSettings, { defaultSettings, settingsKeys } from '../../context/useSettings'
+import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
 import theme from '../../style/theme'
 import Button from '../../components/button'
 import { scaleOnHover } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import Dropdown from '../../components/dropdown'
 import { useMemo } from 'react'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
+import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
@@ -84,60 +87,80 @@ const style = {
   `
 }
 
+export function LangDropdown(props) {
+  const { size } = props
+  const { t, langKey, setLangKey } = useLang()
+
+  const languages = useMemo(() => {
+    return [
+      { key: `en`, text: <><FlagIcon code="us" />&nbsp;&nbsp;{t(`English`)}</> },
+      { key: `fr`, text: <><FlagIcon code="fr" />&nbsp;&nbsp;{t(`French`)}</> },
+      { key: `es`, text: <><FlagIcon code="es" />&nbsp;&nbsp;{t(`Spanish`)}</> }
+    ]
+  }, [t])
+
+  return <Dropdown items={languages} defaultKey={langKey} size={size} onChange={(item) => {
+    setLangKey(item.key)
+  }} />
+}
+
+export function ThemeDropdown(props) {
+  const { size } = props
+  const { theme: currentTheme, setTheme } = useTheme()
+  const { t } = useLang()
+
+  const themes = useMemo(() => {
+    return [
+      { key: `xelis`, text: <><Icon name="palette" />&nbsp;&nbsp;{t(`Default`)}</> },
+      { key: `dark`, text: <><Icon name="moon" />&nbsp;&nbsp;{t(`Dark`)}</> },
+      { key: `light`, text: <><Icon name="sun" />&nbsp;&nbsp;{t(`Light`)}</> }
+    ]
+  }, [t])
+
+  return <Dropdown items={themes} defaultKey={currentTheme} size={size} onChange={(item) => {
+    setTheme(item.key)
+  }} />
+}
+
 function Settings() {
   const { settings, setValue } = useSettings()
-  const { theme: currentTheme, setTheme } = useTheme()
+
 
   const [nodeEnpoint, setNodeEndpoint] = useState(() => {
     return settings[settingsKeys.NODE_WS_ENDPOINT]
   })
 
-  const languages = useMemo(() => {
-    return [
-      { key: `en`, text: `English` },
-      { key: `fr`, text: `French` },
-      { key: `es`, text: `Spanish` }
-    ]
-  }, [])
+  const { t } = useLang()
 
-  const themes = useMemo(() => {
-    return [
-      { key: `xelis`, text: `Default` },
-      { key: `dark`, text: `Dark` },
-      { key: `light`, text: `Light` }
-    ]
-  })
 
   return <div className={style.container}>
-    <PageTitle title="Settings" subtitle="This page allows you to change explorer settings."
-      metaDescription="Set your preferences, manage notifications and other controls." />
+    <PageTitle title={t('Settings')} subtitle={t('This page allows you to change explorer settings.')}
+      metaDescription={t('Set your preferences, manage notifications and other controls.')} />
     <div className="form-items">
       <div className="form-input">
-        <label>Node Endpoint</label>
-        <span>Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.</span>
+        <label>{t('Node Endpoint')}</label>
+        <span>{t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.')}</span>
         <input type="text" value={nodeEnpoint} onChange={(e) => {
           setNodeEndpoint(e.target.value)
         }} placeholder="wss://127.0.0.1/ws" />
         <div className="form-save">
           <Button icon="circle" onClick={() => {
             setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
-          }}>Reset</Button>
+          }}>{t('Reset')}</Button>
           <Button icon="floppy-disk" onClick={() => {
             setValue(settingsKeys.NODE_WS_ENDPOINT, nodeEnpoint)
-          }}>Apply</Button>
+          }}>{t('Apply')}</Button>
         </div>
       </div>
       <div className="form-input">
-        <label>Language</label>
-        <span>Select your preferred language.</span>
-        <Dropdown items={languages} defaultKey={`en`} size={1.2} />
+        <label>{t('Language')}</label>
+        <span>{t('Select your preferred language.')}</span>
+        <LangDropdown size={1.2} />
       </div>
       <div className="form-input">
-        <label>Theme</label>
-        <span>Select your preferred theme.</span>
-        <Dropdown items={themes} defaultKey={currentTheme} size={1.2} onChange={(item) => {
-          setTheme(item.key)
-        }} />
+        <label>{t('Theme')}</label>
+        <span>{t('Select your preferred theme.')}</span>
+        <ThemeDropdown size={1.2} />
       </div>
     </div>
   </div>

@@ -8,6 +8,7 @@ import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import TWEEN from '@tweenjs/tween.js'
+import Age from 'g45-react/components/age'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
@@ -15,11 +16,11 @@ import NodeStatus from '../../layout/node_status'
 import useOffCanvasTable from './offCanvasTable'
 import useOffCanvasBlock from './offCanvasBlock'
 import blockColor from './blockColor'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import BottomInfo from './bottomInfo'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
-import Age from '../../components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   canvas: css`
@@ -253,6 +254,7 @@ function DAG() {
   const [loading, setLoading] = useState()
   const [info, setInfo] = useState({})
   const [err, setErr] = useState()
+  const { t } = useLang()
 
   const stableHeight = info.stableheight
 
@@ -414,7 +416,7 @@ function DAG() {
   return <div>
     <Helmet>
       <title>DAG</title>
-      <meta name="description" content="XELIS BlockDAG inspector. Visualize a section of the network's blocks in 2D." />
+      <meta name="description" content={t(`XELIS BlockDAG inspector. Visualize a section of the network's blocks in 2D.`)} />
     </Helmet>
     <div className={style.canvas}>
       <Canvas style={{ cursor }} orthographic
@@ -430,7 +432,7 @@ function DAG() {
       >
         <CanvasFrame />
         <MapControls maxZoom={200} minZoom={10} enableDamping={false} enableRotate={false} />
-        <group position={[-((offCanvasTable.maxHeights*2)-2), 0, 0]}>
+        <group position={[-((offCanvasTable.maxHeights * 2) - 2), 0, 0]}>
           <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight}
             newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock}
             hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
@@ -452,11 +454,11 @@ function DAG() {
       <NodeStatus />
       <div>
         {(blocks.length > 0 && !offCanvasTable.paused) && <>
-          Last block&nbsp;
+          {t('Last block ')}
           <Age timestamp={blocks[0].timestamp} update format={{ secondsDecimalDigits: 0 }} />
-          &nbsp;ago
+          {t(' ago')}
         </>}
-        {offCanvasTable.paused && `Paused`}
+        {offCanvasTable.paused && t(`Paused`)}
       </div>
     </div>
     <div className={style.controls}>

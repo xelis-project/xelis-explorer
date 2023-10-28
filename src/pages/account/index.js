@@ -4,12 +4,13 @@ import { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import { usePageLoad } from 'g45-react/hooks/usePageLoad'
+import Age from 'g45-react/components/age'
+import Icon from 'g45-react/components/fontawesome_icon'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, formatAsset, formatXelis, reduceText } from '../../utils'
-import Age from '../../components/age'
-import { usePageLoad } from '../../context/usePageLoad'
-import Icon from '../../components/icon'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
@@ -128,6 +129,7 @@ function Account() {
   const { addr } = useParams()
 
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const { firstPageLoad } = usePageLoad()
   //const serverResult = loadAccount_SSR({ addr })
@@ -191,33 +193,33 @@ function Account() {
   const nonce = account.nonce ? account.nonce.nonce : `--`
 
   const description = useMemo(() => {
-    return `Account history of ${addr}.`
-  }, [addr])
+    return t(`Account history of {}.`, [addr])
+  }, [addr, t])
 
   return <div className={style.container}>
-    <PageTitle title={`Account ${reduceText(addr)}`}
-      metaTitle={`Account ${addr || ''}`}
+    <PageTitle title={t('Account {}', [reduceText(addr)])}
+      metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
     <div>
       <div>
         <div>
           <div>
-            <div>Address</div>
+            <div>{t('Address')}</div>
             <div style={{ wordBreak: `break-all` }}>{addr}</div>
           </div>
           <div>
-            <div>Assets</div>
+            <div>{t('Assets')}</div>
             <div>
               <Dropdown items={dropdownAssets} onChange={onAssetChange}
                 size={.8} defaultKey={XELIS_ASSET} />
             </div>
           </div>
           <div>
-            <div>Balance</div>
+            <div>{t('Balance')}</div>
             <div>{formatXelis(balance)}</div>
           </div>
           <div>
-            <div>Nonce</div>
+            <div>{t('Nonce')}</div>
             <div>{nonce}</div>
           </div>
         </div>
@@ -256,6 +258,7 @@ function History(props) {
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
   const [history, setHistory] = useState([])
+  const { t } = useLang()
 
   const [pages, setPages] = useState([])
   const [page, setPage] = useState(-1)
@@ -303,11 +306,11 @@ function History(props) {
     <TableFlex loading={loading} err={err} rowKey={(item, index) => {
       return `${item.hash}_${index}`
     }}
-      emptyText="No history" keepTableDisplay
+      emptyText={t('No history')} keepTableDisplay
       headers={[
         {
           key: "topoheight",
-          title: "Topoheight",
+          title: t('Topoheight'),
           render: (value) => {
             return <Link to={`/blocks/${value}`}>
               {value}
@@ -316,7 +319,7 @@ function History(props) {
         },
         {
           key: "hash",
-          title: "Hash",
+          title: t('Hash'),
           render: (value, item) => {
             let link = ``
             const itemType = getType(item)
@@ -336,7 +339,7 @@ function History(props) {
         },
         {
           key: "type",
-          title: "Type",
+          title: t('Type'),
           render: (_, item) => {
             const itemType = getType(item)
             switch (itemType) {
@@ -355,7 +358,7 @@ function History(props) {
         },
         {
           key: "amount",
-          title: "Amount",
+          title: t('Amount'),
           render: (_, item) => {
             const itemType = getType(item)
             const { outgoing, incoming, mining, burn } = item
@@ -375,7 +378,7 @@ function History(props) {
         },
         {
           key: "from",
-          title: "From",
+          title: t('From'),
           render: (_, item) => {
             const itemType = getType(item)
             switch (itemType) {
@@ -392,7 +395,7 @@ function History(props) {
         },
         {
           key: "block_timestamp",
-          title: "Age",
+          title: t('Age'),
           render: (value) => {
             return <Age timestamp={value} update />
           }
@@ -408,14 +411,14 @@ function History(props) {
           setPage(newPage)
         }
       }}>
-        Previous
+        {t('Previous')}
       </Button>}
       <Button icon="arrow-right" iconLocation="right" onClick={() => {
         const item = history[history.length - 1]
         setPages([...pages, item.topoheight - 1])
         setPage(page + 1)
       }}>
-        Next
+        {t('Next')}
       </Button>
     </div>
   </div>

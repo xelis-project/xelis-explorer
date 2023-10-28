@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-
-import Icon from './icon'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 function Button(props) {
   const { type = 'submit', icon, loading, loadingIcon = 'spinner', iconLocation = 'left', link, iconProps, ...restProps } = props

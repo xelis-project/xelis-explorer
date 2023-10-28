@@ -1,7 +1,8 @@
 import { css } from 'goober'
 import prettyMs from 'pretty-ms'
+import { useLang } from 'g45-react/hooks/useLang'
 
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import blockColor from './blockColor'
 import theme from '../../style/theme'
 
@@ -65,6 +66,7 @@ function BottomInfo(props) {
   const { info } = props
 
   const { theme: currentTheme } = useTheme()
+  const { t } = useLang()
 
   return <div className={style.container}>
     <div>
@@ -78,19 +80,19 @@ function BottomInfo(props) {
     <div>
       <div>
         <div>{prettyMs((info.average_block_time || 0), { compact: true })}</div>
-        <div>Block Time</div>
+        <div>{t('Block Time')}</div>
       </div>
       <div>
         <div>{(info.height || 0).toLocaleString()}</div>
-        <div>Height</div>
+        <div>{t('Height')}</div>
       </div>
       <div>
         <div>{(info.topoheight || 0).toLocaleString()}</div>
-        <div>Topoheight</div>
+        <div>{t('Topoheight')}</div>
       </div>
       <div>
         <div>{(info.stableheight || 0).toLocaleString()}</div>
-        <div>Stable Height</div>
+        <div>{t('Stable Height')}</div>
       </div>
     </div>
   </div>

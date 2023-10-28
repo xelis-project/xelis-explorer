@@ -2,18 +2,19 @@ import { useEffect, useState, useMemo } from 'react'
 import queryString from 'query-string'
 import { useLocation } from 'react-router-dom'
 import { css } from 'goober'
+import Age from 'g45-react/components/age'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import OffCanvas from '../../components/offCanvas'
-import Age from '../../components/age'
 import Table from '../../components/table'
 import { getBlockType } from './index'
 import Button from '../../components/button'
-import Icon from '../../components/icon'
 import blockColor from './blockColor'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import { scaleOnHover } from '../../style/animate'
 import Switch from '../../components/switch'
 import Dropdown from '../../components/dropdown'
+import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   container: css`
@@ -127,6 +128,7 @@ function useOffCanvasTable(props) {
 
   const location = useLocation()
   const { theme: currentTheme } = useTheme()
+  const { t } = useLang()
 
   const searchHeight = useMemo(() => {
     const query = queryString.parse(location.search)
@@ -165,20 +167,19 @@ function useOffCanvasTable(props) {
           <Dropdown items={dagMaxHeightList} defaultKey={maxHeights} onChange={(item) => {
             if (!paused) setInputHeight(height)
             setMaxHeights(item.key)
-          }} prefix="Max Heights: " />
+          }} prefix={t('Block Range: ')} />
         </div>
         <div>
           <div>
             <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
-            <label>Hide Orphaned</label>
+            <label>{t('Hide Orphaned')}</label>
           </div>
           <div>
             <Button onClick={() => {
               setPaused(!paused)
               if (paused) setInputHeight(height)
             }}>
-              {paused && <Icon name="play" />}
-              {!paused && <Icon name="pause" />}
+              <Icon name={pause ? `play` : `pause`} />
             </Button>
             <Button onClick={() => setOpened(false)} icon="close" />
           </div>
@@ -187,24 +188,24 @@ function useOffCanvasTable(props) {
       {paused && <div className={style.navControls}>
         <HeightRangeInput height={height} inputHeight={inputHeight} setInputHeight={setInputHeight} />
         <div>
-          <button onClick={() => setInputHeight(inputHeight - 1)}>Previous</button>
-          <button onClick={() => setInputHeight(inputHeight - 10)}>Previous (10)</button>
-          <button onClick={() => setInputHeight(inputHeight + 10)}>Next (10)</button>
-          <button onClick={() => setInputHeight(inputHeight + 1)}>Next</button>
-          <button onClick={() => setInputHeight(height)}>Reset</button>
+          <button onClick={() => setInputHeight(inputHeight - 1)}>{t('Previous')}</button>
+          <button onClick={() => setInputHeight(inputHeight - 10)}>{t('Previous (10)')}</button>
+          <button onClick={() => setInputHeight(inputHeight + 10)}>{t('Next (10)')}</button>
+          <button onClick={() => setInputHeight(inputHeight + 1)}>{t('Next')}</button>
+          <button onClick={() => setInputHeight(height)}>{t('Reset')}</button>
         </div>
       </div>}
     </div>
     <Table
-      headers={[`Topoheight`, `Type`, `Hash`, `Txs`, `Age`]}
-      list={filteredBlocks} emptyText="No blocks" colSpan={5}
+      headers={[t(`Topoheight`), t(`Type`), t(`Hash`), t(`Txs`), t(`Age`)]}
+      list={filteredBlocks} emptyText={t('No blocks')} colSpan={5}
       onItem={(block, index) => {
         const txCount = block.txs_hashes.length
         const blockType = getBlockType(block, stableHeight)
         return <tr key={block.hash} onClick={() => onBlockClick(block)}>
           <td>
             <span>{block.topoheight}</span>&nbsp;
-            <span title="Height">({block.height})</span>&nbsp;
+            <span title={t('Height')}>({block.height})</span>&nbsp;
           </td>
           <td style={{ color: blockColor.value(currentTheme, blockType) }}>
             {blockType}

@@ -1,11 +1,12 @@
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import Icon from 'g45-react/components/fontawesome_icon'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import packageJSON from '../../package.json'
 import theme from '../style/theme'
-import useTheme from '../context/useTheme'
+import useTheme from '../hooks/useTheme'
 import { scaleOnHover } from '../style/animate'
-import Icon from '../components/icon'
 
 const style = {
   container: css`
@@ -100,49 +101,50 @@ const style = {
 
 function Footer() {
   const { setTheme } = useTheme()
+  const { t } = useLang()
 
   return <div className={style.container}>
     <div className="layout-max-width">
       <div>
-        <div>XELIS Explorer</div>
+        <div>{t('XELIS Explorer')}</div>
         <div>
-          The explorer allows to track and verify transactions on the XELIS network.
-          You can search for specific transactions and monitor the overall health of the network.
+          {t(`The explorer allows to track and verify transactions on the XELIS network.
+          You can search for specific transactions and monitor the overall health of the network.`)}
           <div>v{packageJSON.version}</div>
         </div>
       </div>
       <div>
-        <div>PAGES</div>
+        <div>{t('PAGES')}</div>
         <div>
-          <Link to="/blocks">Blocks</Link>
-          <Link to="/mempool">Mempool</Link>
-          <Link to="/dag">DAG</Link>
-          <Link to="/accounts">Accounts</Link>
-          <Link to="/peers">Peers</Link>
-          <Link to="/settings">Settings</Link>
+          <Link to="/blocks">{t('Blocks')}</Link>
+          <Link to="/mempool">{t('Mempool')}</Link>
+          <Link to="/dag">{t('DAG')}</Link>
+          <Link to="/accounts">{t('Accounts')}</Link>
+          <Link to="/peers">{t('Peers')}</Link>
+          <Link to="/settings">{t('Settings')}</Link>
         </div>
       </div>
       <div>
-        <div>THEME</div>
+        <div>{t('THEME')}</div>
         <div>
-          <button onClick={() => setTheme('xelis')}>Default</button>
-          <button onClick={() => setTheme('dark')}>Dark</button>
-          <button onClick={() => setTheme('light')}>Light</button>
+          <button onClick={() => setTheme('xelis')}>{t('Default')}</button>
+          <button onClick={() => setTheme('dark')}>{t('Dark')}</button>
+          <button onClick={() => setTheme('light')}>{t('Light')}</button>
         </div>
       </div>
       <div>
-        <div>LINKS</div>
+        <div>{t('LINKS')}</div>
         <div>
           <div>
-            <a href="https://xelis.io" target="_blank">Home</a>
+            <a href="https://xelis.io" target="_blank">{t('Home')}</a>
             <Icon name="home" />
           </div>
           <div>
-            <a href="https://stats.xelis.io" target="_blank">Statistics</a>
+            <a href="https://stats.xelis.io" target="_blank">{t('Statistics')}</a>
             <Icon name="chart-simple" />
           </div>
           <div>
-            <a href="https://docs.xelis.io" target="_blank">Documentation</a>
+            <a href="https://docs.xelis.io" target="_blank">{t('Documentation')}</a>
             <Icon name="book" />
           </div>
           <div>

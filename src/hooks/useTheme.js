@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
-
-import useCookie from './useCookie'
+import useCookie from 'g45-react/hooks/useCookie'
 
 const Context = createContext()
 

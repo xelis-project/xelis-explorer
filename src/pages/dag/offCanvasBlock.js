@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formattedBlock } from '../../utils'
@@ -68,6 +69,7 @@ function useOffCanvasBlock(props) {
   const [opened, setOpened] = useState(false)
   const [err, setErr] = useState()
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const open = useCallback((block) => {
     setBlock(block)
@@ -94,55 +96,55 @@ function useOffCanvasBlock(props) {
       <div>
         <Button onClick={() => setOpened(false)} icon="close" />
         {formatBlock.hasPreviousBlock && <Button onClick={() => loadBlock(block.topoheight - 1)} icon="arrow-left">
-          Previous Block
+          {t('Previous Block')}
         </Button>}
         {formatBlock.hasNextBlock && <Button onClick={() => loadBlock(block.topoheight + 1)} icon="arrow-right" iconLocation="right">
-          Next Block
+          {t('Next Block')}
         </Button>}
       </div>
       <div>
         <div>
-          <div>Hash</div>
+          <div>{t('Hash')}</div>
           <div>
             <Link to={`/blocks/${block.hash}`}>{block.hash}</Link>
           </div>
         </div>
         <div>
-          <div>Block Type</div>
+          <div>{t('Block Type')}</div>
           <div>{getBlockType(block, stableHeight)}</div>
         </div>
         <div>
-          <div>Timestamp</div>
+          <div>{t('Timestamp')}</div>
           <div>{formatBlock.date} ({(block.timestamp || 0).toLocaleString()})</div>
         </div>
         <div>
-          <div>Confirmations</div>
+          <div>{t('Confirmations')}</div>
           <div>{(formatBlock.confirmations || 0).toLocaleString()}</div>
         </div>
         <div>
-          <div>Topoheight</div>
+          <div>{t('Topoheight')}</div>
           <div>{(block.topoheight || 0).toLocaleString()}</div>
         </div>
         <div>
-          <div>Height</div>
+          <div>{t('Height')}</div>
           <div>{(block.height || 0).toLocaleString()}</div>
         </div>
         <div>
-          <div>Miner</div>
+          <div>{t('Miner')}</div>
           <div>
             <Link to={`/accounts/${block.miner}`}>{block.miner}</Link>
           </div>
         </div>
         <div>
-          <div>Reward</div>
+          <div>{t('Reward')}</div>
           <div>{formatBlock.reward}</div>
         </div>
         <div>
-          <div>Txs</div>
+          <div>{t('Txs')}</div>
           <div>{(block.txs_hashes || []).length.toLocaleString()}</div>
         </div>
         <div>
-          <div>Difficulty</div>
+          <div>{t('Difficulty')}</div>
           <div>
             <span>{block.difficulty.toLocaleString()} </span>
             <span title="Cumulative Difficulty">
@@ -151,22 +153,22 @@ function useOffCanvasBlock(props) {
           </div>
         </div>
         <div>
-          <div>Hash Rate</div>
+          <div>{t('Hash Rate')}</div>
           <div>{formatBlock.hashRate}</div>
         </div>
         <div>
-          <div>Size</div>
+          <div>{t('Size')}</div>
           <div>{formatBlock.size}</div>
         </div>
         <div>
-          <div>Nonce</div>
+          <div>{t('Nonce')}</div>
           <div>
             <span>{block.nonce.toLocaleString()} </span>
             <span title="Extra Nonce">({block.extra_nonce})</span>
           </div>
         </div>
         <div>
-          <div>Tips</div>
+          <div>{t('Tips')}</div>
           <div>
             {block.tips.map((tip, index) => {
               return <div key={tip}>

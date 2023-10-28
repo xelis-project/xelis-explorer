@@ -1,6 +1,4 @@
-import { createBrowserRouter, createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom'
-
-import { PageLoadProvider } from './context/usePageLoad'
+import App from './app'
 import Layout from './layout/layout'
 
 import Block from './pages/block'
@@ -17,9 +15,7 @@ import Peers from './pages/peers'
 
 const routes = [
   {
-    element: <PageLoadProvider>
-      <Outlet />
-    </PageLoadProvider>,
+    element: <App />,
     children: [
       {
         element: <Layout />,
@@ -74,13 +70,4 @@ const routes = [
   }
 ]
 
-export const ServerRouter = (props) => {
-  const { path } = props
-  return <RouterProvider router={createMemoryRouter(routes, {
-    initialEntries: [path]
-  })} />
-}
-
-export const ClientRouter = () => {
-  return <RouterProvider router={createBrowserRouter(routes)} />
-}
+export default routes

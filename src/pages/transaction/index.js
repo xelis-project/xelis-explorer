@@ -4,14 +4,15 @@ import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { css } from 'goober'
+import { usePageLoad } from 'g45-react/hooks/usePageLoad'
+import { useServerData } from 'g45-react/hooks/useServerData'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import Table from '../../components/table'
 import { formatXelis, formatAsset, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
-import { useServerData } from '../../context/useServerData'
-import { daemonRPC } from '../../ssr/nodeRPC'
-import { usePageLoad } from '../../context/usePageLoad'
+import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
 
 const style = {
@@ -59,6 +60,7 @@ function Transaction() {
   const { hash } = useParams()
 
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const { firstPageLoad } = usePageLoad()
   const serverResult = loadTransaction_SSR({ hash })
@@ -99,16 +101,16 @@ function Transaction() {
 
   const description = useMemo(() => {
     return `
-      Transaction ${tx.hash}.
-      Signed by ${reduceText(tx.owner)}.
-      ${tx.executed_in_block ? `Executed in block ${reduceText(tx.executed_in_block)}.` : `Discarded or not executed yet.`}
+      ${t('Transaction {}.', [tx.hash])}
+      ${t('Signed by {}.', [reduceText(tx.owner)])}
+      ${tx.executed_in_block ? t('Executed in block {}.', [reduceText(tx.executed_in_block)]) : t('Discarded or not executed yet.')}
     `
-  }, [tx])
+  }, [tx, t])
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
-    <PageTitle title={`Transaction ${reduceText(tx.hash, 4, 4)}`}
-      metaTitle={`Transaction ${tx.hash || ''}`}
+    <PageTitle title={t('Transaction {}', [reduceText(tx.hash, 4, 4)])}
+      metaTitle={t('Transaction {}', [tx.hash || ''])}
       metaDescription={description} />
     {err && <div className="error">{displayError(err)}</div>}
     <div>
@@ -116,11 +118,11 @@ function Transaction() {
         headers={[
           {
             key: 'hash',
-            title: 'Hash',
+            title: t('Hash'),
           },
           {
             key: 'owner',
-            title: 'Signer',
+            title: t('Signer'),
             render: (value) => {
               return <Link to={`/accounts/${value}`}>
                 {value}
@@ -129,29 +131,29 @@ function Transaction() {
           },
           {
             key: 'in_mempool',
-            title: 'In Mempool',
+            title: t('In Mempool'),
             render: (value) => {
-              if (value === true) return `Yes`
-              if (value === false) return `No`
+              if (value === true) return t(`Yes`)
+              if (value === false) return t(`No`)
               return ``
             }
           },
           {
             key: 'signature',
-            title: 'Signature',
+            title: t('Signature'),
           },
           {
             key: 'fee',
-            title: 'Fee',
+            title: t('Fee'),
             render: (value) => value && formatXelis(value)
           },
           {
             key: 'nonce',
-            title: 'Nonce',
+            title: t('Nonce'),
           },
           {
             key: 'executed_in_block',
-            title: 'Executed In',
+            title: t('Executed In'),
             render: (value, item) => {
               if (value) return <Link to={`/blocks/${value}`}>{value}</Link>
               if (item.in_mempool) return `Not executed yet.`
@@ -165,7 +167,7 @@ function Transaction() {
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <InBlocks tx={tx} />
-      <h2>Extra</h2>
+      <h2>{t('Extra')}</h2>
       <ExtraData tx={tx} />
     </div>
   </div>
@@ -174,19 +176,24 @@ function Transaction() {
 function ExtraData(props) {
   const { tx } = props
 
+  const { t } = useLang()
+
   return <div className="extra">
-    {!tx.extra_data && <div>This transaction does not contain extra information.</div>}
+    {!tx.extra_data && <div>{t('This transaction does not contain extra information.')}</div>}
     {tx.extra_data && <pre>{JSON.stringify(tx.extra_data, null, 2)}</pre>}
   </div>
 }
 
 function Transfers(props) {
   const { transfers } = props
+
+  const { t } = useLang()
+
   return <div>
-    <h2>Transfers</h2>
+    <h2>{t('Transfers')}</h2>
     <Table
-      headers={[`Asset`, `Amount`, `Recipient`]}
-      list={transfers} emptyText="No transfers" colSpan={3}
+      headers={[t(`Asset`), t(`Amount`), t(`Recipient`)]}
+      list={transfers} emptyText={t('No transfers')} colSpan={3}
       onItem={(item, index) => {
         const { amount, asset, to } = item
         return <tr key={index}>
@@ -205,11 +212,14 @@ function Transfers(props) {
 
 function Burns(props) {
   const { burns } = props
+
+  const { t } = useLang()
+
   return <div>
-    <h2>Burns</h2>
+    <h2>{t('Burns')}</h2>
     <Table
-      headers={[`Asset`, `Amount`]}
-      list={burns} emptyText="No burns" colSpan={2}
+      headers={[t(`Asset`), t(`Amount`)]}
+      list={burns} emptyText={t('No burns')} colSpan={2}
       onItem={(item, index) => {
         const { amount, asset } = item
         return <tr key={index}>
@@ -224,6 +234,7 @@ function Burns(props) {
 function InBlocks(props) {
   const { tx } = props
 
+  const { t } = useLang()
   const nodeSocket = useNodeSocket()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
@@ -260,10 +271,10 @@ function InBlocks(props) {
   }, [loadTxBlocks])
 
   return <div>
-    <h2>In Blocks</h2>
+    <h2>{t('In Blocks')}</h2>
     <Table
-      headers={[`Topoheight`, `Hash`, `Type`, `Size`, `Fees`, `Timestamp`, `Txs`]}
-      list={blocks} loading={loading} err={err} emptyText="No blocks" colSpan={7}
+      headers={[t(`Topoheight`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Timestamp`), t(`Txs`)]}
+      list={blocks} loading={loading} err={err} emptyText={t('No blocks')} colSpan={7}
       onItem={(item, index) => {
         const size = formatSize(item.total_size_in_bytes)
         const time = new Date(item.timestamp).toLocaleString()

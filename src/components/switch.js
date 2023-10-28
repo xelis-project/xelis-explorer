@@ -1,7 +1,6 @@
 import { css } from 'goober'
 import { useState } from 'react'
-
-import Icon from './icon'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 const defaultStyle = {
   switch: css`

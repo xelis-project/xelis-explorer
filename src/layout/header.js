@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import Icon from 'g45-react/components/fontawesome_icon'
 
-import useTheme from '../context/useTheme'
-import Icon from '../components/icon'
+import useTheme from '../hooks/useTheme'
 import theme from '../style/theme'
 import { scaleOnHover } from '../style/animate'
+import { useLang } from 'g45-react/hooks/useLang'
+import { LangDropdown, ThemeDropdown } from '../pages/settings'
 
 const headerStyle = {
   container: css`
@@ -96,28 +98,15 @@ const menuStyle = {
     > :nth-child(2) {
       display: flex;
       gap: .5em;
-      margin-top: .5em;
-  
-      ${theme.query.minDesktop} {
-        justify-content: space-evenly;
-      }
-  
-      button {
-        font-weight: bold;
-        border: none;
-        padding: .5em .7em;
-        cursor: pointer;
-        color: var(--bg-color);
-        background-color: var(--text-color);
-        transition: .25s all;
-        border-radius: 5px;
-        ${scaleOnHover({ scale: .93 })}
-      }
+      margin-top: 1em;
+      flex-direction: column;
     }
   `
 }
 
 function useMenuLinks() {
+  const { t } = useLang()
+
   return useMemo(() => {
     const isActive = ({ isActive }) => {
       if (isActive) return `item active`
@@ -125,27 +114,27 @@ function useMenuLinks() {
     }
 
     return [
-      { path: `/`, title: `Home`, className: isActive, icon: 'house' },
-      { path: `/blocks`, title: `Blocks`, className: isActive, icon: 'boxes-stacked' },
-      { path: `/mempool`, title: `Mempool`, className: isActive, icon: 'square-poll-horizontal' },
+      { path: `/`, title: t(`Home`), className: isActive, icon: 'house' },
+      { path: `/blocks`, title: t(`Blocks`), className: isActive, icon: 'boxes-stacked' },
+      { path: `/mempool`, title: t(`Mempool`), className: isActive, icon: 'square-poll-horizontal' },
       { path: `/dag`, title: `DAG`, className: isActive, icon: 'network-wired' },
-      { path: `/accounts`, title: `Accounts`, className: isActive, icon: 'user-group' },
-      { path: `/peers`, title: `Peers`, className: isActive, icon: 'ethernet' },
-      { path: `/settings`, title: `Settings`, className: isActive, icon: 'gear' }
+      { path: `/accounts`, title: t(`Accounts`), className: isActive, icon: 'user-group' },
+      { path: `/peers`, title: t(`Peers`), className: isActive, icon: 'ethernet' },
+      { path: `/settings`, title: t(`Settings`), className: isActive, icon: 'gear' }
     ]
-  }, [])
+  }, [t])
 }
 
 function Header(props) {
   const links = useMenuLinks()
-  const headerMenuRef = useRef()
+  const menuRef = useRef()
+  const location = useLocation()
 
   const [menuOpen, setMenuOpen] = useState(false)
-  const { setTheme } = useTheme()
 
   useEffect(() => {
     const clickOutside = (e) => {
-      if (!headerMenuRef.current.contains(e.target)) {
+      if (!menuRef.current.contains(e.target)) {
         setMenuOpen(false)
       }
     }
@@ -157,13 +146,17 @@ function Header(props) {
     }
   }, [menuOpen])
 
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location])
+
   return <div className={headerStyle.container} {...props}>
     <Link to="/" className={headerStyle.logo}>
       <div>{/* LOGO */}</div>
       <div>XELIS</div>
     </Link>
-    <div>
-      <button ref={headerMenuRef} className={menuStyle.button} aria-label="Menu" onClick={() => setMenuOpen(!menuOpen)}>
+    <div ref={menuRef}>
+      <button className={menuStyle.button} aria-label="Menu" onClick={() => setMenuOpen(!menuOpen)}>
         <Icon name="bars" />
       </button>
       <div data-open={menuOpen} className={menuStyle.container}>
@@ -176,9 +169,8 @@ function Header(props) {
           })}
         </div>
         <div>
-          <button onClick={() => setTheme('xelis')}>Default</button>
-          <button onClick={() => setTheme('dark')}>Dark</button>
-          <button onClick={() => setTheme('light')}>Light</button>
+          <LangDropdown size={0.9} />
+          <ThemeDropdown size={0.9} />
         </div>
       </div>
     </div>

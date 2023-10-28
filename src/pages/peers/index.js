@@ -4,14 +4,16 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
 import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import TableFlex from '../../components/tableFlex'
 import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
 import { useRef } from 'react'
 import PageTitle from '../../layout/page_title'
+import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
@@ -85,6 +87,7 @@ function Peers() {
   const [geoLoading, setGeoLoading] = useState(true)
   const [geoLocation, setGeoLocation] = useState({})
   const [err, setErr] = useState()
+  const { t } = useLang()
 
   const loadPeers = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -166,8 +169,8 @@ function Peers() {
   const mapRef = useRef()
 
   return <div className={style.container}>
-    <PageTitle title="Peers" subtitle={`${peers.length} beautiful peers`}
-      metaDescription="Map with list of network peers. Monitor connected peers, network status and geo location." />
+    <PageTitle title={t('Peers')} subtitle={t('{} beautiful peers', [peers.length])}
+      metaDescription={t('Map with list of network peers. Monitor connected peers, network status and geo location.')} />
     <Map mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
     <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
   </div>
@@ -178,23 +181,27 @@ export default Peers
 function Table(props) {
   const { loading, err, peers, geoLocation, geoLoading, mapRef } = props
 
-  return <TableFlex loading={loading} err={err} data={peers} emptyText="No peers"
+  const { t } = useLang()
+
+  return <TableFlex loading={loading} err={err} data={peers} emptyText={t('No peers')}
     rowKey="id"
     headers={[
       {
         key: 'addr',
-        title: 'Address',
+        title: t('Address'),
         render: (value) => {
           return value
         }
       },
       {
         key: 'location',
-        title: 'Location',
+        title: t('Location'),
         render: (_, item) => {
           const data = geoLocation[item.ip]
           if (data && data.country && data.region) {
+            const code = (data.country_code || 'xx').toLowerCase()
             return <div>
+              <FlagIcon code={code} />&nbsp;&nbsp;
               <span>{data.country} / {data.region}</span>
               <button onClick={() => {
                 const position = [data.latitude, data.longitude]
@@ -212,14 +219,14 @@ function Table(props) {
       },
       {
         key: 'peers',
-        title: 'Peers',
+        title: t('Peers'),
         render: (value) => {
           return (value || []).length
         }
       },
       {
         key: 'tag',
-        title: 'Tag',
+        title: t('Tag'),
         render: (value) => {
           if (value) return reduceText(value, 20, 0)
           return `--`
@@ -227,28 +234,28 @@ function Table(props) {
       },
       {
         key: 'height',
-        title: 'Height',
+        title: t('Height'),
         render: (value) => {
           return value
         }
       },
       {
         key: 'topoheight',
-        title: 'Topo',
+        title: t('Topo'),
         render: (value) => {
           return value
         }
       },
       {
         key: 'pruned_topoheight',
-        title: 'Pruned Topo',
+        title: t('Pruned Topo'),
         render: (value) => {
           return value || `--`
         }
       },
       {
         key: 'version',
-        title: 'Version',
+        title: t('Version'),
         render: (value) => {
           return value
         }
@@ -260,6 +267,8 @@ function Table(props) {
 function MapControls(props) {
   const { controls, setControls, mapRef } = props
   const { showConnections, showPeers } = controls
+
+  const { t } = useLang()
 
   const setControlValue = useCallback((key, value) => {
     setControls((controls) => {
@@ -273,15 +282,15 @@ function MapControls(props) {
 
   return <div className={style.mapControls}>
     <div>
-      Peers
+      {t('Peers')}
       <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
     </div>
     <div>
-      Connections
+      {t('Connections')}
       <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
     </div>
     <div>
-      <button onClick={reset}>Reset</button>
+      <button onClick={reset}>{t('Reset')}</button>
     </div>
   </div>
 }
