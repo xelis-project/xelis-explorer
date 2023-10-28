@@ -4,15 +4,15 @@ import { css } from 'goober'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
+import { useServerData } from 'g45-react/hooks/useServerData'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import { formatHashRate, formatXelis } from '../../utils'
 import theme from '../../style/theme'
-import Icon from '../../components/icon'
 import { scaleOnHover } from '../../style/animate'
 import Chart from '../../components/chart'
-import { useTheme } from '../../context/useTheme'
-import { useServerData } from '../../context/useServerData'
-import { daemonRPC } from '../../ssr/nodeRPC'
+import { useTheme } from '../../hooks/useTheme'
+import { daemonRPC } from '../../hooks/nodeRPC'
 
 theme.xelis`
   --stats-bg-color: rgb(14 30 32 / 70%);

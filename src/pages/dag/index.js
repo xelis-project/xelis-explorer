@@ -8,6 +8,7 @@ import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import TWEEN from '@tweenjs/tween.js'
+import Age from 'g45-react/components/age'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
@@ -15,11 +16,10 @@ import NodeStatus from '../../layout/node_status'
 import useOffCanvasTable from './offCanvasTable'
 import useOffCanvasBlock from './offCanvasBlock'
 import blockColor from './blockColor'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import BottomInfo from './bottomInfo'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
-import Age from '../../components/age'
 
 const style = {
   canvas: css`

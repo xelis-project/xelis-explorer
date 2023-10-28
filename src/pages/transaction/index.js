@@ -4,14 +4,14 @@ import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { css } from 'goober'
+import { usePageLoad } from 'g45-react/hooks/usePageLoad'
+import { useServerData } from 'g45-react/hooks/useServerData'
 
 import Table from '../../components/table'
 import { formatXelis, formatAsset, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
-import { useServerData } from '../../context/useServerData'
-import { daemonRPC } from '../../ssr/nodeRPC'
-import { usePageLoad } from '../../context/usePageLoad'
+import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
 
 const style = {

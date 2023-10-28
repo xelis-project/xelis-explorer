@@ -1,7 +1,7 @@
 import { css } from 'goober'
 import prettyMs from 'pretty-ms'
 
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import blockColor from './blockColor'
 import theme from '../../style/theme'
 

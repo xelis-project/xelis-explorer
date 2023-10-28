@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useMemo } from 'react'
+import Age from 'g45-react/components/age'
 
-import Age from '../../components/age'
 import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
 import { bounceIn, slideX } from '../../style/animate'

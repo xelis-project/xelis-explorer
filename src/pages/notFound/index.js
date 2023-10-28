@@ -1,8 +1,8 @@
 import { css } from 'goober'
 import { Helmet } from 'react-helmet-async'
+import useServer from 'g45-react/hooks/useServer'
 
 import Button from '../../components/button'
-import useServer from '../../context/useServer'
 import { scaleOnHover } from '../../style/animate'
 
 const style = {

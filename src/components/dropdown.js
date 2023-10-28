@@ -1,7 +1,7 @@
 import { css } from 'goober'
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
+import Icon from 'g45-react/components/fontawesome_icon'
 
-import Icon from './icon'
 import theme from '../style/theme'
 
 const defaultStyle = {

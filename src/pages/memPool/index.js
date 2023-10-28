@@ -5,14 +5,14 @@ import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import prettyMs from 'pretty-ms'
+import Age from 'g45-react/components/age'
 
 import Table from '../../components/table'
 import { formatXelis, reduceText } from '../../utils'
-import Age from '../../components/age'
 import Chart from '../../components/chart'
 import theme from '../../style/theme'
 import { useRecentBlocks } from '../../pages/home'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 import PageTitle from '../../layout/page_title'
 
 const style = {

@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import Icon from 'g45-react/components/fontawesome_icon'
 
-import useTheme from '../context/useTheme'
-import Icon from '../components/icon'
+import useTheme from '../hooks/useTheme'
 import theme from '../style/theme'
 import { scaleOnHover } from '../style/animate'
 

@@ -1,14 +1,14 @@
 import { css } from 'goober'
 import { useState } from 'react'
 
-import useSettings, { defaultSettings, settingsKeys } from '../../context/useSettings'
+import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
 import theme from '../../style/theme'
 import Button from '../../components/button'
 import { scaleOnHover } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import Dropdown from '../../components/dropdown'
 import { useMemo } from 'react'
-import useTheme from '../../context/useTheme'
+import useTheme from '../../hooks/useTheme'
 
 const style = {
   container: css`

@@ -1,12 +1,11 @@
-import { setup } from 'goober'
 import { createElement } from 'react'
-import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { Outlet } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
+import { extractCss, setup } from 'goober'
 import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
 
-import { ThemeProvider } from './context/useTheme'
-import useSettings, { SettingsProvider, settingsKeys } from './context/useSettings'
-import { ServerProvider } from './context/useServer'
-import { ServerDataProvider, getServerDataContext } from './context/useServerData'
+import { ThemeProvider } from './hooks/useTheme'
+import useSettings, { SettingsProvider, settingsKeys } from './hooks/useSettings'
 
 import "reset-css/reset.css"
 
@@ -14,42 +13,32 @@ import './style/theme'
 import './style/page'
 import './style/scrollbar'
 
-setup(createElement) // not really sure if this is needed
+setup(createElement) // this is for goober styled() func
 
-function App(props) {
-  const { children, css, serverContext, helmetContext, serverDataContext = getServerDataContext() } = props
-
-  return <HelmetProvider context={helmetContext}>
-    <Helmet titleTemplate="%s · XELIS Explorer">
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="/public/client.css" />
-      <link rel="icon" href="/public/favicon.ico" />
-      <style id="goober">{css}</style>
-    </Helmet>
-    <ServerProvider context={serverContext}>
-      <ServerDataProvider context={serverDataContext}>
-        <ThemeProvider>
-          <SettingsProvider>
-            <SubApp>
-              {children}
-            </SubApp>
-          </SettingsProvider>
-        </ThemeProvider>
-      </ServerDataProvider>
-    </ServerProvider>
-  </HelmetProvider>
-}
-
-function SubApp(props) {
-  const { children } = props
-
+function SubApp() {
   const { settings } = useSettings()
   const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
 
   return <NodeSocketProvider endpoint={endpoint}>
-    {children}
+    <Outlet />
   </NodeSocketProvider>
+}
+
+let css = ``
+
+function App(props) {
+  if (!css) {
+    css = extractCss()
+  }
+
+  return <ThemeProvider>
+    <SettingsProvider>
+      <Helmet titleTemplate='%s · XELIS Explorer'>
+        <style>{css}</style> {/* Don't use id="_goober" or css will flicker. Probably an issue with goober reseting css.*/}
+      </Helmet>
+      <SubApp />
+    </SettingsProvider>
+  </ThemeProvider>
 }
 
 export default App

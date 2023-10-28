@@ -1,11 +1,11 @@
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import packageJSON from '../../package.json'
 import theme from '../style/theme'
-import useTheme from '../context/useTheme'
+import useTheme from '../hooks/useTheme'
 import { scaleOnHover } from '../style/animate'
-import Icon from '../components/icon'
 
 const style = {
   container: css`
