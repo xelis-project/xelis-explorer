@@ -179,7 +179,7 @@ function useOffCanvasTable(props) {
               setPaused(!paused)
               if (paused) setInputHeight(height)
             }}>
-              <Icon name={pause ? `play` : `pause`} />
+              <Icon name={paused ? `play` : `pause`} />
             </Button>
             <Button onClick={() => setOpened(false)} icon="close" />
           </div>

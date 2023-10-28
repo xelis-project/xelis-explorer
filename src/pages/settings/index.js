@@ -99,7 +99,7 @@ export function LangDropdown(props) {
     ]
   }, [t])
 
-  return <Dropdown items={languages} defaultKey={langKey} size={size} onChange={(item) => {
+  return <Dropdown items={languages} defaultKey={langKey || `en`} size={size} onChange={(item) => {
     setLangKey(item.key)
   }} />
 }
