@@ -1,5 +1,4 @@
 import { css, glob } from 'goober'
-import 'flag-icons/css/flag-icons.css'
 
 import theme from './theme'
 
@@ -31,10 +30,6 @@ glob`
     min-width: 320px;
     font-size: 16px;
     height: 100%;
-  }
-
-  .fi {
-    border-radius: 3px;
   }
 
   #app {

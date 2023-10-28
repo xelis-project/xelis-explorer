@@ -11,6 +11,7 @@ import PageTitle from '../../layout/page_title'
 import Dropdown from '../../components/dropdown'
 import { useMemo } from 'react'
 import useTheme from '../../hooks/useTheme'
+import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
@@ -92,9 +93,9 @@ export function LangDropdown(props) {
 
   const languages = useMemo(() => {
     return [
-      { key: `en`, text: <><i class="fi fi-us" />&nbsp;&nbsp;{t(`English`)}</> },
-      { key: `fr`, text: <><i class="fi fi-fr" />&nbsp;&nbsp;{t(`French`)}</> },
-      { key: `es`, text: <><i class="fi fi-es" />&nbsp;&nbsp;{t(`Spanish`)}</> }
+      { key: `en`, text: <><FlagIcon code="us" />&nbsp;&nbsp;{t(`English`)}</> },
+      { key: `fr`, text: <><FlagIcon code="fr" />&nbsp;&nbsp;{t(`French`)}</> },
+      { key: `es`, text: <><FlagIcon code="es" />&nbsp;&nbsp;{t(`Spanish`)}</> }
     ]
   }, [t])
 

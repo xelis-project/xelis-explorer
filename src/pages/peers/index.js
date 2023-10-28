@@ -13,6 +13,7 @@ import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
 import { useRef } from 'react'
 import PageTitle from '../../layout/page_title'
+import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
@@ -198,7 +199,9 @@ function Table(props) {
         render: (_, item) => {
           const data = geoLocation[item.ip]
           if (data && data.country && data.region) {
+            const code = (data.country_code || 'xx').toLowerCase()
             return <div>
+              <FlagIcon code={code} />&nbsp;&nbsp;
               <span>{data.country} / {data.region}</span>
               <button onClick={() => {
                 const position = [data.latitude, data.longitude]
