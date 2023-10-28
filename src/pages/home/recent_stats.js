@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import useNodeSocket from '@xelis/sdk/react/daemon'
 import { useCallback } from 'react'
 import to from 'await-to-js'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 
@@ -85,6 +86,7 @@ export function RecentStats(props) {
 
   const nodeSocket = useNodeSocket()
   const [p2pStatus, setP2PStatus] = useState({})
+  const { t } = useLang()
 
   const loadP2PStatus = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -121,33 +123,33 @@ export function RecentStats(props) {
 
   return <div className={style.container}>
     <div>
-      Recent Stats
+      {t('Recent Stats')}
       <div>Last {blocks.length} blocks</div>
     </div>
     <div>
       <div>
-        <div>Txs</div>
+        <div>{t('Txs')}</div>
         <div>{stats.txs}</div>
       </div>
       <div>
-        <div>Size</div>
+        <div>{t('Size')}</div>
         <div>{formatSize(stats.size)}</div>
       </div>
       <div>
-        <div>Fees</div>
+        <div>{t('Fees')}</div>
         <div>{formatXelis(stats.fees, { withSuffix: false })}</div>
       </div>
       <div>
-        <div>Reward</div>
+        <div>{t('Reward')}</div>
         <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
       </div>
       <div>
-        <div>Peers</div>
+        <div>{t('Peers')}</div>
         <div>{p2pStatus.peer_count || 0}</div>
       </div>
     </div>
     <div>
-      Miners Distribution
+      {t('Miners Distribution')}
       <div>Last {blocks.length} blocks</div>
     </div>
     <MinersDistribution miners={stats.miners} />

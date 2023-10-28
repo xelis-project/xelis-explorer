@@ -1,5 +1,6 @@
 import { css } from 'goober'
 import { useState } from 'react'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
 import theme from '../../style/theme'
@@ -84,60 +85,80 @@ const style = {
   `
 }
 
+export function LangDropdown(props) {
+  const { size } = props
+  const { t, langKey, setLangKey } = useLang()
+
+  const languages = useMemo(() => {
+    return [
+      { key: `en`, text: t(`English`) },
+      { key: `fr`, text: t(`French`) },
+      { key: `es`, text: t(`Spanish`) }
+    ]
+  }, [t])
+
+  return <Dropdown items={languages} defaultKey={langKey} size={size} onChange={(item) => {
+    setLangKey(item.key)
+  }} />
+}
+
+export function ThemeDropdown(props) {
+  const { size } = props
+  const { theme: currentTheme, setTheme } = useTheme()
+  const { t } = useLang()
+
+  const themes = useMemo(() => {
+    return [
+      { key: `xelis`, text: t(`Default`) },
+      { key: `dark`, text: t(`Dark`) },
+      { key: `light`, text: t(`Light`) }
+    ]
+  }, [t])
+
+  return <Dropdown items={themes} defaultKey={currentTheme} size={size} onChange={(item) => {
+    setTheme(item.key)
+  }} />
+}
+
 function Settings() {
   const { settings, setValue } = useSettings()
-  const { theme: currentTheme, setTheme } = useTheme()
+
 
   const [nodeEnpoint, setNodeEndpoint] = useState(() => {
     return settings[settingsKeys.NODE_WS_ENDPOINT]
   })
 
-  const languages = useMemo(() => {
-    return [
-      { key: `en`, text: `English` },
-      { key: `fr`, text: `French` },
-      { key: `es`, text: `Spanish` }
-    ]
-  }, [])
+  const { t } = useLang()
 
-  const themes = useMemo(() => {
-    return [
-      { key: `xelis`, text: `Default` },
-      { key: `dark`, text: `Dark` },
-      { key: `light`, text: `Light` }
-    ]
-  })
 
   return <div className={style.container}>
-    <PageTitle title="Settings" subtitle="This page allows you to change explorer settings."
-      metaDescription="Set your preferences, manage notifications and other controls." />
+    <PageTitle title={t('Settings')} subtitle={t('This page allows you to change explorer settings.')}
+      metaDescription={t('Set your preferences, manage notifications and other controls.')} />
     <div className="form-items">
       <div className="form-input">
-        <label>Node Endpoint</label>
-        <span>Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.</span>
+        <label>{t('Node Endpoint')}</label>
+        <span>{t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.')}</span>
         <input type="text" value={nodeEnpoint} onChange={(e) => {
           setNodeEndpoint(e.target.value)
         }} placeholder="wss://127.0.0.1/ws" />
         <div className="form-save">
           <Button icon="circle" onClick={() => {
             setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
-          }}>Reset</Button>
+          }}>{t('Reset')}</Button>
           <Button icon="floppy-disk" onClick={() => {
             setValue(settingsKeys.NODE_WS_ENDPOINT, nodeEnpoint)
-          }}>Apply</Button>
+          }}>{t('Apply')}</Button>
         </div>
       </div>
       <div className="form-input">
-        <label>Language</label>
-        <span>Select your preferred language.</span>
-        <Dropdown items={languages} defaultKey={`en`} size={1.2} />
+        <label>{t('Language')}</label>
+        <span>{t('Select your preferred language.')}</span>
+        <LangDropdown size={1.2} />
       </div>
       <div className="form-input">
-        <label>Theme</label>
-        <span>Select your preferred theme.</span>
-        <Dropdown items={themes} defaultKey={currentTheme} size={1.2} onChange={(item) => {
-          setTheme(item.key)
-        }} />
+        <label>{t('Theme')}</label>
+        <span>{t('Select your preferred theme.')}</span>
+        <ThemeDropdown size={1.2} />
       </div>
     </div>
   </div>

@@ -7,6 +7,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
@@ -66,6 +67,7 @@ function Blocks() {
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
+  const { t } = useLang()
 
   const serverResult = loadBlocks_SSR({ limit: 20 })
   const [blockCount, setBlockCount] = useState(serverResult.totalBlocks)
@@ -135,9 +137,9 @@ function Blocks() {
   }, [pageState])
 
   return <div className={style.container}>
-    <PageTitle title="Blocks" subtitle={`${blockCount.toLocaleString()} mined blocks`}
-      metaDescription="List of mined blocks. Access block heights, timestamps and transaction counts." />
-    <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText="No blocks"
+    <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
+      metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
+    <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText={t('No blocks')}
       rowClassName={(block) => {
         if (newBlock && block.hash === newBlock.hash) return style.animateBlock
         return null
@@ -145,49 +147,49 @@ function Blocks() {
       headers={[
         {
           key: 'topoheight',
-          title: 'Topoheight',
+          title: t('Topoheight'),
           render: (value) => <Link to={`/blocks/${value}`}>{value}</Link>
         },
         {
           key: 'txs_hashes',
-          title: 'Txs',
+          title: t('Txs'),
           render: (value) => (value || []).length
         },
         {
           key: 'timestamp',
-          title: 'Age',
+          title: t('Age'),
           render: (value) => <Age timestamp={value} update format={{ secondsDecimalDigits: 0 }} />
         },
         {
           key: 'total_size_in_bytes',
-          title: 'Size',
+          title: t('Size'),
           render: (value) => formatSize(value)
         },
         {
           key: 'hash',
-          title: 'Hash',
+          title: t('Hash'),
           render: (value) => <Link to={`/blocks/${value}`}>{reduceText(value)}</Link>
         },
         {
           key: 'total_fees',
-          title: 'Fees',
+          title: t('Fees'),
           render: (value) => formatXelis(value)
         },
         {
           key: 'miner',
-          title: 'Miner',
+          title: t('Miner'),
           render: (value) => {
             return <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
           }
         },
         {
           key: 'reward',
-          title: 'Reward',
+          title: t('Reward'),
           render: (value) => formatXelis(value)
         }
       ]}
     />
-    <Pagination state={pageState} setState={setPageState} countText="blocks" count={blockCount} />
+    <Pagination state={pageState} setState={setPageState} countText={t('blocks')} count={blockCount} />
   </div>
 }
 

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
@@ -63,6 +64,7 @@ function Accounts() {
   const [err, setErr] = useState()
   const [accounts, setAccounts] = useState(serverResult.accounts)
   const [accountCount, setAccountCount] = useState(serverResult.totalAccounts)
+  const { t } = useLang()
 
   const loadAccounts = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -115,21 +117,21 @@ function Accounts() {
   }, [pageState])
 
   return <div className={style.container}>
-    <PageTitle title="Accounts" subtitle={`${accountCount.toLocaleString()} registered accounts`}
-      metaDescription="List of registered accounts. Check addresses and more." />
+    <PageTitle title={t('Accounts')} subtitle={t('{} registered accounts', [accountCount.toLocaleString()])}
+      metaDescription={t('List of registered accounts. Check addresses and more.')} />
     <TableFlex loading={loading} err={err}
-      emptyText="No accounts" rowKey="addr"
+      emptyText={t('No accounts')} rowKey="addr"
       headers={[
         {
           key: 'addr',
-          title: 'Address',
+          title: t('Address'),
           render: (value) => {
             return <Link to={`/accounts/${value}`}>{value}</Link>
           }
         },
         {
           key: 'topoheight',
-          title: 'Last Topoheight',
+          title: t('Last Topoheight'),
           render: (_, item) => {
             const { topoheight } = item.balance || {}
             return topoheight ? topoheight : `--`
@@ -137,14 +139,14 @@ function Accounts() {
         },
         {
           key: 'balance',
-          title: 'Balance',
+          title: t('Balance'),
           render: (_, item) => {
             const { balance } = item.balance || {}
             return balance ? formatXelis(balance.balance) : `--`
           }
         }
       ]} data={accounts} />
-    <Pagination state={pageState} setState={setPageState} countText="accounts" count={accountCount} />
+    <Pagination state={pageState} setState={setPageState} countText={t('accounts')} count={accountCount} />
   </div>
 }
 

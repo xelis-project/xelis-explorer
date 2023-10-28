@@ -7,6 +7,7 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock, reduceText } from '../../utils'
 import PageLoading from '../../components/pageLoading'
@@ -115,6 +116,7 @@ function Block() {
 
   const { firstPageLoad } = usePageLoad()
   const serverResult = loadBlock_SSR({ id })
+  const { t } = useLang()
 
   const [err, setErr] = useState()
   const [loading, setLoading] = useState(false)
@@ -165,32 +167,32 @@ function Block() {
 
   const description = useMemo(() => {
     return `
-      Block ${block.topoheight} (${reduceText(block.hash)}) with ${formatBlock.confirmations} confirmations.
-      The block reward was ${formatBlock.reward} and mined by ${formatBlock.miner}.
-      It contains ${(block.txs_hashes || 0).length} transactions.
+      ${t('Block {} ({}) with {} confirmations.', [block.topoheight, reduceText(block.hash), formatBlock.confirmations])}
+      ${t('The block reward was {} and mined by {}.', [formatBlock.reward, formatBlock.miner])}
+      ${t('It contains {} transactions.', [(block.txs_hashes || 0).length])}
     `
-  }, [block, formatBlock])
+  }, [block, formatBlock, t])
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <div>
-      <PageTitle title={`Block ${block.topoheight || ``}`}
+      <PageTitle title={t('Block {}', [block.topoheight || ``])}
         metaDescription={description}
       />
       {err && <div className="error">{displayError(err)}</div>}
       {!err && <div className="controls">
         <div>
-          This block was mined by <strong>{formatBlock.miner}</strong>.
-          It currently has <strong>{formatBlock.confirmations} confirmations</strong>.
-          The miner of this block earned <strong>{formatBlock.reward}</strong>.
+          {t('This block was mined by {}.', [formatBlock.miner])}
+          {t('It currently has {} confirmations.', [formatBlock.confirmations])}
+          {t('The miner of this block earned {}.', [formatBlock.reward])}
         </div>
         <div className="buttons">
           <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>
           {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
-            <div>Previous Block</div>
+            <div>{t('Previous Block')}</div>
           </Button>}
           {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="arrow-right" iconLocation="right">
-            <div>Next Block</div>
+            <div>{t('Next Block')}</div>
           </Button>}
         </div>
       </div>}
@@ -199,27 +201,27 @@ function Block() {
         headers={[
           {
             key: 'hash',
-            title: 'Hash',
+            title: t('Hash'),
           },
           {
             key: 'block_type',
-            title: 'Block type',
+            title: t('Block type'),
           },
           {
             key: 'timestamp',
-            title: 'Timestamp',
+            title: t('Timestamp'),
             //render: (value) => value && `${formatBlock.date} (${block.timestamp})`
           },
           {
             key: 'age',
-            title: 'Age',
+            title: t('Age'),
             render: (_, item) => {
               return <Age ssrId="blockAge" timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
             }
           },
           {
             key: 'confirmations',
-            title: 'Confirmations',
+            title: t('Confirmations'),
             render: (value, item) => {
               if (formatBlock.confirmations >= 0) return formatBlock.confirmations
               return ``
@@ -227,22 +229,22 @@ function Block() {
           },
           {
             key: 'topoheight',
-            title: 'Topoheight',
+            title: t('Topoheight'),
           },
           {
             key: 'height',
-            title: 'Height',
+            title: t('Height'),
           },
           {
             key: 'miner',
-            title: 'Miner',
+            title: t('Miner'),
             render: (value) => {
               return <Link to={`/accounts/${value}`}>{value}</Link>
             }
           },
           {
             key: 'total_fees',
-            title: 'Fees',
+            title: t('Fees'),
             render: (value, item) => {
               // total_fees can be undefined even if block is valid - use hash to check instead
               if (item.hash) return formatXelis(value || 0)
@@ -251,17 +253,17 @@ function Block() {
           },
           {
             key: 'reward',
-            title: 'Reward',
+            title: t('Reward'),
             render: (value) => value && formatXelis(value)
           },
           {
             key: 'txs_hashes',
-            title: 'Txs',
+            title: t('Txs'),
             render: (value) => value ? value.length : ``
           },
           {
             key: 'difficulty',
-            title: 'Difficulty',
+            title: t('Difficulty'),
             render: (value, item) => value && <>
               <span>{value} </span>
               <span title="Cumulative Difficulty">
@@ -271,17 +273,17 @@ function Block() {
           },
           {
             key: 'hash_rate',
-            title: 'Hash Rate',
+            title: t('Hash Rate'),
             render: (value, item) => item.difficulty && formatHashRate(item.difficulty / 15)
           },
           {
             key: 'total_size_in_bytes',
-            title: 'Size',
+            title: t('Size'),
             render: (value) => formatSize(value)
           },
           {
             key: 'tips',
-            title: 'Tips',
+            title: t('Tips'),
             render: (value) => {
               const tips = value || []
               if (tips.length === 0) return 'No tips. This is most likely the genesis block.'

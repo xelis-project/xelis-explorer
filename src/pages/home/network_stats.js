@@ -6,6 +6,7 @@ import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Icon from 'g45-react/components/fontawesome_icon'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatHashRate, formatXelis } from '../../utils'
 import theme from '../../style/theme'
@@ -163,6 +164,7 @@ function loadNetworkStats_SSR() {
 export function NetworkStats(props) {
   const { blocks } = props
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const serverResult = loadNetworkStats_SSR()
 
@@ -232,14 +234,14 @@ export function NetworkStats(props) {
     }
 
     return [
-      { title: `Max Supply`, render: () => formatXelis(maxSupply, { withSuffix: false }) },
-      { title: `Circulating Supply`, render: () => formatXelis(data.native_supply, { withSuffix: false }) },
-      { title: `Mined`, render: () => `${mined}%` },
-      { title: `Block Count`, render: () => (data.topoheight || 0).toLocaleString() },
-      { title: `Block Reward`, render: () => formatXelis(data.block_reward, { withSuffix: false }) },
-      { title: `Mempool`, render: () => `${data.mempool_size || 0} tx` },
+      { title: t(`Max Supply`), render: () => formatXelis(maxSupply, { withSuffix: false }) },
+      { title: t(`Circulating Supply`), render: () => formatXelis(data.native_supply, { withSuffix: false }) },
+      { title: t(`Mined`), render: () => `${mined}%` },
+      { title: t(`Block Count`), render: () => (data.topoheight || 0).toLocaleString() },
+      { title: t(`Block Reward`), render: () => formatXelis(data.block_reward, { withSuffix: false }) },
+      { title: t(`Mempool`), render: () => `${data.mempool_size || 0} tx` },
       {
-        title: `Difficulty`, render: () => {
+        title: t(`Difficulty`), render: () => {
           return <div>
             <div>{(data.difficulty || 0).toLocaleString()}</div>
             <MiniChart data={difficultyChartData} />
@@ -247,13 +249,13 @@ export function NetworkStats(props) {
         }
       },
       {
-        title: `Hashrate`, render: () => formatHashRate((data.difficulty || 0) / 15)
+        title: t(`Hashrate`), render: () => formatHashRate((data.difficulty || 0) / 15)
       },
       {
-        title: `Avg Block Time`, render: () => prettyMs((data.average_block_time || 0), { compact: true })
+        title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true })
       },
     ]
-  }, [info, blocks, currentTheme])
+  }, [info, blocks, currentTheme, t])
 
   return <div className={style.container}>
     <div>Network Stats</div>
@@ -268,7 +270,7 @@ export function NetworkStats(props) {
       })}
     </div>
     <a href="https://stats.xelis.io" target="_blank">
-      Go to stats.xelis.io
+      {t('Go to {}', ['stats.xelis.io'])}
       <Icon name="arrow-right" />
     </a>
   </div>

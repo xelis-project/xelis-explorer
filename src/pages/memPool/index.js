@@ -14,6 +14,7 @@ import theme from '../../style/theme'
 import { useRecentBlocks } from '../../pages/home'
 import useTheme from '../../hooks/useTheme'
 import PageTitle from '../../layout/page_title'
+import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   container: css`
@@ -78,6 +79,7 @@ function MemPool() {
   const [err, setErr] = useState()
   const nodeSocket = useNodeSocket()
   const [filterTx, setFilterTx] = useState()
+  const { t } = useLang()
 
   const loadMemPool = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -116,11 +118,11 @@ function MemPool() {
   }, [memPool, filterTx])
 
   return <div className={style.container}>
-    <PageTitle title="Mempool" subtitle="Past, pending and executed transactions."
-      metaDescription="View pending transactions and network congestion. Verify if your transaction was executed." />
+    <PageTitle title={t('Mempool')} subtitle={t('Past, pending and executed transactions.')}
+      metaDescription={t('View pending transactions and network congestion. Verify if your transaction was executed.')} />
     <div>
       <TxsHistoryChart />
-      <input type="text" placeholder="Type your account address or transaction hash to filter the list below." onChange={(e) => {
+      <input type="text" placeholder={t('Type your account address or transaction hash to filter the list below.')} onChange={(e) => {
         setFilterTx(e.target.value)
       }} />
       <div>
@@ -134,6 +136,7 @@ function MemPool() {
 function TxsHistoryChart(props) {
   const { blocks } = useRecentBlocks()
   const { theme: currentTheme } = useTheme()
+  const { t } = useLang()
 
   const totalTxs = useMemo(() => {
     return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
@@ -218,7 +221,7 @@ function TxsHistoryChart(props) {
   }, [])
 
   return <div>
-    <h2>Last 20 blocks ({totalTxs} txs)</h2>
+    <h2>{t('Last 20 blocks ({} txs)', [totalTxs])}</h2>
     <Chart chartRef={chartRef} config={chartConfig} />
   </div>
 }
@@ -226,10 +229,12 @@ function TxsHistoryChart(props) {
 function PendingTxs(props) {
   const { memPool, loading, err } = props
 
+  const { t } = useLang()
+
   return <div>
-    <h2>Pending Transactions ({memPool.length})</h2>
+    <h2>{t('Pending Transactions ({})', [memPool.length])}</h2>
     <Table
-      headers={[`Hash`, `Signer`, `Fees`, `Age`]}
+      headers={[t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={memPool} loading={loading} err={err} colSpan={4} emptyText="No transactions"
       onItem={(item) => {
         return <tr key={item.hash}>
@@ -257,6 +262,7 @@ function ExecutedTxs(props) {
   const [executedTxs, setExecutedTxs] = useState([])
   const nodeSocket = useNodeSocket()
   const [topoheight, setTopoheight] = useState()
+  const { t } = useLang()
 
   const loadExecutedTxs = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -355,11 +361,11 @@ function ExecutedTxs(props) {
   }, [executedTxs, filterTx])
 
   return <div>
-    <h2>Executed Transactions ({executedTxs.length})</h2>
+    <h2>{t('Executed Transactions ({})', [executedTxs.length])}</h2>
     <Table
-      headers={[`Topo`, `Hash`, `Signer`, `Fees`, `Age`]}
+      headers={[t(`Topo`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
-      emptyText="No transactions"
+      emptyText={t('No transactions')}
       onItem={(item) => {
         const { tx, block } = item
         const blockCount = topoheight - block.topoheight

@@ -2,6 +2,7 @@ import { css } from 'goober'
 import { useNodeSocket, INITIATING } from '@xelis/sdk/react/daemon'
 
 import DotLoading from '../components/dotLoading'
+import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   container: css`
@@ -72,6 +73,7 @@ const style = {
 
 function NodeStatus() {
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const { daemon, readyState } = nodeSocket
   const { connectionTries, maxConnectionTries } = daemon
@@ -79,9 +81,9 @@ function NodeStatus() {
   return <div className={style.container}>
     {(() => {
       if (readyState === WebSocket.CONNECTING || readyState === INITIATING) {
-        let text = `Connecting`
+        let text = t(`Connecting`)
         if (connectionTries > 0) {
-          text = `Reconnecting (${connectionTries})`
+          text = t(`Reconnecting ({})`, [connectionTries])
         }
 
         return <div>
@@ -92,20 +94,20 @@ function NodeStatus() {
 
       if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
         return <>
-          <div onClick={() => location.reload()} style={{ cursor: 'pointer' }} title="Click to reload">
+          <div onClick={() => location.reload()} style={{ cursor: 'pointer' }} title={t('Click to reload.')}>
             <div data-status="error" />
-            <div>Disconnected</div>
+            <div>{t('Disconnected')}</div>
           </div>
           {connectionTries >= maxConnectionTries && <div>
-            Despite multiple reconnection attempts, the client was unable to establish a successful connection.
-            Click here to reload and attempt reconnecting to the node manually.
+            {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection.
+            Click here to reload and attempt reconnecting to the node manually.`)}
           </div>}
         </>
       }
 
       return <div>
         <div data-status="connected" />
-        <div>Connected</div>
+        <div>{t('Connected')}</div>
       </div>
     })()}
   </div>

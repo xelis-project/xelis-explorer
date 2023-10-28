@@ -4,6 +4,7 @@ import to from 'await-to-js'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import Icon from 'g45-react/components/fontawesome_icon'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import Button from '../../components/button'
 import theme from '../../style/theme'
@@ -79,6 +80,7 @@ const style = {
 export function ExplorerSearch() {
   const navigate = useNavigate()
   const nodeSocket = useNodeSocket()
+  const { t } = useLang()
 
   const search = useCallback(async (e) => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -109,13 +111,13 @@ export function ExplorerSearch() {
 
   return <form onSubmit={search}>
     <div className={style.container}>
-      <div>XELIS Explorer</div>
+      <div>{t('XELIS Explorer')}</div>
       <div>
-        <input type="text" name="search" placeholder="Search block, transaction or account address."
+        <input type="text" name="search" placeholder={t('Search block, transaction or account address.')}
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit" aria-label="Search">
           <Icon name="search" />
-          <span>Search</span>
+          <span>{t('Search')}</span>
         </Button>
       </div>
     </div>

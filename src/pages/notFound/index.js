@@ -1,6 +1,7 @@
 import { css } from 'goober'
 import { Helmet } from 'react-helmet-async'
 import useServer from 'g45-react/hooks/useServer'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import Button from '../../components/button'
 import { scaleOnHover } from '../../style/animate'
@@ -54,20 +55,22 @@ const style = {
 
 function NotFound() {
   const server = useServer()
+  const { t } = useLang()
+
   if (server) {
     server.statusCode = 404
   }
 
   return <div className={style.container}>
     <Helmet>
-      <title>404 | Page not found</title>
-      <meta name="description" content="The page you are looking for does not exists or was deleted." />
+      <title>{t('404 | Page not found')}</title>
+      <meta name="description" content={t('The page you are looking for does not exists or was deleted.')} />
     </Helmet>
     <h1>404</h1>
-    <h2>Page not found</h2>
-    <p>The page you are looking for does not exists or was deleted.</p>
+    <h2>{t('Page not found')}</h2>
+    <p>{t('The page you are looking for does not exists or was deleted.')}</p>
     <Button link="/" icon="arrow-right" iconLocation="right">
-      Go to homepage
+      {t('Go to homepage')}
     </Button>
   </div>
 }

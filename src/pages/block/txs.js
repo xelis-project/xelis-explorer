@@ -7,6 +7,7 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formatXelis, reduceText } from '../../utils'
 import Table from '../../components/table'
 import Pagination, { getPaginationRange } from '../../components/pagination'
+import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   container: css`
@@ -30,6 +31,7 @@ function Transactions(props) {
   const txCount = useMemo(() => {
     return (block.txs_hashes || []).length
   }, [block])
+  const { t } = useLang()
 
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
@@ -65,10 +67,10 @@ function Transactions(props) {
   }, [block, load])
 
   return <div className={style.container}>
-    <h2>Transactions</h2>
+    <h2>{t('Transactions')}</h2>
     <Table
-      headers={[`Hash`, `Transfers / Burns`, `Signer`, `Fees`]}
-      list={transactions} loading={loading} err={err} emptyText="No transactions" colSpan={4}
+      headers={[t(`Hash`), t(`Transfers / Burns`), t(`Signer`), t(`Fees`)]}
+      list={transactions} loading={loading} err={err} emptyText={t('No transactions')} colSpan={4}
       onItem={(item) => {
         const transfers = item.data.transfers || []
 

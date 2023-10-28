@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useMemo } from 'react'
 import Age from 'g45-react/components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
@@ -106,9 +107,10 @@ const style = {
   `
 }
 
-
 export function RecentBlocks(props) {
   const { blocks, newBlock } = props
+
+  const { t } = useLang()
 
   const newBlockHash = useMemo(() => {
     if (newBlock) return newBlock.hash
@@ -119,7 +121,7 @@ export function RecentBlocks(props) {
   if (recentBlocks.length === 0) recentBlocks = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
 
   return <div className={style.container}>
-    <div>Recent Blocks</div>
+    <div>{t('Recent Blocks')}</div>
     <div className={`${!newBlockHash ? `no-animation` : ``}`}>
       {recentBlocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
@@ -128,7 +130,7 @@ export function RecentBlocks(props) {
         const animateClassName = newBlockHash === block.hash ? `animate` : null
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={animateClassName}>
-          <div>Block {block.topoheight}</div>
+          <div>{t('Block {}', [block.topoheight])}</div>
           <div>{txCount} txs | {size}</div>
           <div>{reduceText(block.miner, 0, 7) || '--'}</div>
           <div>

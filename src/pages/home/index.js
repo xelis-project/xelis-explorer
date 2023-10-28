@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { ExplorerSearch } from './explorer_search'
 import { RecentBlocks } from './recent_blocks'
@@ -84,11 +85,12 @@ export function useRecentBlocks() {
 
 function Home() {
   const { blocks, newBlock } = useRecentBlocks()
+  const { t } = useLang()
 
   return <div>
     <Helmet>
       <title>Home</title>
-      <meta name="description" content="Dive into the XELIS Explorer. Navigate the blockchain, verify transactions, and access specific metadata." />
+      <meta name="description" content={t('Dive into the XELIS Explorer. Navigate the blockchain, verify transactions, and access specific metadata.')} />
     </Helmet>
     <ExplorerSearch />
     <RecentBlocks blocks={blocks} newBlock={newBlock} />
