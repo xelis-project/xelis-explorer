@@ -30,6 +30,7 @@
     "bignumber.js": "^9.1.2",
     "bytes": "^3.1.2",
     "chart.js": "^4.2.1",
+    "flag-icons": "^6.11.2",
     "framer-motion-3d": "^10.1.0",
     "goober": "^2.1.10",
     "hash-it": "^6.0.0",

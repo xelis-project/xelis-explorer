@@ -1,6 +1,7 @@
 import { css } from 'goober'
 import { useState } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
 import theme from '../../style/theme'
@@ -91,9 +92,9 @@ export function LangDropdown(props) {
 
   const languages = useMemo(() => {
     return [
-      { key: `en`, text: t(`English`) },
-      { key: `fr`, text: t(`French`) },
-      { key: `es`, text: t(`Spanish`) }
+      { key: `en`, text: <><i class="fi fi-us" />&nbsp;&nbsp;{t(`English`)}</> },
+      { key: `fr`, text: <><i class="fi fi-fr" />&nbsp;&nbsp;{t(`French`)}</> },
+      { key: `es`, text: <><i class="fi fi-es" />&nbsp;&nbsp;{t(`Spanish`)}</> }
     ]
   }, [t])
 
@@ -109,9 +110,9 @@ export function ThemeDropdown(props) {
 
   const themes = useMemo(() => {
     return [
-      { key: `xelis`, text: t(`Default`) },
-      { key: `dark`, text: t(`Dark`) },
-      { key: `light`, text: t(`Light`) }
+      { key: `xelis`, text: <><Icon name="palette" />&nbsp;&nbsp;{t(`Default`)}</> },
+      { key: `dark`, text: <><Icon name="moon" />&nbsp;&nbsp;{t(`Dark`)}</> },
+      { key: `light`, text: <><Icon name="sun" />&nbsp;&nbsp;{t(`Light`)}</> }
     ]
   }, [t])
 
