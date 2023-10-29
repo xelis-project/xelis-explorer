@@ -171,11 +171,11 @@ export function NetworkStats(props) {
   const [info, setInfo] = useState(serverResult.info)
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
+  const [p2pStatus, setP2PStatus] = useState({})
   const { theme: currentTheme } = useTheme()
 
   const loadInfo = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
 
     const resErr = (err) => {
       setInfo({})
@@ -190,9 +190,19 @@ export function NetworkStats(props) {
     setLoading(false)
   }, [nodeSocket])
 
+  const loadP2PStatus = useCallback(async () => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    const [err, p2p] = await to(nodeSocket.daemon.p2pStatus())
+    if (err) return
+
+    setP2PStatus(p2p)
+  }, [nodeSocket])
+
   useEffect(() => {
     loadInfo()
-  }, [blocks, loadInfo])
+    loadP2PStatus()
+  }, [blocks, loadInfo, loadP2PStatus])
 
   useNodeSocketSubscribe({
     event: RPCEvent.TransactionAddedInMempool,
@@ -237,9 +247,15 @@ export function NetworkStats(props) {
       { title: t(`Max Supply`), render: () => formatXelis(maxSupply, { withSuffix: false }) },
       { title: t(`Circulating Supply`), render: () => formatXelis(data.native_supply, { withSuffix: false }) },
       { title: t(`Mined`), render: () => `${mined}%` },
-      { title: t(`Block Count`), render: () => (data.topoheight || 0).toLocaleString() },
+
+      { title: t(`Topo Height`), render: () => (data.topoheight || 0).toLocaleString() },
       { title: t(`Block Reward`), render: () => formatXelis(data.block_reward, { withSuffix: false }) },
       { title: t(`Mempool`), render: () => `${data.mempool_size || 0} tx` },
+
+      { title: t(`Height`), render: () => (data.height || 0).toLocaleString() },
+      { title: t(`Stable Height`), render: () => (data.stableheight || 0).toLocaleString() },
+      { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString() },
+
       {
         title: t(`Difficulty`), render: () => {
           return <div>
@@ -255,7 +271,7 @@ export function NetworkStats(props) {
         title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true })
       },
     ]
-  }, [info, blocks, currentTheme, t])
+  }, [info, blocks, currentTheme, t, p2pStatus])
 
   return <div className={style.container}>
     <div>Network Stats</div>
