@@ -6,7 +6,6 @@
   "Max Supply": "Offre Maximale",
   "Circulating Supply": "Offre en Circulation",
   "Mined": "Miné",
-  "Block Count": "Nombre de Blocs",
   "Block Reward": "Récompense de Bloc",
   "Mempool": "Mempool",
   "Difficulty": "Difficulté",
@@ -52,7 +51,6 @@
   "Balance": "Solde",
   "Nonce": "Nonce",
   "No history": "Pas d'historique",
-  "Topoheight": "Topo-hauteur",
   "Hash": "Hachage",
   "Type": "Type",
   "Amount": "Montant",
@@ -63,7 +61,6 @@
   "{} registered accounts": "{} comptes enregistrés",
   "List of registered accounts. Check addresses and more.": "Liste des comptes enregistrés. Vérifiez les adresses et plus encore.",
   "No accounts": "Aucun compte",
-  "Last Topoheight": "Dernière Topo-hauteur",
   "accounts": "comptes",
   "Block {} ({}) with {} confirmations.": "Bloc {} ({}) avec {} confirmations.",
   "The block reward was {} and mined by {}.": "La récompense du bloc était de {} et a été minée par {}.",
@@ -140,5 +137,13 @@
   "THEME": "THÈME",
   "This block was mined by {}": "Ce bloc a été miné par {}.",
   "It currently has {} confirmations": "Il a actuellement {} confirmations.",
-  "The miner of this block earned {}": "Le mineur de ce bloc a gagné {}."
+  "The miner of this block earned {}": "Le mineur de ce bloc a gagné {}.",
+  "Last Topo": "Dernier Topo",
+  "Topo Height": "Hauteur Topo",
+  "Last block ": "Dernier bloc ",
+  " ago": " il y a",
+  "Paused": "En pause",
+  "English": "Anglais",
+  "French": "Français",
+  "Spanish": "Espagnol"
 }

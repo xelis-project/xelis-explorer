@@ -6,7 +6,6 @@
   "Max Supply": "Max Supply",
   "Circulating Supply": "Circulating Supply",
   "Mined": "Mined",
-  "Block Count": "Block Count",
   "Block Reward": "Block Reward",
   "Mempool": "Mempool",
   "Difficulty": "Difficulty",
@@ -52,7 +51,6 @@
   "Balance": "Balance",
   "Nonce": "Nonce",
   "No history": "No history",
-  "Topoheight": "Topoheight",
   "Hash": "Hash",
   "Type": "Type",
   "Amount": "Amount",
@@ -63,7 +61,6 @@
   "{} registered accounts": "{} registered accounts",
   "List of registered accounts. Check addresses and more.": "List of registered accounts. Check addresses and more.",
   "No accounts": "No accounts",
-  "Last Topoheight": "Last Topoheight",
   "accounts": "accounts",
   "Block {} ({}) with {} confirmations.": "Block {} ({}) with {} confirmations.",
   "The block reward was {} and mined by {}.": "The block reward was {} and mined by {}.",
@@ -141,5 +138,13 @@
   "THEME": "THEME",
   "This block was mined by {}.": "This block was mined by {}.",
   "It currently has {} confirmations.": "It currently has {} confirmations.",
-  "The miner of this block earned {}.": "The miner of this block earned {}."
+  "The miner of this block earned {}.": "The miner of this block earned {}.",
+  "Last Topo": "Last Topo",
+  "Topo Height": "Topo Height",
+  "Last block ": "Last block ",
+  " ago": " ago",
+  "Paused": "Paused",
+  "English": "English",
+  "French": "French",
+  "Spanish": "Spanish"
 }
