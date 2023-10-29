@@ -15,13 +15,12 @@
     "build-prod:node": "npm run bundle -- --type node_server --minify",
     "build-prod:cf": "npm run bundle -- --type cf_worker --minify",
     "build-cf:dev-pages": "npm run build-dev:cf -- --define ./env/cf_dev.json",
-    "build-cf:testnet-pages": "npm run build-prod:cf -- --define ./env/cf_testnet.json",
+    "build-cf:testnet-pages": "npm run build-dev:cf -- --define ./env/cf_testnet.json",
     "build-cf:mainnet-pages": "npm run build-prod:cf -- --define ./env/cf_mainnet.json",
     "build": "npm run build-dev:cf",
     "start": "npm run start-dev:cf"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.4.2",
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@tweenjs/tween.js": "^21.0.0",
