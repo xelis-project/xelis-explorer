@@ -54,7 +54,7 @@ function Transactions(props) {
     const txCount = txHashes.length
     start = Math.min(txCount, start)
     end = Math.min(txCount, end)
-    txHashes = txHashes.slice(start, end)
+    txHashes = txHashes.slice(start, end + 1)
     const [err, txs] = await to(nodeSocket.daemon.getTransactions(txHashes))
     if (err) return resErr(err)
 
