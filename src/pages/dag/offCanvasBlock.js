@@ -122,7 +122,7 @@ function useOffCanvasBlock(props) {
           <div>{(formatBlock.confirmations || 0).toLocaleString()}</div>
         </div>
         <div>
-          <div>{t('Topoheight')}</div>
+          <div>{t('Topo Height')}</div>
           <div>{(block.topoheight || 0).toLocaleString()}</div>
         </div>
         <div>

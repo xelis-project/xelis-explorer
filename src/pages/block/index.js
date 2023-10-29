@@ -229,7 +229,7 @@ function Block() {
           },
           {
             key: 'topoheight',
-            title: t('Topoheight'),
+            title: t('Topo Height'),
           },
           {
             key: 'height',

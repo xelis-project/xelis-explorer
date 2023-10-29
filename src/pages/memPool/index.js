@@ -232,10 +232,10 @@ function PendingTxs(props) {
   const { t } = useLang()
 
   return <div>
-    <h2>{t('Pending Transactions ({})', [memPool.length])}</h2>
+    <h2>{t('Pending Transactions ({})', [memPool.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
-      list={memPool} loading={loading} err={err} colSpan={4} emptyText="No transactions"
+      list={memPool} loading={loading} err={err} colSpan={4} emptyText={t('No transactions')}
       onItem={(item) => {
         return <tr key={item.hash}>
           <td title={item.hash}>
@@ -361,7 +361,7 @@ function ExecutedTxs(props) {
   }, [executedTxs, filterTx])
 
   return <div>
-    <h2>{t('Executed Transactions ({})', [executedTxs.length])}</h2>
+    <h2>{t('Executed Transactions ({})', [executedTxs.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Topo`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}

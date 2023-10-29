@@ -131,7 +131,7 @@ function Accounts() {
         },
         {
           key: 'topoheight',
-          title: t('Last Topoheight'),
+          title: t('Last Topo'),
           render: (_, item) => {
             const { topoheight } = item.balance || {}
             return topoheight ? topoheight : `--`

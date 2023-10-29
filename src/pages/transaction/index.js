@@ -273,7 +273,7 @@ function InBlocks(props) {
   return <div>
     <h2>{t('In Blocks')}</h2>
     <Table
-      headers={[t(`Topoheight`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Timestamp`), t(`Txs`)]}
+      headers={[t(`Topo Height`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Timestamp`), t(`Txs`)]}
       list={blocks} loading={loading} err={err} emptyText={t('No blocks')} colSpan={7}
       onItem={(item, index) => {
         const size = formatSize(item.total_size_in_bytes)
