@@ -84,21 +84,7 @@ const defaultStats = {
 export function RecentStats(props) {
   const { blocks } = props
 
-  const nodeSocket = useNodeSocket()
-  const [p2pStatus, setP2PStatus] = useState({})
   const { t } = useLang()
-
-  const loadP2PStatus = useCallback(async () => {
-    if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
-    if (err) return
-    setP2PStatus(res)
-  }, [nodeSocket])
-
-  useEffect(() => {
-    loadP2PStatus()
-  }, [loadP2PStatus, blocks]) // keep blocks has dependencies to update on new block
 
   const stats = useMemo(() => {
     let stats = Object.assign({}, defaultStats)
@@ -142,10 +128,6 @@ export function RecentStats(props) {
       <div>
         <div>{t('Reward')}</div>
         <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
-      </div>
-      <div>
-        <div>{t('Peers')}</div>
-        <div>{p2pStatus.peer_count || 0}</div>
       </div>
     </div>
     <div>
