@@ -25,7 +25,6 @@
   "Select your preferred language.": "Select your preferred language.",
   "Theme": "Theme",
   "Select your preferred theme.": "Select your preferred theme.",
-  "The explorer allows to track and verify transactions on the XELIS network.\r\n          You can search for specific transactions and monitor the overall health of the network.": "The explorer allows to track and verify transactions on the XELIS network.\r\n          You can search for specific transactions and monitor the overall health of the network.",
   "PAGES": "PAGES",
   "Blocks": "Blocks",
   "DAG": "DAG",
@@ -42,7 +41,6 @@
   "Reconnecting ({})": "Reconnecting ({})",
   "Click to reload.": "Click to reload.",
   "Disconnected": "Disconnected",
-  "Despite multiple reconnection attempts, the client was unable to establish a successful connection.\r\n            Click here to reload and attempt reconnecting to the node manually.": "Despite multiple reconnection attempts, the client was unable to establish a successful connection.\r\n            Click here to reload and attempt reconnecting to the node manually.",
   "Connected": "Connected",
   "Account history of {}.": "Account history of {}.",
   "Account {}": "Account {}",
@@ -146,5 +144,7 @@
   "Paused": "Paused",
   "English": "English",
   "French": "French",
-  "Spanish": "Spanish"
+  "Spanish": "Spanish",
+  "The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.": "The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.",
+  "Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.": "Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually."
 }

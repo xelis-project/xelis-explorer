@@ -99,8 +99,7 @@ function NodeStatus() {
             <div>{t('Disconnected')}</div>
           </div>
           {connectionTries >= maxConnectionTries && <div>
-            {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection.
-            Click here to reload and attempt reconnecting to the node manually.`)}
+            {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.`)}
           </div>}
         </>
       }

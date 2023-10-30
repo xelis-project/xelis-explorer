@@ -108,8 +108,7 @@ function Footer() {
       <div>
         <div>{t('XELIS Explorer')}</div>
         <div>
-          {t(`The explorer allows to track and verify transactions on the XELIS network.
-          You can search for specific transactions and monitor the overall health of the network.`)}
+          {t(`The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.`)}
           <div>v{packageJSON.version}</div>
         </div>
       </div>
