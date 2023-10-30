@@ -36,32 +36,35 @@ const defaultStyle = {
   }
 
   > :nth-child(2) {
-    max-width: 100%;
-    min-width: 100%;
     position: absolute;
-    border: 1px solid var(--dropdown-text-color);
-    background-color: var(--dropdown-bg-color);
-    overflow: auto;
-    cursor: pointer;
-    transition: .25s all;
-    opacity: 0;
-    max-height: 10em;
-    transform: scaleY(0);
-    margin-top: -10px;
-    padding-top: 10px;
-    border-bottom-right-radius: 15px;
-    border-top: none;
-    border-bottom-left-radius: 15px;
-    transform-origin: top;
+    width: 100%;
+    clip-path: inset(-10px 0 0 0);
+    visibility: hidden;
     z-index: 1;
-
+  
     > div {
-      user-select: none;
-      padding: .5em;
+      border: 1px solid var(--dropdown-text-color);
+      background-color: var(--dropdown-bg-color);
+      overflow: auto;
+      cursor: pointer;
+      transition: .25s all;
+      max-height: 10em;
+      margin-top: -10px;
+      padding-top: 10px;
+      border-bottom-right-radius: 15px;
+      border-top: none;
+      border-bottom-left-radius: 15px;
+      transform-origin: top;
+      transform: translateY(-100%);
 
-      &:hover {
-        background-color: white;
-        color: black;
+      > div {
+        user-select: none;
+        padding: .5em;
+
+        &:hover {
+          background-color: white;
+          color: black;
+        }
       }
     }
   }
@@ -72,11 +75,14 @@ const defaultStyle = {
     }
 
     > :nth-child(2) {
-      transform: scaleY(1);
-      opacity: 1;
+      visibility: visible;
+
+      > div {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
   }
-
   `
 }
 
@@ -121,9 +127,11 @@ function Dropdown(props) {
       <Icon name="arrow-down" />
     </div>
     <div>
-      {items.map((item) => {
-        return <div key={item.key} onClick={() => onSelect(item)}>{item.text}</div>
-      })}
+      <div>
+        {items.map((item) => {
+          return <div key={item.key} onClick={() => onSelect(item)}>{item.text}</div>
+        })}
+      </div>
     </div>
   </div>
 }
