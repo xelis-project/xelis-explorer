@@ -145,5 +145,7 @@
   "French": "Francés",
   "Spanish": "Español",
   "The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.": "El explorador permite rastrear y verificar transacciones en la red XELIS. Puede buscar transacciones específicas y monitorear el estado general de la red.",
-  "Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.": "A pesar de múltiples intentos de reconexión, el cliente no pudo establecer una conexión exitosa. Haga clic aquí para recargar e intentar reconectarse al nodo manualmente."
+  "Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.": "A pesar de múltiples intentos de reconexión, el cliente no pudo establecer una conexión exitosa. Haga clic aquí para recargar e intentar reconectarse al nodo manualmente.",
+  "Network Stats": "Estadísticas de la Red",
+  "Last Ping": "Último Ping"
 }

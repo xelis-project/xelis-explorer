@@ -5,6 +5,7 @@ import to from 'await-to-js'
 import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
 import { useLang } from 'g45-react/hooks/useLang'
+import Age from 'g45-react/components/age'
 
 import TableFlex from '../../components/tableFlex'
 import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
@@ -17,7 +18,7 @@ import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
-    table button {
+    .fly-to-button {
       background: var(--text-color);
       color: var(--bg-color);
       border: none;
@@ -102,34 +103,20 @@ function Peers() {
     const [err, result] = await to(nodeSocket.daemon.getPeers())
     if (err) return resErr(err)
 
-    setPeers(result.map((peer) => {
+    const peers = result.map((peer) => {
       const addr = parseAddressWithPort(peer.addr)
       if (addr) peer.ip = addr.ip
       return peer
-    }))
+    })
+
+    setPeers(peers)
     setLoading(false)
-  }, [nodeSocket])
-
-  const loadGeoLocation = useCallback(async () => {
-    if (peers.length === 0) return
-    setGeoLoading(true)
-
-    let geoLocation = {}
-    const ipList = []
-    for (let i = 0; i < peers.length; i++) {
-      const peer = peers[i]
-      ipList.push(peer.ip)
-
-      peer.peers.forEach((pAddr) => {
-        const addr = parseAddressWithPort(pAddr)
-        if (ipList.indexOf(addr.ip) === -1) {
-          ipList.push(addr.ip)
-        }
-      })
-    }
 
     // max 50 ips per fetch
+    setGeoLoading(true)
     const batch = 50
+    let geoLocation = {}
+    const ipList = peers.map((p) => p.ip)
     for (let i = 0; i < ipList.length; i += batch) {
       const ips = ipList.slice(i, batch)
       const [err, data] = await to(fetchGeoLocation(ips))
@@ -137,17 +124,13 @@ function Peers() {
       geoLocation = { ...geoLocation, ...data }
     }
 
-    setGeoLocation(geoLocation)
     setGeoLoading(false)
-  }, [peers])
+    setGeoLocation(geoLocation)
+  }, [nodeSocket])
 
   useEffect(() => {
     loadPeers()
   }, [loadPeers])
-
-  useEffect(() => {
-    loadGeoLocation()
-  }, [loadGeoLocation])
 
   useNodeSocketSubscribe({
     event: RPCEvent.PeerConnected,
@@ -162,6 +145,18 @@ function Peers() {
         const exists = peers.find((p) => p.addr === peer.addr)
         if (!exists) return [...peers, peer]
         return peers
+      })
+    }
+  }, [])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.PeerStateUpdated,
+    onData: async (_, peer) => {
+      setPeers((peers) => {
+        return peers.map(p => {
+          if (p.id === peer.id) return { ...p, ...peer } // merge to keep ip variable
+          return p
+        })
       })
     }
   }, [])
@@ -203,7 +198,7 @@ function Table(props) {
             return <div>
               <FlagIcon code={code} />&nbsp;&nbsp;
               <span>{data.country} / {data.region}</span>
-              <button onClick={() => {
+              <button className="fly-to-button" onClick={() => {
                 const position = [data.latitude, data.longitude]
                 mapRef.current.flyTo(position, 6)
               }}>Fly To</button>
@@ -251,6 +246,13 @@ function Table(props) {
         title: t('Pruned Topo'),
         render: (value) => {
           return value || `--`
+        }
+      },
+      {
+        key: 'last_ping',
+        title: t('Last Ping'),
+        render: (value) => {
+          return <Age timestamp={value * 1000} update />
         }
       },
       {

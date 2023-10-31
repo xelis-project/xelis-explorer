@@ -274,7 +274,7 @@ export function NetworkStats(props) {
   }, [info, blocks, currentTheme, t, p2pStatus])
 
   return <div className={style.container}>
-    <div>Network Stats</div>
+    <div>{t('Network Stats')}</div>
     <div>
       {stats.map((item) => {
         let value = null
