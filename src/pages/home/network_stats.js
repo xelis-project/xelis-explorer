@@ -103,8 +103,7 @@ const style = {
 
     .mini-chart {
       height: 3em;
-      padding: 0.25em;
-      margin-top: 0.5em;
+      margin-top: 0.25em;
     }
   `,
 }
@@ -238,6 +237,8 @@ export function NetworkStats(props) {
         label: 'Units',
         data: difficultyHistory,
         borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+        fill: true,
+        backgroundColor: currentTheme === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
         borderWidth: 4,
         tension: .3
       }]

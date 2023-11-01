@@ -159,7 +159,11 @@ function TxsHistoryChart(props) {
       datasets: [{
         label: 'Txs',
         data,
-        backgroundColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+        backgroundColor: currentTheme === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+        fill: true,
+        borderWidth: 4,
+        tension: .3,
+        borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
       }]
     }
 
@@ -168,7 +172,7 @@ function TxsHistoryChart(props) {
     }
 
     return {
-      type: 'bar',
+      type: 'line',
       data: chartData,
       options: {
         animation: {

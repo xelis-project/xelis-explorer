@@ -134,16 +134,15 @@ function Layout() {
   const location = useLocation()
 
   return <>
-    <div className={style.background}>
+    <div className={style.background} />
+    {/*
       <div className="bg" />
-      {/*
-        <div className="noise" />
-        <div className="bg bgl" />
-        <div className="bg bgc" />
-        <div className="bg bgt" />
-        <div className="bg bgbr" />
-      */}
-    </div>
+      <div className="noise" />
+      <div className="bg bgl" />
+      <div className="bg bgc" />
+      <div className="bg bgt" />
+      <div className="bg bgbr" />
+    */}
     <div className={style.container}>
       <div className={style.nodeStatus}>
         <NodeStatus />
