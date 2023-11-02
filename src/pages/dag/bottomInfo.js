@@ -33,11 +33,13 @@ const style = {
         align-items: center;
         gap: .5em;
         background-color: rgb(0 0 0 / 20%);
-        padding: .5em;
+        padding: .5em 1em;
+        border-radius: .5em;
   
-        > :nth-child(2) {
+        > :nth-child(1) {
           width: 12px;
           height: 12px;
+          border-radius: .25em;
         }
       }
     }
@@ -72,8 +74,8 @@ function BottomInfo(props) {
     <div>
       {blockColor.types.map((key) => {
         return <div key={key}>
-          <div>{key}</div>
           <div style={{ backgroundColor: blockColor.value(currentTheme, key) }} />
+          <div>{key}</div>
         </div>
       })}
     </div>

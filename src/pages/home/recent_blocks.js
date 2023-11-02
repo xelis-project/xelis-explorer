@@ -56,7 +56,8 @@ const style = {
         padding: 1em;
         min-width: 9em;
         background-color: var(--block-bg-color);
-        border-left: 3px solid var(--block-border-color);
+        border-left: .3em solid var(--block-border-color);
+        border-radius: .25em;
         position: relative;
         flex-shrink: 0;
         text-decoration: none;

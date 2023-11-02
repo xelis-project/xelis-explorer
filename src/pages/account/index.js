@@ -24,16 +24,6 @@ const style = {
       font-size: 1.5em;
     }
 
-    select {
-      width: 100%;
-      padding: 0.5em;
-      border: none;
-      border-radius: 10px;
-      font-size: .7em;
-      outline: none;
-      cursor: pointer;
-    }
-
     > :nth-child(2) {
       display: flex;
       gap: 1em;
@@ -54,7 +44,9 @@ const style = {
 
           background-color: var(--table-td-bg-color);
           padding: 1em;
-          border-top: 3px solid var(--table-th-bg-color);
+          border-top: .3em solid var(--table-th-bg-color);
+          border-radius: .5em;
+
           > div {
             display: flex;
             gap: .5em;

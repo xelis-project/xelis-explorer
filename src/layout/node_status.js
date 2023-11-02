@@ -14,7 +14,7 @@ const style = {
       display: flex;
       gap: .5em;
       align-items: center;
-      border-radius: 20px;
+      border-radius: 1em;
       padding: .5em 1em;
       text-transform: uppercase;
       font-size: .9em;
@@ -27,7 +27,7 @@ const style = {
       > :nth-child(1) {
         width: 10px;
         height: 10px;
-        border-radius: 15px;
+        border-radius: 50%;
   
         &[data-status="connected"] {
           background-color: var(--success-color);
@@ -51,7 +51,7 @@ const style = {
       background-color: var(--text-color);
       color: var(--bg-color);
       padding: 1em;
-      border-radius: 10px;
+      border-radius: .5em;
       max-width: 30em;
       display: flex;
       justify-content: center;

@@ -23,7 +23,7 @@ theme.light`
 export const defaultStyle = {
   mobile: css`
     display: flex;
-    gap: 2em;
+    gap: 1em;
     flex-direction: column;
 
     > div {
@@ -33,7 +33,8 @@ export const defaultStyle = {
       flex-direction: column;
       background-color: var(--table-td-bg-color);
       padding: 1em;
-      border-top: 5px solid var(--table-th-bg-color);
+      border-top: .5em solid var(--table-th-bg-color);
+      border-radius: .5em;
 
       > div {
         > :nth-child(1) {
@@ -56,6 +57,7 @@ export const defaultStyle = {
   desktop: css`
     overflow: auto;
     display: none;
+    border-radius: .5em;
 
     ${theme.query.minDesktop} {
       display: block;
@@ -78,11 +80,35 @@ export const defaultStyle = {
       color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
     }
 
+    table thead th {
+      &:first-child {
+        border-top-left-radius: .5em;
+      }
+
+      &:last-child {
+        border-top-right-radius: .5em;
+      }
+    }
+
     table td {
       border-bottom: thin solid ${theme.apply({ xelis: '#232323', dark: '#2b2b2b', light: '#cbcbcb' })};
       background-color: var(--table-td-bg-color);
       padding: .8em 1em;
       color: var(--muted-color);
+    }
+
+    table tr:last-child {
+      td {
+        border-bottom: none;
+      }
+
+      td:first-child {
+        border-bottom-left-radius: .5em;
+      }
+
+      td:last-child {
+        border-bottom-right-radius: .5em;
+      }
     }
 
     table tbody.td-100 td {

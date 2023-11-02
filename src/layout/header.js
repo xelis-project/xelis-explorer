@@ -40,9 +40,12 @@ const headerStyle = {
 
 const menuStyle = {
   button: css`
+    padding: 0.4em 0.5em;
+    background: #00000029;
+    border-radius: 0.5em;
+    display: flex;
     cursor: pointer;
     border: none;
-    background: transparent;
     color: var(--text-color);
     font-size: 1.5em;
     ${scaleOnHover({ scale: `.94` })};
@@ -57,14 +60,17 @@ const menuStyle = {
     padding: 1em;
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-color);
+    background-color: ${theme.apply({ xelis: `rgb(29 59 55 / 80%)`, light: `rgb(250 250 250 / 80%)`, dark: `rgb(16 16 16 / 80%)` })};
     gap: .25em;
     z-index: 1;
     font-size: 1.2em;
     opacity: 0;
     transform: translateY(-100%);
     transition: all .25s;
+    backdrop-filter: blur(5px);
     box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
+    border-bottom-left-radius: .5em;
+    border-bottom-right-radius: .5em;
 
     ${theme.query.minDesktop} {
       max-width: 225px;

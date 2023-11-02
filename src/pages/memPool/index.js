@@ -44,6 +44,9 @@ const style = {
     > :nth-child(2) {
       > :nth-child(1) {
         margin-bottom: 2em;
+        background-color: var(--stats-bg-color);
+        padding: 1em;
+        border-radius: .5em;
       }
     }
 
@@ -225,7 +228,7 @@ function TxsHistoryChart(props) {
   }, [])
 
   return <div>
-    <h2>{t('Last 20 blocks ({} txs)', [totalTxs])}</h2>
+    <div>{t('Last 20 blocks ({} txs)', [totalTxs])}</div>
     <Chart chartRef={chartRef} config={chartConfig} />
   </div>
 }

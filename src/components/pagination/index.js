@@ -17,17 +17,8 @@ export const defaultStyle = {
     align-items: center;
     flex-wrap: wrap;
 
-    select {
-      border: thin solid var(--text-color);
-      border-radius: 25px;
-      padding: .5em 1em;
-      font-weight: bold;
-      outline: none;
-      cursor: pointer;
-    }
-
     button {
-      border-radius: 25px;
+      border-radius: 1em;
       border: thin solid var(--text-color);
       cursor: pointer;
       padding: .5em 1em;

@@ -3,7 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
 import { Text, Segment, Segments, Instance, Instances, MapControls } from '@react-three/drei'
-import { BoxGeometry, MeshBasicMaterial, Vector3 } from 'three'
+import { MeshBasicMaterial, Vector3 } from 'three'
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
@@ -94,10 +95,10 @@ function InstancedLines(props) {
     return blocks.reduce((t, b) => t + b.data.tips.length, 0)
   }, [blocks])
 
-  const [lineWidth, setLineWidth] = useState(5)
+  const [lineWidth, setLineWidth] = useState(1)
   // scale line width based on camera zoom
   useFrame(({ camera }) => {
-    let newLineWidth = 20 * (camera.zoom / 1000)
+    let newLineWidth = 30 * (camera.zoom / 1000)
     setLineWidth(newLineWidth)
   })
 
@@ -127,7 +128,7 @@ function InstancedBlocks(props) {
   const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor } = props
 
   const { theme: currentTheme } = useTheme()
-  const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
+  const geometry = useMemo(() => new RoundedBoxGeometry(1, 1, 1), [])
   const material = useMemo(() => new MeshBasicMaterial(), [])
   /*useFrame(({ gl }) => {
     console.log(gl.info.render.calls)
@@ -224,7 +225,7 @@ function InstancedBlocks(props) {
         scale={boxScale}
         onClick={() => onClick(block)}
       >
-        <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .8, 0]}>
+        <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .85, 0]}>
           {data.hash.slice(-6).toUpperCase()}
         </Text>
         {data.topoheight && <Text name="topoheight" color="black" anchorX="center"

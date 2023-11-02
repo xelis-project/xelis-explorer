@@ -34,6 +34,7 @@ const style = {
     ${theme.query.minDesktop} {
       padding: 4em;
       background-color: var(--stats-bg-color);
+      border-radius: .5em;
 
       > {
         max-width: 700px;
@@ -42,7 +43,7 @@ const style = {
     }
 
     a {
-      border-radius: 30px;
+      border-radius: 1em;
       background-color: var(--text-color);
       color: var(--bg-color);
       padding: .6em 1em;
@@ -64,11 +65,12 @@ const style = {
       
       &::after {
         margin-top:.6em;
-        height: 2px;
-        content: "";
+        height: .1em;
+        content: '';
         background-color: var(--text-color);
         width: 100%;
         display: block;
+        border-radius: .5em;
       }
     }
 

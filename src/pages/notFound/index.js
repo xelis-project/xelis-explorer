@@ -19,9 +19,10 @@ const style = {
       font-size: 7em;
       
       &::after {
-        content: "";
-        height: 1px;
+        content: '';
+        height: .025em;
         width: 100%;
+        border-radius: .5em;
         background-color: var(--text-color);
         display: block;
       }
@@ -38,7 +39,7 @@ const style = {
     }
 
     a {
-      border-radius: 30px;
+      border-radius: 1em;
       background-color: var(--text-color);
       color: var(--bg-color);
       padding: .6em 1em;

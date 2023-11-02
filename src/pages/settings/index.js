@@ -17,25 +17,26 @@ const style = {
   container: css`
     .form-items {
       display: flex;
-      gap: 2em;
+      gap: 3em;
       flex-direction: column;
+      margin-top: 2em;
     }
 
     .form-input {
       display: flex;
       flex-direction: column;
-      border-left: 5px solid var(--text-color);
-      padding-left: 1em;
-      border-radius: 5px;
+      position: relative;
+      margin-left: 1em;
 
       &::before {
         content: '';
         display: block;
-        width: 5px;
+        position: absolute;
+        width: .3em;
         height: 100%;
-        background-color: white;
-        border-radius: 15px;
-        opacity: .5;
+        background-color: rgb(255 255 255 / 25%);
+        border-radius: .5em;
+        left: -1em;
       }
 
       label {
@@ -51,7 +52,7 @@ const style = {
 
       input {
         padding: .7em;
-        border-radius: 10px;
+        border-radius: .5em;
         border: none;
         outline: none;
         font-size: 1.2em;
@@ -76,7 +77,7 @@ const style = {
         gap: .5em;
         padding: .6em .8em;
         cursor: pointer;
-        border-radius: 20px;
+        border-radius: 1em;
         width: 100%;
         font-weight: bold;
         font-size: 1em;

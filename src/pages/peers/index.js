@@ -38,6 +38,7 @@ const style = {
       height: 40em; 
       outline: none;
       background-color: var(--bg-color);
+      border-radius: .5em;
     }
 
     .leaflet-popup-content {

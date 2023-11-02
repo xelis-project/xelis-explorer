@@ -35,9 +35,19 @@ const style = {
         > :nth-child(1) {
           font-weight: bold;
           font-size: 1.2em;
-          margin-bottom: 1em;
-          border-bottom: 3px solid var(--table-th-bg-color);
-          padding-bottom: .5em;
+          margin-bottom: 1.5em;
+          position: relative;
+
+          &::before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: .1em;
+            background-color: var(--text-color);
+            border-radius: .5em;
+            bottom: -.6em;
+          }
         }
       }
 
@@ -91,7 +101,7 @@ const style = {
         color: var(--bg-color);
         background-color: var(--text-color);
         transition: .25s all;
-        border-radius: 5px;
+        border-radius: .5em;
         text-align:left;
         ${scaleOnHover({ scale: .93 })}
       }

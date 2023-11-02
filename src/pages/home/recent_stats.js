@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
-import useNodeSocket from '@xelis/sdk/react/daemon'
-import { useCallback } from 'react'
-import to from 'await-to-js'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
@@ -32,9 +29,10 @@ const style = {
 
       > div {
         padding: 1em;
-        border-left: 3px solid var(--block-border-color);
+        border-left: .3em solid var(--block-border-color);
         background-color: var(--block-bg-color);
         min-width: 9em;
+        border-radius: .25em;
 
         > :nth-child(1) {
           color: var(--muted-color);
@@ -51,8 +49,9 @@ const style = {
     > :nth-child(4) {
       display: flex;
       flex-direction: column;
-      border-left: 3px solid var(--block-border-color);
+      border-left: .3em solid var(--block-border-color);
       background-color: var(--stats-bg-color);
+      border-radius: .25em;
 
       > div {
         display: flex;
@@ -71,6 +70,8 @@ const style = {
           font-weight: bold;
           white-space: nowrap;
           transition: all .25s;
+          border-top-right-radius: .25em;
+          border-bottom-right-radius: .25em;
         }
       }
     }
