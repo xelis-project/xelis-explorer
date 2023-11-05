@@ -100,7 +100,7 @@ export function LangDropdown(props) {
     ]
   }, [t])
 
-  return <Dropdown items={languages} defaultKey={langKey || `en`} size={size} onChange={(item) => {
+  return <Dropdown items={languages} value={langKey || `en`} size={size} onChange={(item) => {
     setLangKey(item.key)
   }} />
 }
@@ -118,7 +118,7 @@ export function ThemeDropdown(props) {
     ]
   }, [t])
 
-  return <Dropdown items={themes} defaultKey={currentTheme} size={size} onChange={(item) => {
+  return <Dropdown items={themes} value={currentTheme} size={size} onChange={(item) => {
     setTheme(item.key)
   }} />
 }

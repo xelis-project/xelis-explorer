@@ -76,7 +76,7 @@ function Pagination(props) {
   }, [sizes])
 
   return <div className={`${styling.pagination} ${className}`} {...restProps}>
-    <Dropdown items={dropdownSizes} onChange={changeSize} defaultKey={state.size} />
+    <Dropdown items={dropdownSizes} onChange={changeSize} value={state.size} />
     <button onClick={setFirstPage} disabled={!canFirstPage} className={!canFirstPage ? `active` : ``}>1</button>
     {(() => {
       const items = []

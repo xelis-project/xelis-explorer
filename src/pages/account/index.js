@@ -203,7 +203,7 @@ function Account() {
             <div>{t('Assets')}</div>
             <div>
               <Dropdown items={dropdownAssets} onChange={onAssetChange}
-                size={.8} defaultKey={XELIS_ASSET} />
+                size={.8} value={XELIS_ASSET} />
             </div>
           </div>
           <div>

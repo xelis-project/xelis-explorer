@@ -87,10 +87,10 @@ const defaultStyle = {
 }
 
 function Dropdown(props) {
-  const { items = [], onChange, defaultKey, size = 1,
+  const { items = [], onChange, value, size = 1,
     notSelectedText = `Choose an option`, prefix = ``, styling = defaultStyle, ...restProps } = props
 
-  const [selectedKey, setSelectedKey] = useState(defaultKey)
+  const [selectedKey, setSelectedKey] = useState(value)
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef()
 
@@ -114,6 +114,10 @@ function Dropdown(props) {
       return document.removeEventListener(`click`, onClick)
     }
   }, [])
+
+  useEffect(() => {
+    setSelectedKey(value)
+  }, [value])
 
   const selectedText = useMemo(() => {
     const item = items.find((item) => item.key === selectedKey)

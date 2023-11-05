@@ -164,7 +164,7 @@ function useOffCanvasTable(props) {
     <div>
       <div className={style.controls}>
         <div>
-          <Dropdown items={dagMaxHeightList} defaultKey={maxHeights} onChange={(item) => {
+          <Dropdown items={dagMaxHeightList} value={maxHeights} onChange={(item) => {
             if (!paused) setInputHeight(height)
             setMaxHeights(item.key)
           }} prefix={t('Block Range: ')} />
