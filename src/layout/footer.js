@@ -1,9 +1,7 @@
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
-import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import packageJSON from '../../package.json'
 import theme from '../style/theme'
 import useTheme from '../hooks/useTheme'
 import { scaleOnHover } from '../style/animate'
@@ -109,28 +107,28 @@ const style = {
   `
 }
 
-function Footer() {
+function Footer(props) {
+  const { title, description, version, pages = [], links = [] } = props
+
   const { setTheme } = useTheme()
   const { t } = useLang()
 
   return <div className={style.container}>
     <div className="layout-max-width">
       <div>
-        <div>{t('XELIS Explorer')}</div>
+        <div>{title}</div>
         <div>
-          {t(`The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.`)}
-          <div>v{packageJSON.version}</div>
+          {description}
+          <div>{version}</div>
         </div>
       </div>
       <div>
         <div>{t('PAGES')}</div>
         <div>
-          <Link to="/blocks">{t('Blocks')}</Link>
-          <Link to="/mempool">{t('Mempool')}</Link>
-          <Link to="/dag">{t('DAG')}</Link>
-          <Link to="/accounts">{t('Accounts')}</Link>
-          <Link to="/peers">{t('Peers')}</Link>
-          <Link to="/settings">{t('Settings')}</Link>
+          {pages.map((page) => {
+            const { link, title } = page
+            return <Link key={link} to={link}>{title}</Link>
+          })}
         </div>
       </div>
       <div>
@@ -144,26 +142,14 @@ function Footer() {
       <div>
         <div>{t('LINKS')}</div>
         <div>
-          <div>
-            <a href="https://xelis.io" target="_blank">{t('Home')}</a>
-            <Icon name="home" />
-          </div>
-          <div>
-            <a href="https://stats.xelis.io" target="_blank">{t('Statistics')}</a>
-            <Icon name="chart-simple" />
-          </div>
-          <div>
-            <a href="https://docs.xelis.io" target="_blank">{t('Documentation')}</a>
-            <Icon name="book" />
-          </div>
-          <div>
-            <a href="https://github.com/xelis-project" target="_blank">GitHub</a>
-            <Icon name="github" type="brands" />
-          </div>
-          <div>
-            <a href="https://discord.gg/z543umPUdj" target="_blank">Discord</a>
-            <Icon name="discord" type="brands" />
-          </div>
+          {links.map((link) => {
+            const { href, title, icon } = link
+
+            return <div key={href}>
+              <a href={href} target="_blank">{title}</a>
+              {icon}
+            </div>
+          })}
         </div>
       </div>
     </div>

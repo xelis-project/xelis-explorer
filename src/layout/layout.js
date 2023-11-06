@@ -1,11 +1,15 @@
 import { Outlet, useLocation } from 'react-router'
 import { css } from 'goober'
+import { useMemo, useRef } from 'react'
+import { useLang } from 'g45-react/hooks/useLang'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import Header from './header'
 import Footer from './footer'
 import NodeStatus from '../layout/node_status'
 import theme from '../style/theme'
 import { opacity } from '../style/animate'
+import packageJSON from '../../package.json'
 
 export const style = {
   background: css`
@@ -105,7 +109,7 @@ export const style = {
     justify-content: space-between;
     height: 100%;
 
-    [data-page="opacity"] {
+    [data-opacity="true"] {
       ${opacity()}
     }
   `,
@@ -132,6 +136,34 @@ export const style = {
 
 function Layout() {
   const location = useLocation()
+  const firstLocation = useRef(location)
+  const { t } = useLang()
+
+  const firstLoad = firstLocation.current.key === location.key
+
+  const footerProps = useMemo(() => {
+    return {
+      title: t('XELIS Explorer'),
+      description: t(`The explorer allows to track and verify transactions on the XELIS network. You can search for specific transactions and monitor the overall health of the network.`),
+      version: `v${packageJSON.version}`,
+      links: [
+        { href: `https://xelis.io`, title: t('Home'), icon: <Icon name="home" /> },
+        { href: `https://stats.xelis.io`, title: t('Statistics'), icon: <Icon name="chart-simple" /> },
+        { href: `https://docs.xelis.io`, title: t('Documentation'), icon: <Icon name="book" /> },
+        { href: `https://github.com/xelis-project`, title: `GitHub`, icon: <Icon name="github" type="brands" /> },
+        { href: `https://discord.gg/z543umPUdj`, title: `Discord`, icon: <Icon name="discord" type="brands" /> },
+      ],
+      pages: [
+        { link: `/`, title: t('Home') },
+        { link: `/blocks`, title: t('Blocks') },
+        { link: `/mempool`, title: t('Mempool') },
+        { link: `/dag`, title: t('DAG') },
+        { link: `/accounts`, title: t('Accounts') },
+        { link: `/peers`, title: t('Peers') },
+        { link: `/settings`, title: t('Settings') },
+      ]
+    }
+  }, [t])
 
   return <>
     <div className={style.background} />
@@ -150,11 +182,11 @@ function Layout() {
       <div className={style.layoutFlex}>
         <div className="layout-max-width">
           <Header />
-          <div data-page="opacity" key={location.key}> {/* Keep location key to re-trigger page transition animation */}
+          <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>
         </div>
-        <Footer />
+        <Footer {...footerProps} />
       </div>
     </div>
   </>

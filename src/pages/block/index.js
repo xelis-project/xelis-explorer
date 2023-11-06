@@ -182,9 +182,11 @@ function Block() {
       {err && <div className="error">{displayError(err)}</div>}
       {!err && <div className="controls">
         <div>
-          {t('This block was mined by {}.', [formatBlock.miner])}
-          {t('It currently has {} confirmations.', [formatBlock.confirmations])}
-          {t('The miner of this block earned {}.', [formatBlock.reward])}
+          {!loading && <>
+            {t('This block was mined by {}.', [formatBlock.miner])}
+            {t('It currently has {} confirmations.', [formatBlock.confirmations])}
+            {t('The miner of this block earned {}.', [formatBlock.reward])}
+          </>}
         </div>
         <div className="buttons">
           <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>

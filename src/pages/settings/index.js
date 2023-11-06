@@ -1,17 +1,14 @@
 import { css } from 'goober'
 import { useState } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
-import Icon from 'g45-react/components/fontawesome_icon'
 
 import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
 import theme from '../../style/theme'
 import Button from '../../components/button'
 import { scaleOnHover } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
-import Dropdown from '../../components/dropdown'
-import { useMemo } from 'react'
-import useTheme from '../../hooks/useTheme'
-import FlagIcon from '../../components/flagIcon'
+import ThemeDropdown from './theme_dropdown'
+import LangDropdown from './lang_dropdown'
 
 const style = {
   container: css`
@@ -34,7 +31,7 @@ const style = {
         position: absolute;
         width: .3em;
         height: 100%;
-        background-color: rgb(255 255 255 / 25%);
+        background-color: ${theme.apply({ xelis: `rgb(255 255 255 / 25%)`, dark: `rgb(241 241 241)`, light: `rgb(28 28 28)` })};
         border-radius: .5em;
         left: -1em;
       }
@@ -88,51 +85,13 @@ const style = {
   `
 }
 
-export function LangDropdown(props) {
-  const { size } = props
-  const { t, langKey, setLangKey } = useLang()
-
-  const languages = useMemo(() => {
-    return [
-      { key: `en`, text: <><FlagIcon code="us" />&nbsp;&nbsp;{t(`English`)}</> },
-      { key: `fr`, text: <><FlagIcon code="fr" />&nbsp;&nbsp;{t(`French`)}</> },
-      { key: `es`, text: <><FlagIcon code="es" />&nbsp;&nbsp;{t(`Spanish`)}</> }
-    ]
-  }, [t])
-
-  return <Dropdown items={languages} value={langKey || `en`} size={size} onChange={(item) => {
-    setLangKey(item.key)
-  }} />
-}
-
-export function ThemeDropdown(props) {
-  const { size } = props
-  const { theme: currentTheme, setTheme } = useTheme()
-  const { t } = useLang()
-
-  const themes = useMemo(() => {
-    return [
-      { key: `xelis`, text: <><Icon name="palette" />&nbsp;&nbsp;{t(`Default`)}</> },
-      { key: `dark`, text: <><Icon name="moon" />&nbsp;&nbsp;{t(`Dark`)}</> },
-      { key: `light`, text: <><Icon name="sun" />&nbsp;&nbsp;{t(`Light`)}</> }
-    ]
-  }, [t])
-
-  return <Dropdown items={themes} value={currentTheme} size={size} onChange={(item) => {
-    setTheme(item.key)
-  }} />
-}
-
 function Settings() {
   const { settings, setValue } = useSettings()
-
+  const { t } = useLang()
 
   const [nodeEnpoint, setNodeEndpoint] = useState(() => {
     return settings[settingsKeys.NODE_WS_ENDPOINT]
   })
-
-  const { t } = useLang()
-
 
   return <div className={style.container}>
     <PageTitle title={t('Settings')} subtitle={t('This page allows you to change explorer settings.')}
