@@ -6,7 +6,6 @@
     "make-lang": "node ./node_modules/g45-react/lang-dict.js --src ./src --outfile ./lang/en.json",
     "bundle": "shx cp -n ./env/local_dev.json ./bundler-define.json && node ./node_modules/g45-react/bundler.js --entry ./src/routes.js",
     "build-dev:index": "npm run bundle -- --type index --watch --sourcemap",
-    "start-dev:index": "live-server ./dist/index --port=3001 --entry-file=index.html",
     "build-dev:cf": "npm run bundle -- --type cf_worker --watch --sourcemap",
     "start-dev:cf": "npx wrangler pages dev ./dist/cf --port=3000 --live-reload",
     "build-dev:node": "npm run bundle -- --type node_server --watch --sourcemap",
@@ -45,7 +44,7 @@
     "three": "^0.150.1"
   },
   "devDependencies": {
-    "g45-react": "^0.1.4",
+    "g45-react": "^0.1.5",
     "node-dev": "^8.0.0",
     "shx": "^0.3.4",
     "wrangler": "^3.10.1"

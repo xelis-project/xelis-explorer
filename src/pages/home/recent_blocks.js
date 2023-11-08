@@ -131,7 +131,7 @@ export function RecentBlocks(props) {
         const animateClassName = newBlockHash === block.hash ? `animate` : null
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={animateClassName}>
-          <div>{t('Block {}', [block.topoheight])}</div>
+          <div>{t('Block {}', [block.topoheight || ``])}</div>
           <div>{txCount} txs | {size}</div>
           <div>{reduceText(block.miner, 0, 7) || '--'}</div>
           <div>

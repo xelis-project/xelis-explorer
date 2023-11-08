@@ -18,7 +18,7 @@ export const style = {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: ${theme.apply({ xelis: `url('/public/img/bg_xelis.jpg')`, dark: `url('/public/img/bg_xelis_dark.jpg')`, light: `url('/public/img/bg_xelis_light.jpg')` })};
+    background-image: ${theme.apply({ xelis: `url('public/img/bg_xelis.jpg')`, dark: `url('public/img/bg_xelis_dark.jpg')`, light: `url('public/img/bg_xelis_light.jpg')` })};
     background-repeat: no-repeat;
     background-size: cover;
     background-position: top center;
@@ -40,7 +40,7 @@ export const style = {
       position: fixed;
       width: 200%;
       height: 200vh;
-      background-image: url('/public/img/noise.jpg');
+      background-image: url('public/img/noise.jpg');
       filter: blur(0px);
       opacity: 0.05;
     }

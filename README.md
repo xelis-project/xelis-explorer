@@ -27,8 +27,8 @@ Using cloudflare wrangler:
 Using node server:  
 `npm run build-dev:node` and `npm run start-dev:node`
 
-Using index (no ssr, use browser to load html):  
-`npm run build-dev:index` and `npm run start-dev:index`
+Using index (no ssr, no server, use browser to load html):  
+`npm run build-dev:index`
 
 ## Production
 
@@ -38,5 +38,5 @@ will automatically build and deploy to cloudflare.
 Build for your own node server:  
 `npm run build-prod:node` and run `node ./dist/node_server/node_server.js`.
 
-Build the single page app (no ssr):  
-`npm run build-prod:index` and check the `./dist/index` folder the `index.html` file.
+Build the single page app (no ssr and no server):  
+`npm run build-prod:index` and check the `./dist/index` folder to open `index.html` with the browser.

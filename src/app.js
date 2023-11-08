@@ -34,13 +34,13 @@ function App(props) {
   return <ThemeProvider>
     <SettingsProvider>
       <Helmet titleTemplate='%s · XELIS Explorer'>
-        <link rel="preload" as="image" href="/public/img/bg_xelis.jpg" />
-        <link rel="preload" as="image" href="/public/img/bg_xelis_light.jpg" />
-        <link rel="preload" as="image" href="/public/img/bg_xelis_dark.jpg" />
-        <link rel="preload" as="image" href="/public/img/black_background_white_logo.svg" type="image/svg+xml" />
-        <link rel="preload" as="image" href="/public/img/white_background_black_logo.svg" type="image/svg+xml" />
-        <link rel="preload" as="font" type="font/woff2" href="/public/fa-brands-400-WYBTWVAN.woff2" crossOrigin="anonymous" />
-        <link rel="preload" as="font" type="font/woff2" href="/public/fa-solid-900-7UFRKXGW.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="image" href="public/img/bg_xelis.jpg" />
+        <link rel="preload" as="image" href="public/img/bg_xelis_light.jpg" />
+        <link rel="preload" as="image" href="public/img/bg_xelis_dark.jpg" />
+        <link rel="preload" as="image" href="public/img/black_background_white_logo.svg" type="image/svg+xml" />
+        <link rel="preload" as="image" href="public/img/white_background_black_logo.svg" type="image/svg+xml" />
+        <link rel="preload" as="font" type="font/woff2" href="public/fa-brands-400-WYBTWVAN.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href="public/fa-solid-900-7UFRKXGW.woff2" crossOrigin="anonymous" />
         <style>{css}</style> {/* Don't use id="_goober" or css will flicker. Probably an issue with goober reseting css.*/}
       </Helmet>
       <SubApp />
