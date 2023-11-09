@@ -126,7 +126,7 @@ function Account() {
   const { firstPageLoad } = usePageLoad()
   //const serverResult = loadAccount_SSR({ addr })
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [account, setAccount] = useState({})
   const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
@@ -247,7 +247,7 @@ function History(props) {
 
   const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [history, setHistory] = useState([])
   const { t } = useLang()

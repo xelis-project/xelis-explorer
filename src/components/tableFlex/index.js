@@ -174,7 +174,7 @@ function TableFlex(props) {
     </div>
     <div className={styling.desktop}>
       <table>
-        {data.length !== 1 && <thead>
+        {(displayTable || data.length !== 1) && <thead>
           <tr>
             {headers.map((header, index) => {
               return <th key={index}>{header.title}</th>

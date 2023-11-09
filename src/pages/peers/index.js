@@ -18,6 +18,17 @@ import FlagIcon from '../../components/flagIcon'
 
 const style = {
   container: css`
+    > :nth-child(2) {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+  
+      h2 {
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+    }
+
     .fly-to-button {
       background: var(--text-color);
       color: var(--bg-color);
@@ -31,7 +42,7 @@ const style = {
   `,
   map: css`
     position: relative;
-    margin-bottom: 2em;
+    z-index: 0;
 
     .leaflet-container {
       width: 100%; 
@@ -84,7 +95,7 @@ const style = {
 
 function Peers() {
   const nodeSocket = useNodeSocket()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [peers, setPeers] = useState([])
   const [geoLoading, setGeoLoading] = useState(true)
   const [geoLocation, setGeoLocation] = useState({})
@@ -167,19 +178,24 @@ function Peers() {
   return <div className={style.container}>
     <PageTitle title={t('Peers')} subtitle={t('{} beautiful peers', [peers.length])}
       metaDescription={t('Map with list of network peers. Monitor connected peers, network status and geo location.')} />
-    <Map mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
-    <Table loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
+    <div>
+      <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
+      <h2>{t(`Connected Node`)}</h2>
+      <ConnectedNodeTable />
+      <h2>{t(`Peer List`)}</h2>
+      <TablePeers loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
+    </div>
   </div>
 }
 
 export default Peers
 
-function Table(props) {
+function TablePeers(props) {
   const { loading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   const { t } = useLang()
 
-  return <TableFlex loading={loading} err={err} data={peers} emptyText={t('No peers')}
+  return <TableFlex keepTableDisplay loading={loading} err={err} data={peers} emptyText={t('No peers')}
     rowKey="id"
     headers={[
       {
@@ -298,7 +314,7 @@ function MapControls(props) {
   </div>
 }
 
-function Map(props) {
+function MapPeers(props) {
   const { mapRef, peers, geoLocation } = props
 
   const { theme } = useTheme()
@@ -392,4 +408,105 @@ function Map(props) {
     {mapContainer && <MapControls controls={controls} setControls={setControls} mapRef={mapRef} />}
     {mapContainer}
   </div>
+}
+
+function ConnectedNodeTable() {
+  const nodeSocket = useNodeSocket()
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState()
+  const [data, setData] = useState([])
+  const { t } = useLang()
+
+  const loadP2PStatus = useCallback(async ({ showLoading = true } = {}) => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    setErr(null)
+    if (showLoading) setLoading(true)
+
+    const resErr = (err) => {
+      setErr(err)
+      setLoading(false)
+    }
+
+    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
+    if (err) return resErr(err)
+
+    const [err2, res2] = await to(nodeSocket.daemon.getInfo())
+    if (err2) return resErr(err)
+
+    setLoading(false)
+    setData([{ ...res, ...res2 }])
+  }, [nodeSocket])
+
+  useEffect(() => {
+    loadP2PStatus()
+  }, [loadP2PStatus])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: () => loadP2PStatus({ showLoading: false })
+  }, [loadP2PStatus])
+
+  return <TableFlex keepTableDisplay loading={loading} err={err} data={data} emptyText={t('Not connected')}
+    rowKey="peer_id"
+    headers={[
+      {
+        key: 'peer_id',
+        title: t('Peer ID'),
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'peer_count',
+        title: t('Peers'),
+        render: (value, item) => {
+          return `${value || 0} (${item.max_peers || 0} max)`
+        }
+      },
+      {
+        key: 'tag',
+        title: t('Tag'),
+        render: (value) => {
+          if (value) return reduceText(value, 20, 0)
+          return `--`
+        }
+      },
+      {
+        key: 'height',
+        title: t('Height'),
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'topoheight',
+        title: t('Topo'),
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'pruned_topoheight',
+        title: t('Pruned Topo'),
+        render: (value) => {
+          return value || `--`
+        }
+      },
+      {
+        key: 'network',
+        title: t('Network'),
+        render: (value) => {
+          return value
+        }
+      },
+      {
+        key: 'version',
+        title: t('Version'),
+        render: (value) => {
+          return value
+        }
+      },
+    ]}
+  />
 }
