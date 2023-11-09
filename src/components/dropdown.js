@@ -14,9 +14,9 @@ const defaultStyle = {
 
   > :nth-child(1) {
     padding: .5em;
-    border: 1px solid var(--dropdown-text-color);
+    border: thin solid var(--dropdown-text-color);
     background-color: var(--dropdown-bg-color);
-    border-radius: 10px;
+    border-radius: .5em;
     cursor: pointer;
     display: flex;
     gap: .5em;
@@ -38,19 +38,18 @@ const defaultStyle = {
   > :nth-child(2) {
     position: absolute;
     width: 100%;
-    clip-path: inset(-10px 0 0 0);
+    clip-path: inset(-.5em 0 0 0);
     visibility: hidden;
     z-index: 1;
   
     > div {
-      border: 1px solid var(--dropdown-text-color);
+      border: thin solid var(--dropdown-text-color);
       background-color: var(--dropdown-bg-color);
       overflow: auto;
-      cursor: pointer;
       transition: .25s all;
       max-height: 10em;
-      margin-top: -10px;
-      padding-top: 10px;
+      margin-top: -.5em;
+      padding-top: .5em;
       border-bottom-right-radius: 15px;
       border-top: none;
       border-bottom-left-radius: 15px;
@@ -60,10 +59,14 @@ const defaultStyle = {
       > div {
         user-select: none;
         padding: .5em;
+        cursor: pointer;
 
-        &:hover {
-          background-color: white;
-          color: black;
+        &[data-separator="true"] {
+          border-bottom: thin solid var(--dropdown-text-color);
+          opacity: .5;
+          background-color: inherit;
+          color: inherit;
+          cursor: inherit;
         }
       }
     }
@@ -80,6 +83,13 @@ const defaultStyle = {
       > div {
         transform: translateY(0);
         opacity: 1;
+
+        > div {
+          &:hover {
+            background-color: var(--dropdown-text-color);
+            color: var(--dropdown-bg-color);
+          }
+        }
       }
     }
   }
@@ -119,21 +129,27 @@ function Dropdown(props) {
     setSelectedKey(value)
   }, [value])
 
-  const selectedText = useMemo(() => {
-    const item = items.find((item) => item.key === selectedKey)
-    if (item) return item.text
-    return notSelectedText
+  const selectedItem = useMemo(() => {
+    return items.find((item) => item.key === selectedKey)
   }, [selectedKey, items])
 
   return <div ref={dropdownRef} data-open={open} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
     <div onClick={() => setOpen(!open)}>
-      <div>{prefix}{selectedText}</div>
+      <div>{selectedItem ? <>{prefix}{selectedItem.text}</> : notSelectedText}</div>
       <Icon name="arrow-down" />
     </div>
     <div>
       <div>
         {items.map((item) => {
-          return <div key={item.key} onClick={() => onSelect(item)}>{item.text}</div>
+          if (item.type === `separator`) {
+            return <div key={item.key} data-separator="true">
+              {item.text}
+            </div>
+          }
+
+          return <div key={item.key} onClick={() => onSelect(item)}>
+            {item.text}
+          </div>
         })}
       </div>
     </div>
