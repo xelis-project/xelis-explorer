@@ -1,5 +1,6 @@
 import { css } from 'goober'
 import { useNodeSocket, INITIATING } from '@xelis/sdk/react/daemon'
+import WebSocket from 'isomorphic-ws'
 
 import DotLoading from '../components/dotLoading'
 import { useLang } from 'g45-react/hooks/useLang'
