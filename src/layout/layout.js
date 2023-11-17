@@ -10,6 +10,7 @@ import NodeStatus from '../layout/node_status'
 import theme from '../style/theme'
 import { opacity } from '../style/animate'
 import packageJSON from '../../package.json'
+import Menu from './menu'
 
 export const style = {
   background: css`
@@ -165,6 +166,18 @@ function Layout() {
     }
   }, [t])
 
+  const links = useMemo(() => {
+    return [
+      { path: `/`, title: t(`Home`), icon: <Icon name="house" /> },
+      { path: `/blocks`, title: t(`Blocks`), icon: <Icon name="boxes-stacked" /> },
+      { path: `/mempool`, title: t(`Mempool`), icon: <Icon name="square-poll-horizontal" /> },
+      { path: `/dag`, title: `DAG`, icon: <Icon name="network-wired" /> },
+      { path: `/accounts`, title: t(`Accounts`), icon: <Icon name="user-group" /> },
+      { path: `/peers`, title: t(`Peers`), icon: <Icon name="ethernet" /> },
+      { path: `/settings`, title: t(`Settings`), icon: <Icon name="gear" /> }
+    ]
+  }, [t])
+
   return <>
     <div className={style.background} />
     {/*
@@ -181,7 +194,7 @@ function Layout() {
       </div>
       <div className={style.layoutFlex}>
         <div className="layout-max-width">
-          <Header />
+          <Header title={t(`Explorer`)} menu={<Menu links={links} />} />
           <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>
