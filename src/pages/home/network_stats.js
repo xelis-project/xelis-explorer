@@ -218,8 +218,8 @@ export function NetworkStats(props) {
   const stats = useMemo(() => {
     const data = info || {}
 
-    const maxSupply = 1840000000000
-    const mined = ((data.native_supply || 0) * 100 / maxSupply).toFixed(2)
+    const maxSupply = data.maximum_supply || 0
+    const mined = ((data.circulating_supply || 0) * 100 / maxSupply).toFixed(2)
 
     const labels = []
     const difficultyHistory = []
@@ -248,7 +248,7 @@ export function NetworkStats(props) {
 
     return [
       { title: t(`Max Supply`), render: () => formatXelis(maxSupply, { withSuffix: false }) },
-      { title: t(`Circulating Supply`), render: () => formatXelis(data.native_supply, { withSuffix: false }) },
+      { title: t(`Circulating Supply`), render: () => formatXelis(data.circulating_supply, { withSuffix: false }) },
       { title: t(`Mined`), render: () => `${mined}%` },
 
       { title: t(`Topo Height`), render: () => (data.topoheight || 0).toLocaleString() },
