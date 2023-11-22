@@ -106,7 +106,7 @@ function HeightRangeInput(props) {
   const [_value, setValue] = useState()
 
   let value = _value ? _value : inputHeight || 0
-  const min = Math.max(0, height - 1000)
+  const min = 0 //Math.max(0, height - 1000)
   return <div>
     <div>Height: {value}</div>
     <input type="range" value={value} step={1}
@@ -140,19 +140,20 @@ function useOffCanvasTable(props) {
   const [opened, setOpened] = useState(false)
   const [paused, setPaused] = useState(searchHeight ? true : false)
   const [hideOrphaned, setHideOrphaned] = useState(false)
+  const [hideLines, setHideLines] = useState(false)
   const [inputHeight, setInputHeight] = useState(searchHeight)
-  const [maxHeights, setMaxHeights] = useState(20)
+  const [blocksRange, setBlocksRange] = useState(20)
 
   useEffect(() => {
-    if (!inputHeight) setInputHeight(height)
+    if (typeof inputHeight === `undefined` || inputHeight === null) setInputHeight(height)
   }, [height, inputHeight])
 
   const filteredBlocks = useMemo(() => {
-    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned').sort((a, b) => b.height - a.height)
-    return blocks.sort((a, b) => b.height - a.height)
+    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned').sort((a, b) => b.topoheight - a.topoheight)
+    return blocks.sort((a, b) => b.topoheight - a.topoheight)
   }, [hideOrphaned, blocks])
 
-  const dagMaxHeightList = useMemo(() => {
+  const blocksRangeList = useMemo(() => {
     return [
       { key: 20, text: `20` },
       { key: 50, text: `50` },
@@ -164,15 +165,19 @@ function useOffCanvasTable(props) {
     <div>
       <div className={style.controls}>
         <div>
-          <Dropdown items={dagMaxHeightList} value={maxHeights} onChange={(item) => {
+          <Dropdown items={blocksRangeList} value={blocksRange} onChange={(item) => {
             if (!paused) setInputHeight(height)
-            setMaxHeights(item.key)
+            setBlocksRange(item.key)
           }} prefix={t('Block Range: ')} />
         </div>
         <div>
           <div>
             <Switch checked={hideOrphaned} onChange={() => setHideOrphaned(!hideOrphaned)} />
             <label>{t('Hide Orphaned')}</label>
+          </div>
+          <div>
+            <Switch checked={hideLines} onChange={() => setHideLines(!hideLines)} />
+            <label>{t('Hide Lines')}</label>
           </div>
           <div>
             <Button onClick={() => {
@@ -186,13 +191,21 @@ function useOffCanvasTable(props) {
         </div>
       </div>
       {paused && <div className={style.navControls}>
-        <HeightRangeInput height={height} inputHeight={inputHeight} setInputHeight={setInputHeight} />
+        <HeightRangeInput height={height} inputHeight={inputHeight} setInputHeight={setInputHeight} min={0} />
         <div>
-          <button onClick={() => setInputHeight(inputHeight - 1)}>{t('Previous')}</button>
-          <button onClick={() => setInputHeight(inputHeight - 10)}>{t('Previous (10)')}</button>
-          <button onClick={() => setInputHeight(inputHeight + 10)}>{t('Next (10)')}</button>
-          <button onClick={() => setInputHeight(inputHeight + 1)}>{t('Next')}</button>
-          <button onClick={() => setInputHeight(height)}>{t('Reset')}</button>
+          <button onClick={() => setInputHeight(inputHeight - 1)} disabled={inputHeight - 1 < 0}>
+            {t('Previous')}
+          </button>
+          <button onClick={() => setInputHeight(inputHeight + 1)}>
+            {t('Next')}</button>
+          <button onClick={() => setInputHeight(inputHeight - 10)} disabled={inputHeight - 10 < 0}>
+            {t('Previous (10)')}</button>
+          <button onClick={() => setInputHeight(inputHeight + 10)}>
+            {t('Next (10)')}
+          </button>
+          <button onClick={() => setInputHeight(height)}>
+            {t('Reset')}
+          </button>
         </div>
       </div>}
     </div>
@@ -204,7 +217,7 @@ function useOffCanvasTable(props) {
         const blockType = getBlockType(block, stableHeight)
         return <tr key={block.hash} onClick={() => onBlockClick(block)}>
           <td>
-            <span>{block.topoheight}</span>&nbsp;
+            <span>{block.topoheight || `?`}</span>&nbsp;
             <span title={t('Height')}>({block.height})</span>&nbsp;
           </td>
           <td style={{ color: blockColor.value(currentTheme, blockType) }}>
@@ -219,7 +232,7 @@ function useOffCanvasTable(props) {
       }} />
   </OffCanvas>
 
-  return { render, setOpened, paused, inputHeight, hideOrphaned, maxHeights }
+  return { render, setOpened, paused, inputHeight, hideOrphaned, blocksRange, hideLines }
 }
 
 export default useOffCanvasTable

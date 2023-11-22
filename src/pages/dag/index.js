@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
@@ -10,6 +10,7 @@ import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import TWEEN from '@tweenjs/tween.js'
 import Age from 'g45-react/components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { groupBy } from '../../utils'
 import Button from '../../components/button'
@@ -21,7 +22,6 @@ import useTheme from '../../hooks/useTheme'
 import BottomInfo from './bottomInfo'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
-import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   canvas: css`
@@ -89,11 +89,7 @@ export function getBlockType(block, stableHeight) {
 }
 
 function InstancedLines(props) {
-  const { blocks = [], hoveredBlock } = props
-
-  const count = useMemo(() => {
-    return blocks.reduce((t, b) => t + b.data.tips.length, 0)
-  }, [blocks])
+  const { blocks = [], hoveredBlock, offCanvasTable } = props
 
   const [lineWidth, setLineWidth] = useState(1)
   // scale line width based on camera zoom
@@ -102,26 +98,58 @@ function InstancedLines(props) {
     setLineWidth(newLineWidth)
   })
 
+  const unhoveredBlocks = useMemo(() => {
+    return blocks.filter((b) => {
+      if (hoveredBlock) return b.data.hash !== hoveredBlock.data.hash
+      return true
+    })
+  }, [blocks, hoveredBlock])
+
+  const unhoveredCount = useMemo(() => {
+    return unhoveredBlocks.reduce((t, b) => t + b.data.tips.length, 0)
+  }, [unhoveredBlocks])
+
+  const hoveredBlocks = useMemo(() => {
+    return blocks.filter((b) => {
+      if (hoveredBlock) return b.data.hash === hoveredBlock.data.hash
+      return false
+    })
+  }, [blocks, hoveredBlock])
+
+  const hoveredCount = useMemo(() => {
+    return hoveredBlocks.reduce((t, b) => t + b.data.tips.length, 0)
+  }, [hoveredBlocks])
+
+
   // make sure key is count or won't unmount - https://github.com/pmndrs/drei/issues/923
-  return <Segments key={count} lineWidth={lineWidth} >
-    {blocks.map((block) => {
-      let { data, x, y } = block
-      return data.tips.map((tip) => {
-        const blockTip = blocks.find((b) => b.data.hash === tip)
-        if (!blockTip) return null
+  return <>
+    {!offCanvasTable.hideLines && <Segments key={unhoveredCount} limit={5000} lineWidth={lineWidth} transparent opacity={0.3}>
+      {unhoveredBlocks.map((block) => {
+        let { data, x, y } = block
+        return data.tips.map((tip) => {
+          const blockTip = blocks.find((b) => b.data.hash === tip)
+          if (!blockTip) return null
 
-        let z = 0
-        let color = `lightgray`
-        if (hoveredBlock && hoveredBlock.data.hash === data.hash) {
-          color = `yellow`
-          z = 1
-        }
+          const key = data.hash + tip
+          const z = 0
+          return <Segment key={key} start={[blockTip.x, blockTip.y, z]} end={[x, y, z]} />
+        })
+      })}
+    </Segments>}
+    <Segments key={hoveredCount} lineWidth={lineWidth} transparent>
+      {hoveredBlocks.map((block) => {
+        let { data, x, y } = block
+        return data.tips.map((tip) => {
+          const blockTip = blocks.find((b) => b.data.hash === tip)
+          if (!blockTip) return null
 
-        const key = data.hash + tip
-        return <Segment key={key} start={[blockTip.x, blockTip.y, z]} end={[x, y, z]} color={color} />
-      })
-    })}
-  </Segments>
+          const key = data.hash + tip
+          const z = 1
+          return <Segment key={key} start={[blockTip.x, blockTip.y, z]} end={[x, y, z]} />
+        })
+      })}
+    </Segments>
+  </>
 }
 
 function InstancedBlocks(props) {
@@ -225,7 +253,7 @@ function InstancedBlocks(props) {
         scale={boxScale}
         onClick={() => onClick(block)}
       >
-        <Text name="hash" color="gray" anchorX="center" anchorY="top" fontSize={.3} position={[0, .85, 0]}>
+        <Text name="hash" color="white" anchorX="center" anchorY="top" fontSize={.3} position={[0, .85, 0]}>
           {data.hash.slice(-6).toUpperCase()}
         </Text>
         {data.topoheight && <Text name="topoheight" color="black" anchorX="center"
@@ -258,10 +286,6 @@ function DAG() {
   const { t } = useLang()
 
   const stableHeight = info.stableheight
-
-  //const fetchMaxBlockHeight = 20
-  //const maxHeights = 100
-  //const displayMaxBlockHeight = 20
 
   const offCanvasBlock = useOffCanvasBlock({ info })
 
@@ -296,13 +320,14 @@ function DAG() {
 
     let newBlocks = []
     const batch = 20
-    let start = Math.max(0, inputHeight - offCanvasTable.maxHeights)
-    for (let i = start; i <= inputHeight; i += batch) {
-      let end = i + batch - 1
-      if (end > inputHeight) end = inputHeight
+    let start = Math.max(-1, inputHeight - offCanvasTable.blocksRange)
+    let end = start + offCanvasTable.blocksRange
+    for (let i = start; i <= end; i += batch) {
+      let next = i + batch
+      if (next > end) break
       const [err, data] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
-        start_height: i,
-        end_height: end
+        start_height: i + 1,
+        end_height: next
       }))
       if (err) return resErr(err)
       newBlocks = [...newBlocks, ...data]
@@ -310,7 +335,7 @@ function DAG() {
 
     setBlocks(newBlocks)
     setLoading(false)
-  }, [offCanvasTable.inputHeight, offCanvasTable.maxHeights, nodeSocket])
+  }, [offCanvasTable.inputHeight, offCanvasTable.blocksRange, nodeSocket])
 
   useEffect(() => {
     if (offCanvasTable.paused) return
@@ -330,7 +355,7 @@ function DAG() {
         setBlocks((blocks) => {
           const entries = [...groupBy(blocks, (b) => b.height).entries()]
           entries.sort((a, b) => a[0] - b[0])
-          if (entries.length >= offCanvasTable.maxHeights) {
+          if (entries.length >= offCanvasTable.blocksRange) {
             const height = entries[0][0]
             blocks = blocks.filter(b => b.height !== height)
           }
@@ -340,7 +365,7 @@ function DAG() {
         })
       }
     }
-  }, [offCanvasTable.paused, offCanvasTable.maxHeights])
+  }, [offCanvasTable.paused, offCanvasTable.blocksRange])
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrdered,
@@ -357,9 +382,11 @@ function DAG() {
     }
   }, [offCanvasTable.paused])
 
-  const distance = 2
+  const distanceX = 2.5
+  const distanceY = 2
   const [blocksToRender, setBlocksToRender] = useState([])
   const [heightsText, setHeightsText] = useState([])
+  const [heightCount, setHeightCount] = useState(0)
 
   useEffect(() => {
     let filteredBlocks = blocks
@@ -371,20 +398,24 @@ function DAG() {
     const heightsText = []
     const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()]
     entries.sort((a, b) => a[0] - b[0])
+    setHeightCount(entries.length)
 
     entries.forEach(([height, innerBlocks], heightIndex) => {
-      innerBlocks.sort((a, b) => a.topoheight - b.topoheight) // when dag is paused make sure its sorted to avoid displacement when fetching next block
+      innerBlocks.sort((a, b) => {
+        return a.hash.localeCompare(b.hash) // sort with hash because orphan block have null topoheight
+        // return a.topoheight - b.topoheight
+      }) // when dag is paused make sure its sorted to avoid displacement when fetching next block
       let evenCount = 0, oddCount = 0
 
-      const x = heightIndex * distance
+      const x = heightIndex * distanceX
 
       innerBlocks.forEach((block, blockIndex) => {
         let y = 0
         if (innerBlocks.length > 1) {
           if (blockIndex % 2 === 0) {
-            y = evenCount++ * distance + 1
+            y = evenCount++ * distanceY + 1
           } else {
-            y = oddCount-- * distance - 1
+            y = oddCount-- * distanceY - 1
           }
         }
 
@@ -392,7 +423,7 @@ function DAG() {
 
         if (innerBlocks.length - 1 === blockIndex) {
           //const x = x * distance
-          y = Math.min(-0.5, -Math.floor(innerBlocks.length / 2)) * distance
+          y = Math.min(-0.5, -Math.floor(innerBlocks.length / 2)) * distanceY
           heightsText.push({ height, x, y })
         }
       })
@@ -432,16 +463,16 @@ function DAG() {
         }}
       >
         <CanvasFrame />
-        <MapControls maxZoom={200} minZoom={10} enableDamping={false} enableRotate={false} />
-        <group position={[-((offCanvasTable.maxHeights * 2) - 2), 0, 0]}>
+        <MapControls maxZoom={200} minZoom={5} enableDamping={false} enableRotate={false} />
+        <group position={[-((heightCount * distanceX) - 2), 0, 0]}>
           <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight}
             newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock}
             hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
-          <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} />
+          <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} offCanvasTable={offCanvasTable} />
           {heightsText.map((text) => {
             const { height, x, y } = text
             return <Text key={height} color="white" anchorX="center"
-              anchorY="middle" fontSize={.20} position={[x, y + 0.25, 4]}>
+              anchorY="middle" fontSize={.25} position={[x, y + 0.2, 4]}>
               {height.toLocaleString()}
             </Text>
           })}
