@@ -32,9 +32,9 @@ const style = {
 }
 
 function Header(props) {
-  const { title, menu } = props
+  const { title, menu, ...restProps } = props
 
-  return <div className={style.container} {...props}>
+  return <div className={style.container} {...restProps}>
     <Link to="/" className={style.logo}>
       <div>{/* LOGO */}</div>
       <div>{title}</div>
