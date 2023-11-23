@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
@@ -12,9 +12,9 @@ import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
-import { useRef } from 'react'
 import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -28,8 +28,14 @@ const style = {
         font-weight: bold;
       }
     }
+  `,
+  tableRowLocation: css`
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    flex-wrap: wrap;
 
-    .fly-to-button {
+    button {
       background: var(--text-color);
       color: var(--bg-color);
       border: none;
@@ -37,7 +43,7 @@ const style = {
       padding: 0.3em 0.6em;
       font-weight: bold;
       cursor: pointer;
-      margin-left: 1em;
+      ${scaleOnHover()}
     }
   `,
   map: css`
@@ -201,89 +207,91 @@ function TablePeers(props) {
     document.body.scrollTop = 0
   }, [])
 
-  return <TableFlex keepTableDisplay loading={loading} err={err} data={peers} emptyText={t('No peers')}
-    rowKey="id"
-    headers={[
-      {
-        key: 'addr',
-        title: t('Address'),
-        render: (value) => {
-          return value
-        }
-      },
-      {
-        key: 'location',
-        title: t('Location'),
-        render: (_, item) => {
-          const data = geoLocation[item.ip]
-          if (data && data.country && data.region) {
-            const code = (data.country_code || 'xx').toLowerCase()
-            return <div>
-              <FlagIcon code={code} />&nbsp;&nbsp;
-              <span>{data.country} / {data.region}</span>
-              <button className="fly-to-button" onClick={() => flyTo(data)}>Fly To</button>
-            </div>
+  return <div className={style.peerList}>
+    <TableFlex keepTableDisplay loading={loading} err={err} data={peers} emptyText={t('No peers')}
+      rowKey="id"
+      headers={[
+        {
+          key: 'addr',
+          title: t('Address'),
+          render: (value) => {
+            return value
           }
+        },
+        {
+          key: 'location',
+          title: t('Location'),
+          render: (_, item) => {
+            const data = geoLocation[item.ip]
+            if (data && data.country && data.region) {
+              const code = (data.country_code || 'xx').toLowerCase()
+              return <div className={style.tableRowLocation}>
+                <FlagIcon code={code} />
+                <span>{data.country} / {data.region}</span>
+                <button onClick={() => flyTo(data)}>Fly To</button>
+              </div>
+            }
 
-          if (geoLoading) {
-            return <DotLoading />
+            if (geoLoading) {
+              return <DotLoading />
+            }
+
+            return `--`
           }
-
-          return `--`
-        }
-      },
-      {
-        key: 'peers',
-        title: t('Peers'),
-        render: (value) => {
-          return (value || []).length
-        }
-      },
-      {
-        key: 'tag',
-        title: t('Tag'),
-        render: (value) => {
-          if (value) return reduceText(value, 20, 0)
-          return `--`
-        }
-      },
-      {
-        key: 'height',
-        title: t('Height'),
-        render: (value) => {
-          return value
-        }
-      },
-      {
-        key: 'topoheight',
-        title: t('Topo'),
-        render: (value) => {
-          return value
-        }
-      },
-      {
-        key: 'pruned_topoheight',
-        title: t('Pruned Topo'),
-        render: (value) => {
-          return value || `--`
-        }
-      },
-      {
-        key: 'last_ping',
-        title: t('Last Ping'),
-        render: (value) => {
-          return <Age timestamp={value * 1000} update />
-        }
-      },
-      {
-        key: 'version',
-        title: t('Version'),
-        render: (value) => {
-          return value
-        }
-      },
-    ]}
-  />
+        },
+        {
+          key: 'peers',
+          title: t('Peers'),
+          render: (value) => {
+            return (value || []).length
+          }
+        },
+        {
+          key: 'tag',
+          title: t('Tag'),
+          render: (value) => {
+            if (value) return reduceText(value, 20, 0)
+            return `--`
+          }
+        },
+        {
+          key: 'height',
+          title: t('Height'),
+          render: (value) => {
+            return value
+          }
+        },
+        {
+          key: 'topoheight',
+          title: t('Topo'),
+          render: (value) => {
+            return value
+          }
+        },
+        {
+          key: 'pruned_topoheight',
+          title: t('Pruned Topo'),
+          render: (value) => {
+            return value || `--`
+          }
+        },
+        {
+          key: 'last_ping',
+          title: t('Last Ping'),
+          render: (value) => {
+            return <Age timestamp={value * 1000} update />
+          }
+        },
+        {
+          key: 'version',
+          title: t('Version'),
+          render: (value) => {
+            return value
+          }
+        },
+      ]}
+    />
+  </div>
 }
 
 function MapControls(props) {

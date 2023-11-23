@@ -97,7 +97,11 @@ export const style = {
       margin: 0 auto;
       max-width: 1000px;
       width: 100%;
-      padding: 0 2em;
+      padding: 0 1em;
+
+      ${theme.query.minMobile} {
+        padding: 0 2em;
+      }
   
       ${theme.query.minLarge} {
         max-width: 1400px;

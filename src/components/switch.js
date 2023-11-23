@@ -6,6 +6,8 @@ const defaultStyle = {
   switch: css`
     width: 2.5em;
     height: 1.5em;
+    min-width: 2.5em;
+    min-height: 1.5em;
     background-color: var(--text-color);
     border-radius: 15px;
     cursor: pointer;
