@@ -15,6 +15,7 @@ import Switch from '../../components/switch'
 import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
 import { scaleOnHover } from '../../style/animate'
+import theme from '../../style/theme'
 
 const style = {
   container: css`
@@ -31,9 +32,12 @@ const style = {
   `,
   tableRowLocation: css`
     display: flex;
-    gap: 1em;
+    gap: .5em;
     align-items: center;
-    flex-wrap: wrap;
+
+    ${theme.query.maxMobile} {
+      flex-wrap: wrap;
+    }
 
     button {
       background: var(--text-color);
