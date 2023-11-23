@@ -30,16 +30,12 @@ theme.light`
 const style = {
   container: css`
     margin: 5em 0 3em 0;
+    background-color: var(--stats-bg-color);
+    padding: 2em;
+    border-radius: .5em;
 
-    ${theme.query.minDesktop} {
+    ${theme.query.minLarge} {
       padding: 4em;
-      background-color: var(--stats-bg-color);
-      border-radius: .5em;
-
-      > {
-        max-width: 700px;
-        margin: 0 auto;
-      }
     }
 
     a {
@@ -77,14 +73,11 @@ const style = {
     > :nth-child(2) {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2em;
-  
-      ${theme.query.minMobile} {
-        grid-template-columns: 1fr 1fr;
-      }
+      gap: 1em;
   
       ${theme.query.minDesktop} {
         grid-template-columns: 1fr 1fr 1fr;
+        gap: 2em;
       }
   
       > div {
