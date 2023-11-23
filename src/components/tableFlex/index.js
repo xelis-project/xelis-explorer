@@ -81,6 +81,9 @@ export const defaultStyle = {
     }
 
     table thead th {
+      position: sticky;
+      top: 0;
+
       &:first-child {
         border-top-left-radius: .5em;
       }

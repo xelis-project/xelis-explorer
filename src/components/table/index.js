@@ -7,7 +7,6 @@ import { displayError } from '../../utils'
 export const defaultStyle = {
   container: css`
     overflow: auto;
-    padding-bottom: .5em;
     --table-hover-bg-color: ${theme.apply({ xelis: 'black', dark: '#373737', light: '#cbcbcb' })};
     --table-hover-text-color: var(--text-color);
     border-radius: .5em;
@@ -27,6 +26,9 @@ export const defaultStyle = {
     }
 
     table thead th {
+      position: sticky;
+      top: 0;
+
       &:first-child {
         border-top-left-radius: .5em;
       }

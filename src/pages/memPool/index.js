@@ -51,25 +51,21 @@ const style = {
     }
 
     > div > :nth-child(3) {
-      display: grid;
+      display: flex;
       gap: 1em;
-      grid-template-columns: 1fr;
-      overflow-x: auto;
-      padding-bottom: 1em;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1em;
 
-      ${theme.query.minLarge} {
-        grid-template-columns: 1fr 1fr;
+      ${theme.query.minDesktop} {
+        flex-direction: row;
       }
 
-      > div > div {
-        overflow-y: auto;
-        max-height: 30em;
+      > div {
+        flex: 1;
         
-        table {
-          thead tr th {
-            position: sticky;
-            top: 0;
-          }
+        > div {
+          max-height: 30em;
         }
       }
     }
