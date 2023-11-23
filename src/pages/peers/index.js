@@ -195,6 +195,12 @@ function TablePeers(props) {
 
   const { t } = useLang()
 
+  const flyTo = useCallback((data) => {
+    const position = [data.latitude, data.longitude]
+    mapRef.current.flyTo(position, 6)
+    document.body.scrollTop = 0
+  }, [])
+
   return <TableFlex keepTableDisplay loading={loading} err={err} data={peers} emptyText={t('No peers')}
     rowKey="id"
     headers={[
@@ -215,10 +221,7 @@ function TablePeers(props) {
             return <div>
               <FlagIcon code={code} />&nbsp;&nbsp;
               <span>{data.country} / {data.region}</span>
-              <button className="fly-to-button" onClick={() => {
-                const position = [data.latitude, data.longitude]
-                mapRef.current.flyTo(position, 6)
-              }}>Fly To</button>
+              <button className="fly-to-button" onClick={() => flyTo(data)}>Fly To</button>
             </div>
           }
 
