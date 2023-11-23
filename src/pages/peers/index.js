@@ -172,6 +172,15 @@ function Peers() {
   }, [])
 
   useNodeSocketSubscribe({
+    event: RPCEvent.PeerDisconnected,
+    onData: async (_, peer) => {
+      setPeers((peers) => {
+        return peers.filter(p => p.id !== peer.id)
+      })
+    }
+  }, [])
+
+  useNodeSocketSubscribe({
     event: RPCEvent.PeerStateUpdated,
     onData: async (_, peer) => {
       setPeers((peers) => {
