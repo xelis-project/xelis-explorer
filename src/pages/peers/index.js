@@ -384,8 +384,9 @@ function MapPeers(props) {
       }
 
       // handle sub peers
-      peer.peers.forEach((pAddr) => {
-        const addr = parseAddressWithPort(pAddr)
+      for (const ip in peer.peers) {
+        // const direction = peer.peers[ip]
+        const addr = parseAddressWithPort(ip)
         const subPeerLocation = geoLocation[addr.ip]
         if (!subPeerLocation) return
         const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
@@ -393,7 +394,7 @@ function MapPeers(props) {
 
         // keep only one line and overwrite if key exists
         connectionLines[lineKey] = linePositions
-      })
+      }
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
