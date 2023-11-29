@@ -138,7 +138,18 @@ function Peers() {
     setGeoLoading(true)
     const batch = 50
     let geoLocation = {}
-    const ipList = peers.map((p) => p.ip)
+
+    const ipList = []
+    for (let i in peers) {
+      const peer = peers[i]
+      ipList.push(peer.ip)
+
+      for (let addr in peer.peers) {
+        const { ip } = parseAddressWithPort(addr)
+        if (ipList.indexOf(ip) === -1) ipList.push(ip)
+      }
+    }
+
     for (let i = 0; i < ipList.length; i += batch) {
       const ips = ipList.slice(i, batch)
       const [err, data] = await to(fetchGeoLocation(ips))
@@ -420,7 +431,7 @@ function MapPeers(props) {
         {controls.showConnections && <>
           {Object.keys(connectionLines).map((key) => {
             const positions = connectionLines[key]
-            return <Polyline key={key} pathOptions={{ color: `green`, opacity: 0.5, weight: 2, dashArray: `0 6 0` }} positions={positions} />
+            return <Polyline key={key} pathOptions={{ color: `green`, opacity: 0.3, weight: 2, dashArray: `0 6 0` }} positions={positions} />
           })}
         </>}
       </>
