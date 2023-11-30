@@ -210,7 +210,10 @@ function Peers() {
     onData: async (_, peer) => {
       setPeers((peers) => {
         return peers.map(p => {
-          if (p.id === peer.id) return { ...p, ...peer } // merge to keep ip variable
+          if (p.id === peer.id) {
+            return { ...p, ...peer } // merge to keep ip variable
+          }
+
           return p
         })
       })
@@ -413,7 +416,8 @@ function MapPeers(props) {
 
       // handle sub peers
       for (const ip in peer.peers) {
-        // const direction = peer.peers[ip]
+        const direction = peer.peers[ip]
+        if (direction !== `Both`) continue
         const addr = parseAddressWithPort(ip)
         const subPeerLocation = geoLocation[addr.ip]
         if (!subPeerLocation) return
@@ -423,7 +427,7 @@ function MapPeers(props) {
         // keep only one line and overwrite if key exists
         connectionLines[lineKey] = linePositions
       }
-    })
+    }, [peers])
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
     const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={mapRef}>
