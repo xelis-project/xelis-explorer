@@ -287,7 +287,7 @@ function TablePeers(props) {
           key: 'peers',
           title: t('Peers'),
           render: (value) => {
-            return (value || []).length
+            return Object.keys(value || {}).length
           }
         },
         {
@@ -443,7 +443,8 @@ function MapPeers(props) {
               <Popup>
                 <div>{location.country} / {location.region}</div>
                 {peers.map((peer) => {
-                  return <div key={peer.addr}>{peer.addr} {peer.tag ? `(${peer.tag})` : ``}</div>
+                  const peerCount = Object.keys(peer.peers || {}).length
+                  return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
                 })}
               </Popup>
             </CircleMarker>
