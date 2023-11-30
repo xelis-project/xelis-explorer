@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css'
 import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
+import TWEEN from '@tweenjs/tween.js'
 
 import TableFlex from '../../components/tableFlex'
 import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
@@ -65,11 +66,17 @@ const style = {
   map: css`
     position: relative;
     z-index: 0;
+    width: 100%; 
+    height: 30em;
+    background-color: var(--bg-color);
+    border-radius: .5em;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 
     .leaflet-container {
-      width: 100%; 
-      height: 40em; 
       outline: none;
+      width: 100%; 
+      height: 100%;
       background-color: var(--bg-color);
       border-radius: .5em;
       border-top-left-radius: 0;
@@ -217,6 +224,20 @@ function Peers() {
           return p
         })
       })
+    }
+  }, [])
+
+  useEffect(() => {
+    // make sure tween package is updated on request animation
+    let animationFrameId
+    const animate = () => {
+      requestAnimationFrame(animate)
+      TWEEN.update()
+    }
+    requestAnimationFrame(animate)
+
+    return () => {
+      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
@@ -369,6 +390,35 @@ function MapControls(props) {
   </div>
 }
 
+function PeerDot(props) {
+  const { peerDot, leaflet } = props
+  const { peers, position, location } = peerDot
+  const { CircleMarker, Popup } = leaflet.react
+
+  const [radius, setRadius] = useState(6)
+
+  useEffect(() => {
+    new TWEEN.Tween({ x: 3 })
+      .to({ x: 6 })
+      .duration(500)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate((v) => {
+        setRadius(v.x)
+      })
+      .start()
+  }, [peerDot.lastPing])
+
+  return <CircleMarker radius={radius} pathOptions={{ opacity: 1, weight: 1, color: `green` }} center={position}>
+    <Popup>
+      <div>{location.country} / {location.region}</div>
+      {peers.map((peer) => {
+        const peerCount = Object.keys(peer.peers || {}).length
+        return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
+      })}
+    </Popup>
+  </CircleMarker>
+}
+
 function MapPeers(props) {
   const { mapRef, peers, geoLocation } = props
 
@@ -409,18 +459,22 @@ function MapPeers(props) {
 
       if (peerDots[dotKey]) {
         // another peer with the same location
+        if (peer.last_ping < peerDots[dotKey].lastPing) {
+          peerDots[dotKey].lastPing = peer.last_ping
+        }
+
         peerDots[dotKey].peers.push(peer)
       } else {
-        peerDots[dotKey] = { peers: [peer], location: peerLocation, position: dotPosition }
+        peerDots[dotKey] = { peers: [peer], location: peerLocation, position: dotPosition, lastPing: peer.last_ping }
       }
 
-      // handle sub peers
+      // handle sub peers and create connection line if direction is Both
       for (const ip in peer.peers) {
         const direction = peer.peers[ip]
         if (direction !== `Both`) continue
         const addr = parseAddressWithPort(ip)
         const subPeerLocation = geoLocation[addr.ip]
-        if (!subPeerLocation) return
+        if (!subPeerLocation) continue
         const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
         const lineKey = (peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude).toFixed(4)
 
@@ -438,16 +492,7 @@ function MapPeers(props) {
       <>
         {controls.showPeers && <>
           {Object.keys(peerDots).map((key) => {
-            const { peers, position, location } = peerDots[key]
-            return <CircleMarker key={key} radius={6} pathOptions={{ opacity: 1, weight: 3 }} center={position} color="green">
-              <Popup>
-                <div>{location.country} / {location.region}</div>
-                {peers.map((peer) => {
-                  const peerCount = Object.keys(peer.peers || {}).length
-                  return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
-                })}
-              </Popup>
-            </CircleMarker>
+            return <PeerDot key={key} peerDot={peerDots[key]} leaflet={leaflet} />
           })}
         </>}
         {controls.showConnections && <>
