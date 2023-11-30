@@ -6,6 +6,7 @@ import { css } from 'goober'
 import 'leaflet/dist/leaflet.css'
 import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import TableFlex from '../../components/tableFlex'
 import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
@@ -16,7 +17,6 @@ import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
-import Icon from 'g45-react/components/fontawesome_icon'
 
 const style = {
   container: css`
@@ -427,7 +427,7 @@ function MapPeers(props) {
         // keep only one line and overwrite if key exists
         connectionLines[lineKey] = linePositions
       }
-    }, [peers])
+    })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
     const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={mapRef}>
