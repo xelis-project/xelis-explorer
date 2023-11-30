@@ -16,10 +16,22 @@ import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 const style = {
   container: css`
     > :nth-child(2) {
+      background: var(--table-td-bg-color);
+      padding: 1em;
+      border-radius: 0.5em;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      font-size: .9em;
+      display: flex;
+      gap: .5em;
+    }
+
+    > :nth-child(3) {
       display: flex;
       flex-direction: column;
       gap: 1em;
@@ -60,6 +72,8 @@ const style = {
       outline: none;
       background-color: var(--bg-color);
       border-radius: .5em;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
 
     .leaflet-popup-content {
@@ -208,6 +222,9 @@ function Peers() {
   return <div className={style.container}>
     <PageTitle title={t('Peers')} subtitle={t('{} beautiful peers', [peers.length])}
       metaDescription={t('Map with list of network peers. Monitor connected peers, network status and geo location.')} />
+    <div>
+      <Icon name="warning" />{t(`This map does not represent the entire XELIS network.`)}
+    </div>
     <div>
       <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
       <h2>{t(`Connected Node`)}</h2>
