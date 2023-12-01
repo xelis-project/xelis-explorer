@@ -218,7 +218,7 @@ function Block() {
             key: 'age',
             title: t('Age'),
             render: (_, item) => {
-              return <Age ssrId="blockAge" timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+              return <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
             }
           },
           {
