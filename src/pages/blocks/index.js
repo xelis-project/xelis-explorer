@@ -110,20 +110,22 @@ function Blocks() {
 
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,
-    onData: (_, block) => {
+    onData: (_, newBlock) => {
       // don't add new block if we're not on first page
       if (pageState.page > 1) return
 
-      setNewBlock(block)
       setBlocks((blocks) => {
-        blocks.unshift(block)
+        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
+
+        blocks.unshift(newBlock)
         if (blocks.length > pageState.size) {
           blocks.pop()
         }
 
+        setNewBlock(newBlock)
+        setBlockCount((count) => count + 1)
         return [...blocks]
       })
-      setBlockCount((count) => count + 1)
     }
   }, [pageState])
 

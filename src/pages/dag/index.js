@@ -123,7 +123,7 @@ function InstancedLines(props) {
 
   // make sure key is count or won't unmount - https://github.com/pmndrs/drei/issues/923
   return <>
-    {!offCanvasTable.hideLines && <Segments key={unhoveredCount} limit={5000} lineWidth={lineWidth} transparent opacity={0.3}>
+    {!offCanvasTable.hideLines && <Segments key={`lines-${unhoveredCount}`} limit={5000} lineWidth={lineWidth} transparent opacity={0.3}>
       {unhoveredBlocks.map((block) => {
         let { data, x, y } = block
         return data.tips.map((tip) => {
@@ -136,7 +136,7 @@ function InstancedLines(props) {
         })
       })}
     </Segments>}
-    <Segments key={hoveredCount} lineWidth={lineWidth} transparent>
+    <Segments key={`hover-lines-${hoveredCount}`} lineWidth={lineWidth} transparent>
       {hoveredBlocks.map((block) => {
         let { data, x, y } = block
         return data.tips.map((tip) => {
@@ -350,20 +350,20 @@ function DAG() {
     event: RPCEvent.NewBlock,
     onData: (_, newBlock) => {
       loadInfo()
-      if (!offCanvasTable.paused) {
-        setNewBlock(newBlock)
-        setBlocks((blocks) => {
-          const entries = [...groupBy(blocks, (b) => b.height).entries()]
-          entries.sort((a, b) => a[0] - b[0])
-          if (entries.length >= offCanvasTable.blocksRange) {
-            const height = entries[0][0]
-            blocks = blocks.filter(b => b.height !== height)
-          }
+      if (offCanvasTable.paused) return
+      setBlocks((blocks) => {
+        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
 
-          if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
-          return [newBlock, ...blocks]
-        })
-      }
+        const entries = [...groupBy(blocks, (b) => b.height).entries()]
+        entries.sort((a, b) => a[0] - b[0])
+        if (entries.length >= offCanvasTable.blocksRange) {
+          const height = entries[0][0]
+          blocks = blocks.filter(b => b.height !== height)
+        }
+
+        setNewBlock(newBlock)
+        return [newBlock, ...blocks]
+      })
     }
   }, [offCanvasTable.paused, offCanvasTable.blocksRange])
 
