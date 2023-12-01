@@ -391,24 +391,26 @@ function MapControls(props) {
 }
 
 function PeerDot(props) {
-  const { peerDot, leaflet } = props
+  const { peerDot, leaflet, visible } = props
   const { peers, position, location } = peerDot
   const { CircleMarker, Popup } = leaflet.react
 
-  const [radius, setRadius] = useState(6)
+  const [dotRadius, setDotRadius] = useState(6)
 
   useEffect(() => {
     new TWEEN.Tween({ x: 3 })
-      .to({ x: 6 })
-      .duration(500)
-      .easing(TWEEN.Easing.Quadratic.Out)
+      .to({ x: 6 }, 1500)
+      .easing(TWEEN.Easing.Elastic.Out)
       .onUpdate((v) => {
-        setRadius(v.x)
+        setDotRadius(v.x)
       })
       .start()
   }, [peerDot.lastPing])
 
-  return <CircleMarker radius={radius} pathOptions={{ opacity: 1, weight: 1, color: `green` }} center={position}>
+  return <CircleMarker radius={dotRadius} pathOptions={{
+    opacity: visible ? 1 : 0, fillOpacity: visible ? .3 : 0,
+    weight: 1, color: `green`
+  }} center={position}>
     <Popup>
       <div>{location.country} / {location.region}</div>
       {peers.map((peer) => {
@@ -417,6 +419,29 @@ function PeerDot(props) {
       })}
     </Popup>
   </CircleMarker>
+}
+
+function PeerConnection(props) {
+  const { positions, leaflet, visible } = props
+  const { Polyline } = leaflet.react
+
+  const [lineOpacity, setLineOpacity] = useState()
+
+  useEffect(() => {
+    new TWEEN.Tween({ x: 0 })
+      .to({ x: .4 }, 2000)
+      .easing(TWEEN.Easing.Linear.None)
+      .onUpdate((v) => {
+        setLineOpacity(v.x)
+      })
+      .yoyo(true)
+      .repeat(Infinity)
+      .start()
+  }, [])
+
+  const opacity = visible ? lineOpacity : 0
+
+  return <Polyline pathOptions={{ color: `green`, opacity, weight: 2, dashArray: `0 4 0` }} positions={positions} />
 }
 
 function MapPeers(props) {
@@ -441,7 +466,7 @@ function MapPeers(props) {
   useEffect(() => {
     if (!leaflet) return
 
-    const { MapContainer, TileLayer, CircleMarker, Popup, Polyline } = leaflet.react
+    const { MapContainer, TileLayer } = leaflet.react
 
     let tileLayerUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`
     if (theme === `light`) {
@@ -489,19 +514,13 @@ function MapPeers(props) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
       />
-      <>
-        {controls.showPeers && <>
-          {Object.keys(peerDots).map((key) => {
-            return <PeerDot key={key} peerDot={peerDots[key]} leaflet={leaflet} />
-          })}
-        </>}
-        {controls.showConnections && <>
-          {Object.keys(connectionLines).map((key) => {
-            const positions = connectionLines[key]
-            return <Polyline key={key} pathOptions={{ color: `green`, opacity: 0.3, weight: 2, dashArray: `0 6 0` }} positions={positions} />
-          })}
-        </>}
-      </>
+      {Object.keys(peerDots).map((key) => {
+        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} />
+      })}
+      {Object.keys(connectionLines).map((key) => {
+        const positions = connectionLines[key]
+        return <PeerConnection key={key} positions={positions} visible={controls.showConnections} leaflet={leaflet} />
+      })}
     </MapContainer>
 
     setMapContainer(mapContainer)
