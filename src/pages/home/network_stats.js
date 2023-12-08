@@ -281,7 +281,7 @@ export function NetworkStats(props) {
         </div>
       })}
     </div>
-    <a href="https://stats.xelis.io" target="_blank">
+    <a href={STATS_LINK} target="_blank">
       {t(`See more`)}
       <Icon name="arrow-right" />
     </a>

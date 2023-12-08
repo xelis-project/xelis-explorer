@@ -54,20 +54,26 @@ const style = {
       opacity: 1;
     }
 
-    > :nth-child(1) > a {
-      text-decoration: none;
-      color: var(--header-nav-color);
-      user-select: none;
-      cursor: pointer;
-      padding: 0.5em 0.7em;
+    > :nth-child(1) {
       display: flex;
-      gap: 0.5em;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 5px;
-  
-      &:hover, &.active {
-        background-color: var(--header-nav-active-color);
+      flex-direction: column;
+      gap: .25em;
+
+      > a {
+        text-decoration: none;
+        color: var(--header-nav-color);
+        user-select: none;
+        cursor: pointer;
+        padding: 0.5em 0.7em;
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 5px;
+    
+        &:hover, &.active {
+          background-color: var(--header-nav-active-color);
+        }
       }
     }
 
