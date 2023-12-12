@@ -67,11 +67,15 @@ const style = {
     position: relative;
     z-index: 0;
     width: 100%; 
-    height: 30em;
+    height: 15em;
     background-color: var(--bg-color);
     border-radius: .5em;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    
+    ${theme.query.minDesktop} {
+      height: 30em;
+    }
 
     .leaflet-container {
       outline: none;
@@ -121,12 +125,64 @@ const style = {
       font-weight: bold;
       cursor: pointer;
     }
+  `,
+  mapLoad: css`
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    top: 0;
+    z-index: 999;
+
+    > div {
+      background-color: black;
+      padding: .5em;
+      border-radius: .5em;
+      display: flex;
+      gap: .25em;
+
+      > div {
+        width: .5em;
+        height: 1.5em;
+        background-color: white;
+        border-radius: .5em;
+        animation-name: scale;
+        animation-duration: .75s;
+        animation-iteration-count: infinite;
+      }
+
+      > :nth-child(1) {
+        animation-delay: 0;
+      }
+
+      > :nth-child(2) {
+        animation-delay: .25s;
+      }
+
+      > :nth-child(3) {
+        animation-delay: .5s;
+      }
+
+      @keyframes scale {
+        0% {
+          transform: scaleY(1);
+        }
+        20% {
+          transform: scaleY(.8);
+        }
+        40% {
+          transform: scaleY(1);
+        }
+      }
+    }
   `
 }
 
 function Peers() {
   const nodeSocket = useNodeSocket()
-  const [loading, setLoading] = useState(false)
+  const [peersLoading, setPeersLoading] = useState(true)
   const [peers, setPeers] = useState([])
   const [geoLoading, setGeoLoading] = useState(true)
   const [geoLocation, setGeoLocation] = useState({})
@@ -135,11 +191,11 @@ function Peers() {
 
   const loadPeers = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-    setLoading(true)
+    setPeersLoading(true)
     setErr(null)
 
     const resErr = (err) => {
-      setLoading(false)
+      setPeersLoading(false)
       setErr(err)
     }
 
@@ -153,7 +209,7 @@ function Peers() {
     })
 
     setPeers(peers)
-    setLoading(false)
+    setPeersLoading(false)
 
     // max 50 ips per fetch
     setGeoLoading(true)
@@ -250,11 +306,11 @@ function Peers() {
       <Icon name="warning" />{t(`This map does not represent the entire XELIS network.`)}
     </div>
     <div>
-      <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} />
+      <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} peersLoading={peersLoading} geoLoading={geoLoading} />
       <h2>{t(`Connected Node`)}</h2>
       <ConnectedNodeTable />
       <h2>{t(`Peer List`)}</h2>
-      <TablePeers loading={loading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
+      <TablePeers peersLoading={peersLoading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
     </div>
   </div>
 }
@@ -262,7 +318,7 @@ function Peers() {
 export default Peers
 
 function TablePeers(props) {
-  const { loading, err, peers, geoLocation, geoLoading, mapRef } = props
+  const { peersLoading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   const { t } = useLang()
 
@@ -273,7 +329,7 @@ function TablePeers(props) {
   }, [])
 
   return <div className={style.peerList}>
-    <TableFlex keepTableDisplay loading={loading} err={err} data={peers} emptyText={t('No peers')}
+    <TableFlex keepTableDisplay loading={peersLoading} err={err} data={peers} emptyText={t('No peers')}
       rowKey="id"
       headers={[
         {
@@ -372,7 +428,7 @@ function MapControls(props) {
   }, [setControls])
 
   const reset = useCallback(() => {
-    mapRef.current.setView([0, 0], 2)
+    mapRef.current.setView([0, 0], 1)
   }, [])
 
   return <div className={style.mapControls}>
@@ -445,7 +501,7 @@ function PeerConnection(props) {
 }
 
 function MapPeers(props) {
-  const { mapRef, peers, geoLocation } = props
+  const { mapRef, peers, geoLocation, peersLoading, geoLoading } = props
 
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
@@ -509,7 +565,7 @@ function MapPeers(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const mapContainer = <MapContainer minZoom={2} zoom={2} preferCanvas center={[0, 0]} ref={mapRef}>
+    const mapContainer = <MapContainer minZoom={1} zoom={1} preferCanvas center={[0, 0]} ref={mapRef}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
@@ -529,6 +585,18 @@ function MapPeers(props) {
   return <div className={style.map}>
     {mapContainer && <MapControls controls={controls} setControls={setControls} mapRef={mapRef} />}
     {mapContainer}
+    <MapLoad peersLoading={peersLoading} geoLoading={geoLoading} />
+  </div>
+}
+
+function MapLoad(props) {
+  const { peersLoading, geoLoading } = props
+  return (peersLoading || geoLoading) && <div className={style.mapLoad}>
+    <div>
+      <div />
+      <div />
+      <div />
+    </div>
   </div>
 }
 
