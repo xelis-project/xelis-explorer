@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from 'react'
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
@@ -10,7 +10,8 @@ import Icon from 'g45-react/components/fontawesome_icon'
 import TWEEN from '@tweenjs/tween.js'
 
 import TableFlex from '../../components/tableFlex'
-import { fetchGeoLocation, parseAddressWithPort, reduceText } from '../../utils'
+import Table from '../../components/table'
+import { fetchGeoLocation, groupBy, parseAddressWithPort, reduceText } from '../../utils'
 import DotLoading from '../../components/dotLoading'
 import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
@@ -124,6 +125,41 @@ const style = {
       padding: 0.3em 0.6em;
       font-weight: bold;
       cursor: pointer;
+    }
+  `,
+  peerList: css`
+    input {
+      padding: 0.7em;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1.2em;
+      background-color: ${theme.apply({ xelis: `rgb(0 0 0 / 20%)`, light: `rgb(255 255 255 / 20%)`, dark: `rgb(0 0 0 / 20%)` })};
+      color: var(--text-color);
+      width: 100%;
+      border: thin solid ${theme.apply({ xelis: `#7afad3`, light: `#cbcbcb`, dark: `#373737` })};
+
+      &::placeholder {
+        color: ${theme.apply({ xelis: `rgb(255 255 255 / 20%)`, light: `rgb(0 0 0 / 30%)`, dark: `rgb(255 255 255 / 20%)` })};
+        opacity: 1;
+      }
+    }
+
+    > :nth-child(1) {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin-bottom: 1em;
+
+      ${theme.query.minDesktop} {
+        flex-direction: row;
+      }
+
+      > :nth-child(2) {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+      }
     }
   `,
   mapLoad: css`
@@ -321,6 +357,8 @@ function TablePeers(props) {
   const { peersLoading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   const { t } = useLang()
+  const [filterIP, setFilterIP] = useState(``)
+  const [groupCountry, setGroupCountry] = useState(false)
 
   const flyTo = useCallback((data) => {
     const position = [data.latitude, data.longitude]
@@ -328,89 +366,98 @@ function TablePeers(props) {
     document.body.scrollTop = 0
   }, [])
 
+  const onFilterIP = useCallback((e) => {
+    setFilterIP(e.target.value)
+  }, [peers])
+
+  const groupPeers = useMemo(() => {
+    const group = groupBy(peers, (p) => {
+      const data = geoLocation[p.ip]
+      if (data) return { country: data.country, country_code: data.country_code }
+      return { country: `unknown`, country_code: `xx` }
+    })
+
+    let items = []
+    group.forEach((value, key) => {
+      items.push({ key, group: true, count: value.length })
+      items = [...items, ...value]
+    })
+
+    return items
+  }, [peers, geoLocation])
+
+  const filteredPeers = useMemo(() => {
+    const peersToFilter = groupCountry ? groupPeers : peers
+    return peersToFilter.filter((p) => {
+      if (filterIP.length > 0) {
+        if (p.addr) return p.addr.includes(filterIP)
+        return false
+      }
+      return true
+    })
+  }, [peers, groupPeers, filterIP, groupCountry])
+
   return <div className={style.peerList}>
-    <TableFlex keepTableDisplay loading={peersLoading} err={err} data={peers} emptyText={t('No peers')}
-      rowKey="id"
-      headers={[
-        {
-          key: 'addr',
-          title: t('Address'),
-          render: (value) => {
-            return value
-          }
-        },
-        {
-          key: 'location',
-          title: t('Location'),
-          render: (_, item) => {
-            const data = geoLocation[item.ip]
-            if (data && data.country && data.region) {
-              const code = (data.country_code || 'xx').toLowerCase()
-              return <div className={style.tableRowLocation}>
-                <FlagIcon code={code} />
-                <span>{data.country} / {data.region}</span>
-                <button onClick={() => flyTo(data)}>Fly To</button>
+    <div>
+      <input type="text" onChange={onFilterIP} placeholder={t(`Type to filter peers by address.`)} />
+      <div>
+        <Switch checked={groupCountry} onChange={setGroupCountry} />{t(`Group by Country`)}
+      </div>
+    </div>
+    <Table
+      headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Last Ping'), t('Version')]}
+      loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={9}
+      onItem={(item) => {
+        if (item.group) {
+          const { country, country_code } = item.key
+          return <tr key={country}>
+            <td colSpan={9}>
+              <div className={style.tableRowLocation}>
+                <FlagIcon code={country_code.toLowerCase()} />
+                <span>{country} ({item.count})</span>
               </div>
-            }
+            </td>
+          </tr>
+        }
 
-            if (geoLoading) {
-              return <DotLoading />
-            }
+        let location = `--`
+        if (geoLoading) location = <DotLoading />
 
-            return `--`
+        const data = geoLocation[item.ip]
+        if (data && data.country && data.region) {
+          const code = (data.country_code || 'xx').toLowerCase()
+
+          if (groupCountry) {
+            location = <div className={style.tableRowLocation}>
+              <span>{data.region}</span>
+              <button onClick={() => flyTo(data)}>Fly To</button>
+            </div>
+          } else {
+            location = <div className={style.tableRowLocation}>
+              <FlagIcon code={code} />
+              <span>{data.country} / {data.region}</span>
+              <button onClick={() => flyTo(data)}>Fly To</button>
+            </div>
           }
-        },
-        {
-          key: 'peers',
-          title: t('Peers'),
-          render: (value) => {
-            return Object.keys(value || {}).length
-          }
-        },
-        {
-          key: 'tag',
-          title: t('Tag'),
-          render: (value) => {
-            if (value) return reduceText(value, 20, 0)
-            return `--`
-          }
-        },
-        {
-          key: 'height',
-          title: t('Height'),
-          render: (value) => {
-            return value
-          }
-        },
-        {
-          key: 'topoheight',
-          title: t('Topo'),
-          render: (value) => {
-            return value
-          }
-        },
-        {
-          key: 'pruned_topoheight',
-          title: t('Pruned Topo'),
-          render: (value) => {
-            return value || `--`
-          }
-        },
-        {
-          key: 'last_ping',
-          title: t('Last Ping'),
-          render: (value) => {
-            return <Age timestamp={value * 1000} update />
-          }
-        },
-        {
-          key: 'version',
-          title: t('Version'),
-          render: (value) => {
-            return value
-          }
-        },
-      ]}
+        }
+
+        const peers = Object.keys(item.peers || {}).length
+        const tag = item.tag ? reduceText(value, 20, 0) : `--`
+
+        return <tr key={item.addr}>
+          <td>{item.addr}</td>
+          <td>{location}</td>
+          <td>{peers}</td>
+          <td>{tag}</td>
+          <td>{item.height}</td>
+          <td>{item.topoheight}</td>
+          <td>{item.pruned_topoheight || `--`}</td>
+          <td>
+            <Age timestamp={item.last_ping * 1000} update />
+          </td>
+          <td>{item.version}</td>
+        </tr>
+      }}
     />
   </div>
 }
