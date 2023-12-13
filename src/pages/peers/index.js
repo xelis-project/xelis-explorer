@@ -481,23 +481,23 @@ function PeerConnection(props) {
   const { positions, leaflet, visible } = props
   const { Polyline } = leaflet.react
 
-  const [lineOpacity, setLineOpacity] = useState()
+  const [dashOffset, setDashOffset] = useState(0)
 
   useEffect(() => {
     new TWEEN.Tween({ x: 0 })
-      .to({ x: .4 }, 2000)
+      .to({ x: 100 }, 100000)
       .easing(TWEEN.Easing.Linear.None)
-      .onUpdate((v) => {
-        setLineOpacity(v.x)
+      .onUpdate((obj) => {
+        setDashOffset(obj.x)
       })
-      .yoyo(true)
+      //.yoyo(true)
       .repeat(Infinity)
       .start()
   }, [])
 
-  const opacity = visible ? lineOpacity : 0
+  const opacity = visible ? .2 : 0
 
-  return <Polyline pathOptions={{ color: `green`, opacity, weight: 2, dashArray: `0 4 0` }} positions={positions} />
+  return <Polyline pathOptions={{ color: `green`, opacity, weight: 2, dashArray: `0 4 0`, dashOffset: `${dashOffset}%` }} positions={positions} />
 }
 
 function MapPeers(props) {
@@ -565,7 +565,7 @@ function MapPeers(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const mapContainer = <MapContainer minZoom={1} zoom={1} preferCanvas center={[0, 0]} ref={mapRef}>
+    const mapContainer = <MapContainer minZoom={1} zoom={1} center={[0, 0]} ref={mapRef}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
