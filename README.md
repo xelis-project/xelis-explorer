@@ -1,16 +1,19 @@
 # XELIS Explorer
 
-Official Explorer for XELIS Blockchain.
+Real-time Blockchain Explorer for XELIS using JavaScript and WebSocket.
 
 <https://explorer.xelis.io>  
 
-- Realtime statistics with WebSockets.
+- Real-time statistics with WebSockets.
 - Navigate all blocks of the entire blockchain (if node isn't pruned).
+- Block page.
+- Transaction page.
+- Accounts list page.
+- Account history page.
 - Live mempool.
 - BlockDAG viewer.
 
-Testnet: <https://testnet-explorer.xelis.io>  
-Dev: <https://dev-explorer.xelis.io>  
+Testnet: <https://testnet-explorer.xelis.io>
 
 ## Development
 
