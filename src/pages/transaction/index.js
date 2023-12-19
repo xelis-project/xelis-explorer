@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
@@ -28,16 +28,6 @@ const style = {
       color: white;
       font-weight: bold;
       background-color: var(--error-color);
-    }
-
-    .extra {
-      padding: 1em;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-size: 1em;
-      opacity: .5;
-      max-height: 30em;
-      overflow: auto;
     }
   `
 }
@@ -101,15 +91,15 @@ function Transaction() {
 
   const description = useMemo(() => {
     return `
-      ${t('Transaction {}.', [tx.hash])}
-      ${t('Signed by {}.', [reduceText(tx.owner)])}
+      ${t('Transaction {}.', [tx.hash || `?`])}
+      ${t('Signed by {}.', [reduceText(tx.owner || `?`)])}
       ${tx.executed_in_block ? t('Executed in block {}.', [reduceText(tx.executed_in_block)]) : t('Discarded or not executed yet.')}
     `
   }, [tx, t])
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
-    <PageTitle title={t('Transaction {}', [reduceText(tx.hash, 4, 4)])}
+    <PageTitle title={t('Transaction {}', [reduceText(tx.hash || ``, 4, 4)])}
       metaTitle={t('Transaction {}', [tx.hash || ''])}
       metaDescription={description} />
     {err && <div className="error">{displayError(err)}</div>}
@@ -167,20 +157,7 @@ function Transaction() {
       <Transfers transfers={transfers} />
       <Burns burns={burns} />
       <InBlocks tx={tx} />
-      <h2>{t('Extra')}</h2>
-      <ExtraData tx={tx} />
     </div>
-  </div>
-}
-
-function ExtraData(props) {
-  const { tx } = props
-
-  const { t } = useLang()
-
-  return <div className="extra">
-    {!tx.extra_data && <div>{t('This transaction does not contain extra information.')}</div>}
-    {tx.extra_data && <pre>{JSON.stringify(tx.extra_data, null, 2)}</pre>}
   </div>
 }
 
@@ -189,22 +166,34 @@ function Transfers(props) {
 
   const { t } = useLang()
 
+  const formatExtraData = useCallback((extraData) => {
+    // format extra_data int array to hexadecimal
+    return (extraData || []).map((value) => `${value.toString(16)}`)
+  }, [])
+
   return <div>
     <h2>{t('Transfers')}</h2>
     <Table
       headers={[t(`Asset`), t(`Amount`), t(`Recipient`)]}
       list={transfers} emptyText={t('No transfers')} colSpan={3}
       onItem={(item, index) => {
-        const { amount, asset, to } = item
-        return <tr key={index}>
-          <td>{reduceText(asset)}</td>
-          <td>{formatAsset(amount, asset)}</td>
-          <td>
-            <Link to={`/accounts/${to}`}>
-              {to}
-            </Link>
-          </td>
-        </tr>
+        const { amount, asset, to, extra_data } = item
+        return <React.Fragment key={index}>
+          <tr key={index}>
+            <td>{reduceText(asset)}</td>
+            <td>{formatAsset(amount, asset)}</td>
+            <td>
+              <Link to={`/accounts/${to}`}>
+                {to}
+              </Link>
+            </td>
+          </tr>
+          {extra_data && <tr>
+            <td colSpan={3}>
+              {t(`Extra Data:`)} {formatExtraData(extra_data)}
+            </td>
+          </tr>}
+        </React.Fragment>
       }}
     />
   </div>
