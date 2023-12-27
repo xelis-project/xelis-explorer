@@ -35,7 +35,7 @@ export function useRecentBlocks() {
     if (err1) return resErr(err1)
 
     const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
-      start_topoheight: topoheight - 19,
+      start_topoheight: Math.max(0, topoheight - 19), // don't ask for lower than 0 - this is for the first 20 blocks of the blockchain
       end_topoheight: topoheight
     }))
     if (err2) return resErr(err2)

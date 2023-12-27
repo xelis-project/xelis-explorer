@@ -308,8 +308,7 @@ function DAG() {
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    const inputHeight = offCanvasTable.inputHeight
-    if (!inputHeight) return
+    const inputHeight = offCanvasTable.inputHeight || 0
     setLoading(true)
     setErr(null)
 
@@ -319,15 +318,20 @@ function DAG() {
     }
 
     let newBlocks = []
-    const batch = 20
+    const batch = 20 // can't fetch more than 20 at a time for getBlocksRangeByHeight
     let start = Math.max(-1, inputHeight - offCanvasTable.blocksRange)
     let end = start + offCanvasTable.blocksRange
-    for (let i = start; i <= end; i += batch) {
-      let next = i + batch
-      if (next > end) break
+    for (let i = start; i < end; i += batch) {
+      let batchStart = i + 1
+      let batchEnd = i + batch
+      if (batchEnd > inputHeight) {
+        batchEnd = inputHeight
+        i = end
+      }
+
       const [err, data] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
-        start_height: i + 1,
-        end_height: next
+        start_height: batchStart,
+        end_height: batchEnd
       }))
       if (err) return resErr(err)
       newBlocks = [...newBlocks, ...data]

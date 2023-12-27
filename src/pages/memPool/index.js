@@ -282,7 +282,7 @@ function ExecutedTxs(props) {
     setTopoheight(topoheight)
 
     const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
-      start_topoheight: topoheight - 19,
+      start_topoheight: Math.max(0, topoheight - 19),
       end_topoheight: topoheight
     }))
     if (err2) return resErr(err2)

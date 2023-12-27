@@ -217,8 +217,8 @@ function useOffCanvasTable(props) {
         const blockType = getBlockType(block, stableHeight)
         return <tr key={block.hash} onClick={() => onBlockClick(block)}>
           <td>
-            <span>{block.topoheight || `?`}</span>&nbsp;
-            <span title={t('Height')}>({block.height})</span>&nbsp;
+            <span>{(block.topoheight || 0).toLocaleString()}</span>&nbsp;
+            <span title={t('Height')}>({(block.height || 0).toLocaleString()})</span>&nbsp;
           </td>
           <td style={{ color: blockColor.value(currentTheme, blockType) }}>
             {blockType}
