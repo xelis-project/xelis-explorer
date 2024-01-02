@@ -76,7 +76,7 @@ function Transaction() {
 
     setTx(data)
     setLoading(false)
-  }, [hash, nodeSocket])
+  }, [hash, nodeSocket.readyState])
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
@@ -253,7 +253,7 @@ function InBlocks(props) {
 
     setLoading(false)
     setBlocks(blocks)
-  }, [tx, nodeSocket])
+  }, [tx, nodeSocket.readyState])
 
   useEffect(() => {
     loadTxBlocks()

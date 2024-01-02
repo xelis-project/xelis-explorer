@@ -106,7 +106,7 @@ function Blocks() {
     setBlockCount(topoheight + 1)
     setBlocks(blocks.reverse())
     setLoading(false)
-  }, [pageState, nodeSocket])
+  }, [pageState, nodeSocket.readyState])
 
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,

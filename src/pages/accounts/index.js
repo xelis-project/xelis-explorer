@@ -105,7 +105,7 @@ function Accounts() {
     setAccounts(accounts)
     setAccountCount(result1)
     setLoading(false)
-  }, [pageState, nodeSocket])
+  }, [pageState, nodeSocket.readyState])
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return

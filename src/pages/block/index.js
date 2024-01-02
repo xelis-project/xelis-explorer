@@ -153,7 +153,7 @@ function Block() {
     }
 
     setLoading(false)
-  }, [id, nodeSocket])
+  }, [id, nodeSocket.readyState])
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return

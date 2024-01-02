@@ -60,7 +60,7 @@ function Transactions(props) {
 
     setTransactions(txs)
     setLoading(false)
-  }, [block, pageState, nodeSocket])
+  }, [block, pageState, nodeSocket.readyState])
 
   useEffect(() => {
     if (block) load()

@@ -161,7 +161,7 @@ function Account() {
     setAccount({ addr, balance: result, nonce: result2 })
     setAccountAssets(result3)
     setLoading(false)
-  }, [asset, addr, nodeSocket])
+  }, [asset, addr, nodeSocket.readyState])
 
   useEffect(() => {
     //if (firstPageLoad && serverResult.loaded) return

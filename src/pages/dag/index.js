@@ -339,7 +339,7 @@ function DAG() {
 
     setBlocks(newBlocks)
     setLoading(false)
-  }, [offCanvasTable.inputHeight, offCanvasTable.blocksRange, nodeSocket])
+  }, [offCanvasTable.inputHeight, offCanvasTable.blocksRange, nodeSocket.readyState])
 
   useEffect(() => {
     if (offCanvasTable.paused) return
