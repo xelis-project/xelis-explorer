@@ -82,10 +82,10 @@ const style = {
       outline: none;
       width: 100%; 
       height: 100%;
-      background-color: var(--bg-color);
       border-radius: .5em;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
+      background: ${theme.apply({ xelis: `#262626`, dark: `#262626`, light: `#d5dadc` })};
     }
 
     .leaflet-popup-content {
