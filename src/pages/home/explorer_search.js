@@ -107,7 +107,7 @@ export function ExplorerSearch() {
     }
 
     return navigate(`/blocks/${searchValue}`)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   return <form onSubmit={search}>
     <div className={style.container}>

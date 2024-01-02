@@ -89,7 +89,7 @@ function useOffCanvasBlock(props) {
     }))
     if (err) return setErr(err)
     setBlock(data)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
     {block && <>

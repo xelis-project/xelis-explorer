@@ -272,7 +272,7 @@ function Peers() {
 
     setGeoLoading(false)
     setGeoLocation(geoLocation)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadPeers()
@@ -673,7 +673,7 @@ function ConnectedNodeTable() {
 
     setLoading(false)
     setData([{ ...res, ...res2 }])
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadP2PStatus()

@@ -182,7 +182,7 @@ export function NetworkStats(props) {
     if (err) return resErr(err)
     setInfo(info)
     setLoading(false)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   const loadP2PStatus = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -191,7 +191,7 @@ export function NetworkStats(props) {
     if (err) return
 
     setP2PStatus(p2p)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadInfo()

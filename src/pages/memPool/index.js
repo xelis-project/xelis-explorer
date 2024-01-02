@@ -94,7 +94,7 @@ function MemPool() {
     if (err) return resErr(err)
     setMemPool(data)
     setLoading(false)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadMemPool()
@@ -310,7 +310,7 @@ function ExecutedTxs(props) {
 
     setLoading(false)
     setExecutedTxs(recentExecuted)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useNodeSocketSubscribe({
     event: RPCEvent.TransactionExecuted,

@@ -303,7 +303,7 @@ function DAG() {
     const [err, info] = await to(nodeSocket.daemon.getInfo())
     if (err) return setErr(err)
     setInfo(info)
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return

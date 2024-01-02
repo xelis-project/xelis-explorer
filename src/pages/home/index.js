@@ -42,7 +42,7 @@ export function useRecentBlocks() {
     setLoading(false)
 
     setBlocks(blocks.reverse())
-  }, [nodeSocket])
+  }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadRecentBlocks()

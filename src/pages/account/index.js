@@ -279,7 +279,7 @@ function History(props) {
 
     setHistory(result)
     setLoading(false)
-  }, [asset, addr, nodeSocket, pages, page])
+  }, [asset, addr, nodeSocket.readyState, pages, page])
 
   useEffect(() => {
     loadData()
