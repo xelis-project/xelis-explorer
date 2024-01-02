@@ -161,6 +161,10 @@ const style = {
         align-items: center;
       }
     }
+
+    > :nth-child(2) {
+      margin-bottom: .5em;
+    }
   `,
   mapLoad: css`
     position: absolute;
@@ -216,6 +220,45 @@ const style = {
   `
 }
 
+function useNetworkData() {
+  const nodeSocket = useNodeSocket()
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState()
+  const [data, setData] = useState({})
+
+  const loadP2PStatus = useCallback(async ({ showLoading = true } = {}) => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    setErr(null)
+    if (showLoading) setLoading(true)
+
+    const resErr = (err) => {
+      setErr(err)
+      setLoading(false)
+    }
+
+    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
+    if (err) return resErr(err)
+
+    const [err2, res2] = await to(nodeSocket.daemon.getInfo())
+    if (err2) return resErr(err)
+
+    setLoading(false)
+    setData({ ...res, ...res2 })
+  }, [nodeSocket.readyState])
+
+  useEffect(() => {
+    loadP2PStatus()
+  }, [loadP2PStatus])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: () => loadP2PStatus({ showLoading: false })
+  }, [loadP2PStatus])
+
+  return { data, loading, err }
+}
+
 function Peers() {
   const nodeSocket = useNodeSocket()
   const [peersLoading, setPeersLoading] = useState(true)
@@ -224,6 +267,7 @@ function Peers() {
   const [geoLocation, setGeoLocation] = useState({})
   const [err, setErr] = useState()
   const { t } = useLang()
+  const networkData = useNetworkData()
 
   const loadPeers = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -344,9 +388,9 @@ function Peers() {
     <div>
       <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} peersLoading={peersLoading} geoLoading={geoLoading} />
       <h2>{t(`Connected Node`)}</h2>
-      <ConnectedNodeTable />
+      <ConnectedNodeTable networkData={networkData} />
       <h2>{t(`Peer List`)}</h2>
-      <TablePeers peersLoading={peersLoading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} />
+      <TablePeers peersLoading={peersLoading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} networkData={networkData} />
     </div>
   </div>
 }
@@ -354,7 +398,7 @@ function Peers() {
 export default Peers
 
 function TablePeers(props) {
-  const { peersLoading, err, peers, geoLocation, geoLoading, mapRef } = props
+  const { networkData, peersLoading, err, peers, geoLocation, geoLoading, mapRef } = props
 
   const { t } = useLang()
   const [filterIP, setFilterIP] = useState(``)
@@ -397,12 +441,31 @@ function TablePeers(props) {
     })
   }, [peers, groupPeers, filterIP, groupCountry])
 
+  const peerStats = useMemo(() => {
+    const stats = [0, 0, 0, 0, 0] // synced, desync, fullLedger, prunedLedger, sameVersion
+
+    peers.forEach((peer) => {
+      if (peer.height >= networkData.data.stableheight) stats[0]++
+      else stats[1]++
+
+      if (peer.pruned_topoheight) stats[3]++
+      else stats[2]++
+
+      if (networkData.data.version === peer.version) stats[4]++
+    })
+
+    return stats
+  }, [peers, networkData])
+
   return <div className={style.peerList}>
     <div>
       <input type="text" onChange={onFilterIP} placeholder={t(`Type to filter peers by address.`)} />
       <div>
         <Switch checked={groupCountry} onChange={setGroupCountry} />{t(`Group by Country`)}
       </div>
+    </div>
+    <div>
+      {t(`{} synced | {} desync | {} full ledger | {} pruned ledger | {} on the same version`, peerStats)}
     </div>
     <Table
       headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Last Ping'), t('Version')]}
@@ -647,44 +710,12 @@ function MapLoad(props) {
   </div>
 }
 
-function ConnectedNodeTable() {
-  const nodeSocket = useNodeSocket()
-  const [loading, setLoading] = useState(false)
-  const [err, setErr] = useState()
-  const [data, setData] = useState([])
+function ConnectedNodeTable(props) {
+  const { networkData } = props
+  const { err, data, loading } = networkData
   const { t } = useLang()
 
-  const loadP2PStatus = useCallback(async ({ showLoading = true } = {}) => {
-    if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-    setErr(null)
-    if (showLoading) setLoading(true)
-
-    const resErr = (err) => {
-      setErr(err)
-      setLoading(false)
-    }
-
-    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
-    if (err) return resErr(err)
-
-    const [err2, res2] = await to(nodeSocket.daemon.getInfo())
-    if (err2) return resErr(err)
-
-    setLoading(false)
-    setData([{ ...res, ...res2 }])
-  }, [nodeSocket.readyState])
-
-  useEffect(() => {
-    loadP2PStatus()
-  }, [loadP2PStatus])
-
-  useNodeSocketSubscribe({
-    event: RPCEvent.NewBlock,
-    onData: () => loadP2PStatus({ showLoading: false })
-  }, [loadP2PStatus])
-
-  return <TableFlex keepTableDisplay loading={loading} err={err} data={data} emptyText={t('Not connected')}
+  return <TableFlex keepTableDisplay loading={loading} err={err} data={[data]} emptyText={t('Not connected')}
     rowKey="peer_id"
     headers={[
       {
