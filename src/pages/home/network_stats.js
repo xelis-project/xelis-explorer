@@ -212,7 +212,7 @@ export function NetworkStats(props) {
     const data = info || {}
 
     const maxSupply = data.maximum_supply || 0
-    const mined = ((data.circulating_supply || 0) * 100 / maxSupply).toFixed(2)
+    const mined = ((data.circulating_supply || 0) * 100 / (maxSupply || 1)).toFixed(2)
 
     const labels = []
     const difficultyHistory = []

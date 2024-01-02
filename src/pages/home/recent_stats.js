@@ -64,14 +64,18 @@ const style = {
         }
 
         > :nth-child(2) {
-          padding: .7em;
-          color: white;
-          overflow: hidden;
-          font-weight: bold;
-          white-space: nowrap;
-          transition: all .25s;
-          border-top-right-radius: .25em;
-          border-bottom-right-radius: .25em;
+          flex: 1;
+
+          > div {
+            padding: .7em;
+            color: white;
+            overflow: hidden;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all .25s;
+            border-top-right-radius: .25em;
+            border-bottom-right-radius: .25em;
+          }
         }
       }
     }
@@ -140,11 +144,11 @@ export function RecentStats(props) {
 }
 
 const colors = [
-  'rgba(221, 90, 57, 0.4)', 'rgba(42, 177, 211, 0.4)', 'rgba(109, 255, 177, 0.4)', 'rgba(36, 34, 155, 0.4)',
-  'rgba(161, 186, 40, 0.4)', 'rgba(99, 255, 210, 0.4)', 'rgba(206, 26, 89, 0.4)', 'rgba(69, 247, 164, 0.4)',
-  'rgba(232, 204, 0, 0.4)', 'rgba(25, 160, 120, 0.4)', 'rgba(9, 116, 239, 0.4)', 'rgba(62, 170, 178, 0.4)',
-  'rgba(137, 237, 104, 0.4)', 'rgba(117, 237, 87, 0.4)', 'rgba(196, 98, 7, 0.4)', 'rgba(28, 100, 119, 0.4)',
-  'rgba(22, 164, 247, 0.4)', 'rgba(183, 119, 36, 0.4)', 'rgba(80, 3, 127, 0.4)', 'rgba(62, 165, 28, 0.4)',
+  'rgba(231, 90, 57, 0.4)', 'rgba(42, 187, 211, 0.4)', 'rgba(109, 255, 187, 0.4)', 'rgba(46, 36, 155, 0.4)',
+  'rgba(171, 186, 40, 0.4)', 'rgba(109, 255, 220, 0.4)', 'rgba(216, 26, 89, 0.4)', 'rgba(79, 247, 164, 0.4)',
+  'rgba(242, 204, 0, 0.4)', 'rgba(35, 170, 120, 0.4)', 'rgba(19, 116, 239, 0.4)', 'rgba(66, 170, 178, 0.4)',
+  'rgba(147, 237, 104, 0.4)', 'rgba(127, 237, 87, 0.4)', 'rgba(206, 98, 7, 0.4)', 'rgba(38, 100, 119, 0.4)',
+  'rgba(32, 164, 247, 0.4)', 'rgba(193, 119, 36, 0.4)', 'rgba(90, 3, 127, 0.4)', 'rgba(72, 165, 28, 0.4)',
 ]
 
 function MinersDistribution(props) {
@@ -161,14 +165,16 @@ function MinersDistribution(props) {
 
   return <div>
     {distribution.map((item, index) => {
-      const percentage = item.minedBlock * 100 / distribution[0].minedBlock
+      const percentage = (item.minedBlock * 100 / distribution[0].minedBlock).toFixed(2)
       return <div key={item.miner}>
         <div title={item.miner}>
           <Link to={`/accounts/${item.miner}`}>{reduceText(item.miner, 0, 5)}</Link>
         </div>
-        <div title={`${item.minedBlock} mined blocks`}
-          style={{ width: `${percentage}%`, backgroundColor: colors[index] }}>
-          {item.minedBlock}
+        <div> {/* This is a flex div. Keep both outer/inner div for proper use of width property. */}
+          <div title={`${item.minedBlock} mined blocks`}
+            style={{ width: `${percentage}%`, backgroundColor: colors[index] }}>
+            {item.minedBlock}
+          </div>
         </div>
       </div>
     })}
