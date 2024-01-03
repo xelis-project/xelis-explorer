@@ -1,9 +1,9 @@
-import { useEffect, useState, useMemo } from 'react'
-import queryString from 'query-string'
-import { useLocation } from 'react-router-dom'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { css } from 'goober'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
+import { useLang } from 'g45-react/hooks/useLang'
+import useQueryString from 'g45-react/hooks/useQueryString'
 
 import OffCanvas from '../../components/offCanvas'
 import Table from '../../components/table'
@@ -14,7 +14,6 @@ import useTheme from '../../hooks/useTheme'
 import { scaleOnHover } from '../../style/animate'
 import Switch from '../../components/switch'
 import Dropdown from '../../components/dropdown'
-import { useLang } from 'g45-react/hooks/useLang'
 
 const style = {
   container: css`
@@ -126,23 +125,76 @@ function useOffCanvasTable(props) {
   const height = info.height
   const stableHeight = info.stableHeight
 
-  const location = useLocation()
   const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
-  const searchHeight = useMemo(() => {
-    const query = queryString.parse(location.search)
+  const [query, setQuery] = useQueryString()
+
+  const queryHeight = useMemo(() => {
     const height = parseInt(query.height)
     if (!Number.isNaN(height)) return height
     return null
-  }, [location])
+  }, [query])
+
+  const queryBlockRange = useMemo(() => {
+    const blockRange = parseInt(query.block_range)
+    if (!Number.isNaN(blockRange)) return Math.min(blockRange, 100)
+    return 20
+  }, [query])
+
+  const queryHideOrphaned = useMemo(() => {
+    if (query.hide_orphaned) {
+      return query.hide_orphaned.toLowerCase() === `true`
+    }
+
+    return false
+  }, [query])
+
+  const queryHideLines = useMemo(() => {
+    if (query.hide_lines) {
+      return query.hide_lines.toLowerCase() === `true`
+    }
+
+    return false
+  }, [query])
+
+  const setQueryKey = useCallback((key, value) => {
+    let newQuery = Object.assign({}, query)
+    if (value !== null && typeof value !== "undefined") {
+      newQuery[key] = value.toString()
+    } else {
+      Reflect.deleteProperty(newQuery, key)
+    }
+
+    setQuery(newQuery)
+  }, [query])
 
   const [opened, setOpened] = useState(false)
-  const [paused, setPaused] = useState(searchHeight ? true : false)
-  const [hideOrphaned, setHideOrphaned] = useState(false)
-  const [hideLines, setHideLines] = useState(false)
-  const [inputHeight, setInputHeight] = useState(searchHeight)
-  const [blocksRange, setBlocksRange] = useState(20)
+  const [paused, setPaused] = useState(queryHeight ? true : false)
+  const [hideOrphaned, _setHideOrphaned] = useState(queryHideOrphaned)
+  const [hideLines, _setHideLines] = useState(queryHideLines)
+  const [inputHeight, _setInputHeight] = useState(queryHeight)
+  const [blockRange, _setBlockRange] = useState(queryBlockRange)
+
+  const setBlockRange = useCallback((value) => {
+    setQueryKey(`block_range`, value)
+    _setBlockRange(value)
+  }, [setQueryKey])
+
+  const setInputHeight = useCallback((value) => {
+    setQueryKey(`height`, value)
+    _setInputHeight(value)
+  }, [query])
+
+  const setHideLines = useCallback((value) => {
+    setQueryKey(`hide_lines`, value)
+    _setHideLines(value)
+  }, [query])
+
+  const setHideOrphaned = useCallback((value) => {
+    setQueryKey(`hide_orphaned`, value)
+    _setHideOrphaned(value)
+  }, [query])
 
   useEffect(() => {
     if (typeof inputHeight === `undefined` || inputHeight === null) setInputHeight(height)
@@ -153,21 +205,21 @@ function useOffCanvasTable(props) {
     return blocks.sort((a, b) => b.topoheight - a.topoheight)
   }, [hideOrphaned, blocks])
 
-  const blocksRangeList = useMemo(() => {
+  const blockRangeList = useMemo(() => {
     return [
       { key: 20, text: `20` },
       { key: 50, text: `50` },
       { key: 100, text: `100` }
     ]
-  })
+  }, [])
 
   const render = <OffCanvas opened={opened} maxWidth={500} position="right" className={style.container}>
     <div>
       <div className={style.controls}>
         <div>
-          <Dropdown items={blocksRangeList} value={blocksRange} onChange={(item) => {
+          <Dropdown items={blockRangeList} value={blockRange} onChange={(item) => {
             if (!paused) setInputHeight(height)
-            setBlocksRange(item.key)
+            setBlockRange(item.key)
           }} prefix={t('Block Range: ')} />
         </div>
         <div>
@@ -232,7 +284,7 @@ function useOffCanvasTable(props) {
       }} />
   </OffCanvas>
 
-  return { render, setOpened, paused, inputHeight, hideOrphaned, blocksRange, hideLines }
+  return { render, setOpened, paused, inputHeight, hideOrphaned, blockRange, hideLines }
 }
 
 export default useOffCanvasTable

@@ -319,8 +319,8 @@ function DAG() {
 
     let newBlocks = []
     const batch = 20 // can't fetch more than 20 at a time for getBlocksRangeByHeight
-    let start = Math.max(-1, inputHeight - offCanvasTable.blocksRange)
-    let end = start + offCanvasTable.blocksRange
+    let start = Math.max(-1, inputHeight - offCanvasTable.blockRange)
+    let end = start + offCanvasTable.blockRange
     for (let i = start; i < end; i += batch) {
       let batchStart = i + 1
       let batchEnd = i + batch
@@ -339,7 +339,7 @@ function DAG() {
 
     setBlocks(newBlocks)
     setLoading(false)
-  }, [offCanvasTable.inputHeight, offCanvasTable.blocksRange, nodeSocket.readyState])
+  }, [offCanvasTable.inputHeight, offCanvasTable.blockRange, nodeSocket.readyState])
 
   useEffect(() => {
     if (offCanvasTable.paused) return
@@ -360,7 +360,7 @@ function DAG() {
 
         const entries = [...groupBy(blocks, (b) => b.height).entries()]
         entries.sort((a, b) => a[0] - b[0])
-        if (entries.length >= offCanvasTable.blocksRange) {
+        if (entries.length >= offCanvasTable.blockRange) {
           const height = entries[0][0]
           blocks = blocks.filter(b => b.height !== height)
         }
@@ -369,7 +369,7 @@ function DAG() {
         return [newBlock, ...blocks]
       })
     }
-  }, [offCanvasTable.paused, offCanvasTable.blocksRange])
+  }, [offCanvasTable.paused, offCanvasTable.blockRange])
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrdered,
