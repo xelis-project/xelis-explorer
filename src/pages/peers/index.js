@@ -468,7 +468,7 @@ function TablePeers(props) {
       {t(`{} synced | {} desync | {} full ledger | {} pruned ledger | {} on the same version`, peerStats)}
     </div>
     <Table
-      headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Last Ping'), t('Version')]}
+      headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Since'), t('Last Ping'), t('Version')]}
       loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={9}
       onItem={(item) => {
         if (item.group) {
@@ -515,6 +515,9 @@ function TablePeers(props) {
           <td>{item.height}</td>
           <td>{item.topoheight}</td>
           <td>{item.pruned_topoheight || `--`}</td>
+          <td>
+            <Age timestamp={item.connected_on * 1000} update />
+          </td>
           <td>
             <Age timestamp={item.last_ping * 1000} update />
           </td>
