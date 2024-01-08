@@ -474,7 +474,7 @@ function TablePeers(props) {
         if (item.group) {
           const { country, country_code } = item.key
           return <tr key={country}>
-            <td colSpan={9}>
+            <td colSpan={10}>
               <div className={style.tableRowLocation}>
                 <FlagIcon code={country_code.toLowerCase()} />
                 <span>{country} ({item.count})</span>
