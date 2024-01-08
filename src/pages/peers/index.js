@@ -57,6 +57,7 @@ const style = {
       background: var(--text-color);
       color: var(--bg-color);
       border: none;
+      font-size: .7em;
       border-radius: 15px;
       padding: 0.3em 0.6em;
       font-weight: bold;
@@ -417,8 +418,8 @@ function TablePeers(props) {
   const groupPeers = useMemo(() => {
     const group = groupBy(peers, (p) => {
       const data = geoLocation[p.ip]
-      if (data) return { country: data.country, country_code: data.country_code }
-      return { country: `unknown`, country_code: `xx` }
+      if (data) return `${data.country_code}_${data.country}`
+      return `xx_Unknown`
     })
 
     let items = []
@@ -472,8 +473,11 @@ function TablePeers(props) {
       loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={9}
       onItem={(item) => {
         if (item.group) {
-          const { country, country_code } = item.key
-          return <tr key={country}>
+          const key = item.key
+          const values = key.split(`_`)
+          const country_code = values[0]
+          const country = values[1]
+          return <tr key={key}>
             <td colSpan={10}>
               <div className={style.tableRowLocation}>
                 <FlagIcon code={country_code.toLowerCase()} />
@@ -487,7 +491,7 @@ function TablePeers(props) {
         if (geoLoading) location = <DotLoading />
 
         const data = geoLocation[item.ip]
-        if (data && data.country && data.region) {
+        if (data) {
           const code = (data.country_code || 'xx').toLowerCase()
 
           if (groupCountry) {
@@ -498,7 +502,7 @@ function TablePeers(props) {
           } else {
             location = <div className={style.tableRowLocation}>
               <FlagIcon code={code} />
-              <span>{data.country} / {data.region}</span>
+              <span>{data.country}{data.region && ` / ${data.region}`}</span>
               <button onClick={() => flyTo(data)}>Fly To</button>
             </div>
           }
