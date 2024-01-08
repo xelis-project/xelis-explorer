@@ -565,7 +565,7 @@ function MapControls(props) {
 
 function PeerDot(props) {
   const { peerDot, leaflet, visible } = props
-  const { peers, position, location } = peerDot
+  const { peers, position, location, type } = peerDot
   const { CircleMarker, Popup } = leaflet.react
 
   const [dotRadius, setDotRadius] = useState(6)
@@ -580,13 +580,33 @@ function PeerDot(props) {
       .start()
   }, [peerDot.lastPing])
 
-  return <CircleMarker radius={dotRadius} pathOptions={{
-    opacity: visible ? 1 : 0, fillOpacity: visible ? .3 : 0,
-    weight: 1, color: `green`
-  }} center={position}>
+  const pathOptions = useMemo(() => {
+    let options = {}
+    switch (type) {
+      case `peer`:
+        options = { opacity: 1, fillOpacity: .3, weight: 1, color: `green` }
+        break
+      case `sub_peer`:
+        options = { opacity: .2, fillOpacity: .1, weight: 1, color: `yellow` }
+        break
+    }
+
+    if (!visible) {
+      options.opacity = 0
+      options.fillOpacity = 0
+    }
+
+    return options
+  }, [type, visible])
+
+  return <CircleMarker radius={dotRadius} pathOptions={pathOptions} center={position}>
     <Popup>
       <div>{location.country} / {location.region}</div>
       {peers.map((peer) => {
+        if (type === `sub_peer`) {
+          return <div key={peer.addr}>{peer.addr}</div>
+        }
+
         const peerCount = Object.keys(peer.peers || {}).length
         return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
       })}
@@ -648,31 +668,46 @@ function MapPeers(props) {
 
     const connectionLines = {}
     const peerDots = {}
-    peers.forEach((peer) => {
-      const peerLocation = geoLocation[peer.ip]
-      if (!peerLocation) return
 
-      const dotPosition = [peerLocation.latitude, peerLocation.longitude]
+    function appendDotPeer(props) {
+      const { peer, peerLocation, type } = props
       const dotKey = (peerLocation.latitude + peerLocation.longitude).toFixed(4)
-
       if (peerDots[dotKey]) {
-        // another peer with the same location
         if (peer.last_ping < peerDots[dotKey].lastPing) {
           peerDots[dotKey].lastPing = peer.last_ping
         }
 
-        peerDots[dotKey].peers.push(peer)
+        // another peer with the same location
+        if (!peerDots[dotKey].peers.find(p => p.addr === peer.addr)) {
+          peerDots[dotKey].peers.push(peer)
+        }
       } else {
-        peerDots[dotKey] = { peers: [peer], location: peerLocation, position: dotPosition, lastPing: peer.last_ping }
+        const dotPosition = [peerLocation.latitude, peerLocation.longitude]
+        peerDots[dotKey] = { peers: [peer], location: peerLocation, position: dotPosition, lastPing: peer.last_ping, type }
       }
+    }
+
+    // important use two loop to populate peers first and then add subpeers
+    peers.forEach((peer) => {
+      const peerLocation = geoLocation[peer.ip]
+      if (!peerLocation) return
+
+      appendDotPeer({ peer, peerLocation, type: `peer` })
+    })
+
+    peers.forEach((peer) => {
+      const peerLocation = geoLocation[peer.ip]
+      if (!peerLocation) return
 
       // handle sub peers and create connection line if direction is Both
-      for (const ip in peer.peers) {
-        const direction = peer.peers[ip]
+      for (const addr in peer.peers) {
+        const direction = peer.peers[addr]
         if (direction !== `Both`) continue
-        const addr = parseAddressWithPort(ip)
-        const subPeerLocation = geoLocation[addr.ip]
+        const host = parseAddressWithPort(addr)
+        const subPeerLocation = geoLocation[host.ip]
         if (!subPeerLocation) continue
+
+        appendDotPeer({ peer: { addr }, peerLocation: subPeerLocation, type: `sub_peer` })
         const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
         const lineKey = (peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude).toFixed(4)
 
