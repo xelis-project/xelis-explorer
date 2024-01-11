@@ -509,7 +509,7 @@ function TablePeers(props) {
         }
 
         const peers = Object.keys(item.peers || {}).length
-        const tag = item.tag ? reduceText(value, 20, 0) : `--`
+        const tag = item.tag ? reduceText(item.tag, 20, 0) : `--`
 
         return <tr key={item.addr}>
           <td>{item.addr}</td>
