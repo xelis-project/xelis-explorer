@@ -99,10 +99,10 @@ function Settings() {
     <div className="form-items">
       <div className="form-input">
         <label>{t('Node Endpoint')}</label>
-        <span>{t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/ws` depending on the server configuration.')}</span>
+        <span>{t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/json_rpc` depending on the server configuration.')}</span>
         <input type="text" value={nodeEnpoint} onChange={(e) => {
           setNodeEndpoint(e.target.value)
-        }} placeholder="wss://127.0.0.1/ws" />
+        }} placeholder="wss://127.0.0.1/json_rpc" />
         <div className="form-save">
           <Button icon="circle" onClick={() => {
             setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
