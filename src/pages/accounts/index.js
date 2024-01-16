@@ -39,7 +39,7 @@ function loadAccounts_SSR({ limit }) {
     const accounts = []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
-      const [err, res] = await to(daemonRPC.getLastBalance({
+      const [err, res] = await to(daemonRPC.getBalance({
         address: addr,
         asset: XELIS_ASSET
       }))
@@ -95,7 +95,7 @@ function Accounts() {
     const addresses = result2 || []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
-      const [err, balance] = await to(nodeSocket.daemon.getLastBalance({
+      const [err, balance] = await to(nodeSocket.daemon.getBalance({
         address: addr,
         asset: XELIS_ASSET
       }))
@@ -131,7 +131,7 @@ function Accounts() {
         },
         {
           key: 'topoheight',
-          title: t('Last Topo'),
+          title: t('Topo Height'),
           render: (_, item) => {
             const { topoheight } = item.balance || {}
             return topoheight ? topoheight : `--`
@@ -141,8 +141,9 @@ function Accounts() {
           key: 'balance',
           title: t('Balance'),
           render: (_, item) => {
-            const { balance } = item.balance || {}
-            return balance ? formatXelis(balance.balance) : `--`
+            const { version } = item.balance || {}
+            const { balance } = version || {}
+            return formatXelis(balance)
           }
         }
       ]} data={accounts} />

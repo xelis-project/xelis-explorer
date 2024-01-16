@@ -143,7 +143,7 @@ function Account() {
       setLoading(false)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getLastBalance({
+    const [err, result] = await to(nodeSocket.daemon.getBalance({
       address: addr,
       asset: asset,
     }))
@@ -181,7 +181,8 @@ function Account() {
     })
   }, [accountAssets])
 
-  const balance = account.balance ? account.balance.balance.balance : 0
+  const { version } = account.balance || {}
+  const { balance } = version || {}
   const nonce = account.nonce ? account.nonce.nonce : `--`
 
   const description = useMemo(() => {
