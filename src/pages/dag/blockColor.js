@@ -1,28 +1,26 @@
+import { BlockType } from '@xelis/sdk/daemon/types'
+
 const colors = {
   xelis: {
-    sync: `#32C732`,
-    normal: '#FAC898',
-    side: '#5581AA',
-    orphaned: '#FF6961'
+    [BlockType.Sync]: `#32C732`,
+    [BlockType.Normal]: '#FAC898',
+    [BlockType.Side]: '#5581AA',
+    [BlockType.Orphaned]: '#FF6961'
   },
   light: {
-    sync: '#32C732',
-    normal: '#FAC898',
-    side: '#5581AA',
-    orphaned: '#FF6961'
+    [BlockType.Sync]: '#32C732',
+    [BlockType.Normal]: '#FAC898',
+    [BlockType.Side]: '#5581AA',
+    [BlockType.Orphaned]: '#FF6961'
   },
   dark: {
-    sync: '#32C732',
-    normal: '#FAC898',
-    side: '#5581AA',
-    orphaned: '#FF6961'
+    [BlockType.Sync]: '#32C732',
+    [BlockType.Normal]: '#FAC898',
+    [BlockType.Side]: '#5581AA',
+    [BlockType.Orphaned]: '#FF6961'
   }
 }
 
-const value = (theme, blockType) => {
-  return colors[theme][blockType.toLowerCase()]
+export const getBlockColor = (theme, blockType) => {
+  return colors[theme][blockType]
 }
-
-const types = ['sync', 'normal', 'side', 'orphaned']
-
-export default { colors, types, value }

@@ -4,12 +4,13 @@ import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
 import useQueryString from 'g45-react/hooks/useQueryString'
+import { BlockType } from '@xelis/sdk/daemon/types'
 
 import OffCanvas from '../../components/offCanvas'
 import Table from '../../components/table'
 import { getBlockType } from './index'
 import Button from '../../components/button'
-import blockColor from './blockColor'
+import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
 import { scaleOnHover } from '../../style/animate'
 import Switch from '../../components/switch'
@@ -201,7 +202,7 @@ function useOffCanvasTable(props) {
   }, [height, inputHeight])
 
   const filteredBlocks = useMemo(() => {
-    if (hideOrphaned) return blocks.filter(x => x.block_type !== 'Orphaned').sort((a, b) => b.topoheight - a.topoheight)
+    if (hideOrphaned) return blocks.filter(x => x.block_type !== BlockType.Orphaned).sort((a, b) => b.topoheight - a.topoheight)
     return blocks.sort((a, b) => b.topoheight - a.topoheight)
   }, [hideOrphaned, blocks])
 
@@ -272,7 +273,7 @@ function useOffCanvasTable(props) {
             <span>{(block.topoheight || 0).toLocaleString()}</span>&nbsp;
             <span title={t('Height')}>({(block.height || 0).toLocaleString()})</span>&nbsp;
           </td>
-          <td style={{ color: blockColor.value(currentTheme, blockType) }}>
+          <td style={{ color: getBlockColor(currentTheme, blockType) }}>
             {blockType}
           </td>
           <td>{block.hash.slice(-6).toUpperCase()}</td>

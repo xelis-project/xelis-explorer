@@ -3,8 +3,9 @@ import prettyMs from 'pretty-ms'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import useTheme from '../../hooks/useTheme'
-import blockColor from './blockColor'
+import { getBlockColor } from './blockColor'
 import theme from '../../style/theme'
+import { BlockType } from '@xelis/sdk/daemon/types'
 
 const style = {
   container: css`
@@ -72,9 +73,9 @@ function BottomInfo(props) {
 
   return <div className={style.container}>
     <div>
-      {blockColor.types.map((key) => {
+      {[BlockType.Sync, BlockType.Normal, BlockType.Side, BlockType.Orphaned].map((key) => {
         return <div key={key}>
-          <div style={{ backgroundColor: blockColor.value(currentTheme, key) }} />
+          <div style={{ backgroundColor: getBlockColor(currentTheme, key) }} />
           <div>{key}</div>
         </div>
       })}

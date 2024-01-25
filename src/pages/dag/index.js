@@ -7,7 +7,7 @@ import { MeshBasicMaterial, Vector3 } from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
-import { RPCEvent } from '@xelis/sdk/daemon/types'
+import { RPCEvent, BlockType } from '@xelis/sdk/daemon/types'
 import TWEEN from '@tweenjs/tween.js'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
@@ -17,7 +17,7 @@ import Button from '../../components/button'
 import NodeStatus from '../../layout/node_status'
 import useOffCanvasTable from './offCanvasTable'
 import useOffCanvasBlock from './offCanvasBlock'
-import blockColor from './blockColor'
+import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
 import BottomInfo from './bottomInfo'
 import { scaleOnHover } from '../../style/animate'
@@ -81,8 +81,8 @@ const style = {
 }
 
 export function getBlockType(block, stableHeight) {
-  if (block.block_type === 'Normal' && block.height <= stableHeight) {
-    return "Sync"
+  if (block.block_type === BlockType.Normal && block.height <= stableHeight) {
+    return BlockType.Sync
   }
 
   return block.block_type
@@ -247,7 +247,7 @@ function InstancedBlocks(props) {
       if (hoveredBlock && data.hash === hoveredBlock.data.hash) scaleValue = 1.3
       let boxScale = new Vector3(scaleValue, scaleValue, scaleValue)
 
-      return <Instance key={data.hash} position={[x, y, 2]} color={blockColor.value(currentTheme, blockType)}
+      return <Instance key={data.hash} position={[x, y, 2]} color={getBlockColor(currentTheme, blockType)}
         onPointerOver={(e) => onPointerEnter(block, e)}
         onPointerOut={onPointerLeave}
         scale={boxScale}
@@ -386,6 +386,20 @@ function DAG() {
     }
   }, [offCanvasTable.paused])
 
+  useNodeSocketSubscribe({
+    event: RPCEvent.BlockOrphaned,
+    onData: (_, data) => {
+      if (offCanvasTable.paused) return
+      const { block_hash, old_topoheight } = data
+      setBlocks((blocks) => blocks.map(block => {
+        if (block.hash === block_hash) {
+          block.block_type = BlockType.Orphaned
+        }
+        return block
+      }))
+    }
+  }, [offCanvasBlock.paused])
+
   const distanceX = 2.5
   const distanceY = 2
   const [blocksToRender, setBlocksToRender] = useState([])
@@ -395,7 +409,7 @@ function DAG() {
   useEffect(() => {
     let filteredBlocks = blocks
     if (offCanvasTable.hideOrphaned) {
-      filteredBlocks = blocks.filter(x => x.block_type !== 'Orphaned')
+      filteredBlocks = blocks.filter(x => x.block_type !== BlockType.Orphaned)
     }
 
     const blocksToRender = []
