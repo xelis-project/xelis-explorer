@@ -17,10 +17,15 @@ export const shiftNumber = (value, decimals) => {
 }
 
 export const formatXelis = (value, { withSuffix = true } = {}) => {
-  let number = shiftNumber(value, 5).toNumber().toLocaleString(undefined, { maximumFractionDigits: 5 })
+  const number = formatAsset(value, 8)
   return `${number}${withSuffix ? ` XEL` : ``}`
 }
 
+export const formatAsset = (value, decimals) => {
+  return shiftNumber(value, decimals).toNumber().toLocaleString(undefined, { maximumFractionDigits: decimals })
+}
+
+/*
 export const formatAsset = (value, asset) => {
   switch (asset) {
     case XELIS_ASSET:
@@ -28,7 +33,7 @@ export const formatAsset = (value, asset) => {
     default:
       return `${value} (${reduceText(asset)})`
   }
-}
+}*/
 
 export const formatSize = (value, options = { unitSeparator: ` ` }) => {
   return bytes.format(value, options)

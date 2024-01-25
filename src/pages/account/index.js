@@ -357,13 +357,13 @@ function History(props) {
             const { outgoing, incoming, mining, burn } = item
             switch (itemType) {
               case "OUTGOING":
-                return formatAsset(outgoing.amount, asset)
+                return formatAsset(outgoing.amount, 0)
               case "INCOMING":
-                return formatAsset(incoming.amount, asset)
+                return formatAsset(incoming.amount, 0)
               case "MINING":
-                return formatAsset(mining.reward, asset)
+                return formatAsset(mining.reward, 0)
               case "BURN":
-                return formatAsset(burn.amount, asset)
+                return formatAsset(burn.amount, 0)
               default:
                 return null
             }

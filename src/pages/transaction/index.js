@@ -181,7 +181,7 @@ function Transfers(props) {
         return <React.Fragment key={index}>
           <tr key={index}>
             <td>{reduceText(asset)}</td>
-            <td>{formatAsset(amount, asset)}</td>
+            <td>{formatAsset(amount, 0)}</td>
             <td>
               <Link to={`/accounts/${to}`}>
                 {to}
@@ -213,7 +213,7 @@ function Burns(props) {
         const { amount, asset } = item
         return <tr key={index}>
           <td>{reduceText(asset)}</td>
-          <td>{formatAsset(amount, asset)}</td>
+          <td>{formatAsset(amount, 0)}</td>
         </tr>
       }}
     />
