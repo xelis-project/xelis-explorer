@@ -4,13 +4,12 @@ import { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
-import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import TableFlex from '../../components/tableFlex'
-import { XELIS_ASSET, formatAsset, formatXelis, reduceText } from '../../utils'
+import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, reduceText } from '../../utils'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
@@ -123,7 +122,6 @@ function Account() {
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
 
-  const { firstPageLoad } = usePageLoad()
   //const serverResult = loadAccount_SSR({ addr })
 
   const [loading, setLoading] = useState(false)
@@ -131,6 +129,7 @@ function Account() {
   const [account, setAccount] = useState({})
   const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
   const [asset, setAsset] = useState(XELIS_ASSET)
+  const [assetData, setAssetData] = useState(XELIS_ASSET_DATA)
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -154,12 +153,19 @@ function Account() {
     }))
     if (err2) return resErr(err2)
 
-
     const [err3, result3] = await to(nodeSocket.daemon.getAccountAssets(addr))
     if (err3) return resErr(err3)
 
+    // we don't need to fetch asset decimals if it's xelis - we have it hardcoded
+    if (asset !== XELIS_ASSET) {
+      const [err4, result4] = await to(nodeSocket.daemon.getAsset({ asset }))
+      if (err4) return resErr(err4)
+      setAssetData(result4)
+    }
+
     setAccount({ addr, balance: result, nonce: result2 })
     setAccountAssets(result3)
+
     setLoading(false)
   }, [asset, addr, nodeSocket.readyState])
 
@@ -217,7 +223,7 @@ function Account() {
           </div>
         </div>
       </div>
-      <History addr={addr} asset={asset} />
+      <History addr={addr} asset={asset} assetData={assetData} />
     </div>
   </div>
 }
@@ -244,7 +250,7 @@ function loadAccountHistory_SSR() {
 */
 
 function History(props) {
-  const { asset, addr } = props
+  const { asset, assetData, addr } = props
 
   const nodeSocket = useNodeSocket()
 
@@ -355,15 +361,16 @@ function History(props) {
           render: (_, item) => {
             const itemType = getType(item)
             const { outgoing, incoming, mining, burn } = item
+            const { decimals } = assetData
             switch (itemType) {
               case "OUTGOING":
-                return formatAsset(outgoing.amount, 0)
+                return formatAsset(outgoing.amount, decimals)
               case "INCOMING":
-                return formatAsset(incoming.amount, 0)
+                return formatAsset(incoming.amount, decimals)
               case "MINING":
-                return formatAsset(mining.reward, 0)
+                return formatAsset(mining.reward, decimals)
               case "BURN":
-                return formatAsset(burn.amount, 0)
+                return formatAsset(burn.amount, decimals)
               default:
                 return null
             }

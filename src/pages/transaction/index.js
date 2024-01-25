@@ -62,7 +62,6 @@ function Transaction() {
   const loadTx = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-
     setErr(null)
     setLoading(true)
 
@@ -181,7 +180,7 @@ function Transfers(props) {
         return <React.Fragment key={index}>
           <tr key={index}>
             <td>{reduceText(asset)}</td>
-            <td>{formatAsset(amount, 0)}</td>
+            <td>{formatXelis(amount)}</td> {/* We assume it's native asset for now */}
             <td>
               <Link to={`/accounts/${to}`}>
                 {to}
@@ -213,7 +212,7 @@ function Burns(props) {
         const { amount, asset } = item
         return <tr key={index}>
           <td>{reduceText(asset)}</td>
-          <td>{formatAsset(amount, 0)}</td>
+          <td>{formatXelis(amount)}</td>
         </tr>
       }}
     />

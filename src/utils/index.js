@@ -11,13 +11,15 @@ export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
 }
 
 export const XELIS_ASSET = `0000000000000000000000000000000000000000000000000000000000000000`
+export const XELIS_DECIMALS = 8
+export const XELIS_ASSET_DATA = { topoheight: 0, decimals: XELIS_DECIMALS }
 
 export const shiftNumber = (value, decimals) => {
   return new BigNumber(value || 0).shiftedBy(-decimals)
 }
 
 export const formatXelis = (value, { withSuffix = true } = {}) => {
-  const number = formatAsset(value, 8)
+  const number = formatAsset(value, XELIS_DECIMALS)
   return `${number}${withSuffix ? ` XEL` : ``}`
 }
 
