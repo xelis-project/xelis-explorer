@@ -32,6 +32,7 @@ const style = {
         border-left: .3em solid var(--block-border-color);
         background-color: var(--block-bg-color);
         min-width: 9em;
+        flex-shrink: 0;
         border-radius: .25em;
 
         > :nth-child(1) {

@@ -89,14 +89,24 @@ const style = {
       background: ${theme.apply({ xelis: `#262626`, dark: `#262626`, light: `#d5dadc` })};
     }
 
+    .leaflet-popup-content-wrapper {
+      border-radius: .5em;
+    }
+
     .leaflet-popup-content {
+      margin: 1em;
+
       > :nth-child(1) {
         font-weight: bold;
         padding-bottom: .5em;
+        font-size: 1.1em;
       }
 
-      > :nth-child(2), > :nth-child(3) {
+      > :nth-child(2) {
         font-size: .9em;
+        max-height: 5em;
+        overflow: auto;
+        padding-right: 1em;
       }
     }
   `,
@@ -602,14 +612,16 @@ function PeerDot(props) {
   return <CircleMarker radius={dotRadius} pathOptions={pathOptions} center={position}>
     <Popup>
       <div>{location.country} / {location.region}</div>
-      {peers.map((peer) => {
-        if (type === `sub_peer`) {
-          return <div key={peer.addr}>{peer.addr}</div>
-        }
+      <div>
+        {peers.map((peer) => {
+          if (type === `sub_peer`) {
+            return <div key={peer.addr}>{peer.addr}</div>
+          }
 
-        const peerCount = Object.keys(peer.peers || {}).length
-        return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
-      })}
+          const peerCount = Object.keys(peer.peers || {}).length
+          return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
+        })}
+      </div>
     </Popup>
   </CircleMarker>
 }
