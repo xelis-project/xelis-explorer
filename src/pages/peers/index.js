@@ -544,7 +544,7 @@ function TablePeers(props) {
 
 function MapControls(props) {
   const { controls, setControls, mapRef } = props
-  const { showConnections, showPeers } = controls
+  const { showConnections, showPeers, useAnimation } = controls
 
   const { t } = useLang()
 
@@ -568,27 +568,41 @@ function MapControls(props) {
       <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
     </div>
     <div>
+      {t('Animate')}
+      <Switch checked={useAnimation} onChange={(checked) => setControlValue('useAnimation', checked)} />
+    </div>
+    <div>
       <button onClick={reset}>{t('Reset')}</button>
     </div>
   </div>
 }
 
 function PeerDot(props) {
-  const { peerDot, leaflet, visible } = props
+  const { peerDot, leaflet, visible, animate = true } = props
   const { peers, position, location, type } = peerDot
   const { CircleMarker, Popup } = leaflet.react
 
   const [dotRadius, setDotRadius] = useState(6)
+  const tweenRef = useRef()
 
   useEffect(() => {
-    new TWEEN.Tween({ x: 3 })
-      .to({ x: 6 }, 1500)
-      .easing(TWEEN.Easing.Elastic.Out)
-      .onUpdate((v) => {
-        setDotRadius(v.x)
-      })
-      .start()
-  }, [peerDot.lastPing])
+    const startSize = 3
+    const endSize = 6
+    if (!tweenRef.current) {
+      tweenRef.current = new TWEEN.Tween({ x: startSize })
+        .to({ x: endSize }, 1500)
+        .easing(TWEEN.Easing.Elastic.Out)
+        .onUpdate((v) => {
+          setDotRadius(v.x)
+        })
+        .onStop(() => {
+          setDotRadius(endSize)
+        })
+    }
+
+    if (animate) tweenRef.current.start()
+    else tweenRef.current.stop()
+  }, [animate, peerDot.lastPing])
 
   const pathOptions = useMemo(() => {
     let options = {}
@@ -627,22 +641,27 @@ function PeerDot(props) {
 }
 
 function PeerConnection(props) {
-  const { positions, leaflet, visible } = props
+  const { positions, leaflet, visible, animate = true } = props
   const { Polyline } = leaflet.react
 
   const [dashOffset, setDashOffset] = useState(0)
+  const tweenRef = useRef()
 
   useEffect(() => {
-    new TWEEN.Tween({ x: 0 })
-      .to({ x: 100 }, 100000)
-      .easing(TWEEN.Easing.Linear.None)
-      .onUpdate((obj) => {
-        setDashOffset(obj.x)
-      })
-      //.yoyo(true)
-      .repeat(Infinity)
-      .start()
-  }, [])
+    if (!tweenRef.current) {
+      tweenRef.current = new TWEEN.Tween({ x: 0 })
+        .to({ x: 100 }, 100000)
+        .easing(TWEEN.Easing.Linear.None)
+        .onUpdate((obj) => {
+          setDashOffset(obj.x)
+        })
+        //.yoyo(true)
+        .repeat(Infinity)
+    }
+
+    if (animate) tweenRef.current.start()
+    else tweenRef.current.stop()
+  }, [animate])
 
   const opacity = visible ? .2 : 0
 
@@ -655,7 +674,7 @@ function MapPeers(props) {
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
   const [mapContainer, setMapContainer] = useState()
-  const [controls, setControls] = useState({ showConnections: true, showPeers: true })
+  const [controls, setControls] = useState({ showConnections: true, showPeers: true, useAnimation: true })
 
   useEffect(() => {
     const load = async () => {
@@ -735,11 +754,11 @@ function MapPeers(props) {
         url={tileLayerUrl}
       />
       {Object.keys(peerDots).map((key) => {
-        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} />
+        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.useAnimation} />
       })}
       {Object.keys(connectionLines).map((key) => {
         const positions = connectionLines[key]
-        return <PeerConnection key={key} positions={positions} visible={controls.showConnections} leaflet={leaflet} />
+        return <PeerConnection key={key} positions={positions} visible={controls.showConnections} leaflet={leaflet} animate={controls.useAnimation} />
       })}
     </MapContainer>
 
