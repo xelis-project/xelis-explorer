@@ -343,7 +343,7 @@ function Peers() {
       peer.ip = addr.ip
       setGeoLocation((geo) => ({ ...geo, ...data }))
       setPeers((peers) => {
-        const exists = peers.find((p) => p.addr === peer.addr)
+        const exists = peers.find((p) => p.id === peer.id)
         if (!exists) return [...peers, peer]
         return peers
       })
@@ -521,7 +521,7 @@ function TablePeers(props) {
         const peers = Object.keys(item.peers || {}).length
         const tag = item.tag ? reduceText(item.tag, 20, 0) : `--`
 
-        return <tr key={item.addr}>
+        return <tr key={item.id}>
           <td>{item.addr}</td>
           <td>{location}</td>
           <td>{peers}</td>
