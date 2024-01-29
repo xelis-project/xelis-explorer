@@ -15,6 +15,9 @@ import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import { slideX } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
+import { getBlockColor } from '../dag/blockColor'
+import useTheme from '../../hooks/useTheme'
+import { getBlockType } from '../dag'
 
 const style = {
   container: css`
@@ -68,12 +71,14 @@ function Blocks() {
   const [loading, setLoading] = useState()
   const [pageState, setPageState] = useState({ page: 1, size: 20 })
   const { t } = useLang()
+  const { theme } = useTheme()
 
   const serverResult = loadBlocks_SSR({ limit: 20 })
   const [blockCount, setBlockCount] = useState(serverResult.totalBlocks)
   const [blocks, setBlocks] = useState(serverResult.blocks)
   const nodeSocket = useNodeSocket()
   const [newBlock, setNewBlock] = useState()
+  const [info, setInfo] = useState({})
 
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -108,12 +113,21 @@ function Blocks() {
     setLoading(false)
   }, [pageState, nodeSocket.readyState])
 
+  const loadInfo = useCallback(async () => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    const [err, info] = await to(nodeSocket.daemon.methods.getInfo())
+    if (err) return setErr(err)
+    setInfo(info)
+  }, [nodeSocket.readyState])
+
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,
     onData: (_, newBlock) => {
       // don't add new block if we're not on first page
       if (pageState.page > 1) return
 
+      loadInfo()
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
 
@@ -129,6 +143,23 @@ function Blocks() {
     }
   }, [pageState])
 
+  useNodeSocketSubscribe({
+    event: RPCEvent.BlockOrdered,
+    onData: (_, data) => {
+      // dont't update blocks if we are not on first page
+      if (pageState.page > 1) return
+
+      const { topoheight, block_hash, block_type } = data
+      setBlocks((blocks) => blocks.map(block => {
+        if (block.hash === block_hash) {
+          block.topoheight = topoheight
+          block.block_type = block_type
+        }
+        return block
+      }))
+    }
+  }, [pageState])
+
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
     loadBlocks()
@@ -141,7 +172,7 @@ function Blocks() {
   return <div className={style.container}>
     <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
-    <TableFlex data={blocks} rowKey={'topoheight'} err={err} loading={loading} emptyText={t('No blocks')}
+    <TableFlex data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}
       rowClassName={(block) => {
         if (newBlock && block.hash === newBlock.hash) return style.animateBlock
         return null
@@ -151,6 +182,15 @@ function Blocks() {
           key: 'topoheight',
           title: t('Topo'),
           render: (value) => <Link to={`/blocks/${value}`}>{value}</Link>
+        },
+        {
+          key: 'block_type',
+          title: t('Type'),
+          render: (_, block) => {
+            const blockType = getBlockType(block, info.stableheight || 0)
+            const color = getBlockColor(theme, blockType)
+            return <span style={{ color }}>{blockType}</span>
+          }
         },
         {
           key: 'txs_hashes',
