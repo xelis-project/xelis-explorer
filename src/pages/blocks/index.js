@@ -90,14 +90,14 @@ function Blocks() {
 
     let pagination = getPaginationRange(pageState)
 
-    const [err1, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
     if (err1) return resErr(err1)
 
     // reverse pager range
     let startTopoheight = Math.max(0, topoheight - pagination.end)
     let endTopoheight = topoheight - pagination.start
 
-    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
+    const [err2, blocks] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight
     }))

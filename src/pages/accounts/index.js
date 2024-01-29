@@ -80,12 +80,12 @@ function Accounts() {
       setLoading(false)
     }
 
-    const [err1, result1] = await to(nodeSocket.daemon.countAccounts())
+    const [err1, result1] = await to(nodeSocket.daemon.methods.countAccounts())
     if (err1) return resErr(err)
 
     let pagination = getPaginationRange(pageState)
 
-    const [err2, result2] = await to(nodeSocket.daemon.getAccounts({
+    const [err2, result2] = await to(nodeSocket.daemon.methods.getAccounts({
       skip: Math.max(0, pagination.start - 1),
       maximum: pageState.size
     }))
@@ -95,7 +95,7 @@ function Accounts() {
     const addresses = result2 || []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
-      const [err, balance] = await to(nodeSocket.daemon.getBalance({
+      const [err, balance] = await to(nodeSocket.daemon.methods.getBalance({
         address: addr,
         asset: XELIS_ASSET
       }))

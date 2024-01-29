@@ -178,7 +178,7 @@ export function NetworkStats(props) {
     }
 
     setLoading(true)
-    const [err, info] = await to(nodeSocket.daemon.getInfo())
+    const [err, info] = await to(nodeSocket.daemon.methods.getInfo())
     if (err) return resErr(err)
     setInfo(info)
     setLoading(false)
@@ -187,7 +187,7 @@ export function NetworkStats(props) {
   const loadP2PStatus = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    const [err, p2p] = await to(nodeSocket.daemon.p2pStatus())
+    const [err, p2p] = await to(nodeSocket.daemon.methods.p2pStatus())
     if (err) return
 
     setP2PStatus(p2p)

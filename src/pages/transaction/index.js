@@ -70,7 +70,7 @@ function Transaction() {
       setLoading(false)
     }
 
-    const [err, data] = await to(nodeSocket.daemon.getTransaction(hash))
+    const [err, data] = await to(nodeSocket.daemon.methods.getTransaction(hash))
     if (err) return resErr(err)
 
     setTx(data)
@@ -243,7 +243,7 @@ function InBlocks(props) {
     const blocks = []
     for (let i = 0; i < (tx.blocks || []).length; i++) {
       const hash = tx.blocks[i]
-      const [err, data] = await to(nodeSocket.daemon.getBlockByHash({
+      const [err, data] = await to(nodeSocket.daemon.methods.getBlockByHash({
         hash: hash
       }))
       if (err) return resErr(err)

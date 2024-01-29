@@ -248,10 +248,10 @@ function useNetworkData() {
       setLoading(false)
     }
 
-    const [err, res] = await to(nodeSocket.daemon.p2pStatus())
+    const [err, res] = await to(nodeSocket.daemon.methods.p2pStatus())
     if (err) return resErr(err)
 
-    const [err2, res2] = await to(nodeSocket.daemon.getInfo())
+    const [err2, res2] = await to(nodeSocket.daemon.methods.getInfo())
     if (err2) return resErr(err)
 
     setLoading(false)
@@ -290,7 +290,7 @@ function Peers() {
       setErr(err)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getPeers())
+    const [err, result] = await to(nodeSocket.daemon.methods.getPeers())
     if (err) return resErr(err)
 
     const peers = result.map((peer) => {

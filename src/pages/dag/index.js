@@ -300,7 +300,7 @@ function DAG() {
   const loadInfo = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    const [err, info] = await to(nodeSocket.daemon.getInfo())
+    const [err, info] = await to(nodeSocket.daemon.methods.getInfo())
     if (err) return setErr(err)
     setInfo(info)
   }, [nodeSocket.readyState])
@@ -329,7 +329,7 @@ function DAG() {
         i = end
       }
 
-      const [err, data] = await to(nodeSocket.daemon.getBlocksRangeByHeight({
+      const [err, data] = await to(nodeSocket.daemon.methods.getBlocksRangeByHeight({
         start_height: batchStart,
         end_height: batchEnd
       }))

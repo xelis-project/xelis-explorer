@@ -90,7 +90,7 @@ function MemPool() {
       setErr(err)
     }
 
-    const [err, data] = await to(nodeSocket.daemon.getMemPool())
+    const [err, data] = await to(nodeSocket.daemon.methods.getMemPool())
     if (err) return resErr(err)
     setMemPool(data)
     setLoading(false)
@@ -277,11 +277,11 @@ function ExecutedTxs(props) {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
     if (err1) return resErr(err1)
     setTopoheight(topoheight)
 
-    const [err2, blocks] = await to(nodeSocket.daemon.getBlocksRangeByTopoheight({
+    const [err2, blocks] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
       start_topoheight: Math.max(0, topoheight - 19),
       end_topoheight: topoheight
     }))
@@ -298,7 +298,7 @@ function ExecutedTxs(props) {
     const recentExecuted = []
     for (let i = 0; i < txBlockMap.size; i += 20) {
       const txIds = Array.from(txBlockMap.keys())
-      const [err3, txs] = await to(nodeSocket.daemon.getTransactions(txIds.slice(i, 20)))
+      const [err3, txs] = await to(nodeSocket.daemon.methods.getTransactions(txIds.slice(i, 20)))
       if (err3) return resErr(err3)
 
       txs.forEach((tx) => {
@@ -320,7 +320,7 @@ function ExecutedTxs(props) {
         let filteredPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.tx_hash) {
-            const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
               topoheight: data.topoheight
             }))
             if (err) return setErr(err)
@@ -340,7 +340,7 @@ function ExecutedTxs(props) {
     event: RPCEvent.NewBlock,
     onData: async () => {
       // remove txs with blocks lower than the first tx block
-      const [err, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
+      const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
       if (err) return setErr(err)
 
       setTopoheight(topoheight)

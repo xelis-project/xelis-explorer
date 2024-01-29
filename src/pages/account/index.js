@@ -142,23 +142,23 @@ function Account() {
       setLoading(false)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getBalance({
+    const [err, result] = await to(nodeSocket.daemon.methods.getBalance({
       address: addr,
       asset: asset,
     }))
     if (err) return resErr(err)
 
-    const [err2, result2] = await to(nodeSocket.daemon.getNonce({
+    const [err2, result2] = await to(nodeSocket.daemon.methods.getNonce({
       address: addr,
     }))
     if (err2) return resErr(err2)
 
-    const [err3, result3] = await to(nodeSocket.daemon.getAccountAssets(addr))
+    const [err3, result3] = await to(nodeSocket.daemon.methods.getAccountAssets(addr))
     if (err3) return resErr(err3)
 
     // we don't need to fetch asset decimals if it's xelis - we have it hardcoded
     if (asset !== XELIS_ASSET) {
-      const [err4, result4] = await to(nodeSocket.daemon.getAsset({ asset }))
+      const [err4, result4] = await to(nodeSocket.daemon.methods.getAsset({ asset }))
       if (err4) return resErr(err4)
       setAssetData(result4)
     }
@@ -281,7 +281,7 @@ function History(props) {
       params.maximum_topoheight = pages[page]
     }
 
-    const [err, result] = await to(nodeSocket.daemon.getAccountHistory(params))
+    const [err, result] = await to(nodeSocket.daemon.methods.getAccountHistory(params))
     if (err) return resErr(err)
 
     setHistory(result)

@@ -134,18 +134,18 @@ function Block() {
       setLoading(false)
     }
 
-    const [err, topoheight] = await to(nodeSocket.daemon.getTopoHeight())
+    const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
     if (err) return resErr(err)
     setTopoheight(topoheight)
 
     if (isHash(id)) {
-      const [err, block] = await to(nodeSocket.daemon.getBlockByHash({
+      const [err, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
         hash: id
       }))
       if (err) return resErr(err)
       setBlock(block)
     } else {
-      const [err, block] = await to(nodeSocket.daemon.getBlockAtTopoHeight({
+      const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
         topoheight: parseInt(id)
       }))
       if (err) return resErr(err)

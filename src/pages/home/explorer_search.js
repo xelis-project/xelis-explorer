@@ -96,7 +96,7 @@ export function ExplorerSearch() {
     }
 
     if (searchValue.length === 64) {
-      const [err, block] = await to(nodeSocket.daemon.getBlockByHash({
+      const [err, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
         hash: searchValue
       }))
       if (block) {
