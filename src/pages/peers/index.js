@@ -19,6 +19,7 @@ import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
+import Dropdown from '../../components/dropdown'
 
 const style = {
   container: css`
@@ -169,7 +170,8 @@ const style = {
       > :nth-child(2) {
         display: flex;
         gap: 0.5em;
-        align-items: center;
+        flex-direction: column;
+        min-width: 10em;
       }
     }
 
@@ -413,7 +415,7 @@ function TablePeers(props) {
 
   const { t } = useLang()
   const [filterIP, setFilterIP] = useState(``)
-  const [groupCountry, setGroupCountry] = useState(false)
+  const [groupKey, setGroupKey] = useState(``)
 
   const flyTo = useCallback((data) => {
     const position = [data.latitude, data.longitude]
@@ -427,30 +429,35 @@ function TablePeers(props) {
 
   const groupPeers = useMemo(() => {
     const group = groupBy(peers, (p) => {
-      const data = geoLocation[p.ip]
-      if (data) return `${data.country_code}_${data.country}`
-      return `xx_Unknown`
+      if (groupKey === `country`) {
+        const data = geoLocation[p.ip]
+        if (data) return `${data.country_code}_${data.country}`
+        return `xx_Unknown`
+      }
+
+      return p[groupKey]
     })
 
     let items = []
     group.forEach((value, key) => {
-      items.push({ key, group: true, count: value.length })
+      items.push({ key, groupHeader: true, count: value.length })
       items = [...items, ...value]
     })
 
     return items
-  }, [peers, geoLocation])
+  }, [groupKey, peers, geoLocation])
 
   const filteredPeers = useMemo(() => {
-    const peersToFilter = groupCountry ? groupPeers : peers
+    const peersToFilter = groupKey ? groupPeers : peers
     return peersToFilter.filter((p) => {
       if (filterIP.length > 0) {
+        if (p.groupHeader) return true
         if (p.addr) return p.addr.includes(filterIP)
         return false
       }
       return true
     })
-  }, [peers, groupPeers, filterIP, groupCountry])
+  }, [peers, groupPeers, filterIP, groupKey])
 
   const peerStats = useMemo(() => {
     const stats = [0, 0, 0, 0, 0] // synced, desync, fullLedger, prunedLedger, sameVersion
@@ -468,11 +475,21 @@ function TablePeers(props) {
     return stats
   }, [peers, networkData])
 
+  const groupItems = useMemo(() => {
+    return [
+      { key: ``, text: t(`None`) },
+      { key: `country`, text: t(`Country`) },
+      { key: `version`, text: t(`Version`) },
+      { key: `height`, text: t(`Height`) },
+    ]
+  }, [t])
+
   return <div className={style.peerList}>
     <div>
       <input type="text" onChange={onFilterIP} placeholder={t(`Type to filter peers by address.`)} />
       <div>
-        <Switch checked={groupCountry} onChange={setGroupCountry} />{t(`Group by Country`)}
+        <div>Group by</div>
+        <Dropdown items={groupItems} onChange={({ key }) => setGroupKey(key)} value={groupKey} />
       </div>
     </div>
     <div>
@@ -482,16 +499,24 @@ function TablePeers(props) {
       headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Since'), t('Last Ping'), t('Version')]}
       loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={9}
       onItem={(item) => {
-        if (item.group) {
+        if (item.groupHeader) {
           const key = item.key
-          const values = key.split(`_`)
-          const country_code = values[0]
-          const country = values[1]
+          let text = <span>{key} ({item.count})</span>
+
+          if (groupKey === `country`) {
+            const values = key.split(`_`)
+            const country_code = values[0]
+            const country = values[1]
+            text = <>
+              <FlagIcon code={country_code.toLowerCase()} />
+              <span>{country} ({item.count})</span>
+            </>
+          }
+
           return <tr key={key}>
-            <td colSpan={10}>
+            <td style={{ color: `var(--text-color)` }} colSpan={10}>
               <div className={style.tableRowLocation}>
-                <FlagIcon code={country_code.toLowerCase()} />
-                <span>{country} ({item.count})</span>
+                {text}
               </div>
             </td>
           </tr>
@@ -504,7 +529,7 @@ function TablePeers(props) {
         if (data) {
           const code = (data.country_code || 'xx').toLowerCase()
 
-          if (groupCountry) {
+          if (groupKey == `country`) {
             location = <div className={style.tableRowLocation}>
               <span>{data.region}</span>
               <button onClick={() => flyTo(data)}>Fly To</button>

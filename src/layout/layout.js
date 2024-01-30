@@ -95,7 +95,7 @@ export const style = {
 
     .layout-max-width {
       margin: 0 auto;
-      max-width: 1000px;
+      max-width: 1200px;
       width: 100%;
       padding: 0 1em;
 
