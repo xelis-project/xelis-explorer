@@ -198,7 +198,9 @@ function useOffCanvasTable(props) {
   }, [query])
 
   useEffect(() => {
-    if (typeof inputHeight === `undefined` || inputHeight === null) setInputHeight(height)
+    if (typeof inputHeight === `undefined` || inputHeight === null) {
+      _setInputHeight(height)
+    }
   }, [height, inputHeight])
 
   const filteredBlocks = useMemo(() => {
@@ -235,7 +237,10 @@ function useOffCanvasTable(props) {
           <div>
             <Button onClick={() => {
               setPaused(!paused)
-              if (paused) setInputHeight(height)
+              if (paused) {
+                setQueryKey(`height`, null)
+                _setInputHeight(height)
+              }
             }}>
               <Icon name={paused ? `play` : `pause`} />
             </Button>
