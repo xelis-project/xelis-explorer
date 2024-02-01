@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Helmet } from 'react-helmet-async'
 import to from 'await-to-js'
@@ -266,9 +266,17 @@ function InstancedBlocks(props) {
 }
 
 function CanvasFrame() {
+  const timeRef = useRef(Date.now())
+  const fps = 1000 / 30 // 30 fps
+
   useFrame(({ gl, scene, camera }) => {
-    TWEEN.update()
-    gl.render(scene, camera)
+    const now = Date.now()
+    const lastFrame = now - timeRef.current
+    if (lastFrame > fps) {
+      timeRef.current = now
+      TWEEN.update()
+      gl.render(scene, camera)
+    }
   }, 1)
 
   return null
