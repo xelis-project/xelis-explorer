@@ -87,7 +87,7 @@ xelis`
   --muted-color: rgb(255 255 255 / 50%);
   --error-color: red;
   --success-color: green;
-  --link-color: #287358;
-  --link-hover-color: #309979;
+  --link-color: #308566;
+  --link-hover-color: #38b18c;
   --warning-color: #dfde32;
 `
