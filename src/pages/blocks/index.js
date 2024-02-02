@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { css } from 'goober'
@@ -9,7 +9,7 @@ import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { formatSize, formatXelis, reduceText } from '../../utils'
+import { formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
@@ -169,6 +169,10 @@ function Blocks() {
     loadBlocks()
   }, [pageState])
 
+  const heightBlocks = useMemo(() => {
+    return [...groupBy(blocks, (b) => b.height).entries()]
+  }, [blocks])
+
   return <div className={style.container}>
     <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
@@ -187,7 +191,7 @@ function Blocks() {
           key: 'block_type',
           title: t('Type'),
           render: (_, block) => {
-            const blockType = getBlockType(block, info.stableheight || 0)
+            const blockType = getBlockType(block, info.stableheight, heightBlocks)
             const color = getBlockColor(theme, blockType)
             return <span style={{ color }}>{blockType}</span>
           }

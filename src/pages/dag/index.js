@@ -80,8 +80,22 @@ const style = {
   `
 }
 
-export function getBlockType(block, stableHeight) {
-  if (block.block_type === BlockType.Normal && block.height <= stableHeight) {
+export function getBlockType(block, stableHeight, heightBlocks) {
+  const nextHeight = block.height + 1
+  let blocksNextHeight = 0
+  for (let i = 0; i < heightBlocks.length; i++) {
+    const [height, blocks] = heightBlocks[i]
+    if (height === nextHeight) {
+      blocksNextHeight = blocks.length
+      break
+    }
+  }
+
+  if (
+    blocksNextHeight <= 1 &&
+    block.block_type === BlockType.Normal &&
+    block.height <= stableHeight
+  ) {
     return BlockType.Sync
   }
 
@@ -153,7 +167,7 @@ function InstancedLines(props) {
 }
 
 function InstancedBlocks(props) {
-  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor } = props
+  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor, heightBlocks } = props
 
   const { theme: currentTheme } = useTheme()
   const geometry = useMemo(() => new RoundedBoxGeometry(1, 1, 1), [])
@@ -241,7 +255,7 @@ function InstancedBlocks(props) {
   return <Instances material={material} geometry={geometry}>
     {blocks.map((block) => {
       const { x, y, data } = block
-      const blockType = getBlockType(data, stableHeight)
+      const blockType = getBlockType(data, stableHeight, heightBlocks)
 
       let scaleValue = scale[data.hash] || 1
       if (hoveredBlock && data.hash === hoveredBlock.data.hash) scaleValue = 1.3
@@ -285,6 +299,7 @@ function CanvasFrame() {
 function DAG() {
   const nodeSocket = useNodeSocket()
   const [blocks, setBlocks] = useState([])
+  const [heightBlocks, setHeightBlocks] = useState([])
   const [newBlock, setNewBlock] = useState()
   //const [blocks, setBlocks] = useState(mock.dag.reverse())
 
@@ -302,7 +317,8 @@ function DAG() {
     blocks,
     onBlockClick: (block) => {
       offCanvasBlock.open(block)
-    }
+    },
+    heightBlocks
   })
 
   const loadInfo = useCallback(async () => {
@@ -423,6 +439,7 @@ function DAG() {
     const blocksToRender = []
     const heightsText = []
     const entries = [...groupBy(filteredBlocks, (b) => b.height).entries()]
+    setHeightBlocks(entries)
     entries.sort((a, b) => a[0] - b[0])
     setHeightCount(entries.length)
 
@@ -491,7 +508,7 @@ function DAG() {
         <CanvasFrame />
         <MapControls maxZoom={200} minZoom={5} enableDamping={false} enableRotate={false} />
         <group position={[-((heightCount * distanceX) - 2), 0, 0]}>
-          <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight}
+          <InstancedBlocks setCursor={setCursor} stableHeight={stableHeight} heightBlocks={heightBlocks}
             newBlock={newBlock} blocks={blocksToRender} setHoveredBlock={setHoveredBlock}
             hoveredBlock={hoveredBlock} offCanvasBlock={offCanvasBlock} />
           <InstancedLines blocks={blocksToRender} hoveredBlock={hoveredBlock} offCanvasTable={offCanvasTable} />
