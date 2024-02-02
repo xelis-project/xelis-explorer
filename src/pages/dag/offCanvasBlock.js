@@ -61,7 +61,7 @@ const style = {
 }
 
 function useOffCanvasBlock(props) {
-  const { info } = props
+  const { info, heightBlocks } = props
 
   const topoheight = info.topoheight
   const stableHeight = info.stableHeight
@@ -111,7 +111,7 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Block Type')}</div>
-          <div>{getBlockType(block, stableHeight)}</div>
+          <div>{getBlockType(block, stableHeight, heightBlocks)}</div>
         </div>
         <div>
           <div>{t('Timestamp')}</div>

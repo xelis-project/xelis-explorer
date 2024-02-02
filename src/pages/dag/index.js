@@ -310,7 +310,10 @@ function DAG() {
 
   const stableHeight = info.stableheight
 
-  const offCanvasBlock = useOffCanvasBlock({ info })
+  const offCanvasBlock = useOffCanvasBlock({
+    info,
+    heightBlocks
+  })
 
   const offCanvasTable = useOffCanvasTable({
     info,
