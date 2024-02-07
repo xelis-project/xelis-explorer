@@ -8,6 +8,8 @@ import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
+import useQueryString from 'g45-react/hooks/useQueryString'
+import hashIt from 'hash-it'
 
 import { formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
@@ -36,19 +38,21 @@ const style = {
   `
 }
 
-export function loadBlocks_SSR({ limit, defaultBlocks = [] }) {
+export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
   const defaultResult = { totalBlocks: 0, blocks: defaultBlocks, err: null, loaded: false }
 
-  return useServerData(`func:loadBlocks(${limit})`, async () => {
+  return useServerData(`func:loadBlocks(${hashIt(pageState)})`, async () => {
     const result = Object.assign({}, defaultResult)
+
     const [err, res1] = await to(daemonRPC.getTopoHeight())
     result.err = err
     if (err) return result
 
-    const topoheight = res1.result
 
-    let startTopoheight = Math.max(0, topoheight - limit + 1)
-    let endTopoheight = topoheight
+    const topoheight = res1.result
+    let pagination = getPaginationRange(pageState)
+    let startTopoheight = Math.max(0, topoheight - pagination.end)
+    let endTopoheight = topoheight - pagination.start
 
     const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
@@ -69,11 +73,22 @@ function Blocks() {
   const { firstPageLoad } = usePageLoad()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
-  const [pageState, setPageState] = useState({ page: 1, size: 20 })
+  const [query, setQuery] = useQueryString()
   const { t } = useLang()
   const { theme } = useTheme()
 
-  const serverResult = loadBlocks_SSR({ limit: 20 })
+  const [pageState, _setPageState] = useState(() => {
+    const page = parseInt(query.page) || 1
+    const size = parseInt(query.size) || 20
+    return { page, size }
+  })
+
+  const setPageState = useCallback((value) => {
+    _setPageState(value)
+    setQuery(value)
+  }, [])
+
+  const serverResult = loadBlocks_SSR({ pageState })
   const [blockCount, setBlockCount] = useState(serverResult.totalBlocks)
   const [blocks, setBlocks] = useState(serverResult.blocks)
   const nodeSocket = useNodeSocket()

@@ -6,6 +6,8 @@ import { css } from 'goober'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import { useLang } from 'g45-react/hooks/useLang'
+import hashIt from 'hash-it'
+import useQueryString from 'g45-react/hooks/useQueryString'
 
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
@@ -21,9 +23,9 @@ const style = {
   `
 }
 
-function loadAccounts_SSR({ limit }) {
+function loadAccounts_SSR({ pageState }) {
   const defaultResult = { accounts: [], totalAccounts: 0, loaded: false }
-  return useServerData(`func:loadAccounts(${limit})`, async () => {
+  return useServerData(`func:loadAccounts(${hashIt(pageState)})`, async () => {
     let result = Object.assign({}, defaultResult)
 
     const [err1, res1] = await to(daemonRPC.countAccounts())
@@ -31,7 +33,12 @@ function loadAccounts_SSR({ limit }) {
     if (err1) return result
     result.totalAccounts = res1.result
 
-    const [err2, res2] = await to(daemonRPC.getAccounts({ maximum: limit }))
+    let pagination = getPaginationRange(pageState)
+
+    const [err2, res2] = await to(daemonRPC.getAccounts({
+      skip: Math.max(0, pagination.start - 1),
+      maximum: pageState.size
+    }))
     result.err = err2
     if (err2) return result
     const addresses = res2.result || []
@@ -56,19 +63,31 @@ function loadAccounts_SSR({ limit }) {
 function Accounts() {
   const nodeSocket = useNodeSocket()
 
-  const [pageState, setPageState] = useState({ page: 1, size: 20 })
-
   const { firstPageLoad } = usePageLoad()
-  const serverResult = loadAccounts_SSR({ limit: 20 })
+
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
+  const { t } = useLang()
+
+  const [query, setQuery] = useQueryString()
+
+  const [pageState, _setPageState] = useState(() => {
+    const page = parseInt(query.page) || 1
+    const size = parseInt(query.size) || 20
+    return { page, size }
+  })
+
+  const setPageState = useCallback((value) => {
+    _setPageState(value)
+    setQuery(value)
+  }, [])
+
+  const serverResult = loadAccounts_SSR({ pageState })
   const [accounts, setAccounts] = useState(serverResult.accounts)
   const [accountCount, setAccountCount] = useState(serverResult.totalAccounts)
-  const { t } = useLang()
 
   const loadAccounts = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
-
 
     setLoading(true)
     setErr(null)

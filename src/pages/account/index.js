@@ -14,6 +14,7 @@ import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
+import useQueryString from 'g45-react/hooks/useQueryString'
 
 const style = {
   container: css`
@@ -215,7 +216,7 @@ function Account() {
           </div>
           <div>
             <div>{t('Balance')}</div>
-            <div>{formatXelis(balance)}</div>
+            <div>{balance ? formatXelis(balance) : `--`}</div>
           </div>
           <div>
             <div>{t('Nonce')}</div>
@@ -254,13 +255,32 @@ function History(props) {
 
   const nodeSocket = useNodeSocket()
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
   const [history, setHistory] = useState([])
   const { t } = useLang()
 
-  const [pages, setPages] = useState([])
-  const [page, setPage] = useState(-1)
+  const [query, setQuery] = useQueryString()
+
+  const [pageState, _setPageState] = useState(() => {
+    if (query.max_topo) {
+      const maxTopo = parseInt(query.max_topo)
+      return { page: 0, pages: [maxTopo] }
+    }
+    return { page: -1, pages: [] }
+  })
+
+  const setPageState = useCallback((value) => {
+    _setPageState(value)
+
+    const { pages } = value
+    if (pages.length > 0) {
+      const lastTopo = pages[pages.length - 1]
+      setQuery({ max_topo: lastTopo })
+    } else {
+      setQuery({})
+    }
+  }, [])
 
   const loadData = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -277,6 +297,7 @@ function History(props) {
       asset: asset,
     }
 
+    const { pages, page } = pageState
     if (pages[page]) {
       params.maximum_topoheight = pages[page]
     }
@@ -286,7 +307,7 @@ function History(props) {
 
     setHistory(result)
     setLoading(false)
-  }, [asset, addr, nodeSocket.readyState, pages, page])
+  }, [asset, addr, nodeSocket.readyState, pageState])
 
   useEffect(() => {
     loadData()
@@ -299,7 +320,6 @@ function History(props) {
     if (item.incoming) return `INCOMING`
     return ``
   }, [])
-
 
   return <div>
     <TableFlex loading={loading} err={err} rowKey={(item, index) => {
@@ -402,21 +422,22 @@ function History(props) {
         }
       ]} data={history} />
     <div>
-      {pages.length > 0 && <Button icon="arrow-left" onClick={() => {
-        const newPage = page - 1
-        if (newPage < 0) {
-          setPages([])
-          setPage(-1)
-        } else {
-          setPage(newPage)
-        }
+      {pageState.pages.length > 0 && <Button icon="arrow-left" onClick={() => {
+        const newPageState = Object.assign({}, pageState)
+        newPageState.pages.pop()
+        newPageState.page--
+
+        setPageState(newPageState)
       }}>
         {t('Previous')}
       </Button>}
       <Button icon="arrow-right" iconLocation="right" onClick={() => {
+        const newPageState = Object.assign({}, pageState)
         const item = history[history.length - 1]
-        setPages([...pages, item.topoheight - 1])
-        setPage(page + 1)
+        newPageState.pages.push(item.topoheight - 1)
+        newPageState.page++
+
+        setPageState(newPageState)
       }}>
         {t('Next')}
       </Button>
