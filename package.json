@@ -33,7 +33,7 @@
     "goober": "^2.1.10",
     "hash-it": "^6.0.0",
     "isomorphic-ws": "^5.0.0",
-    "leaflet": "^1.9.4",
+    "leaflet": "github:g45t345rt/Leaflet",
     "pretty-ms": "^8.0.0",
     "query-string": "^8.1.0",
     "react": "^18.2.0",

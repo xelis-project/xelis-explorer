@@ -380,10 +380,10 @@ function Peers() {
     // make sure tween package is updated on request animation
     let animationFrameId
     const animate = () => {
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
       TWEEN.update()
     }
-    requestAnimationFrame(animate)
+    animationFrameId = requestAnimationFrame(animate)
 
     return () => {
       cancelAnimationFrame(animationFrameId)
@@ -667,30 +667,65 @@ function PeerDot(props) {
 
 function PeerConnection(props) {
   const { positions, leaflet, visible, animate = true } = props
-  const { Polyline } = leaflet.react
+  const { Polyline, useMapEvents } = leaflet.react
 
   const [dashOffset, setDashOffset] = useState(0)
-  const tweenRef = useRef()
+
+  const [isMove, setIsMove] = useState(false)
+  const moveTimeout = useRef()
+
+  useMapEvents({
+    dragstart: () => {
+      if (moveTimeout.current) clearTimeout(moveTimeout.current)
+      setIsMove(true)
+    },
+    dragend: () => {
+      moveTimeout.current = setTimeout(() => {
+        setIsMove(false)
+      }, 1000)
+    },
+    zoomstart: () => {
+      if (moveTimeout.current) clearTimeout(moveTimeout.current)
+      setIsMove(true)
+    },
+    zoomend: () => {
+      moveTimeout.current = setTimeout(() => {
+        setIsMove(false)
+      }, 1000)
+    }
+  })
 
   useEffect(() => {
-    if (!tweenRef.current) {
-      tweenRef.current = new TWEEN.Tween({ x: 0 })
-        .to({ x: 100 }, 100000)
-        .easing(TWEEN.Easing.Linear.None)
-        .onUpdate((obj) => {
-          setDashOffset(obj.x)
-        })
-        //.yoyo(true)
-        .repeat(Infinity)
+    if (!animate) return
+    if (isMove) return
+
+    let animationFrameId
+    var i = 0
+    var update = () => {
+      i += 0.1
+      i %= 10000
+      setDashOffset(i)
+      animationFrameId = requestAnimationFrame(update)
     }
 
-    if (animate) tweenRef.current.start()
-    else tweenRef.current.stop()
-  }, [animate])
+    animationFrameId = requestAnimationFrame(update)
+    return () => {
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [animate, isMove])
 
-  const opacity = visible ? .2 : 0
+  const opacity = visible ? .5 : 0
 
-  return <Polyline pathOptions={{ color: `green`, opacity, weight: 2, dashArray: `0 4 0`, dashOffset: `${dashOffset}%` }} positions={positions} />
+  return <Polyline
+    pathOptions={{
+      color: `#4d4d4d`,
+      opacity,
+      weight: 2,
+      dashArray: `0 6 0`,
+      dashOffset: `${dashOffset}`
+    }}
+    positions={positions}
+  />
 }
 
 function MapPeers(props) {
@@ -773,17 +808,17 @@ function MapPeers(props) {
     })
 
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
-    const mapContainer = <MapContainer minZoom={1} zoom={1} center={[0, 0]} ref={mapRef}>
+    const mapContainer = <MapContainer minZoom={1} zoom={2} center={[0, 0]} ref={mapRef} preferCanvas>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
       />
-      {Object.keys(peerDots).map((key) => {
-        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.useAnimation} />
-      })}
       {Object.keys(connectionLines).map((key) => {
         const positions = connectionLines[key]
         return <PeerConnection key={key} positions={positions} visible={controls.showConnections} leaflet={leaflet} animate={controls.useAnimation} />
+      })}
+      {Object.keys(peerDots).map((key) => {
+        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.useAnimation} />
       })}
     </MapContainer>
 
