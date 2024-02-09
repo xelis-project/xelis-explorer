@@ -47,6 +47,13 @@ const style = {
         background-color: var(--stats-bg-color);
         padding: 1em;
         border-radius: .5em;
+        display: flex;
+        gap: 1em;
+        flex-direction: column;
+
+        canvas {
+          max-height: 10em;
+        }
       }
     }
 
@@ -141,9 +148,7 @@ function TxsHistoryChart(props) {
     return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
   }, [blocks])
 
-  const chartRef = useRef()
-
-  const chartConfig = useMemo(() => {
+  const data = useMemo(() => {
     const lastBlocks = Object.assign([], blocks).reverse()
     const labels = lastBlocks.map((block) => {
       return block.timestamp
@@ -153,7 +158,7 @@ function TxsHistoryChart(props) {
       return block.txs_hashes.length
     })
 
-    const chartData = {
+    return {
       labels,
       datasets: [{
         label: 'Txs',
@@ -162,57 +167,57 @@ function TxsHistoryChart(props) {
         fill: true,
         borderWidth: 4,
         tension: .3,
+        pointRadius: 2,
         borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
       }]
     }
+  }, [blocks, currentTheme])
 
+  const options = useMemo(() => {
     const formatTimestamp = (timestamp) => {
       return prettyMs(new Date().getTime() - timestamp, { secondsDecimalDigits: 0 })
     }
 
     return {
-      type: 'line',
-      data: chartData,
-      options: {
-        animation: {
-          duration: 0
+      animation: {
+        duration: 0
+      },
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
         },
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              title: function (context) {
-                const timestamp = context[0].label
-                return formatTimestamp(timestamp)
-              }
+        tooltip: {
+          callbacks: {
+            title: function (context) {
+              const timestamp = context[0].label
+              return formatTimestamp(timestamp)
             }
           }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+            precision: 0
+          }
         },
-        scales: {
-          y: {
-            ticks: {
-              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
-              beginAtZero: true,
-              precision: 0
-            }
-          },
-          x: {
-            ticks: {
-              color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
-              callback: function (value, index, ticks) {
-                const timestamp = this.getLabelForValue(value)
-                return formatTimestamp(timestamp)
-              }
+        x: {
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+            callback: function (value, index, ticks) {
+              const timestamp = this.getLabelForValue(value)
+              return formatTimestamp(timestamp)
             }
           }
         }
       }
     }
-  }, [blocks, currentTheme])
+  }, [])
 
+  /*
   useEffect(() => {
     const intervalId = setInterval(() => {
       // update callback ticks to display elapsed time every second
@@ -222,10 +227,11 @@ function TxsHistoryChart(props) {
       return clearInterval(intervalId)
     }
   }, [])
+  */
 
   return <div>
     <div>{t('Last 20 blocks ({} txs)', [totalTxs])}</div>
-    <Chart chartRef={chartRef} config={chartConfig} />
+    <Chart type="line" data={data} options={options} />
   </div>
 }
 

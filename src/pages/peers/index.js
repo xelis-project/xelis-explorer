@@ -8,6 +8,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import TWEEN from '@tweenjs/tween.js'
+import Chart from '../../components/chart'
 
 import TableFlex from '../../components/tableFlex'
 import Table from '../../components/table'
@@ -42,6 +43,7 @@ const style = {
       h2 {
         font-size: 1.2em;
         font-weight: bold;
+        margin-top: 1em;
       }
     }
   `,
@@ -230,6 +232,30 @@ const style = {
         }
       }
     }
+  `,
+  chart: css`
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    gap: 1em;
+
+    ${theme.query.minDesktop} {
+      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    > div {
+      background-color: var(--stats-bg-color);
+      padding: 1em;
+      border-radius: .5em;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+
+      canvas {
+        max-height: 15em;
+      }
+    }
   `
 }
 
@@ -402,6 +428,8 @@ function Peers() {
       <MapPeers mapRef={mapRef} peers={peers} geoLocation={geoLocation} peersLoading={peersLoading} geoLoading={geoLoading} />
       <h2>{t(`Connected Node`)}</h2>
       <ConnectedNodeTable networkData={networkData} />
+      <h2>{t(`Stats`)}</h2>
+      <PeersStats peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} />
       <h2>{t(`Peer List`)}</h2>
       <TablePeers peersLoading={peersLoading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} networkData={networkData} />
     </div>
@@ -894,4 +922,190 @@ function ConnectedNodeTable(props) {
       },
     ]}
   />
+}
+
+function PeersStats(props) {
+  const { peers, geoLoading, geoLocation } = props
+  const { theme: currentTheme } = useTheme()
+  const { t } = useLang()
+
+  const textColor = useMemo(() => {
+    return currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`
+  }, [currentTheme])
+
+  const data = useMemo(() => {
+    let versionData = { labels: [], data: [] }
+    let heightData = { labels: [], data: [] }
+    let continentData = { labels: [], data: [] }
+    let countryData = { labels: [], data: [] }
+
+    const evaluate = (data, value) => {
+      let index = data.labels.indexOf(value)
+      if (index === -1) {
+        data.labels.push(value)
+        index = data.labels.length - 1
+      }
+
+      if (data.data[index]) {
+        data.data[index]++
+      } else {
+        data.data.push(1)
+      }
+    }
+
+    const filterMax = (data, max) => {
+      const values = data.data.map((v, i) => ({ label: data.labels[i], value: v }))
+      values.sort((a, b) => b.value - a.value)
+      const filtered = values.slice(0, max)
+
+      const newData = { labels: [], data: [] }
+      filtered.forEach((item) => {
+        newData.labels.push(item.label)
+        newData.data.push(item.value)
+      })
+      return newData
+    }
+
+    peers.forEach((peer) => {
+      evaluate(versionData, peer.version)
+      evaluate(heightData, peer.height)
+
+      const data = geoLocation[peer.ip]
+      const continent = data ? data.continent : ''
+      const country = data ? data.country : ''
+      evaluate(continentData, continent)
+      evaluate(countryData, country)
+    })
+
+    versionData = filterMax(versionData, 5)
+    heightData = filterMax(heightData, 5)
+
+    return { versionData, heightData, continentData, countryData }
+  }, [peers])
+
+  const barOptions = useMemo(() => {
+    return {
+      animation: false,
+      //responsive: false,
+      //maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      }
+    }
+  }, [])
+
+  const pieOptions = useMemo(() => {
+    return {
+      animation: false,
+      //responsive: false,
+      //maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+        },
+      }
+    }
+  }, [])
+
+  const continentData = useMemo(() => {
+    return {
+      labels: data.continentData.labels,
+      datasets: [
+        {
+          data: data.continentData.data,
+          borderWidth: 0,
+        }
+      ]
+    }
+  }, [data.continentData])
+
+  const countryData = useMemo(() => {
+    return {
+      labels: data.countryData.labels,
+      datasets: [
+        {
+          data: data.countryData.data,
+          borderWidth: 0,
+        }
+      ]
+    }
+  }, [data.countryData])
+
+  const heightData = useMemo(() => {
+    return {
+      labels: data.heightData.labels,
+      datasets: [
+        {
+          data: data.heightData.data,
+          borderWidth: 0,
+        }
+      ]
+    }
+  }, [data.heightData])
+
+  const versionData = useMemo(() => {
+    return {
+      labels: data.versionData.labels,
+      datasets: [
+        {
+          data: data.versionData.data,
+          borderWidth: 0,
+        }
+      ]
+    }
+  }, [data.versionData])
+
+
+  const continentChartConfig = useMemo(() => {
+    const chartData = {
+      labels: data.continentData.labels,
+      datasets: [
+        {
+          //label: 'Dataset 1',
+          data: data.continentData.data,
+          borderWidth: 0,
+          //backgroundColor: `white`,
+        }
+      ]
+    }
+
+    return {
+      type: 'bar',
+      data: chartData,
+      options: {
+        animation: false,
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+            color: `#fff`,
+            position: 'bottom'
+          }
+        }
+      },
+    }
+  }, [textColor, data.continentData])
+
+  return <div className={style.chart}>
+    <div>
+      <div>{t(`Nodes by Continent`)}</div>
+      {!geoLoading && <Chart type="bar" options={barOptions} data={continentData} />}
+    </div>
+    <div>
+      <div>{t(`Nodes by Country`)}</div>
+      {!geoLoading && <Chart type="bar" options={barOptions} data={countryData} />}
+    </div>
+    <div>
+      <div>{t(`Nodes by Height`)}</div>
+      <Chart type="doughnut" options={pieOptions} data={heightData} />
+    </div>
+    <div>
+      <div>{t(`Nodes by Version`)}</div>
+      <Chart type="pie" options={pieOptions} data={versionData} />
+    </div>
+  </div>
 }

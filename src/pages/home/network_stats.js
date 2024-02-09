@@ -97,7 +97,7 @@ const style = {
     }
 
     .mini-chart {
-      height: 3em;
+      max-height: 3em;
       margin-top: 0.25em;
     }
   `,
@@ -106,39 +106,36 @@ const style = {
 function MiniChart(props) {
   const { data } = props
 
-  const chartConfig = useMemo(() => {
+  const options = useMemo(() => {
     return {
-      type: 'line',
-      data: data,
-      options: {
-        animation: {
-          duration: 0
+      animation: {
+        duration: 0
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
         },
-        maintainAspectRatio: false,
-        elements: {
-          point: {
-            radius: 0
-          }
+      },
+      scales: {
+        y: {
+          display: false,
+          beginAtZero: false
         },
-        plugins: {
-          legend: {
-            display: false
-          },
-        },
-        scales: {
-          y: {
-            display: false,
-            beginAtZero: false
-          },
-          x: {
-            display: false
-          }
+        x: {
+          display: false
         }
       }
     }
-  }, [data])
+  }, [])
 
-  return <Chart config={chartConfig} className="mini-chart" />
+  return <Chart type="line" options={options} data={data} className="mini-chart" />
 }
 
 function loadNetworkStats_SSR() {
