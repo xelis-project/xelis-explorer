@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import bytes from 'bytes'
+import hashIt from 'hash-it'
 
 export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
   if (typeof text !== 'string') return text
@@ -147,10 +148,19 @@ export const parseAddressWithPort = (addr) => {
 }
 
 export const fetchGeoLocation = async (ips) => {
+  ips.sort() // sort or the hash we not be the same
+  const cacheKey = `geo_cache_${hashIt(ips)}` 
   try {
+    // using session storage to cache if page reload
+    const cacheData = sessionStorage.getItem(cacheKey)
+    if (cacheData) {
+      return JSON.parse(cacheData)
+    }
+
     const query = `?ips=${ips.join(`,`)}`
     const res = await fetch(`https://geoip.xelis.io${query}`)
     const data = await res.json()
+    sessionStorage.setItem(cacheKey, JSON.stringify(data))
     return Promise.resolve(data)
   } catch (e) {
     return Promise.reject(e)
