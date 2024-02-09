@@ -691,69 +691,6 @@ function PeerDot(props) {
   </CircleMarker2>
 }
 
-function PeerConnection(props) {
-  const { positions, leaflet, visible, animate = true } = props
-  const { Polyline, useMapEvents } = leaflet.react
-
-  const [dashOffset, setDashOffset] = useState(0)
-
-  const [isMove, setIsMove] = useState(false)
-  const moveTimeout = useRef()
-
-  useMapEvents({
-    dragstart: () => {
-      if (moveTimeout.current) clearTimeout(moveTimeout.current)
-      setIsMove(true)
-    },
-    dragend: () => {
-      moveTimeout.current = setTimeout(() => {
-        setIsMove(false)
-      }, 1000)
-    },
-    zoomstart: () => {
-      if (moveTimeout.current) clearTimeout(moveTimeout.current)
-      setIsMove(true)
-    },
-    zoomend: () => {
-      moveTimeout.current = setTimeout(() => {
-        setIsMove(false)
-      }, 1000)
-    }
-  })
-
-  useEffect(() => {
-    if (!animate) return
-    if (isMove) return
-
-    let animationFrameId
-    var i = 0
-    var update = () => {
-      i += 0.1
-      i %= 10000
-      setDashOffset(i)
-      animationFrameId = requestAnimationFrame(update)
-    }
-
-    animationFrameId = requestAnimationFrame(update)
-    return () => {
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [animate, isMove])
-
-  const opacity = visible ? .5 : 0
-
-  return <Polyline
-    pathOptions={{
-      color: `#4d4d4d`,
-      opacity,
-      weight: 2,
-      dashArray: `0 6 0`,
-      dashOffset: `${dashOffset}`
-    }}
-    positions={positions}
-  />
-}
-
 function MapPeers(props) {
   const { mapRef, peers, geoLocation, peersLoading, geoLoading } = props
 
@@ -787,7 +724,6 @@ function MapPeers(props) {
       tileLayerUrl = `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png`
     }
 
-    //const connectionLines = {}
     const peerDots = {}
 
     function appendDotPeer(props) {
