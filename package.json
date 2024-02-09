@@ -34,6 +34,7 @@
     "hash-it": "^6.0.0",
     "isomorphic-ws": "^5.0.0",
     "leaflet": "github:g45t345rt/Leaflet",
+    "leaflet.markercluster": "github:g45t345rt/leaflet.markercluster",
     "pretty-ms": "^8.0.0",
     "query-string": "^8.1.0",
     "react": "^18.2.0",

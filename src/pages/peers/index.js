@@ -393,7 +393,7 @@ function Peers() {
   const mapRef = useRef()
 
   return <div className={style.container}>
-    <PageTitle title={t('Peers')} subtitle={t('{} beautiful peers', [peers.length])}
+    <PageTitle title={t('Peers')} subtitle={t('{} nodes', [peers.length])}
       metaDescription={t('Map with list of network peers. Monitor connected peers, network status and geo location.')} />
     <div>
       <Icon name="warning" />{t(`This map does not represent the entire XELIS network.`)}
@@ -569,7 +569,7 @@ function TablePeers(props) {
 
 function MapControls(props) {
   const { controls, setControls, mapRef } = props
-  const { showConnections, showPeers, useAnimation } = controls
+  const { showCluster, showPeers, showPulse } = controls
 
   const { t } = useLang()
 
@@ -589,12 +589,12 @@ function MapControls(props) {
       <Switch checked={showPeers} onChange={(checked) => setControlValue('showPeers', checked)} />
     </div>
     <div>
-      {t('Connections')}
-      <Switch checked={showConnections} onChange={(checked) => setControlValue('showConnections', checked)} />
+      {t('Cluster')}
+      <Switch checked={showCluster} onChange={(checked) => setControlValue('showCluster', checked)} />
     </div>
     <div>
-      {t('Animate')}
-      <Switch checked={useAnimation} onChange={(checked) => setControlValue('useAnimation', checked)} />
+      {t('Pulse')}
+      <Switch checked={showPulse} onChange={(checked) => setControlValue('showPulse', checked)} />
     </div>
     <div>
       <button onClick={reset}>{t('Reset')}</button>
@@ -605,7 +605,7 @@ function MapControls(props) {
 function PeerDot(props) {
   const { peerDot, leaflet, visible, animate = true } = props
   const { peers, position, location, type } = peerDot
-  const { CircleMarker, Popup } = leaflet.react
+  const { CircleMarker2, Popup } = leaflet.react
 
   const [dotRadius, setDotRadius] = useState(6)
   const tweenRef = useRef()
@@ -613,30 +613,28 @@ function PeerDot(props) {
   useEffect(() => {
     const startSize = 3
     const endSize = 6
-    if (!tweenRef.current) {
-      tweenRef.current = new TWEEN.Tween({ x: startSize })
-        .to({ x: endSize }, 1500)
-        .easing(TWEEN.Easing.Elastic.Out)
-        .onUpdate((v) => {
-          setDotRadius(v.x)
-        })
-        .onStop(() => {
-          setDotRadius(endSize)
-        })
-    }
+    tweenRef.current = new TWEEN.Tween({ x: startSize })
+      .to({ x: endSize }, 1500)
+      .easing(TWEEN.Easing.Elastic.Out)
+      .onUpdate((v) => {
+        setDotRadius(v.x)
+      })
+  }, [])
 
-    if (animate) tweenRef.current.start()
-    else tweenRef.current.stop()
+  useEffect(() => {
+    if (tweenRef.current && animate) {
+      tweenRef.current.start()
+    }
   }, [animate, peerDot.lastPing])
 
   const pathOptions = useMemo(() => {
     let options = {}
     switch (type) {
       case `peer`:
-        options = { opacity: 1, fillOpacity: .3, weight: 1, color: `green` }
+        options = { opacity: 1, fillOpacity: .3, weight: 2, color: `green` }
         break
       case `sub_peer`:
-        options = { opacity: .2, fillOpacity: .1, weight: 1, color: `yellow` }
+        options = { opacity: .2, fillOpacity: .1, weight: 2, color: `yellow` }
         break
     }
 
@@ -648,7 +646,7 @@ function PeerDot(props) {
     return options
   }, [type, visible])
 
-  return <CircleMarker radius={dotRadius} pathOptions={pathOptions} center={position}>
+  return <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
     <Popup>
       <div>{location.country} / {location.region}</div>
       <div>
@@ -662,7 +660,7 @@ function PeerDot(props) {
         })}
       </div>
     </Popup>
-  </CircleMarker>
+  </CircleMarker2>
 }
 
 function PeerConnection(props) {
@@ -734,13 +732,17 @@ function MapPeers(props) {
   const { theme } = useTheme()
   const [leaflet, setLeaflet] = useState()
   const [mapContainer, setMapContainer] = useState()
-  const [controls, setControls] = useState({ showConnections: true, showPeers: true, useAnimation: true })
+  const [controls, setControls] = useState({ showPeers: true, showPulse: true, showCluster: true })
 
   useEffect(() => {
     const load = async () => {
+      const markerCluster = await import('./markerCluster')
+      const circleMarker = await import('./circleMarker')
       // load here (client side only) to avoid ssr loading leaflet
       const react = await import('react-leaflet')
       // const { Simple }  = await import('leaflet/src/geo/crs/CRS.Simple')
+      react.MarkerClusterGroup = markerCluster.default
+      react.CircleMarker2 = circleMarker.default // overwrite
       setLeaflet({ react })
     }
 
@@ -750,19 +752,19 @@ function MapPeers(props) {
   useEffect(() => {
     if (!leaflet) return
 
-    const { MapContainer, TileLayer } = leaflet.react
+    const { MapContainer, TileLayer, MarkerClusterGroup } = leaflet.react
 
     let tileLayerUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`
     if (theme === `light`) {
       tileLayerUrl = `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png`
     }
 
-    const connectionLines = {}
+    //const connectionLines = {}
     const peerDots = {}
 
     function appendDotPeer(props) {
       const { peer, peerLocation, type } = props
-      const dotKey = (peerLocation.latitude + peerLocation.longitude).toFixed(4)
+      const dotKey = `${peerLocation.latitude}_${peerLocation.longitude}`
       if (peerDots[dotKey]) {
         if (peer.last_ping < peerDots[dotKey].lastPing) {
           peerDots[dotKey].lastPing = peer.last_ping
@@ -786,40 +788,22 @@ function MapPeers(props) {
       appendDotPeer({ peer, peerLocation, type: `peer` })
     })
 
-    peers.forEach((peer) => {
-      const peerLocation = geoLocation[peer.ip]
-      if (!peerLocation) return
-
-      // handle sub peers and create connection line if direction is Both
-      for (const addr in peer.peers) {
-        const direction = peer.peers[addr]
-        if (direction !== `Both`) continue
-        const host = parseAddressWithPort(addr)
-        const subPeerLocation = geoLocation[host.ip]
-        if (!subPeerLocation) continue
-
-        appendDotPeer({ peer: { addr }, peerLocation: subPeerLocation, type: `sub_peer` })
-        const linePositions = [[peerLocation.latitude, peerLocation.longitude], [subPeerLocation.latitude, subPeerLocation.longitude]]
-        const lineKey = (peerLocation.latitude + peerLocation.longitude + subPeerLocation.latitude + subPeerLocation.longitude).toFixed(4)
-
-        // keep only one line and overwrite if key exists
-        connectionLines[lineKey] = linePositions
-      }
-    })
-
     // other providers https://leaflet-extras.github.io/leaflet-providers/preview/
     const mapContainer = <MapContainer minZoom={1} zoom={2} center={[0, 0]} ref={mapRef} preferCanvas>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url={tileLayerUrl}
       />
-      {Object.keys(connectionLines).map((key) => {
-        const positions = connectionLines[key]
-        return <PeerConnection key={key} positions={positions} visible={controls.showConnections} leaflet={leaflet} animate={controls.useAnimation} />
-      })}
-      {Object.keys(peerDots).map((key) => {
-        return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.useAnimation} />
-      })}
+      {controls.showCluster && <MarkerClusterGroup showCoverageOnHover={false} chunkedLoading>
+        {Object.keys(peerDots).map((key) => {
+          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.showPulse} />
+        })}
+      </MarkerClusterGroup>}
+      {!controls.showCluster && <>
+        {Object.keys(peerDots).map((key) => {
+          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.showPulse} />
+        })}
+      </>}
     </MapContainer>
 
     setMapContainer(mapContainer)
