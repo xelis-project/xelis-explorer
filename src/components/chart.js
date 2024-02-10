@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { Chart as ChartJS } from 'chart.js/auto'
 
-function ReactChart(props) {
+function ReactChart(props, ref) {
   const { type, options, data, style, ...restProps } = props
 
   const canvasRef = useRef()
-  const chartRef = useRef()
+  let chartRef = useRef()
+  if (ref) chartRef = ref
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext(`2d`)
@@ -31,4 +32,4 @@ function ReactChart(props) {
   return <canvas ref={canvasRef} style={{ maxWidth: `100%`, ...style }} {...restProps} />
 }
 
-export default ReactChart
+export default forwardRef(ReactChart)

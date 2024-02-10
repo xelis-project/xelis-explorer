@@ -144,6 +144,8 @@ function TxsHistoryChart(props) {
   const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
+  const chartRef = useRef()
+
   const totalTxs = useMemo(() => {
     return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
   }, [blocks])
@@ -217,7 +219,6 @@ function TxsHistoryChart(props) {
     }
   }, [])
 
-  /*
   useEffect(() => {
     const intervalId = setInterval(() => {
       // update callback ticks to display elapsed time every second
@@ -227,11 +228,10 @@ function TxsHistoryChart(props) {
       return clearInterval(intervalId)
     }
   }, [])
-  */
 
   return <div>
     <div>{t('Last 20 blocks ({} txs)', [totalTxs])}</div>
-    <Chart type="line" data={data} options={options} />
+    <Chart ref={chartRef} type="line" data={data} options={options} />
   </div>
 }
 
