@@ -876,6 +876,8 @@ function PeersStats(props) {
     let countryData = { labels: [], data: [] }
 
     const evaluate = (data, value) => {
+      if (!value) return
+
       let index = data.labels.indexOf(value)
       if (index === -1) {
         data.labels.push(value)
@@ -889,7 +891,7 @@ function PeersStats(props) {
       }
     }
 
-    const filterMax = (data, max) => {
+    const sortMax = (data, max) => {
       const values = data.data.map((v, i) => ({ label: data.labels[i], value: v }))
       values.sort((a, b) => b.value - a.value)
       const filtered = values.slice(0, max)
@@ -913,8 +915,10 @@ function PeersStats(props) {
       evaluate(countryData, country)
     })
 
-    versionData = filterMax(versionData, 5)
-    heightData = filterMax(heightData, 5)
+    continentData = sortMax(continentData, 10)
+    countryData = sortMax(countryData, 10)
+    versionData = sortMax(versionData, 5)
+    heightData = sortMax(heightData, 5)
 
     return { versionData, heightData, continentData, countryData }
   }, [peers])
