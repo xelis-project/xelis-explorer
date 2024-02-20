@@ -38,6 +38,22 @@ const style = {
   `
 }
 
+export function loadStableHeight_SSR() {
+  const defaultResult = { stableheight: 0, err: null, loaded: false }
+
+  return useServerData(`func:stableheight`, async () => {
+    const result = Object.assign({}, defaultResult)
+
+    const [err, res] = await to(daemonRPC.getStableHeight())
+    result.err = err
+    if (err) return result
+
+    result.stableheight = res.result
+    result.loaded = true
+    return result
+  }, defaultResult)
+}
+
 export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
   const defaultResult = { totalBlocks: 0, blocks: defaultBlocks, err: null, loaded: false }
 
@@ -93,7 +109,8 @@ function Blocks() {
   const [blocks, setBlocks] = useState(serverResult.blocks)
   const nodeSocket = useNodeSocket()
   const [newBlock, setNewBlock] = useState()
-  const [info, setInfo] = useState({})
+  const serverResult2 = loadStableHeight_SSR()
+  const [stableheight, setStableheight] = useState(serverResult2.stableheight)
 
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -128,12 +145,12 @@ function Blocks() {
     setLoading(false)
   }, [pageState, nodeSocket.readyState])
 
-  const loadInfo = useCallback(async () => {
+  const loadStableHeight = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    const [err, info] = await to(nodeSocket.daemon.methods.getInfo())
+    const [err, stableheight] = await to(nodeSocket.daemon.methods.getStableHeight())
     if (err) return setErr(err)
-    setInfo(info)
+    setStableheight(stableheight)
   }, [nodeSocket.readyState])
 
   useNodeSocketSubscribe({
@@ -142,7 +159,7 @@ function Blocks() {
       // don't add new block if we're not on first page
       if (pageState.page > 1) return
 
-      loadInfo()
+      loadStableHeight()
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
 
@@ -177,10 +194,12 @@ function Blocks() {
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
+    loadStableHeight()
     loadBlocks()
   }, [loadBlocks, firstPageLoad])
 
   useEffect(() => {
+    loadStableHeight()
     loadBlocks()
   }, [pageState])
 
@@ -188,12 +207,29 @@ function Blocks() {
     return [...groupBy(blocks, (b) => b.height).entries()]
   }, [blocks])
 
+  let stableLineRendered = false
+  let hasUnstableblocks = false
+
   return <div className={style.container}>
     <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
     <TableFlex data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}
       rowClassName={(block) => {
         if (newBlock && block.hash === newBlock.hash) return style.animateBlock
+        return null
+      }}
+      rowBefore={(block, index) => {
+        if (block.height > stableheight) {
+          hasUnstableblocks = true
+        }
+
+        if (hasUnstableblocks && !stableLineRendered && block.height <= stableheight) {
+          stableLineRendered = true
+          return <tr>
+            <td colSpan="9">{t('Blocks below are stable and cannot be rearranged.')}</td>
+          </tr>
+        }
+
         return null
       }}
       headers={[
@@ -206,7 +242,7 @@ function Blocks() {
           key: 'block_type',
           title: t('Type'),
           render: (_, block) => {
-            const blockType = getBlockType(block, info.stableheight, heightBlocks)
+            const blockType = getBlockType(block, stableheight, heightBlocks)
             const color = getBlockColor(theme, blockType)
             return <span style={{ color }}>{blockType}</span>
           }

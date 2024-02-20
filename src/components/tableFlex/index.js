@@ -1,5 +1,5 @@
 import { css } from 'goober'
-import { useCallback } from 'react'
+import { useCallback, Fragment } from 'react'
 
 import DotLoading from '../dotLoading'
 import theme from '../../style/theme'
@@ -132,7 +132,7 @@ export const defaultStyle = {
 }
 
 function TableFlex(props) {
-  const { headers = [], data = [], rowClassName, rowKey, loading, err,
+  const { headers = [], data = [], rowClassName, rowBefore, rowKey, loading, err,
     emptyText = `No items`, keepTableDisplay = false, styling = defaultStyle } = props
 
   const loadingStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
@@ -208,7 +208,7 @@ function TableFlex(props) {
             {headers.map((header, index) => {
               const item = data[0]
               let value = item[header.key]
-              if (typeof (header.render) === 'function') {
+              if (typeof header.render === `function`) {
                 value = header.render(value, item, 0)
               }
 
@@ -225,15 +225,23 @@ function TableFlex(props) {
               className = rowClassName(item, dataIndex)
             }
 
-            return <tr key={key} className={className}>
-              {headers.map((header, headerIndex) => {
-                let value = item[header.key]
-                if (typeof (header.render) === 'function') {
-                  value = header.render(value, item, dataIndex)
-                }
-                return <td key={headerIndex}>{value}</td>
-              })}
-            </tr>
+            let before = null
+            if (typeof rowBefore === `function`) {
+              before = rowBefore(item, dataIndex)
+            }
+
+            return <Fragment key={key}>
+              {before}
+              <tr className={className}>
+                {headers.map((header, headerIndex) => {
+                  let value = item[header.key]
+                  if (typeof (header.render) === 'function') {
+                    value = header.render(value, item, dataIndex)
+                  }
+                  return <td key={headerIndex}>{value}</td>
+                })}
+              </tr>
+            </Fragment>
           })}
         </tbody>
       </table>
