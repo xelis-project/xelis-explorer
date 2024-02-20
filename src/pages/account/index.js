@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
+import { QRCodeCanvas } from 'qrcode.react'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, reduceText } from '../../utils'
@@ -15,6 +16,7 @@ import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
 import useQueryString from 'g45-react/hooks/useQueryString'
+import useTheme from '../../hooks/useTheme'
 
 const style = {
   container: css`
@@ -49,7 +51,7 @@ const style = {
 
           > div {
             display: flex;
-            gap: .5em;
+            gap: 1em;
             flex-direction: column;
 
             > :nth-child(1) {
@@ -78,8 +80,10 @@ const style = {
             gap: .5em;
             align-items: center;
             border-radius: 25px;
-            border: none;
-            background-color: var(--text-color);
+            border: thin solid var(--text-color);
+            transition: .1s all;
+            background: none;
+            color: var(--text-color);
             cursor: pointer;
             padding: 0.5em 1em;
             font-weight: bold;
@@ -121,6 +125,7 @@ function Account() {
   const { addr } = useParams()
 
   const nodeSocket = useNodeSocket()
+  const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
   //const serverResult = loadAccount_SSR({ addr })
@@ -206,6 +211,12 @@ function Account() {
           <div>
             <div>{t('Address')}</div>
             <div style={{ wordBreak: `break-all` }}>{addr}</div>
+            <div>
+              <QRCodeCanvas value={addr}
+                bgColor="transparent"
+                fgColor={currentTheme === `light` ? `#000000` : `#ffffff`}
+              />
+            </div>
           </div>
           <div>
             <div>{t('Assets')}</div>
