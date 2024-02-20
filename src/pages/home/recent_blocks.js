@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
-import { useMemo } from 'react'
+import { useMemo, lazy, Suspense } from 'react'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, reduceText } from '../../utils'
 import theme from '../../style/theme'
 import { bounceIn, slideX } from '../../style/animate'
+import Hashicon from '../../components/hashicon'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -91,10 +92,13 @@ const style = {
       
         > :nth-child(3) {
           font-size: .9em;
-          margin-top: .2em;
+          margin-top: .3em;
           color: var(--muted-color);
           opacity: .6;
           font-style: italic;
+          display: flex;
+          gap: .5em;
+          align-items: center;
         }
       
         > :nth-child(4) {
@@ -133,7 +137,10 @@ export function RecentBlocks(props) {
         return <Link to={`/blocks/${block.hash}`} key={key} className={animateClassName}>
           <div>{t('Block {}', [block.topoheight || ``])}</div>
           <div>{txCount} txs | {size}</div>
-          <div>{reduceText(block.miner, 0, 7) || '--'}</div>
+          <div>
+            <Hashicon value={block.miner} size={20} />
+            {reduceText(block.miner, 0, 7) || '--'}
+          </div>
           <div>
             {block.timestamp ?
               <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />

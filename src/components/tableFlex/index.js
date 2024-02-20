@@ -76,14 +76,9 @@ export const defaultStyle = {
       font-weight: bold;
       padding: .8em 1em;
       text-align: left;
+      vertical-align: middle;
       background-color: var(--table-th-bg-color);
       color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
-    }
-
-    /* in case we have row animation and the header must be on top */
-    table thead {  
-      z-index: 1;
-      position: relative;
     }
 
     table thead th {

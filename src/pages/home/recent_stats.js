@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatSize, formatXelis, reduceText } from '../../utils'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -60,8 +61,11 @@ const style = {
 
         > :nth-child(1) {
           padding: .7em;
-          min-width: 100px;
+          min-width: 140px;
           background-color: var(--block-bg-color);
+          display: flex;
+          align-items: center;
+          gap: .5em;
         }
 
         > :nth-child(2) {
@@ -169,6 +173,7 @@ function MinersDistribution(props) {
       const percentage = (item.minedBlock * 100 / distribution[0].minedBlock).toFixed(2)
       return <div key={item.miner}>
         <div title={item.miner}>
+          <Hashicon value={item.miner} size={20} />
           <Link to={`/accounts/${item.miner}`}>{reduceText(item.miner, 0, 5)}</Link>
         </div>
         <div> {/* This is a flex div. Keep both outer/inner div for proper use of width property. */}

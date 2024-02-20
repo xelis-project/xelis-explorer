@@ -3,11 +3,12 @@ import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import { formatXelis, reduceText } from '../../utils'
 import Table from '../../components/table'
 import Pagination, { getPaginationRange } from '../../components/pagination'
-import { useLang } from 'g45-react/hooks/useLang'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -19,6 +20,12 @@ const style = {
 
     > :nth-child(2) {
       margin-bottom: .5em;
+    }
+
+    table td:nth-child(3) > div {
+      display: flex;
+      gap: .5em;
+      align-items: center;
     }
   `
 }
@@ -87,9 +94,12 @@ function Transactions(props) {
             </td>
             <td>{transfers.length} / {burns.length}</td>
             <td>
-              <Link to={`/accounts/${item.owner}`}>
-                {reduceText(item.owner, 0, 7)}
-              </Link>
+              <div>
+                <Hashicon value={item.owner} size={20} />
+                <Link to={`/accounts/${item.owner}`}>
+                  {reduceText(item.owner, 0, 7)}
+                </Link>
+              </div>
             </td>
             <td>{formatXelis(item.fee)}</td>
           </tr>

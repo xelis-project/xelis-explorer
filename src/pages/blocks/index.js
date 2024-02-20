@@ -20,6 +20,7 @@ import PageTitle from '../../layout/page_title'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import { getBlockType } from '../dag'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -32,9 +33,17 @@ const style = {
     > :nth-child(2) {
       margin-bottom: 1em;
     }
+
+    table td:nth-child(8) > div {
+      display: flex;
+      gap: .5em;
+      align-items: center;
+    }
   `,
   animateBlock: css`
     ${slideY({ from: `-100%`, to: `0%`, duration: `0.5s`, easing: `cubic-bezier(0.34, 1.56, 0.64, 1)` })}
+    z-index: -1;
+    position: relative;
   `
 }
 
@@ -276,7 +285,10 @@ function Blocks() {
           key: 'miner',
           title: t('Miner'),
           render: (value) => {
-            return <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
+            return <div>
+              <Hashicon value={value} size={20} />
+              <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
+            </div>
           }
         },
         {

@@ -14,6 +14,7 @@ import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -28,6 +29,12 @@ const style = {
       color: white;
       font-weight: bold;
       background-color: var(--error-color);
+    }
+
+    .addr {
+      display: flex;
+      gap: .5em;
+      align-items: center;
     }
   `
 }
@@ -113,9 +120,12 @@ function Transaction() {
             key: 'owner',
             title: t('Signer'),
             render: (value) => {
-              return <Link to={`/accounts/${value}`}>
-                {value}
-              </Link>
+              return <div className="addr">
+                <Hashicon value={value} size={25} />
+                <Link to={`/accounts/${value}`}>
+                  {value}
+                </Link>
+              </div>
             }
           },
           {

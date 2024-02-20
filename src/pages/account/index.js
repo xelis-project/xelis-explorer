@@ -17,6 +17,7 @@ import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
 import useQueryString from 'g45-react/hooks/useQueryString'
 import useTheme from '../../hooks/useTheme'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -61,6 +62,12 @@ const style = {
   
             > :nth-child(2) {
               font-size: 1.4em;
+            }
+
+            > :nth-child(3) {
+              display: flex;
+              gap: 1em;
+              flex-wrap: wrap;
             }
           }
         }
@@ -210,12 +217,16 @@ function Account() {
         <div>
           <div>
             <div>{t('Address')}</div>
-            <div style={{ wordBreak: `break-all` }}>{addr}</div>
+            <div style={{ wordBreak: `break-all` }}>
+              {addr}
+            </div>
             <div>
               <QRCodeCanvas value={addr}
                 bgColor="transparent"
                 fgColor={currentTheme === `light` ? `#000000` : `#ffffff`}
+                size={120}
               />
+              <Hashicon value={addr} size={120} />
             </div>
           </div>
           <div>

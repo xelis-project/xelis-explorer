@@ -20,7 +20,7 @@
     "start": "npm run start-dev:cf"
   },
   "dependencies": {
-    "@emeraldpay/hashicon-react": "^0.5.2",
+    "@emeraldpay/hashicon": "^0.5.2",
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@tweenjs/tween.js": "^21.0.0",

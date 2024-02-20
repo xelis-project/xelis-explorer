@@ -18,6 +18,7 @@ import { scaleOnHover } from '../../style/animate'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -26,6 +27,12 @@ const style = {
       color: white;
       font-weight: bold;
       background-color: var(--error-color);
+    }
+
+    .miner {
+      display: flex;
+      gap: .5em;
+      align-items: center;
     }
 
     .controls {
@@ -241,7 +248,10 @@ function Block() {
             key: 'miner',
             title: t('Miner'),
             render: (value) => {
-              return <Link to={`/accounts/${value}`}>{value}</Link>
+              return <div className="miner">
+                <Hashicon value={value} size={25} />
+                <Link to={`/accounts/${value}`}>{value}</Link>
+              </div>
             }
           },
           {
