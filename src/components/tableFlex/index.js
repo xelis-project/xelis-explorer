@@ -149,7 +149,7 @@ function TableFlex(props) {
 
   return <div>
     <div className={styling.mobile}>
-      {data.map((item, dataIndex) => {
+      {!err && !loading && data.map((item, dataIndex) => {
         const key = getRowKeyValue(item, dataIndex)
         return <div key={key}>
           {headers.map((header, headerIndex) => {
@@ -212,7 +212,7 @@ function TableFlex(props) {
               </tr>
             })}
           </>}
-          {displayTable && data.map((item, dataIndex) => {
+          {!err && displayTable && data.map((item, dataIndex) => {
             const key = getRowKeyValue(item, dataIndex)
             let className = null
             if (typeof rowClassName === `function`) {

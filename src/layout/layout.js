@@ -123,11 +123,13 @@ export const style = {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
-    margin-top: 1em;
     transition: .25s all;
+    padding: 1em;
+    width: 100%;
+    max-width: 25em;
 
     ${theme.query.maxMobile} {
-      margin-top:-2px;
+      padding-top: 0;
 
       > div > :nth-child(1) {
         border-radius: 10px;

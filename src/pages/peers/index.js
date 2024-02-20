@@ -525,7 +525,7 @@ function TablePeers(props) {
     </div>
     <Table
       headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Since'), t('Last Ping'), t('Version')]}
-      loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={9}
+      loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={10}
       onItem={(item) => {
         if (item.groupHeader) {
           const key = item.key

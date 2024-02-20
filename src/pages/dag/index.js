@@ -67,12 +67,13 @@ const style = {
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: 1em;
-    display: flex;
-    gap: .5em;
-    flex-direction: column;
+    padding: 1em;
+    width: 100%;
+    max-width: 25em;
+    z-index: 1;
 
     > :nth-child(2) {
+      margin-top: 1em;
       font-size: .8em;
       text-align: center;
       position: relative;
