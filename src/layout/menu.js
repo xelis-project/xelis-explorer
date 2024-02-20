@@ -32,7 +32,7 @@ const style = {
     flex-direction: column;
     background-color: ${theme.apply({ xelis: `rgb(29 59 55 / 80%)`, light: `rgb(250 250 250 / 80%)`, dark: `rgb(16 16 16 / 80%)` })};
     gap: .25em;
-    z-index: 1;
+    z-index: 2;
     font-size: 1.2em;
     opacity: 0;
     transform: translateY(-100%);

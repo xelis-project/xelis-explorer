@@ -37,9 +37,9 @@ const slideYKeyframes = (from, to) => keyframes`
 `
 
 export const slideY = (props) => {
-  const { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
+  const { from = `0%`, to = `100%`, duration = `.25s`, easing = `linear` } = props || {}
   return `
-    animation: ${slideYKeyframes(from, to)} ${duration} linear both;
+    animation: ${slideYKeyframes(from, to)} ${duration} ${easing} both;
   `
 }
 

@@ -17,15 +17,6 @@ const style = {
 
     h1 {
       font-size: 7em;
-      
-      &::after {
-        content: '';
-        height: .025em;
-        width: 100%;
-        border-radius: .5em;
-        background-color: var(--text-color);
-        display: block;
-      }
     }
 
     h2 {

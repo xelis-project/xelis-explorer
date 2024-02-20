@@ -29,11 +29,12 @@ function SubApp() {
 
   return <NodeSocketProvider endpoint={endpoint}>
     <Helmet titleTemplate='%s · XELIS Explorer'>
-      {currentTheme === `xelis` && <link rel="preload" as="image" href="public/img/bg_xelis.jpg" />}
+      <meta name="theme-color" content="#7afad3" />
+      {/*currentTheme === `xelis` && <link rel="preload" as="image" href="public/img/bg_xelis.jpg" />}
       {currentTheme === `light` && <link rel="preload" as="image" href="public/img/bg_xelis_light.jpg" />}
-      {currentTheme === `dark` && <link rel="preload" as="image" href="public/img/bg_xelis_dark.jpg" />}
+{currentTheme === `dark` && <link rel="preload" as="image" href="public/img/bg_xelis_dark.jpg" />}
       {currentTheme !== `light` && <link rel="preload" as="image" href="public/img/white_background_black_logo.svg" type="image/svg+xml" />}
-      {currentTheme === `light` && <link rel="preload" as="image" href="public/img/black_background_white_logo.svg" type="image/svg+xml" />}
+      {currentTheme === `light` && <link rel="preload" as="image" href="public/img/black_background_white_logo.svg" type="image/svg+xml" />*/}
       <style>{css}</style> {/* Don't use id="_goober" or css will flicker. Probably an issue with goober reseting css.*/}
     </Helmet>
     <Outlet />

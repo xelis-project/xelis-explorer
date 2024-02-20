@@ -34,7 +34,7 @@ glob`
 
   #app {
     /* important 100% on html,body,#app */
-    height: 100%;
+    /*height: 100%;*/
   }
 
   button {

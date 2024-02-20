@@ -23,13 +23,17 @@ export const defaultStyle = {
       cursor: pointer;
       padding: .5em 1em;
       font-weight: bold;
-      transition: .25s all;
+      transition: .1s all;
       background: none;
       color: var(--text-color);
 
       &.active {
         background-color: var(--text-color);
         color: var(--bg-color);
+      }
+
+      &:hover {
+        opacity: .7;
       }
     }
   `,
