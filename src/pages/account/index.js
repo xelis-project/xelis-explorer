@@ -18,6 +18,8 @@ import PageTitle from '../../layout/page_title'
 import useQueryString from 'g45-react/hooks/useQueryString'
 import useTheme from '../../hooks/useTheme'
 import Hashicon from '../../components/hashicon'
+import Modal from '../../components/modal'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -27,7 +29,7 @@ const style = {
       font-size: 1.5em;
     }
 
-    > :nth-child(2) {
+    .page-content {
       display: flex;
       gap: 1em;
       flex-direction: column;
@@ -35,68 +37,127 @@ const style = {
       ${theme.query.minDesktop} {
         flex-direction: row;
       }
+    }
 
-      > :nth-child(1) {
-        flex: 1;
-        min-width: 200px;
+    .account {
+      flex: 1;
+      min-width: 250px;
+    }
 
-        > div {
-          display: flex;
-          gap: 1em;
-          flex-direction: column;
+    .history-table {
+      flex: 3;
 
-          background-color: var(--table-td-bg-color);
-          padding: 1em;
-          border-top: .3em solid var(--table-th-bg-color);
-          border-radius: .5em;
+      > div > :nth-child(2) {
+        margin-top: .5em;
+        display: flex;
+        gap: .5em;
 
-          > div {
-            display: flex;
-            gap: 1em;
-            flex-direction: column;
-
-            > :nth-child(1) {
-              color: var(--muted-color);
-              font-size: 1em;
-            }
-  
-            > :nth-child(2) {
-              font-size: 1.4em;
-            }
-
-            > :nth-child(3) {
-              display: flex;
-              gap: 1em;
-              flex-wrap: wrap;
-            }
-          }
-        }
-      }
-
-      > :nth-child(2) {
-        overflow: auto;
-        flex: 3;
-
-        > :nth-child(2) {
+        button {
           display: flex;
           gap: .5em;
-          margin-top: .5em;
-  
-          > button {
-            display: flex;
-            gap: .5em;
-            align-items: center;
-            border-radius: 25px;
-            border: thin solid var(--text-color);
-            transition: .1s all;
-            background: none;
-            color: var(--text-color);
-            cursor: pointer;
-            padding: 0.5em 1em;
-            font-weight: bold;
-          }
+          align-items: center;
+          border-radius: 25px;
+          border: thin solid var(--text-color);
+          transition: .1s all;
+          background: none;
+          color: var(--text-color);
+          cursor: pointer;
+          padding: 0.5em 1em;
+          font-weight: bold;
         }
       }
+    }
+  `,
+  account: css`
+    display: flex;
+    gap: 1em;
+    flex-direction: column;
+    background-color: var(--table-td-bg-color);
+    padding: 1em;
+    border-top: .3em solid var(--table-th-bg-color);
+    border-radius: .5em;
+
+    .top-content {
+      display: flex;
+      gap: 1em;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .hashicon {
+      padding: 1em;
+      border-radius: 50%;
+      background-color: #333333;
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .addr {
+      max-width: 300px;
+      margin: 0 auto;
+      word-break: break-all;
+      text-align: center;
+      font-size: 1.3em;
+    }
+
+    .buttons {
+      position: absolute;
+      right: 0;
+
+      button {
+        display: flex;
+        gap: .5em;
+        align-items: center;
+        background: transparent;
+        border: thin solid var(--text-color);
+        border-radius: 0.5em;
+        padding: 0.25em;
+        color: var(--text-color);
+        font-size: 1em;
+        cursor: pointer;
+        ${scaleOnHover()}
+      }
+    }
+
+    .item {
+      display: flex;
+      gap: .5em;
+      flex-direction: column;
+
+      .subtitle {
+        color: var(--muted-color);
+        font-size: 1em;
+      }
+
+      .value {
+        font-size: 1.4em;
+      }
+    }
+  `,
+  qrCodeModal: css`
+    background-color: var(--table-td-bg-color);
+    border-radius: .5em;
+    padding: 1em;
+
+    .title {
+      font-size: 1.6em;
+      margin-bottom: .25em;
+      text-align: center;
+    }
+
+    .addr {
+      display: flex;
+      gap: .5em;
+      color: var(--muted-color);
+      font-size: 1.2em;
+      margin-bottom: 1em;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .copy {
+      cursor: pointer;
     }
   `
 }
@@ -132,11 +193,11 @@ function Account() {
   const { addr } = useParams()
 
   const nodeSocket = useNodeSocket()
-  const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
   //const serverResult = loadAccount_SSR({ addr })
 
+  const [qrCodeVisible, setQRCodeVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const [account, setAccount] = useState({})
@@ -212,46 +273,76 @@ function Account() {
     <PageTitle title={t('Account {}', [reduceText(addr)])}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
-    <div>
-      <div>
-        <div>
-          <div>
-            <div>{t('Address')}</div>
-            <div style={{ wordBreak: `break-all` }}>
+    <div className="page-content">
+      <div className="account">
+        <div className={style.account}>
+          <div className="top-content">
+            <div className="buttons">
+              <button onClick={() => setQRCodeVisible(true)}>
+                <Icon name="qrcode" />
+              </button>
+            </div>
+            <div className="hashicon">
+              <Hashicon value={addr} size={50} />
+            </div>
+            <div className="addr">
               {addr}
             </div>
-            <div>
-              <QRCodeCanvas value={addr}
-                bgColor="transparent"
-                fgColor={currentTheme === `light` ? `#000000` : `#ffffff`}
-                size={120}
-              />
-              <Hashicon value={addr} size={120} />
-            </div>
           </div>
-          <div>
-            <div>{t('Assets')}</div>
-            <div>
+          <div className="item">
+            <div className="subtitle">{t('Assets')}</div>
+            <div className="value">
               <Dropdown items={dropdownAssets} onChange={onAssetChange}
                 size={.8} value={XELIS_ASSET} />
             </div>
           </div>
-          <div>
-            <div>{t('Balance')}</div>
-            <div>{balance ? formatXelis(balance) : `--`}</div>
+          <div className="item">
+            <div className="subtitle">{t('Balance')}</div>
+            <div className="value">{balance ? formatXelis(balance) : `--`}</div>
           </div>
-          <div>
-            <div>{t('Nonce')}</div>
-            <div>{nonce}</div>
+          <div className="item">
+            <div className="subtitle">{t('Nonce')}</div>
+            <div className="value">{nonce}</div>
           </div>
         </div>
       </div>
-      <History addr={addr} asset={asset} assetData={assetData} />
+      <div className="history-table">
+        <History addr={addr} asset={asset} assetData={assetData} />
+      </div>
     </div>
+    <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
   </div>
 }
 
 export default Account
+
+function AddressQRCodeModal(props) {
+  const { addr, visible, setVisible } = props
+
+  const { theme: currentTheme } = useTheme()
+
+  const copyAddr = useCallback(() => {
+    navigator.clipboard.writeText(addr)
+  }, [addr])
+
+  return <Modal visible={visible} setVisible={setVisible}>
+    <div className={style.qrCodeModal}>
+      <div className="title">Address QR code</div>
+      <div className="addr">
+        <Hashicon value={addr} size={25} />
+        <div>{reduceText(addr)}</div>
+        <Icon name="copy" className="copy" onClick={copyAddr}/>
+      </div>
+      <div className="qrcode">
+        <QRCodeCanvas value={addr}
+          bgColor="transparent"
+          fgColor={currentTheme === `light` ? `#000000` : `#ffffff`}
+          size={250}
+        />
+      </div>
+    </div>
+  </Modal>
+}
 
 /*
 function loadAccountHistory_SSR() {
