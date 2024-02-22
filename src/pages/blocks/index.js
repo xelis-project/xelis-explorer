@@ -15,7 +15,7 @@ import { formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
-import { slideY } from '../../style/animate'
+import { slideX, slideY } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
@@ -41,9 +41,7 @@ const style = {
     }
   `,
   animateBlock: css`
-    ${slideY({ from: `-100%`, to: `0%`, duration: `0.5s`, easing: `cubic-bezier(0.34, 1.56, 0.64, 1)` })}
-    z-index: -1;
-    position: relative;
+    ${slideX({ from: `-100%`, to: `0%`, duration: `0.5s`, easing: `cubic-bezier(0.34, 1.56, 0.64, 1)` })}
   `
 }
 
