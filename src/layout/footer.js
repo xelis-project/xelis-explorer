@@ -33,19 +33,8 @@ const style = {
         > :nth-child(1) {
           font-weight: bold;
           font-size: 1.2em;
-          margin-bottom: 1.5em;
+          margin-bottom: .5em;
           position: relative;
-
-          &::before {
-            content: '';
-            display: block;
-            position: absolute;
-            width: 100%;
-            height: .1em;
-            background-color: var(--text-color);
-            border-radius: .5em;
-            bottom: -.6em;
-          }
         }
       }
 

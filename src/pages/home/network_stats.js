@@ -57,17 +57,7 @@ const style = {
     > :nth-child(1) {
       margin-bottom: 1em;
       font-weight: bold;
-      font-size: 1.5em;
-      
-      &::after {
-        margin-top:.6em;
-        height: .1em;
-        content: '';
-        background-color: var(--text-color);
-        width: 100%;
-        display: block;
-        border-radius: .5em;
-      }
+      font-size: 2em;
     }
 
     > :nth-child(2) {
