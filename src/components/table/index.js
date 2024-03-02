@@ -1,4 +1,5 @@
 import { css } from 'goober'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import DotLoading from '../dotLoading'
 import theme from '../../style/theme'
@@ -64,21 +65,62 @@ export const defaultStyle = {
       width: 100%;
     }
   `,
+  sortHeaderItem: css`
+    cursor: pointer;
+    display: flex;
+    gap: 1em;
+    user-select: none;
+  `,
   errorText: css`
     color: red !important;
   `
 }
 
+// headers can be string array or object array
+// [`Hash`] or { key: `hash`, text: t(`Hash`), sort: true }, 
+
 function Table(props) {
-  const { headers = [], list = [], onItem, loading, err, colSpan, emptyText = `No items`, styling = defaultStyle } = props
+  const { headers = [], sortState = {}, onSort, list = [], onItem, loading, err, colSpan, emptyText = `No items`, styling = defaultStyle } = props
 
   const listBodyStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
+
+  const { key: sortKey, direction: sortDirection } = sortState
 
   return <div className={styling.container}>
     <table>
       <thead>
         <tr>
-          {headers.map((header) => <th key={header}>{header}</th>)}
+          {headers.map((header) => {
+            let key = header, text = header, sort = false, sortIcon = null, onHeaderSort = null
+            if (typeof header === `object`) {
+              key = header.key
+              text = header.text
+              sort = header.sort
+            }
+
+            if (sort) {
+              if (sortKey === key) {
+                if (sortDirection === `desc`) {
+                  sortIcon = `sort-down`
+                } else {
+                  sortIcon = `sort-up`
+                }
+              } else {
+                sortIcon = `sort`
+              }
+
+              onHeaderSort = () => {
+                if (typeof onSort === `function`) onSort(header)
+              }
+            }
+
+            return <th key={key}>
+              <div className={sort ? styling.sortHeaderItem : ``} onClick={onHeaderSort}>
+                {text}
+                {sortIcon && <Icon name={sortIcon} />}
+              </div>
+            </th>
+          })}
         </tr>
       </thead>
       <tbody>

@@ -1,9 +1,10 @@
 import 'flag-icons/css/flag-icons.css'
 import { glob } from 'goober'
-import country from 'flag-icons/country.json'
+// import country from 'flag-icons/country.json'
 
 glob`
   .fi {
+    position: inherit;
     border-radius: 3px;
   }
 `

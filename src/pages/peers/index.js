@@ -180,6 +180,10 @@ const style = {
     > :nth-child(2) {
       margin-bottom: .5em;
     }
+
+    > :nth-child(3) {
+      max-height: 40em;
+    }
   `,
   mapLoad: css`
     position: absolute;
@@ -387,6 +391,7 @@ function Peers() {
     }
   }, [])
 
+  // this is kind of expensive... maybe a disable feature needed
   useNodeSocketSubscribe({
     event: RPCEvent.PeerStateUpdated,
     onData: async (_, peer) => {
@@ -416,6 +421,16 @@ function Peers() {
     }
   }, [])
 
+  const formattedPeers = useMemo(() => {
+    return peers.map((peer) => {
+      const data = geoLocation[peer.ip]
+      peer.location = data
+      peer.location_text = data ? `${data.country_code}_${data.country}` : ``
+      peer.total_peers = Object.keys(peer.peers || {}).length
+      return peer
+    })
+  }, [peers, geoLocation])
+
   const mapRef = useRef()
 
   return <div className={style.container}>
@@ -431,7 +446,7 @@ function Peers() {
       <h2>{t(`Stats`)}</h2>
       <PeersStats peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} />
       <h2>{t(`Peer List`)}</h2>
-      <TablePeers peersLoading={peersLoading} err={err} peers={peers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} networkData={networkData} />
+      <TablePeers peersLoading={peersLoading} err={err} peers={formattedPeers} geoLocation={geoLocation} geoLoading={geoLoading} mapRef={mapRef} networkData={networkData} />
     </div>
   </div>
 }
@@ -439,11 +454,12 @@ function Peers() {
 export default Peers
 
 function TablePeers(props) {
-  const { networkData, peersLoading, err, peers, geoLocation, geoLoading, mapRef } = props
+  const { networkData, peersLoading, err, peers, geoLoading, mapRef } = props
 
   const { t } = useLang()
   const [filterIP, setFilterIP] = useState(``)
   const [groupKey, setGroupKey] = useState(``)
+  const [sort, setSort] = useState({ key: `connected_on`, direction: `desc`, type: `number` })
 
   const flyTo = useCallback((data) => {
     const position = [data.latitude, data.longitude]
@@ -453,13 +469,50 @@ function TablePeers(props) {
 
   const onFilterIP = useCallback((e) => {
     setFilterIP(e.target.value)
-  }, [peers])
+  }, [])
+
+  const sortedPeers = useMemo(() => {
+    return Object.assign([], peers).sort((a, b) => {
+      if (sort.type === `string`) {
+        const v1 = a[sort.key] || ``
+        const v2 = b[sort.key] || ``
+
+        if (sort.direction === `asc`) {
+          return (v2).localeCompare(v1)
+        }
+
+        return (v1).localeCompare(v2)
+      }
+
+      if (sort.type === `number`) {
+        const v1 = a[sort.key] || 0
+        const v2 = b[sort.key] || 0
+
+        if (sort.direction === `asc`) {
+          return v2 - v1
+        }
+
+        return v1 - v2
+      }
+    })
+  }, [sort, peers])
+
+  const filteredPeers = useMemo(() => {
+    return sortedPeers.filter((p) => {
+      if (filterIP.length > 0) {
+        if (p.addr) return p.addr.includes(filterIP)
+        return false
+      }
+      return true
+    })
+  }, [sortedPeers, filterIP])
 
   const groupPeers = useMemo(() => {
-    const group = groupBy(peers, (p) => {
+    if (!groupKey) return filteredPeers
+
+    const group = groupBy(filteredPeers, (p) => {
       if (groupKey === `country`) {
-        const data = geoLocation[p.ip]
-        if (data) return `${data.country_code}_${data.country}`
+        if (p.location) return `${p.location.country_code}_${p.location.country}`
         return `xx_Unknown`
       }
 
@@ -473,19 +526,7 @@ function TablePeers(props) {
     })
 
     return items
-  }, [groupKey, peers, geoLocation])
-
-  const filteredPeers = useMemo(() => {
-    const peersToFilter = groupKey ? groupPeers : peers
-    return peersToFilter.filter((p) => {
-      if (filterIP.length > 0) {
-        if (p.groupHeader) return true
-        if (p.addr) return p.addr.includes(filterIP)
-        return false
-      }
-      return true
-    })
-  }, [peers, groupPeers, filterIP, groupKey])
+  }, [groupKey, filteredPeers])
 
   const peerStats = useMemo(() => {
     const stats = [0, 0, 0, 0, 0] // synced, desync, fullLedger, prunedLedger, sameVersion
@@ -524,8 +565,28 @@ function TablePeers(props) {
       {t(`{} synced | {} desync | {} full ledger | {} pruned ledger | {} on the same version`, peerStats)}
     </div>
     <Table
-      headers={[t('Address'), t('Location'), t('Peers'), t('Tag'), t('Height'), t('Topo'), t('Pruned Topo'), t('Since'), t('Last Ping'), t('Version')]}
-      loading={peersLoading} err={err} list={filteredPeers} emptyText={t('No peers')} colSpan={10}
+      headers={[
+        { key: `addr`, text: t(`Address`), sort: true, type: `string` },
+        { key: `location_text`, text: t(`Location`), sort: true, type: `string` },
+        { key: `total_peers`, text: t(`Peers`), sort: true, type: `number` },
+        { key: `tag`, text: t(`Tag`), sort: true, type: `string` },
+        { key: `height`, text: t(`Height`), sort: true, type: `number` },
+        { key: `topoheight`, text: t(`Topo`), sort: true, type: `number` },
+        { key: `pruned_topoheight`, text: t(`Pruned Topo`), sort: true, type: `number` },
+        { key: `connected_on`, text: t(`Since`), sort: true, type: `number` },
+        { key: `last_ping`, text: t(`Last Ping`), sort: true, type: `number` },
+        { key: `version`, text: t(`Version`), sort: true, type: `string` },
+      ]}
+      sortState={sort}
+      onSort={(header) => {
+        let direction = `desc`
+        if (sort.key === header.key) {
+          direction = sort.direction === `desc` ? `asc` : `desc`
+        }
+
+        setSort({ key: header.key, direction, type: header.type })
+      }}
+      loading={peersLoading} err={err} list={groupPeers} emptyText={t('No peers')} colSpan={10}
       onItem={(item) => {
         if (item.groupHeader) {
           const key = item.key
@@ -553,31 +614,30 @@ function TablePeers(props) {
         let location = `--`
         if (geoLoading) location = <DotLoading />
 
-        const data = geoLocation[item.ip]
+        const data = item.location
         if (data) {
           const code = (data.country_code || 'xx').toLowerCase()
 
           if (groupKey == `country`) {
             location = <div className={style.tableRowLocation}>
-              <span>{data.region}</span>
+              <div>{data.region}</div>
               <button onClick={() => flyTo(data)}>Fly To</button>
             </div>
           } else {
             location = <div className={style.tableRowLocation}>
               <FlagIcon code={code} />
-              <span>{data.country}{data.region && ` / ${data.region}`}</span>
+              <div>{data.country}{data.region && ` / ${data.region}`}</div>
               <button onClick={() => flyTo(data)}>Fly To</button>
             </div>
           }
         }
 
-        const peers = Object.keys(item.peers || {}).length
         const tag = item.tag ? reduceText(item.tag, 20, 0) : `--`
 
         return <tr key={item.id}>
           <td>{item.addr}</td>
           <td>{location}</td>
-          <td>{peers}</td>
+          <td>{item.total_peers}</td>
           <td>{tag}</td>
           <td>{item.height}</td>
           <td>{item.topoheight}</td>
