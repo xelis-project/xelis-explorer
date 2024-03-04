@@ -48,4 +48,8 @@ glob`
   ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-bg-hover);
   }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 `

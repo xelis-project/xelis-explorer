@@ -18,18 +18,21 @@ export const defaultStyle = {
       white-space: nowrap;
     }
 
-    table th {
-      font-weight: bold;
-      padding: .8em 1em;
-      text-align: left;
-      vertical-align: middle;
-      background-color: ${theme.apply({ xelis: 'rgb(122 250 211)', dark: '#373737', light: '#cbcbcb' })};
-      color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
-    }
-
-    table thead th {
-      position: sticky;
-      top: 0;
+    table thead {
+      tr {
+        background-color: ${theme.apply({ xelis: 'rgb(122 250 211)', dark: '#373737', light: '#cbcbcb' })};
+        background-color: ${theme.apply({ xelis: 'rgb(122 250 211)', dark: '#373737', light: '#cbcbcb' })};
+        color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
+        position: sticky;
+        top: 0;
+      }
+    
+      th {
+        font-weight: bold;
+        padding: .8em 1em;
+        text-align: left;
+        vertical-align: middle;
+      }
 
       &:first-child {
         border-top-left-radius: .5em;
@@ -40,7 +43,7 @@ export const defaultStyle = {
       }
     }
 
-    table td {
+    table tbody td {
       border-bottom: thin solid ${theme.apply({ xelis: '#232323', dark: '#2b2b2b', light: '#cbcbcb' })};
       background-color: ${theme.apply({ xelis: '#0c0c0c', dark: '#0e0e0e', light: '#f5f5f5' })};
       padding: .8em 1em;
