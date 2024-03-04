@@ -7,7 +7,7 @@ theme.dark`
   --scrollbar-height: .45em;
   --scrollbar-track-bg: rgb(0 0 0 / 30%);
   --scrollbar-thumb-bg: #727272;
-  --scrollbar-thumb-border-radius: 15px;
+  --scrollbar-thumb-border-radius: 0;
   --scrollbar-thumb-bg-hover: white;
 `
 
@@ -16,7 +16,7 @@ theme.light`
   --scrollbar-height: .45em;
   --scrollbar-track-bg: rgb(0 0 0 / 10%);
   --scrollbar-thumb-bg: #636363;
-  --scrollbar-thumb-border-radius: 15px;
+  --scrollbar-thumb-border-radius: 0;
   --scrollbar-thumb-bg-hover: black;
 `
 
@@ -25,7 +25,7 @@ theme.xelis`
   --scrollbar-height: .45em;
   --scrollbar-track-bg: rgb(0 0 0 / 50%);
   --scrollbar-thumb-bg: rgb(93 227 179);
-  --scrollbar-thumb-border-radius: 15px;
+  --scrollbar-thumb-border-radius: 0;
   --scrollbar-thumb-bg-hover: rgb(86 185 150);
 `
 
@@ -50,6 +50,6 @@ glob`
   }
 
   ::-webkit-scrollbar-corner {
-    background: transparent;
+    background: var(--scrollbar-track-bg);
   }
 `
