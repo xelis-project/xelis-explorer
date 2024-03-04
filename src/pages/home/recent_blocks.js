@@ -133,9 +133,10 @@ export function RecentBlocks(props) {
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
         const animateClassName = newBlockHash === block.hash ? `animate` : null
+        const topo = block.topoheight ? block.topoheight.toLocaleString() : ``
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={animateClassName}>
-          <div>{t('Block {}', [block.topoheight || ``])}</div>
+          <div>{t('Block {}', [topo])}</div>
           <div>{txCount} txs | {size}</div>
           <div>
             <Hashicon value={block.miner} size={20} />

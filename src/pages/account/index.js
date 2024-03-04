@@ -133,6 +133,11 @@ const style = {
       .value {
         font-size: 1.4em;
       }
+
+      .subvalue {
+        font-size: .8em;
+        margin-top: 0.25em;
+      }
     }
   `,
   qrCodeModal: css`
@@ -227,18 +232,30 @@ function Account() {
     }))
     if (err2) return resErr(err2)
 
-    const [err3, result3] = await to(nodeSocket.daemon.methods.getAccountAssets(addr))
+    const [err3, result3] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+      topoheight: result2.topoheight,
+      include_txs: false
+    }))
     if (err3) return resErr(err3)
+
+    const [err4, result4] = await to(nodeSocket.daemon.methods.getAccountAssets(addr))
+    if (err4) return resErr(err4)
 
     // we don't need to fetch asset decimals if it's xelis - we have it hardcoded
     if (asset !== XELIS_ASSET) {
-      const [err4, result4] = await to(nodeSocket.daemon.methods.getAsset({ asset }))
-      if (err4) return resErr(err4)
-      setAssetData(result4)
+      const [err5, result5] = await to(nodeSocket.daemon.methods.getAsset({ asset }))
+      if (err5) return resErr(err5)
+      setAssetData(result5)
     }
 
-    setAccount({ addr, balance: result, nonce: result2 })
-    setAccountAssets(result3)
+    setAccount({
+      addr,
+      balance: result,
+      nonce: result2.nonce,
+      topoheight: result2.topoheight,
+      timestamp: result3.timestamp
+    })
+    setAccountAssets(result4)
 
     setLoading(false)
   }, [asset, addr, nodeSocket.readyState])
@@ -263,7 +280,6 @@ function Account() {
 
   const { version } = account.balance || {}
   const { balance } = version || {}
-  const nonce = account.nonce ? account.nonce.nonce : `--`
 
   const description = useMemo(() => {
     return t(`Account history of {}.`, [addr])
@@ -290,7 +306,7 @@ function Account() {
             </div>
           </div>
           <div className="item">
-            <div className="subtitle">{t('Assets')}</div>
+            <div className="subtitle">{t('Asset')}</div>
             <div className="value">
               <Dropdown items={dropdownAssets} onChange={onAssetChange}
                 size={.8} value={XELIS_ASSET} />
@@ -301,8 +317,17 @@ function Account() {
             <div className="value">{balance ? formatXelis(balance) : `--`}</div>
           </div>
           <div className="item">
+            <div className="subtitle">{t('Last Activity')}</div>
+            <div className="value">
+              {account.topoheight ? <>
+                <div><Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} /></div>
+                <div className="subvalue"><Link to={`/blocks/${account.topoheight}`}>{account.topoheight.toLocaleString()}</Link></div>
+              </> : `--`}
+            </div>
+          </div>
+          <div className="item">
             <div className="subtitle">{t('Nonce')}</div>
-            <div className="value">{nonce}</div>
+            <div className="value">{account.nonce >= 0 ? account.nonce : `--`}</div>
           </div>
         </div>
       </div>
@@ -331,7 +356,7 @@ function AddressQRCodeModal(props) {
       <div className="addr">
         <Hashicon value={addr} size={25} />
         <div>{reduceText(addr)}</div>
-        <Icon name="copy" className="copy" onClick={copyAddr}/>
+        <Icon name="copy" className="copy" onClick={copyAddr} />
       </div>
       <div className="qrcode">
         <QRCodeCanvas value={addr}
@@ -445,7 +470,7 @@ function History(props) {
           title: t('Topo'),
           render: (value) => {
             return <Link to={`/blocks/${value}`}>
-              {value}
+              {value.toLocaleString()}
             </Link>
           }
         },

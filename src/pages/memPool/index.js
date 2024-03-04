@@ -380,7 +380,9 @@ function ExecutedTxs(props) {
         const blockCount = topoheight - block.topoheight
         return <tr key={tx.hash}>
           <td>
-            <Link to={`/blocks/${block.topoheight}`}>{block.topoheight}</Link>
+            <Link to={`/blocks/${block.topoheight}`}>
+              {block.topoheight.toLocaleString()}
+            </Link>
             &nbsp;<span title={`${blockCount} block${blockCount > 1 ? `s` : ``} ago`}>({blockCount})</span>
           </td>
           <td>

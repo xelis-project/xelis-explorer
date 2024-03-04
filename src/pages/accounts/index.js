@@ -153,7 +153,7 @@ function Accounts() {
           title: t('Topo Height'),
           render: (_, item) => {
             const { topoheight } = item.balance || {}
-            return topoheight ? topoheight : `--`
+            return topoheight ? topoheight.toLocaleString() : `--`
           }
         },
         {

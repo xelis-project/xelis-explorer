@@ -232,17 +232,25 @@ function Block() {
             key: 'confirmations',
             title: t('Confirmations'),
             render: (value, item) => {
-              if (formatBlock.confirmations >= 0) return formatBlock.confirmations
+              if (formatBlock.confirmations >= 0) return formatBlock.confirmations.toLocaleString()
               return ``
             }
           },
           {
             key: 'topoheight',
             title: t('Topo Height'),
+            render: (value, item) => {
+              if (value >= 0) return value.toLocaleString()
+              return ``
+            }
           },
           {
             key: 'height',
             title: t('Height'),
+            render: (value, item) => {
+              if (value >= 0) return value.toLocaleString()
+              return ``
+            }
           },
           {
             key: 'miner',

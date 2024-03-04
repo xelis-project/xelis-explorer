@@ -639,9 +639,9 @@ function TablePeers(props) {
           <td>{location}</td>
           <td>{item.total_peers}</td>
           <td>{tag}</td>
-          <td>{item.height}</td>
-          <td>{item.topoheight}</td>
-          <td>{item.pruned_topoheight || `--`}</td>
+          <td>{item.height.toLocaleString()}</td>
+          <td>{item.topoheight.toLocaleString()}</td>
+          <td>{item.pruned_topoheight ? item.pruned_topoheight.toLocaleString() : `--`}</td>
           <td>
             <Age timestamp={item.connected_on * 1000} update />
           </td>

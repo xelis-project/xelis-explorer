@@ -277,7 +277,11 @@ function InBlocks(props) {
         const size = formatSize(item.total_size_in_bytes)
         const time = new Date(item.timestamp).toLocaleString()
         return <tr key={item.hash}>
-          <td><Link to={`/blocks/${item.topoheight}`}>{item.topoheight}</Link></td>
+          <td>
+            <Link to={`/blocks/${item.topoheight}`}>
+              {item.topoheight.toLocaleString()}
+            </Link>
+          </td>
           <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
           <td>{item.block_type}</td>
           <td>{size}</td>

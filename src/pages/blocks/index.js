@@ -243,7 +243,9 @@ function Blocks() {
         {
           key: 'topoheight',
           title: t('Topo'),
-          render: (value) => <Link to={`/blocks/${value}`}>{value}</Link>
+          render: (value) => <Link to={`/blocks/${value}`}>
+            {value.toLocaleString()}
+          </Link>
         },
         {
           key: 'block_type',
