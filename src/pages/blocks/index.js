@@ -220,7 +220,7 @@ function Blocks() {
   return <div className={style.container}>
     <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
-    <TableFlex data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}
+    <TableFlex mobileFormat={false} data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}
       rowClassName={(block) => {
         if (newBlock && block.hash === newBlock.hash) return style.animateBlock
         return null

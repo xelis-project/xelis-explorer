@@ -190,9 +190,8 @@ function Block() {
       {!err && <div className="controls">
         <div>
           {!loading && <>
-            {t('This block was mined by {}.', [formatBlock.miner])}
-            {t('It currently has {} confirmations.', [formatBlock.confirmations])}
-            {t('The miner of this block earned {}.', [formatBlock.reward])}
+            {t('This block was mined by {}. It currently has {} confirmations. The miner of this block earned {}.',
+              [formatBlock.miner, formatBlock.confirmations, formatBlock.reward])}
           </>}
         </div>
         <div className="buttons">
@@ -256,6 +255,8 @@ function Block() {
             key: 'miner',
             title: t('Miner'),
             render: (value) => {
+              if (!value) return null
+
               return <div className="miner">
                 <Hashicon value={value} size={25} />
                 <Link to={`/accounts/${value}`}>{value}</Link>
@@ -305,6 +306,8 @@ function Block() {
             key: 'tips',
             title: t('Tips'),
             render: (value) => {
+              if (!value) return null
+
               const tips = value || []
               if (tips.length === 0) return 'No tips. This is most likely the genesis block.'
 

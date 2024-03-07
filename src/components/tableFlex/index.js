@@ -56,11 +56,16 @@ export const defaultStyle = {
   `,
   desktop: css`
     overflow: auto;
-    display: none;
     border-radius: .5em;
 
+    &.hide {
+      display: none;
+    }
+
     ${theme.query.minDesktop} {
-      display: block;
+      &.hide {
+        display: block;
+      }
     }
 
     table {
@@ -99,6 +104,7 @@ export const defaultStyle = {
       background-color: var(--table-td-bg-color);
       padding: .8em 1em;
       color: var(--muted-color);
+      vertical-align: middle;
     }
 
     table tr:last-child {
@@ -128,7 +134,7 @@ export const defaultStyle = {
 
 function TableFlex(props) {
   const { headers = [], data = [], rowClassName, rowBefore, rowKey, loading, err,
-    emptyText = `No items`, keepTableDisplay = false, styling = defaultStyle } = props
+    emptyText = `No items`, mobileFormat = true, keepTableDisplay = false, styling = defaultStyle } = props
 
   const loadingStyle = loading ? { opacity: .5, userSelect: 'none' } : {}
   const colSpan = headers.length
@@ -149,7 +155,7 @@ function TableFlex(props) {
   if (keepTableDisplay) displayTable = true
 
   return <div>
-    <div className={styling.mobile}>
+    {mobileFormat && <div className={styling.mobile}>
       {!err && !loading && data.map((item, dataIndex) => {
         const key = getRowKeyValue(item, dataIndex)
         return <div key={key}>
@@ -175,8 +181,8 @@ function TableFlex(props) {
       {!err && !loading && data.length === 0 && <div>
         {emptyText}
       </div>}
-    </div>
-    <div className={styling.desktop}>
+    </div>}
+    <div className={`${styling.desktop} ${mobileFormat ? `hide` : ``}`}>
       <table>
         {(displayTable || data.length !== 1) && <thead>
           <tr>

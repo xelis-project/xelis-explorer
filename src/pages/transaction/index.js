@@ -192,9 +192,12 @@ function Transfers(props) {
             <td>{reduceText(asset)}</td>
             <td>{formatXelis(amount)}</td> {/* We assume it's native asset for now */}
             <td>
-              <Link to={`/accounts/${to}`}>
-                {to}
-              </Link>
+              <div className="addr">
+                <Hashicon value={to} size={25} />
+                <Link to={`/accounts/${to}`}>
+                  {to}
+                </Link>
+              </div>
             </td>
           </tr>
           {extra_data && <tr>

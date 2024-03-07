@@ -48,6 +48,7 @@ export const defaultStyle = {
       background-color: ${theme.apply({ xelis: '#0c0c0c', dark: '#0e0e0e', light: '#f5f5f5' })};
       padding: .8em 1em;
       color: var(--muted-color);
+      vertical-align: middle;
     }
 
     table tr:last-child {
