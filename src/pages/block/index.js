@@ -19,6 +19,8 @@ import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
+import { getBlockColor } from '../dag/blockColor'
+import useTheme from '../../hooks/useTheme'
 
 const style = {
   container: css`
@@ -129,6 +131,7 @@ function Block() {
   const [loading, setLoading] = useState(false)
   const [block, setBlock] = useState(serverResult.block)
   const [topoheight, setTopoheight] = useState(serverResult.topoheight)
+  const { theme: currentTheme } = useTheme()
 
   const loadBlock = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -214,6 +217,14 @@ function Block() {
           {
             key: 'block_type',
             title: t('Block type'),
+            render: (value, item) => {
+              if (item) {
+                const color = getBlockColor(currentTheme, item.block_type)
+                return <div style={{ color }}>{value}</div>
+              }
+
+              return ``
+            }
           },
           {
             key: 'timestamp',
@@ -239,7 +250,7 @@ function Block() {
             key: 'topoheight',
             title: t('Topo Height'),
             render: (value, item) => {
-              if (value >= 0) return value.toLocaleString()
+              if (value) return value.toLocaleString()
               return ``
             }
           },
@@ -247,7 +258,7 @@ function Block() {
             key: 'height',
             title: t('Height'),
             render: (value, item) => {
-              if (value >= 0) return value.toLocaleString()
+              if (value) return value.toLocaleString()
               return ``
             }
           },

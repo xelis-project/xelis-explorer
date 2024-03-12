@@ -33,12 +33,11 @@ const style = {
     > :nth-child(2) {
       margin-bottom: 1em;
     }
-
-    table td:nth-child(8) > div {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-    }
+  `,
+  miner: css`
+    display: flex;
+    gap: .5em;
+    align-items: center;
   `,
   animateBlock: css`
     ${slideX({ from: `-100%`, to: `0%`, duration: `0.5s`, easing: `cubic-bezier(0.34, 1.56, 0.64, 1)` })}
@@ -98,7 +97,7 @@ function Blocks() {
   const [loading, setLoading] = useState()
   const [query, setQuery] = useQueryString()
   const { t } = useLang()
-  const { theme } = useTheme()
+  const { theme: currentTheme } = useTheme()
 
   const [pageState, _setPageState] = useState(() => {
     const page = parseInt(query.page) || 1
@@ -233,7 +232,7 @@ function Blocks() {
         if (hasUnstableblocks && !stableLineRendered && block.height <= stableheight) {
           stableLineRendered = true
           return <tr>
-            <td colSpan="9">{t('Blocks below are stable and cannot be rearranged.')}</td>
+            <td colSpan={10}>{t('Blocks below are stable and cannot be rearranged.')}</td>
           </tr>
         }
 
@@ -243,16 +242,31 @@ function Blocks() {
         {
           key: 'topoheight',
           title: t('Topo'),
-          render: (value) => <Link to={`/blocks/${value}`}>
-            {value.toLocaleString()}
-          </Link>
+          render: (value) => {
+            if (value) {
+              return <Link to={`/blocks/${value}`}>
+                {value.toLocaleString()}
+              </Link>
+            }
+            return `--`
+          }
+        },
+        {
+          key: 'height',
+          title: t('Height'),
+          render: (value) => {
+            if (value) {
+              return value.toLocaleString()
+            }
+            return `--`
+          }
         },
         {
           key: 'block_type',
           title: t('Type'),
           render: (_, block) => {
             const blockType = getBlockType(block, stableheight, heightBlocks)
-            const color = getBlockColor(theme, blockType)
+            const color = getBlockColor(currentTheme, blockType)
             return <span style={{ color }}>{blockType}</span>
           }
         },
@@ -285,7 +299,7 @@ function Blocks() {
           key: 'miner',
           title: t('Miner'),
           render: (value) => {
-            return <div>
+            return <div className={style.miner}>
               <Hashicon value={value} size={20} />
               <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
             </div>

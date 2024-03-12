@@ -82,18 +82,19 @@ const style = {
 }
 
 export function getBlockType(block, stableHeight, heightBlocks) {
-  const nextHeight = block.height + 1
-  let blocksNextHeight = 0
+  // block is Sync when he is alone at a stable height
+  let totalBlocksAtHeight = 0
+
   for (let i = 0; i < heightBlocks.length; i++) {
     const [height, blocks] = heightBlocks[i]
-    if (height === nextHeight) {
-      blocksNextHeight = blocks.length
+    if (height === block.height) {
+      totalBlocksAtHeight = blocks.length
       break
     }
   }
 
   if (
-    blocksNextHeight <= 1 &&
+    totalBlocksAtHeight <= 1 &&
     block.block_type === BlockType.Normal &&
     block.height <= stableHeight
   ) {
