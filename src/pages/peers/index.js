@@ -195,14 +195,14 @@ const style = {
     top: 0;
     z-index: 999;
 
-    > div {
+    .content {
       background-color: black;
       padding: .5em;
       border-radius: .5em;
       display: flex;
       gap: .25em;
 
-      > div {
+      .line {
         width: .5em;
         height: 1.5em;
         background-color: white;
@@ -339,19 +339,12 @@ function Peers() {
     const batch = 50
     let geoLocation = {}
 
-    const ipList = []
-    for (let i in peers) {
-      const peer = peers[i]
-      ipList.push(peer.ip)
-
-      for (let addr in peer.peers) {
-        const { ip } = parseAddressWithPort(addr)
-        if (ipList.indexOf(ip) === -1) ipList.push(ip)
-      }
-    }
+    const ipList = peers.map((peer) => {
+      return peer.ip
+    })
 
     for (let i = 0; i < ipList.length; i += batch) {
-      const ips = ipList.slice(i, batch)
+      const ips = ipList.slice(i, i + batch)
       const [err, data] = await to(fetchGeoLocation(ips))
       if (err) console.log(err)
       geoLocation = { ...geoLocation, ...data }
@@ -691,12 +684,13 @@ function MapControls(props) {
 }
 
 function PeerDot(props) {
-  const { peerDot, leaflet, visible, animate = true } = props
+  const { peerDot, leaflet, visible, cluster, animate = true } = props
   const { peers, position, location, type } = peerDot
   const { CircleMarker2, Popup } = leaflet.react
 
   const [dotRadius, setDotRadius] = useState(6)
   const tweenRef = useRef()
+  const { t } = useLang()
 
   useEffect(() => {
     const startSize = 3
@@ -721,9 +715,9 @@ function PeerDot(props) {
       case `peer`:
         options = { opacity: 1, fillOpacity: .3, weight: 2, color: `green` }
         break
-      case `sub_peer`:
-        options = { opacity: .2, fillOpacity: .1, weight: 2, color: `yellow` }
-        break
+      //case `sub_peer`:
+      // options = { opacity: .2, fillOpacity: .1, weight: 2, color: `yellow` }
+      // break
     }
 
     if (!visible) {
@@ -734,21 +728,37 @@ function PeerDot(props) {
     return options
   }, [type, visible])
 
-  return <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
-    <Popup>
-      <div>{location.country} / {location.region}</div>
-      <div>
-        {peers.map((peer) => {
-          if (type === `sub_peer`) {
-            return <div key={peer.addr}>{peer.addr}</div>
-          }
+  return <>
+    {!cluster && <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
+      <Popup>
+        <div>{location.country} / {location.region}</div>
+        <div>
+          {peers.map((peer) => {
+            /*if (type === `sub_peer`) {
+              return <div key={peer.addr}>{peer.addr}</div>
+            }*/
 
-          const peerCount = Object.keys(peer.peers || {}).length
-          return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
-        })}
-      </div>
-    </Popup>
-  </CircleMarker2>
+            const peerCount = Object.keys(peer.peers || {}).length
+            return <div key={peer.addr}>{peer.addr} {`(${peerCount}P)`}</div>
+          })}
+        </div>
+      </Popup>
+    </CircleMarker2>}
+    {cluster && <>
+      {peers.map((peer) => {
+        return <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
+          <Popup>
+            <div>{location.country} / {location.region}</div>
+            <div>
+              <div>{t(`Address`)}: {peer.addr}</div>
+              <div>{t(`Version`)}: {peer.version}</div>
+              <div>{t(`Connected`)}: <Age timestamp={peer.connected_on * 1000} /></div>
+            </div>
+          </Popup>
+        </CircleMarker2>
+      })}
+    </>}
+  </>
 }
 
 function MapPeers(props) {
@@ -777,7 +787,7 @@ function MapPeers(props) {
   useEffect(() => {
     if (!leaflet) return
 
-    const { MapContainer, TileLayer, MarkerClusterGroup } = leaflet.react
+    const { MapContainer, TileLayer, MarkerClusterGroup, CircleMarker2 } = leaflet.react
 
     let tileLayerUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`
     if (theme === `light`) {
@@ -820,12 +830,14 @@ function MapPeers(props) {
       />
       {controls.showCluster && <MarkerClusterGroup showCoverageOnHover={false} chunkedLoading>
         {Object.keys(peerDots).map((key) => {
-          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.showPulse} />
+          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet}
+            cluster={controls.showCluster} animate={controls.showPulse} />
         })}
       </MarkerClusterGroup>}
       {!controls.showCluster && <>
         {Object.keys(peerDots).map((key) => {
-          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet} animate={controls.showPulse} />
+          return <PeerDot key={key} peerDot={peerDots[key]} visible={controls.showPeers} leaflet={leaflet}
+            cluster={controls.showCluster} animate={controls.showPulse} />
         })}
       </>}
     </MapContainer>
@@ -843,10 +855,10 @@ function MapPeers(props) {
 function MapLoad(props) {
   const { peersLoading, geoLoading } = props
   return (peersLoading || geoLoading) && <div className={style.mapLoad}>
-    <div>
-      <div />
-      <div />
-      <div />
+    <div className="content">
+      <div className="line" />
+      <div className="line" />
+      <div className="line" />
     </div>
   </div>
 }
