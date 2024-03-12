@@ -746,7 +746,7 @@ function PeerDot(props) {
     </CircleMarker2>}
     {cluster && <>
       {peers.map((peer) => {
-        return <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
+        return <CircleMarker2 key={peer.addr} radius={dotRadius} pathOptions={pathOptions} center={position}>
           <Popup>
             <div>{location.country} / {location.region}</div>
             <div>
