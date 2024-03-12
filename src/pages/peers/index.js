@@ -853,10 +853,15 @@ function MapLoad(props) {
 
 function ConnectedNodeTable(props) {
   const { networkData } = props
-  const { err, data, loading } = networkData
+  const { err, loading } = networkData
   const { t } = useLang()
 
-  return <TableFlex keepTableDisplay loading={loading} err={err} data={[data]} emptyText={t('Not connected')}
+  const data = useMemo(() => {
+    if (Object.keys(networkData.data).length > 0) return [networkData.data]
+    return []
+  }, [networkData])
+
+  return <TableFlex keepTableDisplay loading={loading} err={err} data={data} emptyText={t('Not connected')}
     rowKey="peer_id"
     headers={[
       {
