@@ -942,10 +942,6 @@ function PeersStats(props) {
   const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
-  const textColor = useMemo(() => {
-    return currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`
-  }, [currentTheme])
-
   const data = useMemo(() => {
     let versionData = { labels: [], data: [] }
     let heightData = { labels: [], data: [] }
@@ -1074,38 +1070,6 @@ function PeersStats(props) {
       ]
     }
   }, [data.versionData])
-
-
-  const continentChartConfig = useMemo(() => {
-    const chartData = {
-      labels: data.continentData.labels,
-      datasets: [
-        {
-          //label: 'Dataset 1',
-          data: data.continentData.data,
-          borderWidth: 0,
-          //backgroundColor: `white`,
-        }
-      ]
-    }
-
-    return {
-      type: 'bar',
-      data: chartData,
-      options: {
-        animation: false,
-        responsive: false,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-            color: `#fff`,
-            position: 'bottom'
-          }
-        }
-      },
-    }
-  }, [textColor, data.continentData])
 
   return <div className={style.chart}>
     <div>

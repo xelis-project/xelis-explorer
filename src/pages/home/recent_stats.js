@@ -1,14 +1,17 @@
 import { useMemo } from 'react'
 import { css } from 'goober'
-import { Link } from 'react-router-dom'
+//import { Link } from 'react-router-dom'
 import { useLang } from 'g45-react/hooks/useLang'
+import prettyMs from 'pretty-ms'
 
-import { formatSize, formatXelis, reduceText } from '../../utils'
-import Hashicon from '../../components/hashicon'
+import { formatHashRate, formatSize, formatXelis, reduceText } from '../../utils'
+//import Hashicon from '../../components/hashicon'
+import Chart from '../../components/chart'
+import theme from '../../style/theme'
 
 const style = {
   container: css`
-    > :nth-child(1), > :nth-child(3) {
+    .title {
       margin-bottom: 1em;
       font-weight: bold;
       font-size: 1.5em;
@@ -21,7 +24,7 @@ const style = {
       }
     }
 
-    > :nth-child(2) {
+    .recent-stats {
       display: flex;
       gap: 1em;
       margin-bottom: 1em;
@@ -30,11 +33,10 @@ const style = {
 
       > div {
         padding: 1em;
-        border-left: .3em solid var(--block-border-color);
-        background-color: var(--block-bg-color);
+        background-color: var(--stats-bg-color);
         min-width: 9em;
         flex-shrink: 0;
-        border-radius: .25em;
+        border-radius: .5em;
 
         > :nth-child(1) {
           color: var(--muted-color);
@@ -48,7 +50,37 @@ const style = {
       }
     }
 
-    > :nth-child(4) {
+    .charts {
+      display: flex;
+      gap: 2em;
+      flex-direction: column;
+
+      ${theme.query.minDesktop} {
+        flex-direction: row;
+      }
+
+      > div {
+        flex: 1;
+      }
+
+      > :nth-child(2) {
+        display: flex;
+        gap: 2em;
+        flex-direction: column;
+      }
+
+      .chart-container {
+        padding: 2em;
+        border-radius: .5em;
+        background-color: var(--stats-bg-color);
+
+        > :nth-child(1) {
+          margin-bottom: 1em;
+        }
+      }
+    }
+
+    .miners-distribution {
       display: flex;
       flex-direction: column;
       border-left: .3em solid var(--block-border-color);
@@ -118,11 +150,11 @@ export function RecentStats(props) {
   }, [blocks])
 
   return <div className={style.container}>
-    <div>
+    <div className="title">
       {t('Recent Stats')}
       <div>Last {blocks.length} blocks</div>
     </div>
-    <div>
+    <div className="recent-stats">
       <div>
         <div>{t('Txs')}</div>
         <div>{stats.txs}</div>
@@ -140,14 +172,193 @@ export function RecentStats(props) {
         <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
       </div>
     </div>
-    <div>
-      {t('Miners Distribution')}
-      <div>Last {blocks.length} blocks</div>
+    <div className="charts">
+      <MinersDistributionChart miners={stats.miners} />
+      <div>
+        <HashrateChart blocks={blocks} />
+        <BlockTimesChart blocks={blocks} />
+      </div>
     </div>
-    <MinersDistribution miners={stats.miners} />
   </div>
 }
 
+function MinersDistributionChart(props) {
+  const { miners } = props
+
+  const { t } = useLang()
+
+  const options = useMemo(() => {
+    return {
+      animation: false,
+      //responsive: false,
+      //maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'left',
+        },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              return t(`{} blocks`, [ctx.raw])
+            }
+          }
+        },
+      }
+    }
+  }, [])
+
+  const data = useMemo(() => {
+    const labels = []
+    const data = []
+
+    Object.entries(miners).forEach(([miner, minedBlock]) => {
+      labels.push(reduceText(miner))
+      data.push(minedBlock)
+    })
+
+    return {
+      labels,
+      datasets: [
+        {
+          data,
+          borderWidth: 0,
+        }
+      ]
+    }
+  }, [miners])
+
+  return <div className="chart-container">
+    <div>{t(`Miners Distribution`)}</div>
+    <Chart type="doughnut" options={options} data={data} />
+  </div>
+}
+
+function HashrateChart(props) {
+  const { blocks } = props
+
+  const { t } = useLang()
+
+  const options = useMemo(() => {
+    return {
+      animation: false,
+      //responsive: false,
+      //maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              return formatHashRate(parseInt(ctx.raw) / 15)
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: (value) => formatHashRate(parseInt(value) / 15),
+          }
+        }
+      }
+    }
+  }, [])
+
+  const data = useMemo(() => {
+    const labels = []
+    const data = []
+
+    const sortedBlocks = Object.assign([], blocks).sort((a, b) => a.topoheight - b.topoheight)
+    sortedBlocks.forEach((block) => {
+      labels.push(block.topoheight)
+      data.push(block.difficulty)
+    })
+
+    return {
+      labels,
+      datasets: [
+        {
+          data,
+          borderWidth: 3,
+          tension: 0.4,
+          fill: `start`
+        }
+      ]
+    }
+  }, [blocks])
+
+  return <div className="chart-container">
+    <div>{t(`Hashrates`)}</div>
+    <Chart type="line" options={options} data={data} />
+  </div>
+}
+
+function BlockTimesChart(props) {
+  const { blocks } = props
+
+  const { t } = useLang()
+
+  const options = useMemo(() => {
+    return {
+      animation: false,
+      //responsive: false,
+      //maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              return prettyMs(ctx.raw)
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: (value) => prettyMs(value),
+          }
+        }
+      }
+    }
+  }, [])
+
+  const data = useMemo(() => {
+    const labels = []
+    const data = []
+
+    const sortedBlocks = Object.assign([], blocks).sort((a, b) => a.topoheight - b.topoheight)
+    for (let i = 0; i < sortedBlocks.length; i++) {
+      const block = sortedBlocks[i]
+      const nextBlock = sortedBlocks[i + 1]
+      if (nextBlock) {
+        const blocktime = Math.max(0, nextBlock.timestamp - block.timestamp)
+        labels.push(block.topoheight)
+        data.push(blocktime)
+      }
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          data,
+        }
+      ]
+    }
+  }, [blocks])
+
+  return <div className="chart-container">
+    <div>{t(`Blocks Time`)}</div>
+    <Chart type="bar" options={options} data={data} />
+  </div>
+}
+
+/*
 const colors = [
   'rgba(231, 90, 57, 0.4)', 'rgba(42, 187, 211, 0.4)', 'rgba(109, 255, 187, 0.4)', 'rgba(46, 36, 155, 0.4)',
   'rgba(171, 186, 40, 0.4)', 'rgba(109, 255, 220, 0.4)', 'rgba(216, 26, 89, 0.4)', 'rgba(79, 247, 164, 0.4)',
@@ -168,7 +379,7 @@ function MinersDistribution(props) {
     return values
   }, [miners])
 
-  return <div>
+  return <div className="miners-distributions">
     {distribution.map((item, index) => {
       const percentage = (item.minedBlock * 100 / distribution[0].minedBlock).toFixed(2)
       return <div key={item.miner}>
@@ -176,7 +387,7 @@ function MinersDistribution(props) {
           <Hashicon value={item.miner} size={20} />
           <Link to={`/accounts/${item.miner}`}>{reduceText(item.miner, 0, 5)}</Link>
         </div>
-        <div> {/* This is a flex div. Keep both outer/inner div for proper use of width property. */}
+        <div>
           <div title={`${item.minedBlock} mined blocks`}
             style={{ width: `${percentage}%`, backgroundColor: colors[index] }}>
             {item.minedBlock}
@@ -185,4 +396,4 @@ function MinersDistribution(props) {
       </div>
     })}
   </div>
-}
+}*/

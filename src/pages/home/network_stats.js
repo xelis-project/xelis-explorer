@@ -7,13 +7,14 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
+import Age from 'g45-react/components/age'
 
 import { formatHashRate, formatXelis } from '../../utils'
 import theme from '../../style/theme'
 import { scaleOnHover } from '../../style/animate'
-import Chart from '../../components/chart'
 import { useTheme } from '../../hooks/useTheme'
 import { daemonRPC } from '../../hooks/nodeRPC'
+
 
 theme.xelis`
   --stats-bg-color: rgb(14 30 32 / 70%);
@@ -33,6 +34,7 @@ const style = {
     background-color: var(--stats-bg-color);
     padding: 2em;
     border-radius: .5em;
+    position: relative;
 
     ${theme.query.minLarge} {
       padding: 4em;
@@ -54,13 +56,13 @@ const style = {
       ${scaleOnHover}
     }
 
-    > :nth-child(1) {
+    .title {
       margin-bottom: 1em;
       font-weight: bold;
       font-size: 2em;
     }
 
-    > :nth-child(2) {
+    .items {
       display: grid;
       grid-template-columns: 1fr;
       gap: 1em;
@@ -75,7 +77,7 @@ const style = {
   
         > :nth-child(1) {
           margin-bottom: .5em;
-          font-size: .8em;
+          font-size: .9em;
           color: var(--muted-color);
         }
   
@@ -86,6 +88,15 @@ const style = {
       }
     }
 
+    .last-update {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 2em;
+      color: var(--muted-color);
+      font-weight: bold;
+    }
+
     .mini-chart {
       max-height: 3em;
       margin-top: 0.25em;
@@ -93,6 +104,7 @@ const style = {
   `,
 }
 
+/*
 function MiniChart(props) {
   const { data } = props
 
@@ -126,7 +138,7 @@ function MiniChart(props) {
   }, [])
 
   return <Chart type="line" options={options} data={data} className="mini-chart" />
-}
+}*/
 
 function loadNetworkStats_SSR() {
   const defaultResult = { err: null, info: {}, loaded: false }
@@ -154,6 +166,7 @@ export function NetworkStats(props) {
   const [loading, setLoading] = useState()
   const [p2pStatus, setP2PStatus] = useState({})
   const { theme: currentTheme } = useTheme()
+  const [lastUpdate, setLastUpdate] = useState(Date.now())
 
   const loadInfo = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -183,6 +196,7 @@ export function NetworkStats(props) {
   useEffect(() => {
     loadInfo()
     loadP2PStatus()
+    setLastUpdate(Date.now())
   }, [blocks, loadInfo, loadP2PStatus])
 
   useNodeSocketSubscribe({
@@ -241,10 +255,11 @@ export function NetworkStats(props) {
 
       {
         title: t(`Difficulty`), render: () => {
-          return <div>
+          return (data.difficulty || 0).toLocaleString()
+          /*return <div>
             <div>{(data.difficulty || 0).toLocaleString()}</div>
             <MiniChart data={difficultyChartData} />
-          </div>
+          </div>*/
         }
       },
       {
@@ -257,8 +272,11 @@ export function NetworkStats(props) {
   }, [info, blocks, currentTheme, t, p2pStatus])
 
   return <div className={style.container}>
-    <div>{t('Network Stats')}</div>
-    <div>
+    <div className="title">{t('Network Stats')}</div>
+    <div className="last-update" title={t(`Last update since`)}>
+      <Age ssrKey="network-update" timestamp={lastUpdate} update />
+    </div>
+    <div className="items">
       {stats.map((item) => {
         let value = null
         if (typeof item.render === 'function') value = item.render()
