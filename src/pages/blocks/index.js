@@ -24,12 +24,6 @@ import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
-    h1 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 2em;
-    }
-
     > :nth-child(2) {
       margin-bottom: 1em;
     }

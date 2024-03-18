@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 
 const style = css`
   h1 {
-    margin: 1.5em 0 .5em 0;
+    margin: 1em 0 .5em 0;
     font-weight: bold;
     font-size: 2em;
 

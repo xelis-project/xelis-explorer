@@ -86,7 +86,7 @@ const style = {
   `
 }
 
-function Menu(props) {
+function MobileMenu(props) {
   const { links = [] } = props
 
   const menuRef = useRef()
@@ -134,4 +134,4 @@ function Menu(props) {
   </div>
 }
 
-export default Menu
+export default MobileMenu

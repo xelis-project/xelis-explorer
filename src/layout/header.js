@@ -1,15 +1,46 @@
 import { css } from 'goober'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 import theme from '../style/theme'
+import MobileMenu from './mobile_menu'
 
 const style = {
   container: css`
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: start;
     position: relative;
-    padding-top: 2em;
+    padding-top: 4em;
+    gap: 2em;
+
+    .menu {
+      display: flex;
+      gap: .5em;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+
+      ${theme.query.maxDesktop} {
+        display: none;
+      }
+
+      > a {
+        display: flex;
+        gap: .5em;
+        text-decoration: none;
+        align-items: center;
+        background-color: var(--stats-bg-color);
+        color: var(--text-color);
+        border-radius: .5em;
+        padding: .6em .8em;
+        opacity: .7;
+        transition: all .1s;
+
+        &.active, &:hover {
+          opacity: 1;
+        }
+      }
+    }
   `,
   logo: css`
     display: flex;
@@ -20,7 +51,7 @@ const style = {
     color: var(--text-color);
     font-weight: bold;
 
-    > :nth-child(1) {
+    .logo {
       width: 30px;
       height: 30px;
       display: block;
@@ -32,14 +63,23 @@ const style = {
 }
 
 function Header(props) {
-  const { title, menu, ...restProps } = props
+  const { title, links, ...restProps } = props
 
   return <div className={style.container} {...restProps}>
     <Link to="/" className={style.logo}>
-      <div>{/* LOGO */}</div>
+      <div className="logo"></div>
       <div>{title}</div>
     </Link>
-    {menu}
+    <div className="menu">
+      {links.map((item) => {
+        const { title, path, icon } = item
+        return <NavLink key={path} to={path}>
+          <div>{title}</div>
+          {icon}
+        </NavLink>
+      })}
+    </div>
+    <MobileMenu links={links} />
   </div>
 }
 

@@ -10,7 +10,6 @@ import NodeStatus from '../layout/node_status'
 import theme from '../style/theme'
 import { opacity } from '../style/animate'
 import packageJSON from '../../package.json'
-import Menu from './menu'
 
 export const style = {
   /*
@@ -184,7 +183,7 @@ function Layout() {
       <NodeStatus />
       <div className={style.layoutFlex}>
         <div className="layout-max-width">
-          <Header title={t(`Explorer`)} menu={<Menu links={links} />} />
+          <Header title={t(`Explorer`)} links={links} />
           <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>

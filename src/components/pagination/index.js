@@ -44,7 +44,7 @@ export const defaultStyle = {
 
 function Pagination(props) {
   const { count, state = { page: 1, size: 20 }, setState, sizes = [5, 10, 20],
-    countText = `items`, className, styling = defaultStyle, ...restProps } = props
+    countText = `items`, className = ``, styling = defaultStyle, ...restProps } = props
 
   const pageCount = useMemo(() => {
     const pages = Math.ceil((count || 0) / state.size)
