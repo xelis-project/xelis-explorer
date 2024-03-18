@@ -65,7 +65,7 @@ const style = {
           display: flex;
           gap: .5em;
           align-items: center;
-          text-wrap: nowrap;
+          white-space: nowrap;
           text-decoration: none;
           ${scaleOnHover}
 

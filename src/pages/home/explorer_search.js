@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
@@ -14,15 +14,18 @@ const style = {
   container: css`
     margin: 5em 0;
 
-    > :nth-child(1) {
+    .title {
       font-size: 3em;
       font-weight: bold;
       margin-bottom: 1em;
       text-align: center;
     }
 
-    > :nth-child(2) {
+    .input {
       position: relative;
+      z-index: 2;
+      max-width: 50em;
+      margin: 0 auto;
 
       input {
         width: 100%;
@@ -74,6 +77,17 @@ const style = {
         }
       }
     }
+
+    .backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+      background-color: rgb(0 0 0 / 40%);
+    }
   `,
 }
 
@@ -109,11 +123,23 @@ export function ExplorerSearch() {
     return navigate(`/blocks/${searchValue}`)
   }, [nodeSocket.readyState])
 
+  const [isFocus, setFocus] = useState(false)
+
+  const onFocus = useCallback((e) => {
+    setFocus(true)
+    console.log('in')
+  }, [])
+
+  const onBlur = useCallback((e) => {
+    setFocus(false)
+  }, [])
+
   return <form onSubmit={search}>
     <div className={style.container}>
-      <div>{t('XELIS Explorer')}</div>
-      <div>
-        <input type="text" name="search" placeholder={t('Search block, transaction or account address.')}
+      <div className="title">{t('XELIS Explorer')}</div>
+      {isFocus && <div className={`backdrop`} />}
+      <div className="input">
+        <input onFocus={onFocus} onBlur={onBlur} type="text" name="search" placeholder={t('Search block, transaction or account address.')}
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit" aria-label="Search">
           <Icon name="search" />
