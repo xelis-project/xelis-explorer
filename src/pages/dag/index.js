@@ -67,17 +67,7 @@ const style = {
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    padding: 1em;
-    width: 100%;
-    max-width: 25em;
-    z-index: 1;
-
-    > :nth-child(2) {
-      margin-top: 1em;
-      font-size: .8em;
-      text-align: center;
-      position: relative;
-    }
+    margin-top: 2.5em;
   `
 }
 
@@ -336,8 +326,9 @@ function DAG() {
 
   const loadBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
+    if (!offCanvasTable.inputHeight) return // wait for inputheight to load
 
-    const inputHeight = offCanvasTable.inputHeight || 0
+    const inputHeight = offCanvasTable.inputHeight
     setLoading(true)
     setErr(null)
 
@@ -530,16 +521,15 @@ function DAG() {
     {offCanvasTable.render}
     {offCanvasBlock.render}
     <BottomInfo info={info} />
+    <NodeStatus />
     <div className={style.status}>
-      <NodeStatus />
-      <div>
-        {(blocks.length > 0 && !offCanvasTable.paused) && <>
-          {t('Last block ')}
-          <Age timestamp={blocks[0].timestamp} update format={{ secondsDecimalDigits: 0 }} />
-          {t(' ago')}
-        </>}
-        {offCanvasTable.paused && t(`Paused`)}
-      </div>
+      {(blocks.length > 0 && !offCanvasTable.paused) && <>
+        {t('Last block ')}
+        {console.log(blocks[0].timestamp)}
+        <Age ssrKey="last-block-timestamp" timestamp={blocks[0].timestamp} update format={{ secondsDecimalDigits: 0 }} />
+        {t(' ago')}
+      </>}
+      {offCanvasTable.paused && t(`Paused`)}
     </div>
     <div className={style.controls}>
       <Button icon="house" link="/" />

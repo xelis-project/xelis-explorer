@@ -1,21 +1,42 @@
 import { css } from 'goober'
 import { useNodeSocket, INITIATING } from '@xelis/sdk/react/daemon'
 import WebSocket from 'isomorphic-ws'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import DotLoading from '../components/dotLoading'
-import { useLang } from 'g45-react/hooks/useLang'
+import theme from '../style/theme'
 
 const style = {
   container: css`
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    transition: .25s all;
+    width: 100%;
+    max-width: 25em;
     display: flex;
     flex-direction: column;
     align-items: center;
+    z-index: 2;
 
-    > :nth-child(1) {
+    ${theme.query.maxMobile} {
+      padding-top: 0;
+
+      > div > :nth-child(1) {
+        border-radius: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        transform: scale(.9);
+      }
+    }
+    
+    .status {
       display: flex;
       gap: .5em;
       align-items: center;
-      border-radius: 1em;
+      border-bottom-left-radius: 1em;
+      border-bottom-right-radius: 1em;
       padding: .5em 1em;
       text-transform: uppercase;
       font-size: .9em;
@@ -25,7 +46,7 @@ const style = {
       user-select: none;
       box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
 
-      > :nth-child(1) {
+      .dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
@@ -42,13 +63,9 @@ const style = {
           background-color: var(--error-color);
         }
       }
-  
-      :nth-child(2) {
-        margin-top: 3px;
-      }
     }
 
-    > :nth-child(2) {
+    .disconnect {
       background-color: var(--text-color);
       color: var(--bg-color);
       padding: 1em;
@@ -57,7 +74,7 @@ const style = {
       display: flex;
       justify-content: center;
       position: relative;
-      margin-top: 1.5em;
+      margin: 1.5em 1em 1em 1em;
       box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
 
       &:before {
@@ -79,37 +96,38 @@ function NodeStatus() {
   const { daemon, readyState } = nodeSocket
   const { connectionTries, maxConnectionTries } = daemon
 
-  return <div className={style.container}>
-    {(() => {
-      if (readyState === WebSocket.CONNECTING || readyState === INITIATING) {
-        let text = t(`Connecting`)
-        if (connectionTries > 0) {
-          text = t(`Reconnecting ({})`, [connectionTries])
-        }
+  let status = <div className="status">
+    <div className="dot" data-status="connected" />
+    <div>{t('Connected')}</div>
+  </div>
 
-        return <div>
-          <div data-status="connecting" />
-          <div>{text}<DotLoading /></div>
-        </div>
-      }
+  if (readyState === WebSocket.CONNECTING || readyState === INITIATING) {
+    let text = t(`Connecting`)
+    if (connectionTries > 0) {
+      text = t(`Reconnecting ({})`, [connectionTries])
+    }
 
-      if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
-        return <>
-          <div onClick={() => location.reload()} style={{ cursor: 'pointer' }} title={t('Click to reload.')}>
-            <div data-status="error" />
-            <div>{t('Disconnected')}</div>
-          </div>
-          {connectionTries >= maxConnectionTries && <div>
-            {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.`)}
-          </div>}
-        </>
-      }
+    status = <div className="status">
+      <div className="dot" data-status="connecting" />
+      <div>{text}<DotLoading /></div>
+    </div>
+  }
 
-      return <div>
-        <div data-status="connected" />
-        <div>{t('Connected')}</div>
+  if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
+    status = <>
+      <div onClick={() => location.reload()} className="status" style={{ cursor: 'pointer' }}
+        title={t('Click to reload.')}>
+        <div className="dot" data-status="error" />
+        <div>{t('Disconnected')}</div>
       </div>
-    })()}
+      <div className="disconnect">
+        {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.`)}
+      </div>
+    </>
+  }
+
+  return <div className={style.container}>
+    {status}
   </div>
 }
 

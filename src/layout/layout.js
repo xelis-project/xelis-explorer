@@ -126,27 +126,6 @@ export const style = {
       ${opacity()}
     }
   `,
-  nodeStatus: css`
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1;
-    transition: .25s all;
-    padding: 1em;
-    width: 100%;
-    max-width: 25em;
-
-    ${theme.query.maxMobile} {
-      padding-top: 0;
-
-      > div > :nth-child(1) {
-        border-radius: 10px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        transform: scale(.9);
-      }
-    }
-  `
 }
 
 function Layout() {
@@ -202,9 +181,7 @@ function Layout() {
         <div className="right-light" />
         <div className="darker" />
       </div>
-      <div className={style.nodeStatus}>
-        <NodeStatus />
-      </div>
+      <NodeStatus />
       <div className={style.layoutFlex}>
         <div className="layout-max-width">
           <Header title={t(`Explorer`)} menu={<Menu links={links} />} />
