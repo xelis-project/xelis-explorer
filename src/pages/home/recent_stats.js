@@ -1,11 +1,9 @@
 import { useMemo } from 'react'
 import { css } from 'goober'
-//import { Link } from 'react-router-dom'
 import { useLang } from 'g45-react/hooks/useLang'
 import prettyMs from 'pretty-ms'
 
 import { formatHashRate, formatSize, formatXelis, reduceText } from '../../utils'
-//import Hashicon from '../../components/hashicon'
 import Chart from '../../components/chart'
 import theme from '../../style/theme'
 
@@ -17,10 +15,10 @@ const style = {
       font-size: 1.5em;
   
       > div {
-        font-size: .6em;
-        opacity: .7;
+        font-size: .7em;
         font-weight: normal;
         margin-top: 5px;
+        color: var(--muted-color);
       }
     }
 
@@ -75,7 +73,13 @@ const style = {
         background-color: var(--stats-bg-color);
 
         > :nth-child(1) {
-          margin-bottom: 1em;
+          color: var(--muted-color);
+          margin-bottom: .25em;
+        }
+
+        > :nth-child(2) {
+          font-size: 1.5em;
+          margin-bottom: .5em;
         }
       }
     }
@@ -124,7 +128,7 @@ const defaultStats = {
 }
 
 export function RecentStats(props) {
-  const { blocks } = props
+  const { blocks, info } = props
 
   const { t } = useLang()
 
@@ -175,8 +179,8 @@ export function RecentStats(props) {
     <div className="charts">
       <MinersDistributionChart miners={stats.miners} />
       <div>
-        <HashrateChart blocks={blocks} />
-        <BlockTimesChart blocks={blocks} />
+        <HashrateChart blocks={blocks} info={info} />
+        <BlockTimesChart blocks={blocks} info={info} />
       </div>
     </div>
   </div>
@@ -229,13 +233,14 @@ function MinersDistributionChart(props) {
   }, [miners])
 
   return <div className="chart-container">
-    <div>{t(`Miners Distribution`)}</div>
+    <div>{t(`Mining Distribution`)}</div>
+    <div>{t(`{} miners`, [Object.keys(miners).length])}</div>
     <Chart type="doughnut" options={options} data={data} />
   </div>
 }
 
 function HashrateChart(props) {
-  const { blocks } = props
+  const { blocks, info } = props
 
   const { t } = useLang()
 
@@ -290,13 +295,14 @@ function HashrateChart(props) {
   }, [blocks])
 
   return <div className="chart-container">
-    <div>{t(`Hashrates`)}</div>
+    <div>{t(`Hashrate`)}</div>
+    <div>{formatHashRate(info.difficulty / 15)}</div>
     <Chart type="line" options={options} data={data} />
   </div>
 }
 
 function BlockTimesChart(props) {
-  const { blocks } = props
+  const { blocks, info } = props
 
   const { t } = useLang()
 
@@ -353,47 +359,8 @@ function BlockTimesChart(props) {
   }, [blocks])
 
   return <div className="chart-container">
-    <div>{t(`Blocks Time`)}</div>
+    <div>{t(`Block Time`)}</div>
+    <div>{t(`{} avg`, [prettyMs(info.average_block_time || 0, { compact: true })])}</div>
     <Chart type="bar" options={options} data={data} />
   </div>
 }
-
-/*
-const colors = [
-  'rgba(231, 90, 57, 0.4)', 'rgba(42, 187, 211, 0.4)', 'rgba(109, 255, 187, 0.4)', 'rgba(46, 36, 155, 0.4)',
-  'rgba(171, 186, 40, 0.4)', 'rgba(109, 255, 220, 0.4)', 'rgba(216, 26, 89, 0.4)', 'rgba(79, 247, 164, 0.4)',
-  'rgba(242, 204, 0, 0.4)', 'rgba(35, 170, 120, 0.4)', 'rgba(19, 116, 239, 0.4)', 'rgba(66, 170, 178, 0.4)',
-  'rgba(147, 237, 104, 0.4)', 'rgba(127, 237, 87, 0.4)', 'rgba(206, 98, 7, 0.4)', 'rgba(38, 100, 119, 0.4)',
-  'rgba(32, 164, 247, 0.4)', 'rgba(193, 119, 36, 0.4)', 'rgba(90, 3, 127, 0.4)', 'rgba(72, 165, 28, 0.4)',
-]
-
-function MinersDistribution(props) {
-  const { miners } = props
-
-  const distribution = useMemo(() => {
-    const values = Object.entries(miners).map(([miner, minedBlock]) => {
-      return { miner, minedBlock }
-    })
-
-    values.sort((a, b) => b.minedBlock - a.minedBlock)
-    return values
-  }, [miners])
-
-  return <div className="miners-distributions">
-    {distribution.map((item, index) => {
-      const percentage = (item.minedBlock * 100 / distribution[0].minedBlock).toFixed(2)
-      return <div key={item.miner}>
-        <div title={item.miner}>
-          <Hashicon value={item.miner} size={20} />
-          <Link to={`/accounts/${item.miner}`}>{reduceText(item.miner, 0, 5)}</Link>
-        </div>
-        <div>
-          <div title={`${item.minedBlock} mined blocks`}
-            style={{ width: `${percentage}%`, backgroundColor: colors[index] }}>
-            {item.minedBlock}
-          </div>
-        </div>
-      </div>
-    })}
-  </div>
-}*/

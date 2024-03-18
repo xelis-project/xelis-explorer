@@ -31,8 +31,8 @@ const style = {
         border-radius: 30px;
         outline: none;
         color: var(--text-color);
-        background-color: var(--bg-color);
-        border: thin solid var(--border-color);
+        background-color: var(--stats-bg-color);
+        border: none;
         font-weight: bold;
       }
   

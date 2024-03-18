@@ -4,12 +4,14 @@ import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
 import { useLang } from 'g45-react/hooks/useLang'
+import { useServerData } from 'g45-react/hooks/useServerData'
 
 import { ExplorerSearch } from './explorer_search'
 import { RecentBlocks } from './recent_blocks'
 import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
+import { daemonRPC } from '../../hooks/nodeRPC'
 
 export function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
@@ -83,9 +85,59 @@ export function useRecentBlocks() {
   return { err, loading, blocks, newBlock }
 }
 
+function loadNetworkStats_SSR() {
+  const defaultResult = { err: null, info: {}, loaded: false }
+  return useServerData(`func:loadNetworkStats`, async () => {
+    const result = Object.assign({}, defaultResult)
+    const [err, res1] = await to(daemonRPC.getInfo())
+    result.err = err
+    if (err) return
+
+    result.info = res1.result
+    result.loaded = true
+    return result
+  }, defaultResult)
+}
+
+function useNetworkStats() {
+  const nodeSocket = useNodeSocket()
+  const serverResult = loadNetworkStats_SSR()
+
+  const [err, setErr] = useState()
+  const [loading, setLoading] = useState()
+  const [info, setInfo] = useState(serverResult.info)
+
+  const loadInfo = useCallback(async () => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    const resErr = (err) => {
+      setInfo({})
+      setErr(err)
+      setLoading(false)
+    }
+
+    setLoading(true)
+    const [err, info] = await to(nodeSocket.daemon.methods.getInfo())
+    if (err) return resErr(err)
+    setInfo(info)
+    setLoading(false)
+  }, [nodeSocket.readyState])
+
+  useEffect(() => {
+    loadInfo()
+  }, [loadInfo])
+
+  return { err, loading, info, loadInfo }
+}
+
 function Home() {
   const { blocks, newBlock } = useRecentBlocks()
   const { t } = useLang()
+
+  const { info, loadInfo } = useNetworkStats()
+  useEffect(() => {
+    loadInfo()
+  }, [blocks])
 
   return <div>
     <Helmet>
@@ -94,8 +146,8 @@ function Home() {
     </Helmet>
     <ExplorerSearch />
     <RecentBlocks blocks={blocks} newBlock={newBlock} />
-    <RecentStats blocks={blocks} />
-    <NetworkStats blocks={blocks} />
+    <RecentStats blocks={blocks} info={info} />
+    <NetworkStats blocks={blocks} info={info} />
   </div>
 }
 
