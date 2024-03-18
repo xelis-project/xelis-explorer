@@ -41,6 +41,12 @@ const style = {
         }
       }
     }
+
+    .mobile-menu {
+      ${theme.query.minDesktop} {
+        display: none;
+      }
+    }
   `,
   logo: css`
     display: flex;
@@ -50,6 +56,10 @@ const style = {
     text-decoration: none;
     color: var(--text-color);
     font-weight: bold;
+
+    ${theme.query.minDesktop} {
+      display: none;
+    }
 
     .logo {
       width: 30px;
@@ -79,7 +89,9 @@ function Header(props) {
         </NavLink>
       })}
     </div>
-    <MobileMenu links={links} />
+    <div className="mobile-menu">
+      <MobileMenu links={links} />
+    </div>
   </div>
 }
 
