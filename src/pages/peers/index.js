@@ -325,7 +325,7 @@ function Peers() {
     const [err, result] = await to(nodeSocket.daemon.methods.getPeers())
     if (err) return resErr(err)
 
-    const peers = result.map((peer) => {
+    const peers = result.peers.map((peer) => {
       const addr = parseAddressWithPort(peer.addr)
       if (addr) peer.ip = addr.ip
       return peer

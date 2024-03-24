@@ -11,7 +11,7 @@ const style = {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1;
+    z-index: 2;
     transition: .25s all;
     width: 100%;
     max-width: 25em;
