@@ -105,7 +105,8 @@ export function ExplorerSearch() {
     const searchValue = formData.get(`search`)
     if (searchValue === ``) return
 
-    if (searchValue.length === 63) {
+    // go to account with address
+    if (searchValue.length === 65) {
       return navigate(`/accounts/${searchValue}`)
     }
 
@@ -114,10 +115,17 @@ export function ExplorerSearch() {
         hash: searchValue
       }))
       if (block) {
+        // go to block with block hash
         return navigate(`/blocks/${searchValue}`)
       } else {
+        // go to tx with tx hash
         return navigate(`/txs/${searchValue}`)
       }
+    }
+
+    if (!isNaN(parseInt(searchValue))) {
+      // go to block with topoheight
+      return navigate(`/blocks/${searchValue}`)
     }
   }, [nodeSocket.readyState])
 
