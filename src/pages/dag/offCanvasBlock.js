@@ -146,9 +146,9 @@ function useOffCanvasBlock(props) {
         <div>
           <div>{t('Difficulty')}</div>
           <div>
-            <span>{block.difficulty.toLocaleString()} </span>
+            <span>{parseInt(block.difficulty).toLocaleString()} </span>
             <span title="Cumulative Difficulty">
-              ({block.cumulative_difficulty.toLocaleString()})
+              ({parseInt(block.cumulative_difficulty).toLocaleString()})
             </span>
           </div>
         </div>

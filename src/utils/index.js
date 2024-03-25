@@ -68,36 +68,44 @@ const HASH_RATE_MAP = {
   yh: 1000000000000000000000000 // YottaHash
 }
 
-export const formatHashRate = (value, decimals = 2) => {
+export const BLOCK_TIME = 15 // 15 seconds
+
+export const formatHashRate = (difficulty, { decimals = 2, withSuffix = true } = {}) => {
   let unit = `H/s`
 
+  let value = new BigNumber(difficulty, 10).div(BLOCK_TIME)
+
   if (value >= HASH_RATE_MAP.yh) {
-    value /= HASH_RATE_MAP.yh
+    value = value.div(HASH_RATE_MAP.yh)
     unit = `YH/s`
   } else if (value >= HASH_RATE_MAP.zh) {
-    value /= HASH_RATE_MAP.zh
+    value = value.div(HASH_RATE_MAP.zh)
     unit = `ZH/s`
   } else if (value >= HASH_RATE_MAP.eh) {
-    value /= HASH_RATE_MAP.eh
+    value = value.div(HASH_RATE_MAP.eh)
     unit = `EH/s`
   } else if (value >= HASH_RATE_MAP.ph) {
-    value /= HASH_RATE_MAP.ph
+    value = value.div(HASH_RATE_MAP.ph)
     unit = `PH/s`
   } else if (value >= HASH_RATE_MAP.th) {
-    value /= HASH_RATE_MAP.th
+    value = value.div(HASH_RATE_MAP.th)
     unit = `TH/s`
   } else if (value >= HASH_RATE_MAP.gh) {
-    value /= HASH_RATE_MAP.gh
+    value = value.div(HASH_RATE_MAP.gh)
     unit = `GH/s`
   } else if (value >= HASH_RATE_MAP.mh) {
-    value /= HASH_RATE_MAP.mh
+    value = value.div(HASH_RATE_MAP.mh)
     unit = `MH/s`
   } else if (value >= HASH_RATE_MAP.kh) {
-    value /= HASH_RATE_MAP.kh
+    value = value.div(HASH_RATE_MAP.kh)
     unit = `KH/s`
   }
 
-  return `${value.toFixed(decimals)} ${unit}`
+  if (withSuffix) {
+    return `${value.toFixed(decimals)} ${unit}`
+  }
+
+  return value.toFixed(decimals)
 }
 
 export const formattedBlock = (block, topoheight) => {
@@ -106,11 +114,11 @@ export const formattedBlock = (block, topoheight) => {
     miner: reduceText(block.miner),
     totalFees: formatXelis(block.total_fees), // if available (include_txs?)
     reward: formatXelis(block.reward),
-    confirmations: topoheight - block.topoheight,
+    confirmations: block.topoheight ? topoheight - block.topoheight : 0,
     size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
-    hashRate: formatHashRate(block.difficulty / 15), // BLOCK_TIME is 15
+    hashRate: formatHashRate(block.difficulty),
   }
 }
 
@@ -149,7 +157,7 @@ export const parseAddressWithPort = (addr) => {
 
 export const fetchGeoLocation = async (ips) => {
   ips.sort() // sort or the hash we not be the same
-  const cacheKey = `geo_cache_${hashIt(ips)}` 
+  const cacheKey = `geo_cache_${hashIt(ips)}`
   try {
     // using session storage to cache if page reload
     const cacheData = sessionStorage.getItem(cacheKey)

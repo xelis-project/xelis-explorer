@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
-import { QRCodeCanvas } from 'qrcode.react'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, reduceText } from '../../utils'
@@ -16,10 +15,10 @@ import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
 import useQueryString from 'g45-react/hooks/useQueryString'
-import useTheme from '../../hooks/useTheme'
 import Hashicon from '../../components/hashicon'
-import Modal from '../../components/modal'
 import { scaleOnHover } from '../../style/animate'
+import AddressQRCodeModal from './addr_qrcode_modal'
+import EncryptedBalanceModal from './encrypted_balance_modal'
 
 const style = {
   container: css`
@@ -66,6 +65,12 @@ const style = {
           font-weight: bold;
         }
       }
+    }
+
+    .from-to {
+      display: flex;
+      gap: .5em;
+      align-items: center;
     }
   `,
   account: css`
@@ -139,31 +144,6 @@ const style = {
         margin-top: 0.25em;
       }
     }
-  `,
-  qrCodeModal: css`
-    background-color: var(--table-td-bg-color);
-    border-radius: .5em;
-    padding: 1em;
-
-    .title {
-      font-size: 1.6em;
-      margin-bottom: .25em;
-      text-align: center;
-    }
-
-    .addr {
-      display: flex;
-      gap: .5em;
-      color: var(--muted-color);
-      font-size: 1.2em;
-      margin-bottom: 1em;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .copy {
-      cursor: pointer;
-    }
   `
 }
 
@@ -233,7 +213,7 @@ function Account() {
     if (err2) return resErr(err2)
 
     const [err3, result3] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
-      topoheight: result2.topoheight,
+      topoheight: result.topoheight,
       include_txs: false
     }))
     if (err3) return resErr(err3)
@@ -250,9 +230,9 @@ function Account() {
 
     setAccount({
       addr,
-      balance: result,
+      balance: result.version,
       nonce: result2.nonce,
-      topoheight: result2.topoheight,
+      topoheight: result.topoheight,
       timestamp: result3.timestamp
     })
     setAccountAssets(result4)
@@ -278,12 +258,13 @@ function Account() {
     })
   }, [accountAssets])
 
-  const { version } = account.balance || {}
-  const { balance } = version || {}
-
   const description = useMemo(() => {
     return t(`Account history of {}.`, [addr])
   }, [addr, t])
+
+  const balance = account.balance || {}
+  const finalBalance = balance.final_balance || {}
+  const commitment = finalBalance.commitment || []
 
   return <div className={style.container}>
     <PageTitle title={t('Account {}', [reduceText(addr)])}
@@ -314,14 +295,22 @@ function Account() {
           </div>
           <div className="item">
             <div className="subtitle">{t('Balance')}</div>
-            <div className="value">{balance ? formatXelis(balance) : `--`}</div>
+            <div className="value">
+              <EncryptedBalanceModal commitment={commitment} />
+            </div>
           </div>
           <div className="item">
             <div className="subtitle">{t('Last Activity')}</div>
             <div className="value">
               {account.topoheight ? <>
-                <div><Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} /></div>
-                <div className="subvalue"><Link to={`/blocks/${account.topoheight}`}>{account.topoheight.toLocaleString()}</Link></div>
+                <div>
+                  <Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} />
+                </div>
+                <div className="subvalue">
+                  <Link to={`/blocks/${account.topoheight}`}>
+                    {account.topoheight.toLocaleString()}
+                  </Link>
+                </div>
               </> : `--`}
             </div>
           </div>
@@ -340,34 +329,6 @@ function Account() {
 }
 
 export default Account
-
-function AddressQRCodeModal(props) {
-  const { addr, visible, setVisible } = props
-
-  const { theme: currentTheme } = useTheme()
-
-  const copyAddr = useCallback(() => {
-    navigator.clipboard.writeText(addr)
-  }, [addr])
-
-  return <Modal visible={visible} setVisible={setVisible}>
-    <div className={style.qrCodeModal}>
-      <div className="title">Address QR code</div>
-      <div className="addr">
-        <Hashicon value={addr} size={25} />
-        <div>{reduceText(addr)}</div>
-        <Icon name="copy" className="copy" onClick={copyAddr} />
-      </div>
-      <div className="qrcode">
-        <QRCodeCanvas value={addr}
-          bgColor="transparent"
-          fgColor={currentTheme === `light` ? `#000000` : `#ffffff`}
-          size={250}
-        />
-      </div>
-    </div>
-  </Modal>
-}
 
 /*
 function loadAccountHistory_SSR() {
@@ -501,15 +462,44 @@ function History(props) {
             const itemType = getType(item)
             switch (itemType) {
               case "OUTGOING":
-                return <><Icon name="arrow-up" />&nbsp;&nbsp;SEND</>
+                return <><Icon name="arrow-up" />&nbsp;&nbsp;{t(`SEND`)}</>
               case "INCOMING":
-                return <><Icon name="arrow-down" />&nbsp;&nbsp;RECEIVE</>
+                return <><Icon name="arrow-down" />&nbsp;&nbsp;{t(`RECEIVE`)}</>
               case "MINING":
-                return <><Icon name="microchip" />&nbsp;&nbsp;MINING</>
+                return <><Icon name="microchip" />&nbsp;&nbsp;{t(`MINING`)}</>
               case "BURN":
-                return <><Icon name="fire" />&nbsp;&nbsp;BURN</>
+                return <><Icon name="fire" />&nbsp;&nbsp;{t(`BURN`)}</>
               default:
                 return null
+            }
+          }
+        },
+        {
+          key: "from_to",
+          title: t('From / To'),
+          render: (_, item) => {
+            const itemType = getType(item)
+            switch (itemType) {
+              case "INCOMING":
+                const { from } = item.incoming
+                return <div className="from-to">
+                  <Hashicon value={from} size={25} />
+                  <Link to={`/accounts/${from}`}>
+                    {reduceText(from, 0, 7)}
+                  </Link>
+                </div>
+              case "OUTGOING":
+                const { to } = item.outgoing
+                return <div className="from-to">
+                  <Hashicon value={to} size={25} />
+                  <Link to={`/accounts/${to}`}>
+                    {reduceText(to, 0, 7)}
+                  </Link>
+                </div>
+              case "MINING":
+                return `Coinbase`
+              default:
+                return `--`
             }
           }
         },
@@ -518,36 +508,20 @@ function History(props) {
           title: t('Amount'),
           render: (_, item) => {
             const itemType = getType(item)
-            const { outgoing, incoming, mining, burn } = item
             const { decimals } = assetData
             switch (itemType) {
               case "OUTGOING":
-                return formatAsset(outgoing.amount, decimals)
+                return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
               case "INCOMING":
-                return formatAsset(incoming.amount, decimals)
+                return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
               case "MINING":
-                return formatAsset(mining.reward, decimals)
+                const { mining } = item
+                return formatXelis(mining.reward)
               case "BURN":
+                const { burn } = item
                 return formatAsset(burn.amount, decimals)
               default:
                 return null
-            }
-          }
-        },
-        {
-          key: "from",
-          title: t('From'),
-          render: (_, item) => {
-            const itemType = getType(item)
-            switch (itemType) {
-              case "INCOMING":
-              /*return <Link to={`/accounts/${item.recipient}`}>
-                {reduceText(item.from)}
-              </Link>*/
-              case "MINING":
-                return `Coinbase`
-              default:
-                return `--`
             }
           }
         },

@@ -86,6 +86,11 @@ export const defaultStyle = {
       color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
     }
 
+    table thead tr {
+      background-color: var(--table-th-bg-color);
+      color: ${theme.apply({ xelis: 'var(--bg-color)', dark: '#f1f1f1', light: '#1c1c1c' })};
+    }
+
     table thead th {
       position: sticky;
       top: 0;

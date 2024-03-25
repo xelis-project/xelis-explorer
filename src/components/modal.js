@@ -1,11 +1,13 @@
 import { css } from 'goober'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 const animationDuration = 300
 
 const style = {
   container: css`
     position: fixed;
+    z-index: 3;
 
     .backdrop {
       position: fixed;
@@ -39,6 +41,7 @@ const style = {
       align-items: center;
       justify-content: center;
       transition: all ${animationDuration}ms;
+      margin: 1em;
     }
 
     .modal.hide {
@@ -82,12 +85,12 @@ function Modal(props) {
 
   if (!display) return null
 
-  return <div className={style.container} onClick={clickOutside}>
+  return createPortal(<div className={style.container} onClick={clickOutside}>
     <div className={`backdrop ${animateClass}`} />
     <div ref={modalRef} className={`modal ${animateClass}`}>
       {children}
     </div>
-  </div>
+  </div>, document.body)
 }
 
 export default Modal

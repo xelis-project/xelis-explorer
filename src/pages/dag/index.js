@@ -525,7 +525,6 @@ function DAG() {
     <div className={style.status}>
       {(blocks.length > 0 && !offCanvasTable.paused) && <>
         {t('Last block ')}
-        {console.log(blocks[0].timestamp)}
         <Age ssrKey="last-block-timestamp" timestamp={blocks[0].timestamp} update format={{ secondsDecimalDigits: 0 }} />
         {t(' ago')}
       </>}

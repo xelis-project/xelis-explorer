@@ -95,9 +95,9 @@ function Transactions(props) {
             <td>{transfers.length} / {burns.length}</td>
             <td>
               <div>
-                <Hashicon value={item.owner} size={20} />
-                <Link to={`/accounts/${item.owner}`}>
-                  {reduceText(item.owner, 0, 7)}
+                <Hashicon value={item.source} size={20} />
+                <Link to={`/accounts/${item.source}`}>
+                  {reduceText(item.source, 0, 7)}
                 </Link>
               </div>
             </td>

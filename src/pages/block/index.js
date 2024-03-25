@@ -306,7 +306,7 @@ function Block() {
           {
             key: 'hash_rate',
             title: t('Hash Rate'),
-            render: (value, item) => item.difficulty && formatHashRate(item.difficulty / 15)
+            render: (value, item) => formatHashRate(item.difficulty)
           },
           {
             key: 'total_size_in_bytes',

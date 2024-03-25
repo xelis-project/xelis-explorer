@@ -162,8 +162,8 @@ export function NetworkStats(props) {
       { title: t(`Stable Height`), render: () => (data.stableheight || 0).toLocaleString() },
       { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString() },
 
-      { title: t(`Difficulty`), render: () => (data.difficulty || 0).toLocaleString() },
-      { title: t(`Hashrate`), render: () => formatHashRate((data.difficulty || 0) / 15) },
+      { title: t(`Difficulty`), render: () => parseInt(data.difficulty).toLocaleString() },
+      { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty) },
       { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true })},
     ]
   }, [info, blocks, currentTheme, t, p2pStatus])

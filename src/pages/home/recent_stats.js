@@ -256,7 +256,7 @@ function HashrateChart(props) {
         tooltip: {
           callbacks: {
             label: function (ctx) {
-              return formatHashRate(parseInt(ctx.raw) / 15)
+              return formatHashRate(ctx.raw)
             }
           }
         }
@@ -264,7 +264,7 @@ function HashrateChart(props) {
       scales: {
         y: {
           ticks: {
-            callback: (value) => formatHashRate(parseInt(value) / 15),
+            callback: (value) => formatHashRate(value),
           }
         }
       }
@@ -296,7 +296,7 @@ function HashrateChart(props) {
 
   return <div className="chart-container">
     <div>{t(`Hashrate`)}</div>
-    <div>{formatHashRate(info.difficulty / 15)}</div>
+    <div>{formatHashRate(info.difficulty)}</div>
     <Chart type="line" options={options} data={data} />
   </div>
 }

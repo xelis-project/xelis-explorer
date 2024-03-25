@@ -462,7 +462,7 @@ const transaction = {
   },
   "fee": 1000,
   "nonce": 2,
-  "owner": "xel1qyq2z43hcfwwl4pcnx9z5ppcvlhcm7g92ss832rjftdp427wqq7l8nqp5khq3",
+  "source": "xel1qyq2z43hcfwwl4pcnx9z5ppcvlhcm7g92ss832rjftdp427wqq7l8nqp5khq3",
   "signature": "d297ef720d388ff2aaedf6755a1f93b4ac1b55c987da5dc53c19350d8a779d970c7f4cfcc25d2f4ce3f4ef3a77d0f31d15635d221d5a72ef6651dbb7f1810301",
   "first_seen": 1696080037,
   "executed_in_block": "2ab430ceff1d181fc8c93ea9db1a7c03267177153783662eaf639f99abcccfab",

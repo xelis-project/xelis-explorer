@@ -14,11 +14,19 @@ import { daemonRPC } from '../../hooks/nodeRPC'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import { XELIS_ASSET, formatXelis } from '../../utils'
 import PageTitle from '../../layout/page_title'
+import Hashicon from '../../components/hashicon'
+import EncryptedBalanceModal from '../account/encrypted_balance_modal'
 
 const style = {
   container: css`
     > :nth-child(2) {
       margin-bottom: 1em;
+    }
+
+    .addr {
+      display: flex;
+      gap: .5em;
+      align-items: center;
     }
   `
 }
@@ -145,7 +153,12 @@ function Accounts() {
           key: 'addr',
           title: t('Address'),
           render: (value) => {
-            return <Link to={`/accounts/${value}`}>{value}</Link>
+            return <div className="addr">
+              <Hashicon value={value} size={25} />
+              <Link to={`/accounts/${value}`}>
+                {value}
+              </Link>
+            </div>
           }
         },
         {
@@ -161,8 +174,8 @@ function Accounts() {
           title: t('Balance'),
           render: (_, item) => {
             const { version } = item.balance || {}
-            const { balance } = version || {}
-            return formatXelis(balance)
+            const { commitment } = version.final_balance || {}
+            return <EncryptedBalanceModal commitment={commitment} />
           }
         }
       ]} data={accounts} />

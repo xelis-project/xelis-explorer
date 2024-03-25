@@ -105,7 +105,7 @@ export function ExplorerSearch() {
     const searchValue = formData.get(`search`)
     if (searchValue === ``) return
 
-    if (searchValue.length === 65) {
+    if (searchValue.length === 63) {
       return navigate(`/accounts/${searchValue}`)
     }
 
@@ -119,15 +119,12 @@ export function ExplorerSearch() {
         return navigate(`/txs/${searchValue}`)
       }
     }
-
-    return navigate(`/blocks/${searchValue}`)
   }, [nodeSocket.readyState])
 
   const [isFocus, setFocus] = useState(false)
 
   const onFocus = useCallback((e) => {
     setFocus(true)
-    console.log('in')
   }, [])
 
   const onBlur = useCallback((e) => {

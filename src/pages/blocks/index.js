@@ -11,7 +11,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 import useQueryString from 'g45-react/hooks/useQueryString'
 import hashIt from 'hash-it'
 
-import { formatSize, formatXelis, groupBy, reduceText } from '../../utils'
+import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
@@ -226,7 +226,7 @@ function Blocks() {
         if (hasUnstableblocks && !stableLineRendered && block.height <= stableheight) {
           stableLineRendered = true
           return <tr>
-            <td colSpan={10}>{t('Blocks below are stable and cannot be rearranged.')}</td>
+            <td colSpan={11}>{t('Blocks below are stable and cannot be rearranged.')}</td>
           </tr>
         }
 
@@ -303,6 +303,11 @@ function Blocks() {
           key: 'reward',
           title: t('Reward'),
           render: (value) => formatXelis(value)
+        },
+        {
+          key: 'difficulty',
+          title: t('Hash rate'),
+          render: (value) => formatHashRate(value)
         }
       ]}
     />

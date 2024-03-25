@@ -9,12 +9,15 @@ import { useServerData } from 'g45-react/hooks/useServerData'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import Table from '../../components/table'
-import { formatXelis, formatAsset, reduceText, displayError, formatSize } from '../../utils'
+import { formatXelis, reduceText, displayError, formatSize } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
+import { getBlockColor } from '../dag/blockColor'
+import useTheme from '../../hooks/useTheme'
+import EncryptedBalanceModal from '../account/encrypted_balance_modal'
 
 const style = {
   container: css`
@@ -98,7 +101,7 @@ function Transaction() {
   const description = useMemo(() => {
     return `
       ${t('Transaction {}.', [tx.hash || `?`])}
-      ${t('Signed by {}.', [reduceText(tx.owner || `?`)])}
+      ${t('Signed by {}.', [reduceText(tx.source || `?`, 0, 7)])}
       ${tx.executed_in_block ? t('Executed in block {}.', [reduceText(tx.executed_in_block)]) : t('Discarded or not executed yet.')}
     `
   }, [tx, t])
@@ -117,7 +120,7 @@ function Transaction() {
             title: t('Hash'),
           },
           {
-            key: 'owner',
+            key: 'source',
             title: t('Signer'),
             render: (value) => {
               return <div className="addr">
@@ -140,6 +143,26 @@ function Transaction() {
           {
             key: 'signature',
             title: t('Signature'),
+          },
+          {
+            key: 'ref_hash',
+            title: t('Ref: Hash'),
+            render: (_, item) => {
+              const { hash } = item.reference || {}
+              return <Link to={`/blocks/${hash}`}>
+                {hash}
+              </Link>
+            }
+          },
+          {
+            key: 'ref_topo',
+            title: t('Ref: Topo Height'),
+            render: (_, item) => {
+              const { topoheight } = item.reference || {}
+              return <Link to={`/blocks/${topoheight}`}>
+                {topoheight}
+              </Link>
+            }
           },
           {
             key: 'fee',
@@ -186,16 +209,18 @@ function Transfers(props) {
       headers={[t(`Asset`), t(`Amount`), t(`Recipient`)]}
       list={transfers} emptyText={t('No transfers')} colSpan={3}
       onItem={(item, index) => {
-        const { amount, asset, to, extra_data } = item
+        const { commitment, asset, extra_data, destination } = item
         return <React.Fragment key={index}>
           <tr key={index}>
             <td>{reduceText(asset)}</td>
-            <td>{formatXelis(amount)}</td> {/* We assume it's native asset for now */}
+            <td>
+              <EncryptedBalanceModal commitment={commitment} />
+            </td>
             <td>
               <div className="addr">
-                <Hashicon value={to} size={25} />
-                <Link to={`/accounts/${to}`}>
-                  {to}
+                <Hashicon value={destination} size={25} />
+                <Link to={`/accounts/${destination}`}>
+                  {destination}
                 </Link>
               </div>
             </td>
@@ -225,7 +250,7 @@ function Burns(props) {
         const { amount, asset } = item
         return <tr key={index}>
           <td>{reduceText(asset)}</td>
-          <td>{formatXelis(amount)}</td>
+          <td>{formatXelis(amount)}</td> {/* We assume it's native asset for now */}
         </tr>
       }}
     />
@@ -240,6 +265,7 @@ function InBlocks(props) {
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
   const [blocks, setBlocks] = useState([])
+  const { theme: currentTheme } = useTheme()
 
   const loadTxBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -286,7 +312,7 @@ function InBlocks(props) {
             </Link>
           </td>
           <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
-          <td>{item.block_type}</td>
+          <td style={{ color: getBlockColor(currentTheme, item.block_type) }}>{item.block_type}</td>
           <td>{size}</td>
           <td>{formatXelis(item.total_fees)}</td>
           <td>{time}</td>

@@ -5,6 +5,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 
 import DotLoading from '../components/dotLoading'
 import theme from '../style/theme'
+import useSettings, { settingsKeys } from '../hooks/useSettings'
 
 const style = {
   container: css`
@@ -71,10 +72,11 @@ const style = {
       border-radius: .5em;
       max-width: 30em;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       position: relative;
       margin: 1.5em 1em 1em 1em;
       box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
+      gap: .5em;
 
       &:before {
         content: "";
@@ -83,6 +85,8 @@ const style = {
         border-bottom: 15px solid var(--text-color);
         position: absolute;
         top: -14px;
+        left: 50%;
+        margin-left: -11px;
       }
     }
   `
@@ -94,6 +98,8 @@ function NodeStatus() {
 
   const { daemon, readyState } = nodeSocket
   const { connectionTries, maxConnectionTries } = daemon
+  const { settings } = useSettings()
+  const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
 
   let status = <div className="status">
     <div className="dot" data-status="connected" />
@@ -120,7 +126,10 @@ function NodeStatus() {
         <div>{t('Disconnected')}</div>
       </div>
       <div className="disconnect">
-        {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection. Click here to reload and attempt reconnecting to the node manually.`)}
+        <div>
+          {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection.`)}
+        </div>
+        <div>{endpoint}</div>
       </div>
     </>
   }

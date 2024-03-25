@@ -118,7 +118,7 @@ function MemPool() {
     if (!filterTx) return memPool
     return memPool.filter((tx) => {
       if (tx.hash.indexOf(filterTx) !== -1) return true
-      if (tx.owner.indexOf(filterTx) !== -1) return true
+      if (tx.source.indexOf(filterTx) !== -1) return true
       return false
     })
   }, [memPool, filterTx])
@@ -181,9 +181,7 @@ function TxsHistoryChart(props) {
     }
 
     return {
-      animation: {
-        duration: 0
-      },
+      animation: false,
       maintainAspectRatio: false,
       plugins: {
         legend: {
@@ -251,7 +249,7 @@ function PendingTxs(props) {
             <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
           </td>
           <td>
-            <Link to={`/accounts/${item.owner}`}>{reduceText(item.owner, 0, 7)}</Link>
+            <Link to={`/accounts/${item.source}`}>{reduceText(item.source, 0, 7)}</Link>
           </td>
           <td>{formatXelis(item.fee)}</td>
           <td>
@@ -364,7 +362,7 @@ function ExecutedTxs(props) {
     if (!filterTx) return executedTxs
     return executedTxs.filter(({ tx }) => {
       if (tx.hash.indexOf(filterTx) !== -1) return true
-      if (tx.owner.indexOf(filterTx) !== -1) return true
+      if (tx.source.indexOf(filterTx) !== -1) return true
       return false
     })
   }, [executedTxs, filterTx])
@@ -389,7 +387,7 @@ function ExecutedTxs(props) {
             <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
           </td>
           <td>
-            <Link to={`/accounts/${tx.owner}`}>{reduceText(tx.owner, 0, 7)}</Link>
+            <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
           </td>
           <td>{formatXelis(tx.fee)}</td>
           <td>
