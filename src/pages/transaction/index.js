@@ -17,7 +17,7 @@ import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
-import EncryptedBalanceModal from '../account/encrypted_balance_modal'
+import EncryptedAmountModal from '../account/encrypted_amount_modal'
 
 const style = {
   container: css`
@@ -38,6 +38,12 @@ const style = {
       display: flex;
       gap: .5em;
       align-items: center;
+    }
+
+    .reference {
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
     }
   `
 }
@@ -145,23 +151,19 @@ function Transaction() {
             title: t('Signature'),
           },
           {
-            key: 'ref_hash',
-            title: t('Ref: Hash'),
+            key: 'ref',
+            title: t('Reference'),
             render: (_, item) => {
-              const { hash } = item.reference || {}
-              return <Link to={`/blocks/${hash}`}>
-                {hash}
-              </Link>
-            }
-          },
-          {
-            key: 'ref_topo',
-            title: t('Ref: Topo Height'),
-            render: (_, item) => {
-              const { topoheight } = item.reference || {}
-              return <Link to={`/blocks/${topoheight}`}>
-                {topoheight}
-              </Link>
+              const { hash, topoheight } = item.reference || {}
+
+              return <div>
+                <Link to={`/blocks/${hash}`}>
+                  {hash}
+                </Link>&nbsp;
+                <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
+                  ({(topoheight || 0).toLocaleString()})
+                </span>
+              </div>
             }
           },
           {
@@ -214,7 +216,7 @@ function Transfers(props) {
           <tr key={index}>
             <td>{reduceText(asset)}</td>
             <td>
-              <EncryptedBalanceModal commitment={commitment} />
+              <EncryptedAmountModal title={t(`Amount`)} commitment={commitment} />
             </td>
             <td>
               <div className="addr">

@@ -18,7 +18,7 @@ import useQueryString from 'g45-react/hooks/useQueryString'
 import Hashicon from '../../components/hashicon'
 import { scaleOnHover } from '../../style/animate'
 import AddressQRCodeModal from './addr_qrcode_modal'
-import EncryptedBalanceModal from './encrypted_balance_modal'
+import EncryptedAmountModal from './encrypted_amount_modal'
 
 const style = {
   container: css`
@@ -296,7 +296,7 @@ function Account() {
           <div className="item">
             <div className="subtitle">{t('Balance')}</div>
             <div className="value">
-              <EncryptedBalanceModal commitment={commitment} />
+              <EncryptedAmountModal title={t(`Balance`)} commitment={commitment} />
             </div>
           </div>
           <div className="item">

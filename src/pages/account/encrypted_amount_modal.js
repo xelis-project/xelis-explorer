@@ -7,17 +7,23 @@ import Modal from '../../components/modal'
 
 const style = {
   button: css`
-    border: thin solid var(--text-color);
+    border: thin solid var(--muted-color);
     background: transparent;
     padding: .5em;
     border-radius: .5em;
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--muted-color);
     display: flex;
     gap: .5em;
     align-items: center;
+    transition: all .25s;
+
+    &:hover {
+      border: thin solid var(--text-color);
+      color: var(--text-color);
+    }
   `,
-  balanceModal: css`
+  modal: css`
     background-color: var(--table-td-bg-color);
     border-radius: .5em;
     padding: 1em;
@@ -35,8 +41,8 @@ const style = {
   `
 }
 
-function EncryptedBalanceModal(props) {
-  const { commitment } = props
+function EncryptedAmountModal(props) {
+  const { title, commitment } = props
   const [visible, setVisible] = useState()
   const { t } = useLang()
 
@@ -52,12 +58,12 @@ function EncryptedBalanceModal(props) {
       <div>{t(`Encrypted`)}</div>
     </button>
     <Modal visible={visible} setVisible={setVisible}>
-      <div className={style.balanceModal}>
-        <div className="title">Balance</div>
+      <div className={style.modal}>
+        <div className="title">{title}</div>
         <div className="value">{hexCommitment}</div>
       </div>
     </Modal>
   </>
 }
 
-export default EncryptedBalanceModal
+export default EncryptedAmountModal

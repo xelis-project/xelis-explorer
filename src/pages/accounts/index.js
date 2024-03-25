@@ -15,7 +15,7 @@ import Pagination, { getPaginationRange } from '../../components/pagination'
 import { XELIS_ASSET, formatXelis } from '../../utils'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
-import EncryptedBalanceModal from '../account/encrypted_balance_modal'
+import EncryptedAmountModal from '../account/encrypted_amount_modal'
 
 const style = {
   container: css`
@@ -175,7 +175,7 @@ function Accounts() {
           render: (_, item) => {
             const { version } = item.balance || {}
             const { commitment } = version.final_balance || {}
-            return <EncryptedBalanceModal commitment={commitment} />
+            return <EncryptedAmountModal title={t(`Balance`)} commitment={commitment} />
           }
         }
       ]} data={accounts} />

@@ -41,7 +41,7 @@ const style = {
       align-items: center;
       justify-content: center;
       transition: all ${animationDuration}ms;
-      margin: 1em;
+      margin: 2em;
     }
 
     .modal.hide {
