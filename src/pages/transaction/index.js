@@ -160,9 +160,9 @@ function Transaction() {
                 <Link to={`/blocks/${hash}`}>
                   {hash}
                 </Link>&nbsp;
-                <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
-                  ({(topoheight || 0).toLocaleString()})
-                </span>
+                {topoheight && <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
+                  ({topoheight.toLocaleString()})
+                </span>}
               </div>
             }
           },
@@ -309,9 +309,9 @@ function InBlocks(props) {
         const time = new Date(item.timestamp).toLocaleString()
         return <tr key={item.hash}>
           <td>
-            <Link to={`/blocks/${item.topoheight}`}>
+            {item.topoheight ? <Link to={`/blocks/${item.topoheight}`}>
               {item.topoheight.toLocaleString()}
-            </Link>
+            </Link> : `--`}
           </td>
           <td><Link to={`/blocks/${item.hash}`}>{reduceText(item.hash)}</Link></td>
           <td style={{ color: getBlockColor(currentTheme, item.block_type) }}>{item.block_type}</td>
