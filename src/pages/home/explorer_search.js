@@ -106,7 +106,7 @@ export function ExplorerSearch() {
     if (searchValue === ``) return
 
     // go to account with address
-    if (searchValue.length === 65) {
+    if (searchValue.length === 63) {
       return navigate(`/accounts/${searchValue}`)
     }
 
