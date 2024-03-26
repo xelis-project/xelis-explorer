@@ -417,6 +417,7 @@ function History(props) {
     if (item.burn) return `BURN`
     if (item.outgoing) return `OUTGOING`
     if (item.incoming) return `INCOMING`
+    if (item.dev_fee) return `DEV_FEE`
     return ``
   }, [])
 
@@ -467,6 +468,8 @@ function History(props) {
                 return <><Icon name="arrow-down" />&nbsp;&nbsp;{t(`RECEIVE`)}</>
               case "MINING":
                 return <><Icon name="microchip" />&nbsp;&nbsp;{t(`MINING`)}</>
+              case "DEV_FEE":
+                return <><Icon name="wallet" />&nbsp;&nbsp;{t(`DEV FEE`)}</>
               case "BURN":
                 return <><Icon name="fire" />&nbsp;&nbsp;{t(`BURN`)}</>
               default:
@@ -497,6 +500,7 @@ function History(props) {
                   </Link>
                 </div>
               case "MINING":
+              case "DEV_FEE":
                 return `Coinbase`
               default:
                 return `--`
@@ -517,6 +521,9 @@ function History(props) {
               case "MINING":
                 const { mining } = item
                 return formatXelis(mining.reward)
+              case "DEV_FEE":
+                const { dev_fee } = item
+                return formatXelis(dev_fee.reward)
               case "BURN":
                 const { burn } = item
                 return formatAsset(burn.amount, decimals)
