@@ -13,19 +13,6 @@ import theme from '../../style/theme'
 import { scaleOnHover } from '../../style/animate'
 import { useTheme } from '../../hooks/useTheme'
 
-
-theme.xelis`
-  --stats-bg-color: rgb(14 30 32 / 70%);
-`
-
-theme.dark`
-  --stats-bg-color: rgb(12 12 12 / 50%);
-`
-
-theme.light`
-  --stats-bg-color: rgb(231 231 231 / 50%);
-`
-
 const style = {
   container: css`
     .title {

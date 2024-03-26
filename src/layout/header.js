@@ -35,8 +35,14 @@ const style = {
         padding: .6em .8em;
         opacity: .7;
         transition: all .1s;
+        font-size: 1.1em;
 
-        &.active, &:hover {
+        &:hover {
+          opacity: 1;
+          transform: translate(0, 2px);
+        }
+
+        &.active {
           opacity: 1;
         }
       }

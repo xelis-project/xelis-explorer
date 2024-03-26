@@ -127,6 +127,17 @@ export const style = {
   `,
 }
 
+export function Background() {
+  return <div className={style.bg}>
+    <div className="noise" />
+    <div className="circle" />
+    <div className="mid-light" />
+    <div className="top-light" />
+    <div className="right-light" />
+    <div className="darker" />
+  </div>
+}
+
 function Layout() {
   const location = useLocation()
   const firstLocation = useRef(location)
@@ -172,14 +183,7 @@ function Layout() {
 
   return <>
     <div className={style.container}>
-      <div className={style.bg}>
-        <div className="noise" />
-        <div className="circle" />
-        <div className="mid-light" />
-        <div className="top-light" />
-        <div className="right-light" />
-        <div className="darker" />
-      </div>
+      <Background />
       <NodeStatus />
       <div className={style.layoutFlex}>
         <div className="layout-max-width">

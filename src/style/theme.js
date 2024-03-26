@@ -66,6 +66,7 @@ light`
   --link-color: #1870cb;
   --link-hover-color: #3889ff;
   --warning-color: #dfde32;
+  --stats-bg-color: rgb(231 231 231 / 50%);
 `
 
 dark`
@@ -78,6 +79,7 @@ dark`
   --link-color: #1870cb;
   --link-hover-color: #3889ff;
   --warning-color: #dfde32;
+  --stats-bg-color: rgb(12 12 12 / 50%);
 `
 
 xelis`
@@ -90,4 +92,5 @@ xelis`
   --link-color: #308566;
   --link-hover-color: #38b18c;
   --warning-color: #dfde32;
+  --stats-bg-color: rgb(14 30 32 / 70%);
 `
