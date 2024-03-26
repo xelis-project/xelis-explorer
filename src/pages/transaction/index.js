@@ -307,6 +307,7 @@ function InBlocks(props) {
       onItem={(item, index) => {
         const size = formatSize(item.total_size_in_bytes)
         const time = new Date(item.timestamp).toLocaleString()
+        const txCount = item.txs_hashes.length.toLocaleString()
         return <tr key={item.hash}>
           <td>
             {item.topoheight ? <Link to={`/blocks/${item.topoheight}`}>
@@ -318,7 +319,7 @@ function InBlocks(props) {
           <td>{size}</td>
           <td>{formatXelis(item.total_fees)}</td>
           <td>{time}</td>
-          <td>{item.txs_hashes.length}</td>
+          <td>{txCount}</td>
         </tr>
       }}
     />

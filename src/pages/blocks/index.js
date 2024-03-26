@@ -267,7 +267,10 @@ function Blocks() {
         {
           key: 'txs_hashes',
           title: t('Txs'),
-          render: (value) => (value || []).length
+          render: (value) => {
+            const txCount = (value || []).length
+            return txCount.toLocaleString()
+          } 
         },
         {
           key: 'timestamp',

@@ -2,6 +2,7 @@ import { css } from 'goober'
 import { useNodeSocket, INITIATING } from '@xelis/sdk/react/daemon'
 import WebSocket from 'isomorphic-ws'
 import { useLang } from 'g45-react/hooks/useLang'
+import { Link } from 'react-router-dom'
 
 import DotLoading from '../components/dotLoading'
 import theme from '../style/theme'
@@ -70,13 +71,19 @@ const style = {
       color: var(--bg-color);
       padding: 1em;
       border-radius: .5em;
-      max-width: 30em;
+      max-width: 35em;
       display: flex;
       flex-direction: column;
       position: relative;
       margin: 1.5em 1em 1em 1em;
       box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
-      gap: .5em;
+      gap: .75em;
+
+      .endpoint {
+        padding: .5em;
+        background: var(--bg-color);
+        color: var(--muted-color);
+      }
 
       &:before {
         content: "";
@@ -129,7 +136,8 @@ function NodeStatus() {
         <div>
           {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection.`)}
         </div>
-        <div>{endpoint}</div>
+        <div className="endpoint">{endpoint}</div>
+        <div>{t(`Reload the page or go to`)}&nbsp;<Link to="/settings">{t(`Settings`)}</Link>&nbsp;{t(`to change the endpoint.`)}</div>
       </div>
     </>
   }
