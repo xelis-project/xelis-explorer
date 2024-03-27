@@ -9,7 +9,7 @@ import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { displayError, formatHashRate, formatSize, formatXelis, formattedBlock, reduceText } from '../../utils'
+import { displayError, formatHashRate, formatSize, formatXelis, formatBlock, reduceText } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
@@ -29,12 +29,20 @@ const style = {
       color: white;
       font-weight: bold;
       background-color: var(--error-color);
+      margin-bottom: 1em;
+      border-radius: .5em;
     }
 
     .miner {
       display: flex;
       gap: .5em;
       align-items: center;
+    }
+
+    .tips {
+      display: flex;
+      gap: .25em;
+      flex-direction: column;
     }
 
     .controls {
@@ -170,23 +178,27 @@ function Block() {
     loadBlock()
   }, [loadBlock, firstPageLoad])
 
-  const formatBlock = useMemo(() => {
+  const formattedBlock = useMemo(() => {
     if (!block) return {}
-    return formattedBlock(block, topoheight || 0)
+    return formatBlock(block, topoheight)
   }, [block, topoheight])
 
   const description = useMemo(() => {
+    if (!block.hash) {
+      return t(`Block is invalid.`)
+    }
+
     return `
-      ${t('Block {} ({}) with {} confirmations.', [block.topoheight, reduceText(block.hash), formatBlock.confirmations])}
-      ${t('The block reward was {} and mined by {}.', [formatBlock.reward, formatBlock.miner])}
+      ${t('Block {} ({}) with {} confirmations.', [block.topoheight, reduceText(block.hash), formattedBlock.confirmations])}
+      ${t('The block reward was {} and mined by {}.', [formattedBlock.reward, formattedBlock.miner])}
       ${t('It contains {} transactions.', [(block.txs_hashes || 0).length])}
     `
-  }, [block, formatBlock, t])
+  }, [block, formattedBlock, t])
 
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <div>
-      <PageTitle title={t('Block {}', [block.topoheight || ``])}
+      <PageTitle title={t('Block {}', [block.topoheight != null ? block.topoheight : `?`])}
         metaDescription={description}
       />
       {err && <div className="error">{displayError(err)}</div>}
@@ -194,15 +206,15 @@ function Block() {
         <div>
           {!loading && <>
             {t('This block was mined by {}. It currently has {} confirmations. The miner of this block earned {}.',
-              [formatBlock.miner, formatBlock.confirmations, formatBlock.reward])}
+              [formattedBlock.miner, formattedBlock.confirmations, formattedBlock.reward])}
           </>}
         </div>
         <div className="buttons">
           <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>
-          {formatBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
+          {formattedBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
             <div>{t('Previous Block')}</div>
           </Button>}
-          {formatBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="arrow-right" iconLocation="right">
+          {formattedBlock.hasNextBlock && <Button link={`/blocks/${block.topoheight + 1}`} icon="arrow-right" iconLocation="right">
             <div>{t('Next Block')}</div>
           </Button>}
         </div>
@@ -213,60 +225,77 @@ function Block() {
           {
             key: 'hash',
             title: t('Hash'),
+            render: (value, item) => {
+              if (!value) return `--`
+              return value
+            }
           },
           {
             key: 'block_type',
             title: t('Block type'),
             render: (value, item) => {
-              if (item) {
-                const color = getBlockColor(currentTheme, item.block_type)
+              if (value) {
+                const color = getBlockColor(currentTheme, value)
                 return <div style={{ color }}>{value}</div>
               }
 
-              return ``
+              return `--`
             }
           },
           {
             key: 'timestamp',
             title: t('Timestamp'),
-            //render: (value) => value && `${formatBlock.date} (${block.timestamp})`
+            render: (_, item) => {
+              if (item.timestamp != null) {
+                return `${formattedBlock.date} (${item.timestamp})`
+              }
+
+              return `--`
+            }
           },
           {
             key: 'age',
             title: t('Age'),
             render: (_, item) => {
-              return <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+              if (item.timestamp) {
+                return <Age timestamp={item.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+              }
+
+              return `--`
             }
           },
           {
             key: 'confirmations',
             title: t('Confirmations'),
             render: (value, item) => {
-              if (formatBlock.confirmations >= 0) return formatBlock.confirmations.toLocaleString()
-              return ``
+              if (item.hash) {
+                return formattedBlock.confirmations.toLocaleString()
+              }
+
+              return `--`
             }
           },
           {
             key: 'topoheight',
             title: t('Topo Height'),
             render: (value, item) => {
-              if (value) return value.toLocaleString()
-              return ``
+              if (value != null) return value.toLocaleString()
+              return `--`
             }
           },
           {
             key: 'height',
             title: t('Height'),
             render: (value, item) => {
-              if (value) return value.toLocaleString()
-              return ``
+              if (value != null) return value.toLocaleString()
+              return `--`
             }
           },
           {
             key: 'miner',
             title: t('Miner'),
             render: (value) => {
-              if (!value) return null
+              if (!value) return `--`
 
               return <div className="miner">
                 <Hashicon value={value} size={25} />
@@ -280,55 +309,73 @@ function Block() {
             render: (value, item) => {
               // total_fees can be undefined even if block is valid - use hash to check instead
               if (item.hash) return formatXelis(value || 0)
-              return ``
+              return `--`
             }
           },
           {
             key: 'reward',
             title: t('Reward'),
-            render: (value) => value && formatXelis(value)
+            render: (value) => {
+              if (value) {
+                return formatXelis(value)
+              }
+
+              return `--`
+            }
           },
           {
             key: 'txs_hashes',
             title: t('Txs'),
-            render: (value) => value ? value.length : ``
+            render: (value) => value ? value.length : `--`
           },
           {
             key: 'difficulty',
             title: t('Difficulty'),
-            render: (value, item) => value && <>
-              <span>{value} </span>
-              <span title="Cumulative Difficulty">
-                ({item.cumulative_difficulty})
-              </span>
-            </>,
+            render: (value, item) => {
+              if (value) {
+                return <>
+                  <span>{value} </span>
+                  <span title="Cumulative Difficulty">
+                    ({item.cumulative_difficulty})
+                  </span>
+                </>
+              }
+
+              return `--`
+            }
           },
           {
             key: 'hash_rate',
             title: t('Hash Rate'),
-            render: (value, item) => formatHashRate(item.difficulty)
+            render: (_, item) => {
+              if (item.hash) {
+                return formattedBlock.hashRate
+              }
+
+              return `--`
+            }
           },
           {
             key: 'total_size_in_bytes',
             title: t('Size'),
-            render: (value) => formatSize(value)
+            render: (value) => formatSize(value) || `--`
           },
           {
             key: 'tips',
             title: t('Tips'),
             render: (value) => {
-              if (!value) return null
+              if (!value) return `--`
 
               const tips = value || []
               if (tips.length === 0) return 'No tips. This is most likely the genesis block.'
 
-              return <>
+              return <div className="tips">
                 {tips.map((tip, index) => {
                   return <div key={tip}>
                     {index + 1}. <Link to={`/blocks/${tip}`}>{tip}</Link>
                   </div>
                 })}
-              </>
+              </div>
             }
           },
         ]}

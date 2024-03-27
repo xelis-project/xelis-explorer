@@ -5,7 +5,7 @@ import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
-import { formattedBlock } from '../../utils'
+import { formatBlock } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { getBlockType } from './index'
@@ -76,9 +76,9 @@ function useOffCanvasBlock(props) {
     setOpened(true)
   }, [])
 
-  const formatBlock = useMemo(() => {
+  const formattedBlock = useMemo(() => {
     if (!block) return {}
-    return formattedBlock(block, topoheight || 0)
+    return formatBlock(block, topoheight || 0)
   }, [block, topoheight])
 
   const loadBlock = useCallback(async (topoheight) => {
@@ -95,10 +95,10 @@ function useOffCanvasBlock(props) {
     {block && <>
       <div>
         <Button onClick={() => setOpened(false)} icon="close" />
-        {formatBlock.hasPreviousBlock && <Button onClick={() => loadBlock(block.topoheight - 1)} icon="arrow-left">
+        {formattedBlock.hasPreviousBlock && <Button onClick={() => loadBlock(block.topoheight - 1)} icon="arrow-left">
           {t('Previous Block')}
         </Button>}
-        {formatBlock.hasNextBlock && <Button onClick={() => loadBlock(block.topoheight + 1)} icon="arrow-right" iconLocation="right">
+        {formattedBlock.hasNextBlock && <Button onClick={() => loadBlock(block.topoheight + 1)} icon="arrow-right" iconLocation="right">
           {t('Next Block')}
         </Button>}
       </div>
@@ -115,11 +115,11 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Timestamp')}</div>
-          <div>{formatBlock.date} ({(block.timestamp || 0).toLocaleString()})</div>
+          <div>{formattedBlock.date} ({(block.timestamp || 0).toLocaleString()})</div>
         </div>
         <div>
           <div>{t('Confirmations')}</div>
-          <div>{(formatBlock.confirmations || 0).toLocaleString()}</div>
+          <div>{(formattedBlock.confirmations || 0).toLocaleString()}</div>
         </div>
         <div>
           <div>{t('Topo Height')}</div>
@@ -137,7 +137,7 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Reward')}</div>
-          <div>{formatBlock.reward}</div>
+          <div>{formattedBlock.reward}</div>
         </div>
         <div>
           <div>{t('Txs')}</div>
@@ -154,11 +154,11 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Hash Rate')}</div>
-          <div>{formatBlock.hashRate}</div>
+          <div>{formattedBlock.hashRate}</div>
         </div>
         <div>
           <div>{t('Size')}</div>
-          <div>{formatBlock.size}</div>
+          <div>{formattedBlock.size}</div>
         </div>
         <div>
           <div>{t('Nonce')}</div>

@@ -161,7 +161,7 @@ function useOffCanvasTable(props) {
 
   const setQueryKey = useCallback((key, value) => {
     let newQuery = Object.assign({}, query)
-    if (value !== null && typeof value !== "undefined") {
+    if (value != null) {
       newQuery[key] = value.toString()
     } else {
       Reflect.deleteProperty(newQuery, key)
@@ -198,7 +198,7 @@ function useOffCanvasTable(props) {
   }, [query])
 
   useEffect(() => {
-    if (typeof inputHeight === `undefined` || inputHeight === null) {
+    if (inputHeight == null) {
       _setInputHeight(height)
     }
   }, [height, inputHeight])

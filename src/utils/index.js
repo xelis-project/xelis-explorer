@@ -108,13 +108,13 @@ export const formatHashRate = (difficulty, { decimals = 2, withSuffix = true } =
   return value.toFixed(decimals)
 }
 
-export const formattedBlock = (block, topoheight) => {
+export const formatBlock = (block, topoheight) => {
   return {
     date: new Date(block.timestamp).toLocaleString(),
     miner: reduceText(block.miner),
     totalFees: formatXelis(block.total_fees), // if available (include_txs?)
     reward: formatXelis(block.reward),
-    confirmations: block.topoheight ? topoheight - block.topoheight : 0,
+    confirmations: block.topoheight != null ? topoheight - block.topoheight : 0,
     size: formatSize(block.total_size_in_bytes),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,

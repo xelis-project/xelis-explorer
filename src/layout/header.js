@@ -10,7 +10,6 @@ const style = {
     justify-content: space-between;
     align-items: start;
     position: relative;
-    padding-top: 4em;
     gap: 2em;
 
     .menu {
@@ -79,9 +78,9 @@ const style = {
 }
 
 function Header(props) {
-  const { title, links, ...restProps } = props
+  const { title, links, className, ...restProps } = props
 
-  return <div className={style.container} {...restProps}>
+  return <div className={`${style.container} ${className}`} {...restProps}>
     <Link to="/" className={style.logo}>
       <div className="logo"></div>
       <div>{title}</div>
