@@ -429,7 +429,7 @@ function History(props) {
       headers={[
         {
           key: "topoheight",
-          title: t('Topo'),
+          title: t('Topo Height'),
           render: (value) => {
             return <Link to={`/blocks/${value}`}>
               {value.toLocaleString()}

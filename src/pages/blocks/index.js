@@ -235,7 +235,7 @@ function Blocks() {
       headers={[
         {
           key: 'topoheight',
-          title: t('Topo'),
+          title: t('Topo Height'),
           render: (value) => {
             if (value) {
               return <Link to={`/blocks/${value}`}>

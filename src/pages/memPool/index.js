@@ -370,7 +370,7 @@ function ExecutedTxs(props) {
   return <div>
     <h2>{t('Executed Transactions ({})', [executedTxs.length.toLocaleString()])}</h2>
     <Table
-      headers={[t(`Topo`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
+      headers={[t(`Topo Height`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
       emptyText={t('No transactions')}
       onItem={(item) => {

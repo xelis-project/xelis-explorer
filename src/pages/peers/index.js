@@ -564,7 +564,7 @@ function TablePeers(props) {
         { key: `total_peers`, text: t(`Peers`), sort: true, type: `number` },
         { key: `tag`, text: t(`Tag`), sort: true, type: `string` },
         { key: `height`, text: t(`Height`), sort: true, type: `number` },
-        { key: `topoheight`, text: t(`Topo`), sort: true, type: `number` },
+        { key: `topoheight`, text: t(`Topo Height`), sort: true, type: `number` },
         { key: `pruned_topoheight`, text: t(`Pruned Topo`), sort: true, type: `number` },
         { key: `connected_on`, text: t(`Since`), sort: true, type: `number` },
         { key: `last_ping`, text: t(`Last Ping`), sort: true, type: `number` },
@@ -907,7 +907,7 @@ function ConnectedNodeTable(props) {
       },
       {
         key: 'topoheight',
-        title: t('Topo'),
+        title: t('Topo Height'),
         render: (value) => {
           return value
         }
