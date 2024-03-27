@@ -1,5 +1,5 @@
 import { css } from 'goober'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
@@ -9,6 +9,7 @@ import { scaleOnHover } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import ThemeDropdown from './theme_dropdown'
 import LangDropdown from './lang_dropdown'
+import { useNotification } from '../../components/notifications'
 
 const style = {
   container: css`
@@ -78,10 +79,21 @@ const style = {
 function Settings() {
   const { settings, setValue } = useSettings()
   const { t } = useLang()
+  const { pushNotification } = useNotification()
 
   const [nodeEnpoint, setNodeEndpoint] = useState(() => {
     return settings[settingsKeys.NODE_WS_ENDPOINT]
   })
+
+  const resetEndpoint = useCallback(() => {
+    setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
+    //pushNotification({ icon: `info-circle`, title: t(`Info`), description: t(`The endpoint was reset.`) })
+  }, [])
+
+  const applyEndpoint = useCallback(() => {
+    setValue(settingsKeys.NODE_WS_ENDPOINT, nodeEnpoint)
+    pushNotification({ icon: `info-circle`, title: t(`Info`), description: t(`The new endpoint was saved.`) })
+  }, [setValue, nodeEnpoint])
 
   return <div className={style.container}>
     <PageTitle title={t('Settings')} subtitle={t('This page allows you to change explorer settings.')}
@@ -89,17 +101,19 @@ function Settings() {
     <div className="form-items">
       <div className="form-input">
         <label>{t('Node Endpoint')}</label>
-        <span>{t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/json_rpc` depending on the server configuration.')}</span>
+        <span>
+          {t('Enter the websocket connection endpoint of a XELIS node. Usually, `wss://ip:port/json_rpc` depending on the server configuration.')}
+        </span>
         <input type="text" value={nodeEnpoint} onChange={(e) => {
           setNodeEndpoint(e.target.value)
         }} placeholder="wss://127.0.0.1/json_rpc" />
         <div className="form-save">
-          <Button icon="circle" onClick={() => {
-            setNodeEndpoint(defaultSettings[settingsKeys.NODE_WS_ENDPOINT])
-          }}>{t('Reset')}</Button>
-          <Button icon="floppy-disk" onClick={() => {
-            setValue(settingsKeys.NODE_WS_ENDPOINT, nodeEnpoint)
-          }}>{t('Apply')}</Button>
+          <Button icon="circle" onClick={resetEndpoint}>
+            {t('Reset')}
+          </Button>
+          <Button icon="floppy-disk" onClick={applyEndpoint}>
+            {t('Apply')}
+          </Button>
         </div>
       </div>
       <div className="form-input">

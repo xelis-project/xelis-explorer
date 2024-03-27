@@ -4,8 +4,9 @@ import { Helmet } from 'react-helmet-async'
 import { extractCss, setup } from 'goober'
 import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
 
-import useTheme, { ThemeProvider } from './hooks/useTheme'
+import { ThemeProvider } from './hooks/useTheme'
 import useSettings, { SettingsProvider, settingsKeys } from './hooks/useSettings'
+import { NotificationProvider } from './components/notifications'
 
 import "reset-css/reset.css"
 
@@ -25,7 +26,7 @@ function SubApp() {
     css = extractCss()
   }
 
-  const { theme: currentTheme } = useTheme()
+  //const { theme: currentTheme } = useTheme()
 
   return <NodeSocketProvider endpoint={endpoint}>
     <Helmet titleTemplate='%s · XELIS Explorer'>
@@ -44,7 +45,9 @@ function SubApp() {
 function App(props) {
   return <ThemeProvider>
     <SettingsProvider>
-      <SubApp />
+      <NotificationProvider>
+        <SubApp />
+      </NotificationProvider>
     </SettingsProvider>
   </ThemeProvider>
 }

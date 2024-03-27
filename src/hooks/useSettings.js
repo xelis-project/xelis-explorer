@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
 import store from 'store2'
 
 const Context = createContext()
@@ -23,12 +23,10 @@ export function SettingsProvider(props) {
   })
 
   const setValue = useCallback((key, value) => {
-    settings[key] = value
-    setSettings({ ...settings })
-  }, [settings])
-
-  useEffect(() => {
-    storeSettings.setAll(settings)
+    const newSettings = Object.assign({}, settings)
+    newSettings[key] = value
+    setSettings(newSettings)
+    storeSettings.setAll(newSettings)
   }, [settings])
 
   return <Context.Provider value={{ settings, setSettings, setValue }}>
