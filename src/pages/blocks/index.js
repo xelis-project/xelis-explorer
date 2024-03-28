@@ -237,7 +237,9 @@ function Blocks() {
           key: 'topoheight',
           title: t('Topo Height'),
           render: (value) => {
-            if (value) {
+            // use `value != null` to handle both (null and undefined)
+            // don't use `if (value) {}` because zero needs to pass (genenis block)
+            if (value != null) { 
               return <Link to={`/blocks/${value}`}>
                 {value.toLocaleString()}
               </Link>
@@ -249,7 +251,7 @@ function Blocks() {
           key: 'height',
           title: t('Height'),
           render: (value) => {
-            if (value) {
+            if (value != null) {
               return value.toLocaleString()
             }
             return `--`
