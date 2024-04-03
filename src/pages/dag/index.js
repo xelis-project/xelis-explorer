@@ -373,16 +373,18 @@ function DAG() {
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,
     onData: (_, newBlock) => {
-      loadInfo()
       if (offCanvasTable.paused) return
+
+      loadInfo()
       setBlocks((blocks) => {
         if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
 
-        const entries = [...groupBy(blocks, (b) => b.height).entries()]
-        entries.sort((a, b) => a[0] - b[0])
-        if (entries.length >= offCanvasTable.blockRange) {
-          const height = entries[0][0]
-          blocks = blocks.filter(b => b.height !== height)
+        const heights = blocks.map((b) => b.height)
+        const minHeight = Math.min(...heights)
+        const maxHeight = Math.max(...heights)
+        const totalHeights = maxHeight - minHeight
+        if (totalHeights >= offCanvasTable.blockRange - 1) {
+          blocks = blocks.filter(b => b.height !== minHeight)
         }
 
         setNewBlock(newBlock)
@@ -395,6 +397,7 @@ function DAG() {
     event: RPCEvent.BlockOrdered,
     onData: (_, data) => {
       if (offCanvasTable.paused) return
+
       const { topoheight, block_hash, block_type } = data
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
@@ -410,6 +413,7 @@ function DAG() {
     event: RPCEvent.BlockOrphaned,
     onData: (_, data) => {
       if (offCanvasTable.paused) return
+
       const { block_hash, old_topoheight } = data
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
@@ -467,15 +471,6 @@ function DAG() {
         }
       })
     })
-
-    /*
-    if (blocksToRender.length > 0) {
-      const last = blocksToRender[blocksToRender.length - 1]
-      setTimeout(() => {
-        if (cameraRef.current) cameraRef.current.position.x = last.x
-      }, 100)
-    }
-    */
 
     setBlocksToRender(blocksToRender)
     setHeightsText(heightsText)
