@@ -395,14 +395,19 @@ function DAG() {
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrdered,
-    onData: (_, data) => {
+    onData: async (_, data) => {
       if (offCanvasTable.paused) return
 
       const { topoheight, block_hash, block_type } = data
+      const [err, blockData] = await to(nodeSocket.daemon.methods.getBlockByHash({ hash: block_hash }))
+      if (err) return console.log(err)
+
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
-          block.topoheight = topoheight
-          block.block_type = block_type
+          //block.topoheight = topoheight
+          //block.block_type = block_type
+
+          block = blockData
         }
         return block
       }))
@@ -411,13 +416,17 @@ function DAG() {
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrphaned,
-    onData: (_, data) => {
+    onData: async (_, data) => {
       if (offCanvasTable.paused) return
 
       const { block_hash, old_topoheight } = data
+      const [err, blockData] = await to(nodeSocket.daemon.methods.getBlockByHash({ hash: block_hash }))
+      if (err) return console.log(err)
+
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
-          block.block_type = BlockType.Orphaned
+          // block.block_type = BlockType.Orphaned
+          block = blockData
         }
         return block
       }))
