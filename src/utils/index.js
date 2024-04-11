@@ -162,7 +162,8 @@ export const fetchGeoLocation = async (ips) => {
     // using session storage to cache if page reload
     const cacheData = sessionStorage.getItem(cacheKey)
     if (cacheData) {
-      return JSON.parse(cacheData)
+      const data = JSON.parse(cacheData)
+      return Promise.resolve(data)
     }
 
     const query = `?ips=${ips.join(`,`)}`

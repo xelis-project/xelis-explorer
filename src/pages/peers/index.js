@@ -334,24 +334,31 @@ function Peers() {
     setPeers(peers)
     setPeersLoading(false)
 
-    // max 50 ips per fetch
+    // max 25 ips per fetch
     setGeoLoading(true)
-    const batch = 50
+    const batch = 25
     let geoLocation = {}
 
     const ipList = peers.map((peer) => {
       return peer.ip
     })
 
-    for (let i = 0; i < ipList.length; i += batch) {
-      const ips = ipList.slice(i, i + batch)
+    let fetches = Math.ceil(ipList.length / batch)
+
+    const fetchIps = async (ips) => {
       const [err, data] = await to(fetchGeoLocation(ips))
+      fetches--
+      if (fetches <= 0) setGeoLoading(false)
       if (err) console.log(err)
+
       geoLocation = { ...geoLocation, ...data }
+      setGeoLocation(geoLocation)
     }
 
-    setGeoLoading(false)
-    setGeoLocation(geoLocation)
+    for (let i = 0; i < ipList.length; i += batch) {
+      const ips = ipList.slice(i, i + batch)
+      fetchIps(ips) // don't away so we can fetch multiple at a time
+    }
   }, [nodeSocket.readyState])
 
   useEffect(() => {
