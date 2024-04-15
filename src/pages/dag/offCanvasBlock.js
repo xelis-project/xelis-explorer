@@ -5,10 +5,12 @@ import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
-import { formatBlock } from '../../utils'
+import { formatBlock, formatXelis, prettyFormatNumber } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { getBlockType } from './index'
+import { getBlockColor } from './blockColor'
+import useTheme from '../../hooks/useTheme'
 
 const style = {
   container: css`
@@ -51,7 +53,7 @@ const style = {
         }
 
         > :nth-child(2) {
-          font-size: 1em;
+          font-size: 1.2em;
           word-break: break-all;
           color: var(--muted-color);
         }
@@ -70,6 +72,7 @@ function useOffCanvasBlock(props) {
   const [err, setErr] = useState()
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
+  const { theme: currentTheme } = useTheme()
 
   const open = useCallback((block) => {
     setBlock(block)
@@ -91,6 +94,8 @@ function useOffCanvasBlock(props) {
     setBlock(data)
   }, [nodeSocket.readyState])
 
+  const blockType = block ? getBlockType(block, stableHeight, heightBlocks) : ``
+
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
     {block && <>
       <div>
@@ -111,11 +116,11 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Block Type')}</div>
-          <div>{getBlockType(block, stableHeight, heightBlocks)}</div>
+          <div style={{ color: getBlockColor(currentTheme, blockType) }}>{blockType}</div>
         </div>
         <div>
           <div>{t('Timestamp')}</div>
-          <div>{formattedBlock.date} ({(block.timestamp || 0).toLocaleString()})</div>
+          <div title={block.timestamp || 0}>{formattedBlock.date}</div>
         </div>
         <div>
           <div>{t('Confirmations')}</div>
@@ -136,8 +141,20 @@ function useOffCanvasBlock(props) {
           </div>
         </div>
         <div>
+          <div>{t('Fees')}</div>
+          <div>
+            {formatXelis(block.total_fees)}
+          </div>
+        </div>
+        <div>
           <div>{t('Reward')}</div>
           <div>{formattedBlock.reward}</div>
+        </div>
+        <div>
+          <div>{t('Supply')}</div>
+          <div>
+            {formatXelis(block.supply)}
+          </div>
         </div>
         <div>
           <div>{t('Txs')}</div>
@@ -145,11 +162,14 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Difficulty')}</div>
-          <div>
-            <span>{parseInt(block.difficulty).toLocaleString()} </span>
-            <span title="Cumulative Difficulty">
-              ({parseInt(block.cumulative_difficulty).toLocaleString()})
-            </span>
+          <div title={block.difficulty.toLocaleString()}>
+            {prettyFormatNumber(block.difficulty).toLocaleString()}
+          </div>
+        </div>
+        <div>
+          <div>{t('Cumulative Difficulty')}</div>
+          <div title={block.cumulative_difficulty.toLocaleString()}>
+            {prettyFormatNumber(block.cumulative_difficulty).toLocaleString()}
           </div>
         </div>
         <div>
@@ -163,8 +183,13 @@ function useOffCanvasBlock(props) {
         <div>
           <div>{t('Nonce')}</div>
           <div>
-            <span>{block.nonce.toLocaleString()} </span>
-            <span title="Extra Nonce">({block.extra_nonce})</span>
+            {block.nonce.toLocaleString()}
+          </div>
+        </div>
+        <div>
+          <div>{t('Extra Nonce')}</div>
+          <div>
+            {block.extra_nonce}
           </div>
         </div>
         <div>

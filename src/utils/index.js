@@ -56,53 +56,111 @@ export const groupBy = (list, getKey) => {
   return map
 }
 
+// https://en.wikipedia.org/wiki/Names_of_large_numbers
+// https://units.fandom.com/wiki/Prefix_Of_Numbers
+const BIG_NUMBER_MAP = {
+  k: 1_000, // thousand
+  m: 1_000_000, // million
+  b: 1_000_000_000, // billion
+  t: 1_000_000_000_000, // trillion
+  qa: 1_000_000_000_000_000, // quadrillion
+  qi: 1_000_000_000_000_000_000, // quintillion
+  sx: 1_000_000_000_000_000_000_000, // sextillion
+  sp: 1_000_000_000_000_000_000_000_000, // septillion
+  oc: 1_000_000_000_000_000_000_000_000_000, // octillion
+  no: 1_000_000_000_000_000_000_000_000_000_000, // nonillion
+  dc: 1_000_000_000_000_000_000_000_000_000_000_000 // decillion
+}
+
+export const prettyFormatNumber = (nbr, { decimals = 2 } = {}) => {
+  let prefix = ''
+  let value = new BigNumber(nbr, 10)
+
+  if (value >= BIG_NUMBER_MAP.dc) {
+    prefix = ' Dc'
+    value = value.div(BIG_NUMBER_MAP.dc)
+  } else if (value >= BIG_NUMBER_MAP.no) {
+    prefix = ' No'
+    value = value.div(BIG_NUMBER_MAP.no)
+  } else if (value >= BIG_NUMBER_MAP.oc) {
+    prefix = ' Oc'
+    value = value.div(BIG_NUMBER_MAP.oc)
+  } else if (value >= BIG_NUMBER_MAP.sp) {
+    prefix = ' Sp'
+    value = value.div(BIG_NUMBER_MAP.sp)
+  } else if (value >= BIG_NUMBER_MAP.sx) {
+    prefix = ' Sx'
+    value = value.div(BIG_NUMBER_MAP.sx)
+  } else if (value >= BIG_NUMBER_MAP.qi) {
+    prefix = ' Qi'
+    value = value.div(BIG_NUMBER_MAP.qi)
+  } else if (value >= BIG_NUMBER_MAP.qa) {
+    prefix = ' Qa'
+    value = value.div(BIG_NUMBER_MAP.qa)
+  } else if (value >= BIG_NUMBER_MAP.t) {
+    prefix = ' T'
+    value = value.div(BIG_NUMBER_MAP.t)
+  } else if (value >= BIG_NUMBER_MAP.b) {
+    prefix = ' B'
+    value = value.div(BIG_NUMBER_MAP.b)
+  } else if (value >= BIG_NUMBER_MAP.m) {
+    prefix = ' M'
+    value = value.div(BIG_NUMBER_MAP.m)
+  } else if (value >= BIG_NUMBER_MAP.k) {
+    prefix = ' K'
+    value = value.div(BIG_NUMBER_MAP.k)
+  }
+
+  return `${value.toFixed(decimals)}${prefix}`
+}
+
 const HASH_RATE_MAP = {
   h: 1,
-  kh: 1000, // KiloHash
-  mh: 1000000, // MegaHash
-  gh: 1000000000, // GigaHash
-  th: 1000000000000, // TeraHash
-  ph: 1000000000000000, // PetaHash
-  eh: 1000000000000000000,	// ExaHash
-  zh: 1000000000000000000000, // ZettaHash
-  yh: 1000000000000000000000000 // YottaHash
+  kh: 1_000, // KiloHash
+  mh: 1_000_000, // MegaHash
+  gh: 1_000_000_000, // GigaHash
+  th: 1_000_000_000_000, // TeraHash
+  ph: 1_000_000_000_000_000, // PetaHash
+  eh: 1_000_000_000_000_000_000,	// ExaHash
+  zh: 1_000_000_000_000_000_000_000, // ZettaHash
+  yh: 1_000_000_000_000_000_000_000_000 // YottaHash
 }
 
 export const BLOCK_TIME = 15 // 15 seconds
 
 export const formatHashRate = (difficulty, { decimals = 2, withSuffix = true } = {}) => {
-  let unit = `H/s`
+  let prefix = `H/s`
 
   let value = new BigNumber(difficulty, 10).div(BLOCK_TIME)
 
   if (value >= HASH_RATE_MAP.yh) {
     value = value.div(HASH_RATE_MAP.yh)
-    unit = `YH/s`
+    prefix = `YH/s`
   } else if (value >= HASH_RATE_MAP.zh) {
     value = value.div(HASH_RATE_MAP.zh)
-    unit = `ZH/s`
+    prefix = `ZH/s`
   } else if (value >= HASH_RATE_MAP.eh) {
     value = value.div(HASH_RATE_MAP.eh)
-    unit = `EH/s`
+    prefix = `EH/s`
   } else if (value >= HASH_RATE_MAP.ph) {
     value = value.div(HASH_RATE_MAP.ph)
-    unit = `PH/s`
+    prefix = `PH/s`
   } else if (value >= HASH_RATE_MAP.th) {
     value = value.div(HASH_RATE_MAP.th)
-    unit = `TH/s`
+    prefix = `TH/s`
   } else if (value >= HASH_RATE_MAP.gh) {
     value = value.div(HASH_RATE_MAP.gh)
-    unit = `GH/s`
+    prefix = `GH/s`
   } else if (value >= HASH_RATE_MAP.mh) {
     value = value.div(HASH_RATE_MAP.mh)
-    unit = `MH/s`
+    prefix = `MH/s`
   } else if (value >= HASH_RATE_MAP.kh) {
     value = value.div(HASH_RATE_MAP.kh)
-    unit = `KH/s`
+    prefix = `KH/s`
   }
 
   if (withSuffix) {
-    return `${value.toFixed(decimals)} ${unit}`
+    return `${value.toFixed(decimals)} ${prefix}`
   }
 
   return value.toFixed(decimals)

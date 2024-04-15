@@ -324,6 +324,17 @@ function Block() {
             }
           },
           {
+            key: 'supply',
+            title: t('Supply'),
+            render: (value) => {
+              if (value) {
+                return formatXelis(value)
+              }
+
+              return `--`
+            }
+          },
+          {
             key: 'txs_hashes',
             title: t('Txs'),
             render: (value) => value ? value.length : `--`
