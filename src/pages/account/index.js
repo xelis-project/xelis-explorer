@@ -1,5 +1,5 @@
 import { useParams } from 'react-router'
-import useNodeSocket from '@xelis/sdk/react/daemon'
+import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
@@ -19,6 +19,7 @@ import Hashicon from '../../components/hashicon'
 import { scaleOnHover } from '../../style/animate'
 import AddressQRCodeModal from './addr_qrcode_modal'
 import EncryptedAmountModal from './encrypted_amount_modal'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
 
 const style = {
   container: css`
@@ -189,6 +190,7 @@ function Account() {
   const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
   const [asset, setAsset] = useState(XELIS_ASSET)
   const [assetData, setAssetData] = useState(XELIS_ASSET_DATA)
+  const [reloadHistory, setReloadHistory] = useState()
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -244,6 +246,23 @@ function Account() {
     //if (firstPageLoad && serverResult.loaded) return
     loadAccount()
   }, [loadAccount])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: async () => {
+      const [err, balance] = await to(nodeSocket.daemon.methods.getBalance({
+        address: addr,
+        asset: asset,
+      }))
+      if (err) return console.log(err)
+
+      if (balance.topoheight > account.topoheight) {
+        // reload
+        loadAccount()
+        setReloadHistory(Date.now)
+      }
+    }
+  }, [account])
 
   const onAssetChange = useCallback((item) => {
     setAsset(item.key)
@@ -321,7 +340,7 @@ function Account() {
         </div>
       </div>
       <div className="history-table">
-        <History addr={addr} asset={asset} assetData={assetData} />
+        <History reloadHistory={reloadHistory} addr={addr} asset={asset} assetData={assetData} />
       </div>
     </div>
     <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
@@ -350,7 +369,7 @@ function loadAccountHistory_SSR() {
 */
 
 function History(props) {
-  const { asset, assetData, addr } = props
+  const { asset, assetData, addr, reloadHistory } = props
 
   const nodeSocket = useNodeSocket()
 
@@ -406,7 +425,7 @@ function History(props) {
 
     setHistory(result)
     setLoading(false)
-  }, [asset, addr, nodeSocket.readyState, pageState])
+  }, [reloadHistory, asset, addr, nodeSocket.readyState, pageState]) // reload if acount balance topoheight changed
 
   useEffect(() => {
     loadData()
