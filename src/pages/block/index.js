@@ -9,7 +9,7 @@ import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { displayError, formatHashRate, formatSize, formatXelis, formatBlock, reduceText } from '../../utils'
+import { displayError, formatHashRate, formatSize, formatXelis, formatBlock, reduceText, formatDifficulty } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
@@ -342,14 +342,24 @@ function Block() {
           {
             key: 'difficulty',
             title: t('Difficulty'),
-            render: (value, item) => {
+            render: (value) => {
               if (value) {
-                return <>
-                  <span>{value} </span>
-                  <span title="Cumulative Difficulty">
-                    ({item.cumulative_difficulty})
-                  </span>
-                </>
+                return <div title={value}>
+                  {formatDifficulty(value)}
+                </div>
+              }
+
+              return `--`
+            }
+          },
+          {
+            key: 'cumulative_difficulty',
+            title: t('Cumulative Difficulty'),
+            render: (value) => {
+              if (value) {
+                return <div title={value}>
+                  {formatDifficulty(value)}
+                </div>
               }
 
               return `--`

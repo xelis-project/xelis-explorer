@@ -5,7 +5,7 @@ import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
-import { formatBlock, formatXelis, prettyFormatNumber } from '../../utils'
+import { formatBlock, formatXelis, formatDifficulty } from '../../utils'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { getBlockType } from './index'
@@ -163,13 +163,13 @@ function useOffCanvasBlock(props) {
         <div>
           <div>{t('Difficulty')}</div>
           <div title={block.difficulty.toLocaleString()}>
-            {prettyFormatNumber(block.difficulty).toLocaleString()}
+            {formatDifficulty(block.difficulty).toLocaleString()}
           </div>
         </div>
         <div>
           <div>{t('Cumulative Difficulty')}</div>
           <div title={block.cumulative_difficulty.toLocaleString()}>
-            {prettyFormatNumber(block.cumulative_difficulty).toLocaleString()}
+            {formatDifficulty(block.cumulative_difficulty).toLocaleString()}
           </div>
         </div>
         <div>

@@ -56,57 +56,30 @@ export const groupBy = (list, getKey) => {
   return map
 }
 
-// https://en.wikipedia.org/wiki/Names_of_large_numbers
-// https://units.fandom.com/wiki/Prefix_Of_Numbers
-const BIG_NUMBERS_ARRAY = [
-  { unit: 1_000_000_000_000_000_000_000_000_000_000_000, suffix: ' Dc', name: 'Decillion' },
-  { unit: 1_000_000_000_000_000_000_000_000_000_000, suffix: ' No', name: 'Nonillion' },
-  { unit: 1_000_000_000_000_000_000_000_000_000, suffix: ' Oc', name: 'Octillion' },
-  { unit: 1_000_000_000_000_000_000_000_000, suffix: ' Sp', name: 'Septillion' },
-  { unit: 1_000_000_000_000_000_000_000, suffix: ' Sx', name: 'Sextillion' },
-  { unit: 1_000_000_000_000_000_000, suffix: ' Qi', name: 'Quintillion' },
-  { unit: 1_000_000_000_000_000, suffix: ' Qa', name: 'Quatillion' },
-  { unit: 1_000_000_000_000, suffix: ' T', name: 'Trillion' },
-  { unit: 1_000_000_000, suffix: ' B', name: 'Billion' },
-  { unit: 1_000_000, suffix: ' M', name: 'Million' },
-  { unit: 1_000, suffix: ' K', name: 'Thousand' },
-]
-
-export const prettyFormatNumber = (nbr, { decimals = 2, withSuffix = true } = {}) => {
-  let suffix = ``
-  let value = new BigNumber(nbr, 10)
-
-  for (let i = 0; i < BIG_NUMBERS_ARRAY.length; i++) {
-    const item = BIG_NUMBERS_ARRAY[i]
-    if (value >= item.unit) {
-      if (withSuffix) suffix = item.suffix
-      value = value.div(item.unit)
-      break
-    }
-  }
-
-  return `${value.toFixed(decimals)}${suffix}`
-}
-
-const HASH_RATE_ARRAY = [
-  { unit: 1_000_000_000_000_000_000_000_000, suffix: ' YH/s', name: 'YottaHash' },
-  { unit: 1_000_000_000_000_000_000_000, suffix: ' ZH/s', name: 'ZettaHash' },
-  { unit: 1_000_000_000_000_000_000, suffix: ' EH/s', name: 'ExaHash' },
-  { unit: 1_000_000_000_000_000, suffix: ' PH/s', name: 'PetaHash' },
-  { unit: 1_000_000_000_000, suffix: ' TH/s', name: 'TeraHash' },
-  { unit: 1_000_000_000, suffix: ' GH/s', name: 'GigaHash' },
-  { unit: 1_000_000, suffix: ' MH/s', name: 'MegaHash' },
-  { unit: 1_000, suffix: ' KH/s', name: 'KiloHash' },
+const HASH_UNIT_ARRAY = [
+  { unit: 1_000_000_000_000_000_000_000_000, suffix: 'Y' }, // YottaHash
+  { unit: 1_000_000_000_000_000_000_000, suffix: 'Z' }, // ZettaHash
+  { unit: 1_000_000_000_000_000_000, suffix: 'E' }, // ExaHash
+  { unit: 1_000_000_000_000_000, suffix: 'P' }, // PetaHash
+  { unit: 1_000_000_000_000, suffix: 'T' }, // TeraHash
+  { unit: 1_000_000_000, suffix: 'G' }, // GigaHash
+  { unit: 1_000_000, suffix: 'M' }, // MegaHash
+  { unit: 1_000, suffix: 'K' }, // KiloHash
 ]
 
 export const BLOCK_TIME = 15 // in seconds
 
-export const formatHashRate = (difficulty, { decimals = 2, withSuffix = true } = {}) => {
-  let suffix = withSuffix ? ` H/s` : ``
+export const formatHashRate = (difficulty) => {
   let value = new BigNumber(difficulty, 10).div(BLOCK_TIME)
+  return `${formatDifficulty(value.toString())}H/s`
+}
 
-  for (let i = 0; i < HASH_RATE_ARRAY.length; i++) {
-    const item = HASH_RATE_ARRAY[i]
+export const formatDifficulty = (difficulty, { decimals = 2, withSuffix = true } = {}) => {
+  let suffix = ``
+  let value = new BigNumber(difficulty, 10)
+
+  for (let i = 0; i < HASH_UNIT_ARRAY.length; i++) {
+    const item = HASH_UNIT_ARRAY[i]
     if (value >= item.unit) {
       if (withSuffix) suffix = item.suffix
       value = value.div(item.unit)
@@ -114,7 +87,7 @@ export const formatHashRate = (difficulty, { decimals = 2, withSuffix = true } =
     }
   }
 
-  return `${value.toFixed(decimals)}${suffix}`
+  return `${value.toFixed(decimals)} ${suffix}`
 }
 
 export const formatBlock = (block, topoheight) => {

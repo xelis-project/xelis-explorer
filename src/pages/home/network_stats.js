@@ -8,7 +8,7 @@ import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
 
-import { formatHashRate, formatXelis, prettyFormatNumber } from '../../utils'
+import { formatHashRate, formatXelis, formatDifficulty } from '../../utils'
 import theme from '../../style/theme'
 import { scaleOnHover } from '../../style/animate'
 import { useTheme } from '../../hooks/useTheme'
@@ -149,7 +149,7 @@ export function NetworkStats(props) {
       { title: t(`Stable Height`), render: () => (data.stableheight || 0).toLocaleString() },
       { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString() },
 
-      { title: t(`Difficulty`), render: () => prettyFormatNumber(data.difficulty).toLocaleString() },
+      { title: t(`Difficulty`), render: () => formatDifficulty(data.difficulty).toLocaleString() },
       { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty) },
       { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true })},
     ]
