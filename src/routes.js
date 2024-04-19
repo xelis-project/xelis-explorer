@@ -12,6 +12,7 @@ import Settings from './pages/settings'
 import Account from './pages/account'
 import Accounts from './pages/accounts'
 import Peers from './pages/peers'
+import MiningCalculator from './pages/miningCalculator'
 
 const routes = [
   {
@@ -55,6 +56,10 @@ const routes = [
           {
             path: `/peers`,
             element: <Peers />
+          },
+          {
+            path: `/mining-calculator`,
+            element: <MiningCalculator />
           },
           {
             path: '*',

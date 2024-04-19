@@ -43,6 +43,7 @@ function Layout() {
         { link: `/dag`, title: t('DAG') },
         { link: `/accounts`, title: t('Accounts') },
         { link: `/peers`, title: t('Peers') },
+        { link: `/mining-calculator`, title: t('Mining Calculator') },
         { link: `/settings`, title: t('Settings') },
       ]
     }
@@ -56,6 +57,7 @@ function Layout() {
       { path: `/dag`, title: `DAG`, icon: <Icon name="network-wired" /> },
       { path: `/accounts`, title: t(`Accounts`), icon: <Icon name="user-group" /> },
       { path: `/peers`, title: t(`Peers`), icon: <Icon name="ethernet" /> },
+      { path: `/mining-calculator`, title: t('Mining Calculator'), icon: <Icon name="calculator" /> },
       { path: `/settings`, title: t(`Settings`), icon: <Icon name="gear" /> }
     ]
   }, [t])

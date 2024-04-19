@@ -85,7 +85,7 @@ export function useRecentBlocks() {
   return { err, loading, blocks, newBlock }
 }
 
-function loadNetworkStats_SSR() {
+function loadNetworkInfo_SSR() {
   const defaultResult = { err: null, info: {}, loaded: false }
   return useServerData(`func:loadNetworkStats`, async () => {
     const result = Object.assign({}, defaultResult)
@@ -99,9 +99,9 @@ function loadNetworkStats_SSR() {
   }, defaultResult)
 }
 
-function useNetworkStats() {
+export function useNetworkInfo() {
   const nodeSocket = useNodeSocket()
-  const serverResult = loadNetworkStats_SSR()
+  const serverResult = loadNetworkInfo_SSR()
 
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
@@ -134,7 +134,8 @@ function Home() {
   const { blocks, newBlock } = useRecentBlocks()
   const { t } = useLang()
 
-  const { info, loadInfo } = useNetworkStats()
+  const { info, loadInfo } = useNetworkInfo()
+
   useEffect(() => {
     loadInfo()
   }, [blocks])
