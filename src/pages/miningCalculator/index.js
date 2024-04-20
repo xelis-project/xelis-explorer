@@ -61,7 +61,7 @@ const style = {
     }
 
     .mining-reward {
-      background: ${theme.apply({ xelis: `#000000c9`, dark: `#000000c9`, light: `#ffffff7a`})};
+      background: ${theme.apply({ xelis: `#000000c9`, dark: `#000000c9`, light: `#ffffff7a` })};
       padding: 1em;
       border-bottom-right-radius: 1em;
       border-bottom-left-radius: 1em;
@@ -122,14 +122,15 @@ function MiningCalculator() {
     if (!miningData && !hashRate) return {}
 
     const timeUntilBlock = (miningData.networkHashRate / ((hashRate || 1) * hashRateUnit)) * BLOCK_TIME
+    const rewardPerHour = miningData.blockReward / (timeUntilBlock / 60 / 60)
 
     return {
       timeUntilBlock, // in seconds
-      rewardPerHour: miningData.blockReward / (timeUntilBlock / 60 / 60),
-      rewardPerDay: miningData.blockReward / (timeUntilBlock / 60 / 60 / 24),
-      rewardPerWeek: miningData.blockReward / (timeUntilBlock / 60 / 60 / 24 / 7),
-      rewardPerMonth: miningData.blockReward / (timeUntilBlock / 60 / 60 / 24 / 7 / 30),
-      rewardPerYear: miningData.blockReward / (timeUntilBlock / 60 / 60 / 24 / 7 / 30 / 12),
+      rewardPerHour: rewardPerHour,
+      rewardPerDay: rewardPerHour * 24,
+      rewardPerWeek: rewardPerHour * 24 * 7,
+      rewardPerMonth: rewardPerHour * 24 * 30,
+      rewardPerYear: rewardPerHour * 24 * 365,
     }
   }, [miningData, hashRate, hashRateUnit])
 
@@ -171,7 +172,11 @@ function MiningCalculator() {
             <li>{formatXelis(rewardData.rewardPerMonth)} / {t(`month`)}</li>
             <li>{formatXelis(rewardData.rewardPerYear)} / {t(`year`)}</li>
           </ul>
-          <div>{t(`XELIS operates using BlockDAG, meaning it's possible to have multiple block at the same height. These are called side blocks, and their rewards are lower than those of normal blocks. This is not taken into account in the calculator.`)}</div>
+          <div>
+            {t(`XELIS operates using BlockDAG, meaning it's possible to have multiple block at the same height. These are called side blocks, and their rewards are lower than those of normal blocks. 
+            This is not taken into account in the calculator. 
+            The lower emission curve per block is also not taking into account when calculating for longer period.`)}
+          </div>
         </>}
       </div>
     </div>
