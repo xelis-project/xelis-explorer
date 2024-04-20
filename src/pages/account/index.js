@@ -400,7 +400,7 @@ function History(props) {
     }
   }, [])
 
-  const loadData = useCallback(async () => {
+  const loadHistory = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
     setLoading(true)
@@ -420,16 +420,27 @@ function History(props) {
       params.maximum_topoheight = pages[page]
     }
 
-    const [err, result] = await to(nodeSocket.daemon.methods.getAccountHistory(params))
-    if (err) return resErr(err)
+    const [err1, result1] = await to(nodeSocket.daemon.methods.hasBalance({
+      address: addr,
+      asset: asset,
+    }))
+    if (err1) return resErr(err1)
+    
+    if (result1.exist) {
+      const [err2, result2] = await to(nodeSocket.daemon.methods.getAccountHistory(params))
+      if (err2) return resErr(err2)
+  
+      setHistory(result2)
+    } else {
+      setHistory([])
+    }
 
-    setHistory(result)
     setLoading(false)
   }, [reloadHistory, asset, addr, nodeSocket.readyState, pageState]) // reload if acount balance topoheight changed
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    loadHistory()
+  }, [loadHistory])
 
   const getType = useCallback((item) => {
     if (item.mining) return `MINING`
