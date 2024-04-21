@@ -305,6 +305,7 @@ function useNetworkData() {
 function Peers() {
   const nodeSocket = useNodeSocket()
   const [peersLoading, setPeersLoading] = useState(true)
+  const peersStateRef = useRef({})
   const [peers, setPeers] = useState([])
   const [geoLoading, setGeoLoading] = useState(true)
   const [geoLocation, setGeoLocation] = useState({})
@@ -395,7 +396,11 @@ function Peers() {
   useNodeSocketSubscribe({
     event: RPCEvent.PeerStateUpdated,
     onData: async (_, peer) => {
-      setPeers((peers) => {
+      peersStateRef.current[peer.id] = peer
+
+      // this was lagging... too much setState -_-
+      // I am now storing inside a ref and batch setState every 3s - check useEffect below
+      /*setPeers((peers) => {
         return peers.map(p => {
           if (p.id === peer.id) {
             return { ...p, ...peer } // merge to keep ip variable
@@ -403,8 +408,24 @@ function Peers() {
 
           return p
         })
-      })
+      })*/
     }
+  }, [])
+
+  useEffect(() => {
+    setInterval(() => {
+      setPeers((peers) => {
+        return peers.map((peer) => {
+          const peerState = peersStateRef.current[peer.id]
+          if (peerState) {
+            Reflect.deleteProperty(peersStateRef.current, peerState.id)
+            return { ...peer, ...peerState } // merge to keep ip variable
+          }
+
+          return peer
+        })
+      })
+    }, 3000)
   }, [])
 
   useEffect(() => {
