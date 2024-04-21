@@ -553,6 +553,10 @@ function TablePeers(props) {
     ]
   }, [t])
 
+  // Quick fix to avoid lag and display only 100 peers
+  // TODO: virtual scrolling for better perf
+  const list = groupPeers.slice(0, 100)
+
   return <div className={style.peerList}>
     <div>
       <input type="text" onChange={onFilterIP} placeholder={t(`Type to filter peers by address.`)} />
@@ -586,7 +590,7 @@ function TablePeers(props) {
 
         setSort({ key: header.key, direction, type: header.type })
       }}
-      loading={peersLoading} err={err} list={groupPeers} emptyText={t('No peers')} colSpan={10}
+      loading={peersLoading} err={err} list={list} emptyText={t('No peers')} colSpan={10}
       onItem={(item) => {
         if (item.groupHeader) {
           const key = item.key
