@@ -138,20 +138,11 @@ export const parseAddressWithPort = (addr) => {
 }
 
 export const fetchGeoLocation = async (ips) => {
-  ips.sort() // sort or the hash we not be the same
-  const cacheKey = `geo_cache_${hashIt(ips)}`
   try {
-    // using session storage to cache if page reload
-    const cacheData = sessionStorage.getItem(cacheKey)
-    if (cacheData) {
-      const data = JSON.parse(cacheData)
-      return Promise.resolve(data)
-    }
-
+    ips.sort() // sort or the hash we not be the same
     const query = `?ips=${ips.join(`,`)}`
     const res = await fetch(`https://geoip.xelis.io${query}`)
     const data = await res.json()
-    sessionStorage.setItem(cacheKey, JSON.stringify(data))
     return Promise.resolve(data)
   } catch (e) {
     return Promise.reject(e)
