@@ -370,7 +370,8 @@ function Account() {
         </div>
       </div>
       <div className="history-table">
-        <History reloadHistory={reloadHistory} addr={addr} asset={asset} assetData={assetData} />
+        <History reloadHistory={reloadHistory} addr={addr}
+          asset={asset} assetData={assetData} account={account} />
       </div>
     </div>
     <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
@@ -399,7 +400,7 @@ function loadAccountHistory_SSR() {
 */
 
 function History(props) {
-  const { asset, assetData, addr, reloadHistory } = props
+  const { asset, assetData, addr, reloadHistory, account } = props
 
   const nodeSocket = useNodeSocket()
 
@@ -480,6 +481,8 @@ function History(props) {
     if (item.dev_fee) return `DEV_FEE`
     return ``
   }, [])
+
+  const lastItem = history[history.length - 1]
 
   return <div>
     <TableFlex loading={loading} err={err} rowKey={(item, index) => {
@@ -610,16 +613,17 @@ function History(props) {
       }}>
         {t('Previous')}
       </Button>}
-      <Button icon="arrow-right" iconLocation="right" onClick={() => {
-        const newPageState = Object.assign({}, pageState)
-        const item = history[history.length - 1]
-        newPageState.pages.push(item.topoheight - 1)
-        newPageState.page++
+      {((account.registered && lastItem.topoheight > account.registered.topoheight)) &&
+        <Button icon="arrow-right" iconLocation="right" onClick={() => {
+          const newPageState = Object.assign({}, pageState)
+          newPageState.pages.push(lastItem.topoheight - 1)
+          newPageState.page++
 
-        setPageState(newPageState)
-      }}>
-        {t('Next')}
-      </Button>
+          setPageState(newPageState)
+        }}>
+          {t('Next')}
+        </Button>
+      }
     </div>
   </div>
 }
