@@ -74,7 +74,7 @@ const style = {
 
         > :nth-child(1) {
           color: var(--muted-color);
-          margin-bottom: .25em;
+          margin-bottom: .5em;
         }
 
         > :nth-child(2) {
@@ -234,7 +234,7 @@ function MinersDistributionChart(props) {
 
   return <div className="chart-container">
     <div>{t(`Mining Distribution`)}</div>
-    <div>{t(`{} miners`, [Object.keys(miners).length])}</div>
+    <div>{t(`{} miners on the last 20 blocks`, [Object.keys(miners).length])}</div>
     <Chart type="doughnut" options={options} data={data} />
   </div>
 }
