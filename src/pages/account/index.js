@@ -230,12 +230,27 @@ function Account() {
       setAssetData(result5)
     }
 
+    const [err6, result6] = await to(nodeSocket.daemon.methods.getAccountRegistrationTopoheight(addr))
+    if (err6) return resErr(err6)
+
+    console.log(result6)
+
+    const [err7, result7] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+      topoheight: result6,
+      include_txs: false
+    }))
+    if (err7) return resErr(err7)
+
     setAccount({
       addr,
       balance: result.version,
       nonce: result2.nonce,
       topoheight: result.topoheight,
-      timestamp: result3.timestamp
+      timestamp: result3.timestamp,
+      registered: {
+        topoheight: result6,
+        timestamp: result7.timestamp
+      }
     })
     setAccountAssets(result4)
 
@@ -337,6 +352,21 @@ function Account() {
             <div className="subtitle">{t('Nonce')}</div>
             <div className="value">{account.nonce >= 0 ? account.nonce : `--`}</div>
           </div>
+          <div className="item">
+            <div className="subtitle">{t('Registered')}</div>
+            <div className="value">
+              {account.registered ? <>
+                <div>
+                  {new Date(account.registered.timestamp).toLocaleString()}
+                </div>
+                <div className="subvalue">
+                  <Link to={`/blocks/${account.registered.topoheight}`}>
+                    {account.registered.topoheight.toLocaleString()}
+                  </Link>
+                </div>
+              </> : `--`}
+            </div>
+          </div>
         </div>
       </div>
       <div className="history-table">
@@ -425,11 +455,11 @@ function History(props) {
       asset: asset,
     }))
     if (err1) return resErr(err1)
-    
+
     if (result1.exist) {
       const [err2, result2] = await to(nodeSocket.daemon.methods.getAccountHistory(params))
       if (err2) return resErr(err2)
-  
+
       setHistory(result2)
     } else {
       setHistory([])
