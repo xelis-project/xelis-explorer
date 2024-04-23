@@ -281,6 +281,10 @@ function HashrateChart(props) {
       data.push(block.difficulty)
     })
 
+    // add last fake block to show current diff
+    labels.push(info.topoheight+1)
+    data.push(info.difficulty)
+
     return {
       labels,
       datasets: [
@@ -292,7 +296,7 @@ function HashrateChart(props) {
         }
       ]
     }
-  }, [blocks])
+  }, [blocks, info])
 
   return <div className="chart-container">
     <div>{t(`Hashrate`)}</div>
