@@ -760,6 +760,11 @@ function PeerDot(props) {
     return options
   }, [type, visible])
 
+  // check if position array is valid
+  if (!Array.isArray(position) && position.length !== 2) return null
+  if (typeof position[0] !== 'number') return null // latitude
+  if (typeof position[1] !== 'number') return null // longitude
+
   return <>
     {!cluster && <CircleMarker2 radius={dotRadius} pathOptions={pathOptions} center={position}>
       <Popup>
