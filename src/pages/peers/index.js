@@ -305,9 +305,9 @@ function useNetworkData() {
 function Peers() {
   const nodeSocket = useNodeSocket()
   const [peersLoading, setPeersLoading] = useState(true)
-  const peersStateRef = useRef({})
+  const peersRef = useRef({})
   const [peers, setPeers] = useState([])
-  const [geoLoading, setGeoLoading] = useState(true)
+  const [geoLoading, setGeoLoading] = useState(false)
   const [geoLocation, setGeoLocation] = useState({})
   const [err, setErr] = useState()
   const { t } = useLang()
@@ -333,62 +333,70 @@ function Peers() {
     })
 
     setPeers(peers)
+    peersRef.current = peers.reduce((obj, peer) => ({ ...obj, [peer.id]: peer }), {})
     setPeersLoading(false)
-
-    // max 25 ips per fetch
-    setGeoLoading(true)
-    const batch = 25
-    let geoLocation = {}
-
-    const ipList = peers.map((peer) => {
-      return peer.ip
-    })
-
-    let fetches = Math.ceil(ipList.length / batch)
-
-    const fetchIps = async (ips) => {
-      const [err, data] = await to(fetchGeoLocation(ips))
-      fetches--
-      if (fetches <= 0) setGeoLoading(false)
-      if (err) console.log(err)
-
-      geoLocation = { ...geoLocation, ...data }
-      setGeoLocation(geoLocation)
-    }
-
-    for (let i = 0; i < ipList.length; i += batch) {
-      const ips = ipList.slice(i, i + batch)
-      fetchIps(ips) // don't away so we can fetch multiple at a time
-    }
   }, [nodeSocket.readyState])
 
   useEffect(() => {
     loadPeers()
   }, [loadPeers])
 
+  const loadGeoLocation = useCallback(async () => {
+    if (peers.length === 0) return
+    if (geoLoading) return
+
+    const ipList = peers.filter((peer) => {
+      if (geoLocation[peer.ip]) {
+        return false
+      }
+      return true
+    }).map((peer) => peer.ip)
+
+    if (ipList.length === 0) return
+
+    // max 25 ips per fetch
+    setGeoLoading(true)
+    const batch = 25
+
+    let fetches = Math.ceil(ipList.length / batch)
+
+    let tempGeoLocation = Object.assign({}, geoLocation)
+    const fetchIps = async (ips) => {
+      const [err, data] = await to(fetchGeoLocation(ips))
+      fetches--
+      if (fetches <= 0) {
+        setGeoLoading(false)
+      }
+      if (err) console.log(err)
+
+      tempGeoLocation = { ...tempGeoLocation, ...data }
+      setGeoLocation(tempGeoLocation)
+    }
+
+    for (let i = 0; i < ipList.length; i += batch) {
+      const ips = ipList.slice(i, i + batch)
+      fetchIps(ips) // don't use `await` so we can fetch multiple at a time
+    }
+  }, [peers, geoLocation])
+
+  useEffect(() => {
+    loadGeoLocation()
+  }, [loadGeoLocation])
+
   useNodeSocketSubscribe({
     event: RPCEvent.PeerConnected,
     onData: async (_, peer) => {
       const addr = parseAddressWithPort(peer.addr)
-      const [err, data] = await to(fetchGeoLocation([addr.ip]))
-      if (err) console.log(err)
-
-      peer.ip = addr.ip
-      setGeoLocation((geo) => ({ ...geo, ...data }))
-      setPeers((peers) => {
-        const exists = peers.find((p) => p.id === peer.id)
-        if (!exists) return [...peers, peer]
-        return peers
-      })
+      if (addr) {
+        peersRef.current[peer.id] = { ...peer, ip: addr.ip }
+      }
     }
   }, [])
 
   useNodeSocketSubscribe({
     event: RPCEvent.PeerDisconnected,
     onData: async (_, peer) => {
-      setPeers((peers) => {
-        return peers.filter(p => p.id !== peer.id)
-      })
+      Reflect.deleteProperty(peersRef.current, peer.id)
     }
   }, [])
 
@@ -396,37 +404,36 @@ function Peers() {
   useNodeSocketSubscribe({
     event: RPCEvent.PeerStateUpdated,
     onData: async (_, peer) => {
-      peersStateRef.current[peer.id] = peer
-
-      // this was lagging... too much setState -_-
-      // I am now storing inside a ref and batch setState every 3s - check useEffect below
-      /*setPeers((peers) => {
-        return peers.map(p => {
-          if (p.id === peer.id) {
-            return { ...p, ...peer } // merge to keep ip variable
-          }
-
-          return p
-        })
-      })*/
+      peersRef.current[peer.id] = { ...peersRef.current[peer.id], ...peer }
     }
   }, [])
 
   useEffect(() => {
+    const intervalState = 10000 // 10s
+
     setInterval(() => {
       setPeers((peers) => {
-        return peers.map((peer) => {
-          const peerState = peersStateRef.current[peer.id]
-          if (peerState) {
-            Reflect.deleteProperty(peersStateRef.current, peerState.id)
-            return { ...peer, ...peerState } // merge to keep ip variable
+        Object.keys(peersRef.current).forEach((peerId) => {
+          const peer = peersRef.current[peerId]
+          const index = peers.findIndex((p) => {
+            return p.id === parseInt(peerId)
+          })
+          if (index === -1) {
+            peers.push(peer)
           }
-
-          return peer
         })
+
+        peers.forEach((peer, index) => {
+          if (!peersRef.current[peer.id]) {
+            peers.splice(index, 1)
+          }
+        })
+
+        return Object.assign([], peers)
       })
-    }, 3000)
+    }, intervalState)
   }, [])
+
 
   useEffect(() => {
     // make sure tween package is updated on request animation
