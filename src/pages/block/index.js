@@ -366,6 +366,16 @@ function Block() {
             }
           },
           {
+            key: 'nonce',
+            title: t(`Nonce`),
+            render: (value) => value ? value : `--`
+          },
+          {
+            key: 'extra_nonce',
+            title: t(`Extra Nonce`),
+            render: (value) => value ? value : `--`
+          },
+          {
             key: 'hash_rate',
             title: t('Hash Rate'),
             render: (_, item) => {
