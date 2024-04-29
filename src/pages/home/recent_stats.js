@@ -81,6 +81,12 @@ const style = {
           font-size: 1.5em;
           margin-bottom: .5em;
         }
+
+        > :nth-child(4) {
+          font-size: 1em;
+          margin-top: .5em;
+          color: var(--muted-color);
+        }
       }
     }
 
@@ -282,7 +288,7 @@ function HashrateChart(props) {
     })
 
     // add last fake block to show current diff
-    labels.push(info.topoheight+1)
+    labels.push(info.topoheight + 1)
     data.push(info.difficulty)
 
     return {
@@ -302,6 +308,11 @@ function HashrateChart(props) {
     <div>{t(`Hashrate`)}</div>
     <div>{formatHashRate(info.difficulty)}</div>
     <Chart type="line" options={options} data={data} />
+    <div>
+      {t(`Drastic changes in the network hashrate is due to the Kalman Filter. It deter larger entities from manupulating the difficulty in their favor and ensure the average block time remains consistently with the specified target of 15 seconds.`)}
+      <br />
+      <a href="https://docs.xelis.io/features/difficulty-adjustment#difficulty-adjustment-algorithm" target="_blank">Difficulty adjustment</a>
+    </div>
   </div>
 }
 
