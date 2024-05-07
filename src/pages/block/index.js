@@ -313,8 +313,19 @@ function Block() {
             }
           },
           {
-            key: 'reward',
-            title: t('Reward'),
+            key: 'miner_reward',
+            title: t('Miner Reward'),
+            render: (value) => {
+              if (value) {
+                return formatXelis(value)
+              }
+
+              return `--`
+            }
+          },
+          {
+            key: 'dev_reward',
+            title: t('Dev Reward'),
             render: (value) => {
               if (value) {
                 return formatXelis(value)

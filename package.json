@@ -24,7 +24,7 @@
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@tweenjs/tween.js": "^21.0.0",
-    "@xelis/sdk": "^0.8.4",
+    "@xelis/sdk": "^0.9.1",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
     "bytes": "^3.1.2",
@@ -51,6 +51,6 @@
     "g45-react": "^0.1.9",
     "node-dev": "^8.0.0",
     "shx": "^0.3.4",
-    "wrangler": "^3.37.0"
+    "wrangler": "^3.53.1"
   }
 }
