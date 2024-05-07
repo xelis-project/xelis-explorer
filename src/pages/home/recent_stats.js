@@ -309,9 +309,13 @@ function HashrateChart(props) {
     <div>{formatHashRate(info.difficulty)}</div>
     <Chart type="line" options={options} data={data} />
     <div>
-      {t(`Drastic changes in the network hashrate is due to the Kalman Filter. It deter larger entities from manupulating the difficulty in their favor and ensure the average block time remains consistently with the specified target of 15 seconds.`)}
-      <br />
-      <a href="https://docs.xelis.io/features/difficulty-adjustment#difficulty-adjustment-algorithm" target="_blank">Difficulty adjustment</a>
+      {t(`
+      Drastic swings in the nethash are caused by the Kalman Filter. 
+      For a more accurate representation of nethash and additional information about the filter, check the links below.
+      `)}
+      <br /><br />
+      <a href="https://stats.xelis.io/mining" target="_blank">{t(`Average Nethash`)}</a>&nbsp;&nbsp;
+      <a href="https://docs.xelis.io/features/difficulty-adjustment" target="_blank">{t(`Difficulty adjustment`)}</a>
     </div>
   </div>
 }
