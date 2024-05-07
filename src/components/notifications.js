@@ -64,13 +64,22 @@ export const NotificationProvider = (props) => {
     return Object.values(data)
   })
 
-  const pushNotification = useCallback((notification) => {
+  const pushNotification = useCallback((notification, options = { timeout: 3000, store: false }) => {
     const key = Date.now()
     const newNotification = { key, ...notification }
     setNotifications((notifications) => {
       return [newNotification, ...notifications]
     })
-    storeNotifications.add(key, newNotification)
+
+    if (options.store) {
+      storeNotifications.add(key, newNotification)
+    }
+
+    if (options.timeout) {
+      setTimeout(() => {
+        deleteNotification(key)
+      }, [options.timeout])
+    }
   }, [])
 
   const deleteNotification = useCallback((key) => {
