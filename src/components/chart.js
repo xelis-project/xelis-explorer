@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useRef } from 'react'
 import { Chart as ChartJS } from 'chart.js/auto'
 
 function ReactChart(props, ref) {
-  const { type, options, data, style, ...restProps } = props
+  const { type, options, plugins, data, style, ...restProps } = props
 
   const canvasRef = useRef()
   let chartRef = useRef()
@@ -10,14 +10,14 @@ function ReactChart(props, ref) {
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext(`2d`)
-    var chart = new ChartJS(ctx, { type, data, options })
+    var chart = new ChartJS(ctx, { type, data, options, plugins })
 
     chart.update()
     chartRef.current = chart
     return () => {
       return chart.destroy()
     }
-  }, [type])
+  }, [type, plugins])
 
   useEffect(() => {
     chartRef.current.data = data

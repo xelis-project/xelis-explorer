@@ -202,10 +202,16 @@ function MinersDistributionChart(props) {
       animation: false,
       //responsive: false,
       //maintainAspectRatio: false,
+      layout: {
+        padding: 20,
+      },
       plugins: {
         legend: {
           display: true,
-          position: 'left',
+          position: 'bottom',
+          labels: {
+            padding: 15
+          }
         },
         tooltip: {
           callbacks: {
