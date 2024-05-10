@@ -303,6 +303,8 @@ function Block() {
               </div>
             }
           },
+          /*
+          // always return 0 because I'm not using include_txs
           {
             key: 'total_fees',
             title: t('Fees'),
@@ -312,6 +314,7 @@ function Block() {
               return `--`
             }
           },
+          */
           {
             key: 'miner_reward',
             title: t('Miner Reward'),

@@ -289,11 +289,14 @@ function Blocks() {
           title: t('Hash'),
           render: (value) => <Link to={`/blocks/${value}`}>{reduceText(value)}</Link>
         },
+        /*
+        // always return 0 because I'm not using include_txs
         {
           key: 'total_fees',
           title: t('Fees'),
           render: (value) => formatXelis(value)
         },
+        */
         {
           key: 'miner',
           title: t('Miner'),
@@ -311,7 +314,7 @@ function Blocks() {
         },
         {
           key: 'difficulty',
-          title: t('Hash rate'),
+          title: t('Network Diff'),
           render: (value) => formatHashRate(value)
         }
       ]}
