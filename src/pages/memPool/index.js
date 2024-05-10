@@ -6,6 +6,7 @@ import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import prettyMs from 'pretty-ms'
 import Age from 'g45-react/components/age'
+import { useLang } from 'g45-react/hooks/useLang'
 
 import Table from '../../components/table'
 import { formatXelis, reduceText } from '../../utils'
@@ -14,7 +15,7 @@ import theme from '../../style/theme'
 import { useRecentBlocks } from '../../pages/home'
 import useTheme from '../../hooks/useTheme'
 import PageTitle from '../../layout/page_title'
-import { useLang } from 'g45-react/hooks/useLang'
+import Hashicon from '../../components/hashicon'
 
 const style = {
   container: css`
@@ -76,7 +77,12 @@ const style = {
         }
       }
     }
-  `
+  `,
+  account: css`
+    display: flex;
+    gap: .5em;
+    align-items: center;
+  `,
 }
 
 function MemPool() {
@@ -249,7 +255,10 @@ function PendingTxs(props) {
             <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
           </td>
           <td>
-            <Link to={`/accounts/${item.source}`}>{reduceText(item.source, 0, 7)}</Link>
+            <div className={style.account}>
+              <Hashicon value={item.source} size={20} />
+              <Link to={`/accounts/${item.source}`}>{reduceText(item.source, 0, 7)}</Link>
+            </div>
           </td>
           <td>{formatXelis(item.fee)}</td>
           <td>
@@ -387,7 +396,10 @@ function ExecutedTxs(props) {
             <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
           </td>
           <td>
-            <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
+            <div className={style.account}>
+              <Hashicon value={tx.source} size={20} />
+              <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
+            </div>
           </td>
           <td>{formatXelis(tx.fee)}</td>
           <td>
