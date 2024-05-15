@@ -45,6 +45,14 @@ const style = {
       flex-direction: column;
       gap: .5em;
     }
+
+    .discarded {
+      color: var(--error-color);
+    }
+
+    .not-executed-yet {
+      color: var(--warning-color);
+    }
   `
 }
 
@@ -180,8 +188,8 @@ function Transaction() {
             title: t('Executed In'),
             render: (value, item) => {
               if (value) return <Link to={`/blocks/${value}`}>{value}</Link>
-              if (item.in_mempool) return `Not executed yet.`
-              return ``
+              if (item.in_mempool) return <div className="not-executed-yet">{t(`Not executed yet.`)}</div>
+              return <div className="discarded">{t('Discarded / not executed.')}</div>
             }
           },
         ]}
