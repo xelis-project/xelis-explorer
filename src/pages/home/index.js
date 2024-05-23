@@ -90,11 +90,11 @@ function loadNetworkInfo_SSR() {
   return useServerData(`func:loadNetworkStats`, async () => {
     const result = Object.assign({}, defaultResult)
     const [err, res1] = await to(daemonRPC.getInfo())
-    result.err = err
+    result.err = err ? err.message : null
     if (err) return
 
-    result.info = res1.result
     result.loaded = true
+    result.info = res1.result
     return result
   }, defaultResult)
 }

@@ -13,6 +13,7 @@ import Account from './pages/account'
 import Accounts from './pages/accounts'
 import Peers from './pages/peers'
 import MiningCalculator from './pages/miningCalculator'
+import HeightBlocks from './pages/heightBlocks'
 
 const routes = [
   {
@@ -28,6 +29,10 @@ const routes = [
           {
             path: '/blocks',
             element: <Blocks />,
+          },
+          {
+            path: '/height/:height',
+            element: <HeightBlocks />,
           },
           {
             path: '/blocks/:id',

@@ -61,7 +61,7 @@ function loadTransaction_SSR({ hash }) {
   return useServerData(`func:loadTransaction(${hash})`, async () => {
     const result = Object.assign({}, defaultResult)
     const [err, res] = await to(daemonRPC.getTransaction(hash))
-    result.err = err
+    result.err = err ? err.message : null
     if (err) return result
 
     result.tx = res.result
@@ -103,6 +103,7 @@ function Transaction() {
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
+    if (serverResult.err) return
     loadTx()
   }, [loadTx])
 

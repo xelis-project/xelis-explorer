@@ -144,7 +144,7 @@ export function ExplorerSearch() {
       <div className="title">{t('XELIS Explorer')}</div>
       {isFocus && <div className={`backdrop`} />}
       <div className="input">
-        <input onFocus={onFocus} onBlur={onBlur} type="text" name="search" placeholder={t('Search block, transaction or account address.')}
+        <input onFocus={onFocus} onBlur={onBlur} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
           autoComplete="off" autoCapitalize="off" />
         <Button type="submit" aria-label="Search">
           <Icon name="search" />

@@ -98,7 +98,7 @@ function loadBlock_SSR({ id }) {
     const result = Object.assign({}, defaultResult)
 
     const [err1, res2] = await to(daemonRPC.getTopoHeight())
-    result.err = err1
+    result.err = err1 ? err1.message : null
     if (err1) return result
 
     result.topoheight = res2.result
@@ -107,7 +107,7 @@ function loadBlock_SSR({ id }) {
       const [err1, res1] = await to(daemonRPC.getBlockByHash({
         hash: id
       }))
-      result.err = err1
+      result.err = err1 ? err1.message : null
       if (err1) return result
 
       result.block = res1.result
@@ -115,7 +115,7 @@ function loadBlock_SSR({ id }) {
       const [err1, res1] = await to(daemonRPC.getBlockAtTopoHeight({
         topoheight: parseInt(id)
       }))
-      result.err = err1
+      result.err = err1 ? err1.message : null
       if (err1) return result
 
       result.block = res1.result
@@ -135,7 +135,7 @@ function Block() {
   const serverResult = loadBlock_SSR({ id })
   const { t } = useLang()
 
-  const [err, setErr] = useState()
+  const [err, setErr] = useState(serverResult.err)
   const [loading, setLoading] = useState(false)
   const [block, setBlock] = useState(serverResult.block)
   const [topoheight, setTopoheight] = useState(serverResult.topoheight)
@@ -175,6 +175,7 @@ function Block() {
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
+    if (serverResult.err) return
     loadBlock()
   }, [loadBlock, firstPageLoad])
 
@@ -198,7 +199,7 @@ function Block() {
   return <div className={style.container}>
     <PageLoading loading={loading} />
     <div>
-      <PageTitle title={t('Block {}', [block.topoheight != null ? block.topoheight : `?`])}
+      <PageTitle title={t('Block {}', [reduceText(block.hash || '')])}
         metaDescription={description}
       />
       {err && <div className="error">{displayError(err)}</div>}

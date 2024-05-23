@@ -37,7 +37,7 @@ function loadAccounts_SSR({ pageState }) {
     let result = Object.assign({}, defaultResult)
 
     const [err1, res1] = await to(daemonRPC.countAccounts())
-    result.err = err1
+    result.err = err1 ? err1.message : null
     if (err1) return result
     result.totalAccounts = res1.result
 
@@ -47,7 +47,7 @@ function loadAccounts_SSR({ pageState }) {
       skip: Math.max(0, pagination.start - 1),
       maximum: pageState.size
     }))
-    result.err = err2
+    result.err = err2 ? err2.message : null
     if (err2) return result
     const addresses = res2.result || []
 
@@ -60,7 +60,6 @@ function loadAccounts_SSR({ pageState }) {
       }))
       accounts.push({ addr, balance: (res || {}).result })
     }
-
 
     result.loaded = true
     result.accounts = accounts
@@ -136,6 +135,7 @@ function Accounts() {
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
+    if (serverResult.err) return
     loadAccounts()
   }, [loadAccounts, firstPageLoad])
 

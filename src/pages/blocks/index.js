@@ -45,7 +45,7 @@ export function loadStableHeight_SSR() {
     const result = Object.assign({}, defaultResult)
 
     const [err, res] = await to(daemonRPC.getStableHeight())
-    result.err = err
+    result.err = err ? err.message : null
     if (err) return result
 
     result.stableheight = res.result
@@ -61,9 +61,8 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
     const result = Object.assign({}, defaultResult)
 
     const [err, res1] = await to(daemonRPC.getTopoHeight())
-    result.err = err
+    result.err = err ? err.message : null
     if (err) return result
-
 
     const topoheight = res1.result
     let pagination = getPaginationRange(pageState)
@@ -74,7 +73,7 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight,
     }))
-    result.err = err2
+    result.err = err2 ? err.message : null
     if (err2) return result
 
     result.totalBlocks = topoheight + 1
@@ -194,6 +193,7 @@ function Blocks() {
 
   useEffect(() => {
     if (firstPageLoad && serverResult.loaded) return
+    if (serverResult.err) return
     loadStableHeight()
     loadBlocks()
   }, [loadBlocks, firstPageLoad])
@@ -239,7 +239,7 @@ function Blocks() {
           render: (value) => {
             // use `value != null` to handle both (null and undefined)
             // don't use `if (value) {}` because zero needs to pass (genenis block)
-            if (value != null) { 
+            if (value != null) {
               return <Link to={`/blocks/${value}`}>
                 {value.toLocaleString()}
               </Link>
@@ -252,7 +252,9 @@ function Blocks() {
           title: t('Height'),
           render: (value) => {
             if (value != null) {
-              return value.toLocaleString()
+              return <Link to={`/height/${value}`}>
+                {value.toLocaleString()}
+              </Link>
             }
             return `--`
           }
@@ -272,7 +274,7 @@ function Blocks() {
           render: (value) => {
             const txCount = (value || []).length
             return txCount.toLocaleString()
-          } 
+          }
         },
         {
           key: 'timestamp',
