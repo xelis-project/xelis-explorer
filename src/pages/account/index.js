@@ -190,7 +190,6 @@ function Account() {
   const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
   const [asset, setAsset] = useState(XELIS_ASSET)
   const [assetData, setAssetData] = useState(XELIS_ASSET_DATA)
-  const [reloadHistory, setReloadHistory] = useState()
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -233,8 +232,6 @@ function Account() {
     const [err6, result6] = await to(nodeSocket.daemon.methods.getAccountRegistrationTopoheight(addr))
     if (err6) return resErr(err6)
 
-    console.log(result6)
-
     const [err7, result7] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
       topoheight: result6,
       include_txs: false
@@ -261,23 +258,6 @@ function Account() {
     //if (firstPageLoad && serverResult.loaded) return
     loadAccount()
   }, [loadAccount])
-
-  useNodeSocketSubscribe({
-    event: RPCEvent.NewBlock,
-    onData: async () => {
-      const [err, balance] = await to(nodeSocket.daemon.methods.getBalance({
-        address: addr,
-        asset: asset,
-      }))
-      if (err) return console.log(err)
-
-      if (balance.topoheight > account.topoheight) {
-        // reload
-        loadAccount()
-        setReloadHistory(Date.now)
-      }
-    }
-  }, [account])
 
   const onAssetChange = useCallback((item) => {
     setAsset(item.key)
@@ -370,8 +350,8 @@ function Account() {
         </div>
       </div>
       <div className="history-table">
-        <History reloadHistory={reloadHistory} addr={addr}
-          asset={asset} assetData={assetData} account={account} />
+        <History addr={addr} asset={asset} assetData={assetData}
+          account={account} loadAccount={loadAccount} />
       </div>
     </div>
     <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
@@ -400,7 +380,7 @@ function loadAccountHistory_SSR() {
 */
 
 function History(props) {
-  const { asset, assetData, addr, reloadHistory, account } = props
+  const { asset, assetData, addr, account, loadAccount } = props
 
   const nodeSocket = useNodeSocket()
 
@@ -467,11 +447,30 @@ function History(props) {
     }
 
     setLoading(false)
-  }, [reloadHistory, asset, addr, nodeSocket.readyState, pageState]) // reload if acount balance topoheight changed
+  }, [asset, addr, nodeSocket.readyState, pageState]) // reload if acount balance topoheight changed
 
   useEffect(() => {
     loadHistory()
   }, [loadHistory])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: async () => {
+      const [err, balance] = await to(nodeSocket.daemon.methods.getBalance({
+        address: addr,
+        asset: asset,
+      }))
+      if (err) return console.log(err)
+
+      if (balance.topoheight > account.topoheight) {
+        loadAccount()
+
+        if (pageState.page < 0) {
+          loadHistory()
+        }
+      }
+    }
+  }, [account, pageState])
 
   const getType = useCallback((item) => {
     if (item.mining) return `MINING`
