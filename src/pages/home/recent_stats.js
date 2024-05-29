@@ -228,7 +228,9 @@ function MinersDistributionChart(props) {
     const labels = []
     const data = []
 
-    Object.entries(miners).forEach(([miner, minedBlock]) => {
+    const minerList = Object.entries(miners).sort((a, b) => b[1] - a[1])
+
+    minerList.forEach(([miner, minedBlock]) => {
       labels.push(reduceText(miner))
       data.push(minedBlock)
     })
