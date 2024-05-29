@@ -183,7 +183,7 @@ export function RecentStats(props) {
       </div>
     </div>
     <div className="charts">
-      <MinersDistributionChart miners={stats.miners} />
+      <MinersDistributionChart miners={stats.miners} numBlocks={blocks.length} />
       <div>
         <HashrateChart blocks={blocks} info={info} />
         <BlockTimesChart blocks={blocks} info={info} />
@@ -193,7 +193,9 @@ export function RecentStats(props) {
 }
 
 function MinersDistributionChart(props) {
-  const { miners } = props
+  const { miners, numBlocks } = props
+
+  console.log("numBlocks:",numBlocks)
 
   const { t } = useLang()
 
@@ -246,7 +248,7 @@ function MinersDistributionChart(props) {
 
   return <div className="chart-container">
     <div>{t(`Mining Distribution`)}</div>
-    <div>{t(`{} miners on the last 20 blocks`, [Object.keys(miners).length])}</div>
+    <div>{t(`{} miners on the last {} blocks`, [Object.keys(miners).length, numBlocks])}</div>
     <Chart type="doughnut" options={options} data={data} />
   </div>
 }
