@@ -13,6 +13,8 @@ import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
 import { daemonRPC } from '../../hooks/nodeRPC'
 
+const BLOCK_ITERATIONS = 5;
+
 export function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
@@ -36,11 +38,23 @@ export function useRecentBlocks() {
     const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
     if (err1) return resErr(err1)
 
-    const [err2, blocks] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
-      start_topoheight: Math.max(0, topoheight - 19), // don't ask for lower than 0 - this is for the first 20 blocks of the blockchain
-      end_topoheight: topoheight
-    }))
-    if (err2) return resErr(err2)
+    let blocks = [];
+
+    for (let i = 0; i < BLOCK_ITERATIONS; i++) {
+      const x = i * 20;
+
+      const [err2, bls] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
+        start_topoheight: Math.max(0, topoheight - x - 19), // don't ask for lower than 0 - this is for the first 20 blocks of the blockchain
+        end_topoheight: topoheight - x
+      }))
+      if (err2) {
+        console.error(err2)
+        break
+      }
+  
+      blocks = blocks.concat(bls)
+      console.log(blocks)
+    }
     setLoading(false)
 
     setBlocks(blocks.reverse())
@@ -76,7 +90,7 @@ export function useRecentBlocks() {
   }, [])
 
   useEffect(() => {
-    if (blocks.length > 20) {
+    if (blocks.length > 20*BLOCK_ITERATIONS) {
       blocks.pop()
       setBlocks([...blocks])
     }
