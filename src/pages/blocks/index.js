@@ -21,6 +21,7 @@ import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import { getBlockType } from '../dag'
 import Hashicon from '../../components/hashicon'
+import { formatMiner } from '../../utils/pools'
 
 const style = {
   container: css`
@@ -289,7 +290,9 @@ function Blocks() {
         {
           key: 'hash',
           title: t('Hash'),
-          render: (value) => <Link to={`/blocks/${value}`}>{reduceText(value)}</Link>
+          render: (value) => <Link to={`/blocks/${value}`}>
+            {reduceText(value)}
+          </Link>
         },
         /*
         // always return 0 because I'm not using include_txs
@@ -305,7 +308,9 @@ function Blocks() {
           render: (value) => {
             return <div className={style.miner}>
               <Hashicon value={value} size={20} />
-              <Link to={`/accounts/${value}`}>{reduceText(value, 0, 7)}</Link>
+              <Link to={`/accounts/${value}`}>
+                {formatMiner(value)}
+              </Link>
             </div>
           }
         },

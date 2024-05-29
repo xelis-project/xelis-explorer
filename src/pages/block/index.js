@@ -21,6 +21,7 @@ import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
+import { pools } from '../../utils/pools'
 
 const style = {
   container: css`
@@ -300,7 +301,10 @@ function Block() {
 
               return <div className="miner">
                 <Hashicon value={value} size={25} />
-                <Link to={`/accounts/${value}`}>{value}</Link>
+                <Link to={`/accounts/${value}`}>
+                  {value}
+                </Link>
+                {pools[value] && `(${pools[value]})`}
               </div>
             }
           },

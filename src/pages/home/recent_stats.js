@@ -3,9 +3,10 @@ import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 import prettyMs from 'pretty-ms'
 
-import { formatHashRate, formatSize, formatXelis, reduceText } from '../../utils'
+import { formatHashRate, formatSize, formatXelis } from '../../utils'
 import Chart from '../../components/chart'
 import theme from '../../style/theme'
+import { formatMiner } from '../../utils/pools'
 
 const style = {
   container: css`
@@ -231,7 +232,7 @@ function MinersDistributionChart(props) {
     const minerList = Object.entries(miners).sort((a, b) => b[1] - a[1])
 
     minerList.forEach(([miner, minedBlock]) => {
-      labels.push(reduceText(miner))
+      labels.push(formatMiner(miner))
       data.push(minedBlock)
     })
 

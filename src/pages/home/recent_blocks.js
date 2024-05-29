@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
-import { useMemo, lazy, Suspense } from 'react'
+import { useMemo } from 'react'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { formatSize, reduceText } from '../../utils'
+import { formatSize } from '../../utils'
 import theme from '../../style/theme'
 import { bounceIn, slideX } from '../../style/animate'
 import Hashicon from '../../components/hashicon'
+import { formatMiner } from '../../utils/pools'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -140,7 +141,7 @@ export function RecentBlocks(props) {
           <div>{txCount} txs | {size}</div>
           <div>
             <Hashicon value={block.miner} size={20} />
-            {reduceText(block.miner, 0, 7) || '--'}
+            {block.miner ? formatMiner(block.miner) : '--'}
           </div>
           <div>
             {block.timestamp ?

@@ -20,6 +20,7 @@ import { scaleOnHover } from '../../style/animate'
 import AddressQRCodeModal from './addr_qrcode_modal'
 import EncryptedAmountModal from './encrypted_amount_modal'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
+import { pools } from '../../utils/pools'
 
 const style = {
   container: css`
@@ -279,9 +280,14 @@ function Account() {
   const balance = account.balance || {}
   const finalBalance = balance.final_balance || {}
   const commitment = finalBalance.commitment || []
+  
+  let title = t('Account {}', [reduceText(addr)])
+  if (pools[addr]) {
+    title = `${title} (${pools[addr]})`
+  }
 
   return <div className={style.container}>
-    <PageTitle title={t('Account {}', [reduceText(addr)])}
+    <PageTitle title={title}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
     <div className="page-content">
