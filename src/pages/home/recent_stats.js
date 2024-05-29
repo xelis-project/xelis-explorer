@@ -196,8 +196,6 @@ export function RecentStats(props) {
 function MinersDistributionChart(props) {
   const { miners, numBlocks } = props
 
-  console.log("numBlocks:",numBlocks)
-
   const { t } = useLang()
 
   const options = useMemo(() => {
