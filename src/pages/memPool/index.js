@@ -65,7 +65,7 @@ const style = {
       justify-content: space-between;
       gap: 1em;
 
-      ${theme.query.minDesktop} {
+      ${theme.query.minLarge} {
         flex-direction: row;
       }
 
@@ -87,7 +87,8 @@ const style = {
 
 function MemPool() {
   const [memPool, setMemPool] = useState([])
-  const [loading, setLoading] = useState()
+  const [topoheight, setTopoheight] = useState()
+  const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
   const nodeSocket = useNodeSocket()
   const [filterTx, setFilterTx] = useState()
@@ -103,8 +104,12 @@ function MemPool() {
       setErr(err)
     }
 
-    const [err, data] = await to(nodeSocket.daemon.methods.getMemPool())
-    if (err) return resErr(err)
+    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+    if (err1) return resErr(err2)
+    setTopoheight(topoheight)
+
+    const [err2, data] = await to(nodeSocket.daemon.methods.getMemPool())
+    if (err2) return resErr(err2)
     setMemPool(data)
     setLoading(false)
   }, [nodeSocket.readyState])
@@ -117,6 +122,15 @@ function MemPool() {
     event: RPCEvent.TransactionAddedInMempool,
     onData: (_, data) => {
       setMemPool((pool) => [data, ...pool])
+    }
+  }, [])
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.NewBlock,
+    onData: async () => {
+      const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+      if (err) return console.log(err)
+      setTopoheight(topoheight)
     }
   }, [])
 
@@ -139,8 +153,9 @@ function MemPool() {
       }} />
       <div>
         <PendingTxs memPool={filteredMempool} err={err} loading={loading} />
-        <ExecutedTxs filterTx={filterTx} setMemPool={setMemPool} />
+        <ExecutedTxs filterTx={filterTx} setMemPool={setMemPool} topoheight={topoheight} />
       </div>
+      <OrphanedTxs setMemPool={setMemPool} topoheight={topoheight} />
     </div>
   </div>
 }
@@ -271,17 +286,20 @@ function PendingTxs(props) {
 }
 
 function ExecutedTxs(props) {
-  const { filterTx, setMemPool } = props
+  const { filterTx, setMemPool, topoheight } = props
 
-  const [loading, setLoading] = useState()
+  const [loading, setLoading] = useState(true)
   const [err, setErr] = useState()
-  const [executedTxs, setExecutedTxs] = useState([])
+  const [txs, setTxs] = useState([])
   const nodeSocket = useNodeSocket()
-  const [topoheight, setTopoheight] = useState()
+  const loadedRef = useRef(false)
   const { t } = useLang()
 
-  const loadExecutedTxs = useCallback(async () => {
+  const loadTxs = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
+    if (loadedRef.current) return
+    if (!topoheight) return
+
     setLoading(true)
     setErr(null)
 
@@ -290,15 +308,11 @@ function ExecutedTxs(props) {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
-    if (err1) return resErr(err1)
-    setTopoheight(topoheight)
-
-    const [err2, blocks] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
+    const [err1, blocks] = await to(nodeSocket.daemon.methods.getBlocksRangeByTopoheight({
       start_topoheight: Math.max(0, topoheight - 19),
       end_topoheight: topoheight
     }))
-    if (err2) return resErr(err2)
+    if (err1) return resErr(err1)
 
     blocks.reverse()
     const txBlockMap = new Map()
@@ -308,7 +322,7 @@ function ExecutedTxs(props) {
       })
     })
 
-    const recentExecuted = []
+    const txList = []
     for (let i = 0; i < txBlockMap.size; i += 20) {
       const txIds = Array.from(txBlockMap.keys())
       const [err3, txs] = await to(nodeSocket.daemon.methods.getTransactions(txIds.slice(i, 20)))
@@ -317,20 +331,21 @@ function ExecutedTxs(props) {
       txs.forEach((tx) => {
         if (!tx) return
         const block = txBlockMap.get(tx.hash)
-        recentExecuted.push({ tx, block })
+        txList.push({ tx, block })
       })
     }
 
     setLoading(false)
-    setExecutedTxs(recentExecuted)
-  }, [nodeSocket.readyState])
+    setTxs(txList)
+    loadedRef.current = true
+  }, [nodeSocket.readyState, topoheight])
 
   useNodeSocketSubscribe({
     event: RPCEvent.TransactionExecuted,
     onData: (_, data) => {
       // remove from mempool and add tx to data
       setMemPool((pool) => {
-        let filteredPool = []
+        let newPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.tx_hash) {
             const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
@@ -338,49 +353,43 @@ function ExecutedTxs(props) {
             }))
             if (err) return setErr(err)
 
-            setExecutedTxs((executedTxs) => [{ tx, block }, ...executedTxs])
+            tx.executed_in_block = data.block_hash
+            setTxs((txs) => [{ tx, block }, ...txs])
           } else {
-            filteredPool.push(tx)
+            newPool.push(tx)
           }
         })
 
-        return filteredPool
+        return newPool
       })
     }
   }, [])
 
-  useNodeSocketSubscribe({
-    event: RPCEvent.NewBlock,
-    onData: async () => {
-      // remove txs with blocks lower than the first tx block
-      const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
-      if (err) return setErr(err)
-
-      setTopoheight(topoheight)
-      setExecutedTxs((items) => items.filter((item) => {
-        return item.block.topoheight > topoheight - 20
-      }))
-    }
-  }, [])
+  useEffect(() => {
+    // remove txs with blocks lower than the first tx block
+    setTxs((items) => items.filter((item) => {
+      return item.block.topoheight > topoheight - 20
+    }))
+  }, [topoheight])
 
   useEffect(() => {
-    loadExecutedTxs()
-  }, [loadExecutedTxs])
+    loadTxs()
+  }, [loadTxs])
 
-  const filteredExecutedTxs = useMemo(() => {
-    if (!filterTx) return executedTxs
-    return executedTxs.filter(({ tx }) => {
+  const filteredTxs = useMemo(() => {
+    if (!filterTx) return txs
+    return txs.filter(({ tx }) => {
       if (tx.hash.indexOf(filterTx) !== -1) return true
       if (tx.source.indexOf(filterTx) !== -1) return true
       return false
     })
-  }, [executedTxs, filterTx])
+  }, [txs, filterTx])
 
   return <div>
-    <h2>{t('Executed Transactions ({})', [executedTxs.length.toLocaleString()])}</h2>
+    <h2>{t('Executed Transactions ({})', [filteredTxs.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Topo Height`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
-      list={filteredExecutedTxs} loading={loading} err={err} colSpan={5}
+      list={filteredTxs} loading={loading} err={err} colSpan={5}
       emptyText={t('No transactions')}
       onItem={(item) => {
         const { tx, block } = item
@@ -402,6 +411,78 @@ function ExecutedTxs(props) {
             </div>
           </td>
           <td>{formatXelis(tx.fee)}</td>
+          <td>
+            <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
+          </td>
+        </tr>
+      }}
+    />
+  </div>
+}
+
+function OrphanedTxs(props) {
+  const { setMemPool, topoheight } = props
+
+  const [txs, setTxs] = useState([])
+  const [err, setErr] = useState()
+  const nodeSocket = useNodeSocket()
+  const { t } = useLang()
+
+  useNodeSocketSubscribe({
+    event: RPCEvent.TransactionOrphaned,
+    onData: async (_, data) => {
+      setMemPool((pool) => {
+        let newPool = []
+        pool.forEach(async tx => {
+          if (tx.hash === data.hash) {
+            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+              topoheight: tx.reference.topoheight
+            }))
+            if (err) return setErr(err)
+
+            setTxs((txs) => [{ tx, block }, ...txs])
+          } else {
+            newPool.push(tx)
+          }
+        })
+
+        return newPool
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    setTxs((items) => items.filter((item) => {
+      return item.block.topoheight > topoheight - 20
+    }))
+  }, [topoheight])
+
+  return <div>
+    <h2>{t('Orphaned Transactions ({})', [txs.length.toLocaleString()])}</h2>
+    <Table
+      headers={[t(`Topo Ref`), t(`Hash`), , t(`Signer`), t(`Nonce`), t(`Age`)]}
+      list={txs} loading={false} err={err} colSpan={5}
+      emptyText={t('No transactions')}
+      onItem={(item) => {
+        const { tx, block } = item
+        const blockCount = topoheight - block.topoheight
+        return <tr key={tx.hash}>
+          <td>
+            <Link to={`/blocks/${block.topoheight}`}>
+              {block.topoheight.toLocaleString()}
+            </Link>
+            &nbsp;<span title={`${blockCount} block${blockCount > 1 ? `s` : ``} ago`}>({blockCount})</span>
+          </td>
+          <td>
+            <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
+          </td>
+          <td>
+            <div className={style.account}>
+              <Hashicon value={tx.source} size={20} />
+              <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
+            </div>
+          </td>
+          <td>{tx.nonce}</td>
           <td>
             <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
           </td>
