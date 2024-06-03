@@ -428,6 +428,10 @@ function Block() {
               </div>
             }
           },
+          {
+            key: `version`,
+            title: t(`Version`)
+          }
         ]}
         data={[block]}
       />
