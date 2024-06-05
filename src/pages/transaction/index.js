@@ -211,14 +211,15 @@ function Transfers(props) {
 
   const formatExtraData = useCallback((extraData) => {
     // format extra_data int array to hexadecimal
-    return (extraData || []).map((value) => `${value.toString(16)}`)
+    const hexData = (extraData || []).map((value) => `${value.toString(16)}`).join(``)
+    return reduceText(hexData, 0, 20)
   }, [])
 
   return <div>
     <h2>{t('Transfers')}</h2>
     <Table
-      headers={[t(`Asset`), t(`Amount`), t(`Recipient`)]}
-      list={transfers} emptyText={t('No transfers')} colSpan={3}
+      headers={[t(`Asset`), t(`Amount`), t(`Recipient`), t(`Extra Data`)]}
+      list={transfers} emptyText={t('No transfers')} colSpan={4}
       onItem={(item, index) => {
         const { commitment, asset, extra_data, destination } = item
         return <React.Fragment key={index}>
@@ -231,16 +232,14 @@ function Transfers(props) {
               <div className="addr">
                 <Hashicon value={destination} size={25} />
                 <Link to={`/accounts/${destination}`}>
-                  {destination}
+                  {reduceText(destination, 0, 7)}
                 </Link>
               </div>
             </td>
-          </tr>
-          {extra_data && <tr>
-            <td colSpan={3}>
-              {t(`Extra Data:`)} {formatExtraData(extra_data)}
+            <td>
+              {extra_data ? formatExtraData(extra_data) : `--`}
             </td>
-          </tr>}
+          </tr>
         </React.Fragment>
       }}
     />

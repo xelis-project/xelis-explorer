@@ -395,7 +395,7 @@ function History(props) {
   const [history, setHistory] = useState([])
   const { t } = useLang()
 
-  const [query, setQuery] = useQueryString()
+  const [query, setQuery] = useQueryString({})
 
   const [pageState, _setPageState] = useState(() => {
     if (query.max_topo) {

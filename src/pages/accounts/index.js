@@ -76,7 +76,7 @@ function Accounts() {
   const [err, setErr] = useState()
   const { t } = useLang()
 
-  const [query, setQuery] = useQueryString()
+  const [query, setQuery] = useQueryString({})
 
   const [pageState, _setPageState] = useState(() => {
     const page = parseInt(query.page) || 1

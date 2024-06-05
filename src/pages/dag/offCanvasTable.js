@@ -129,7 +129,7 @@ function useOffCanvasTable(props) {
   const { theme: currentTheme } = useTheme()
   const { t } = useLang()
 
-  const [query, setQuery] = useQueryString()
+  const [query, setQuery] = useQueryString({})
 
   const queryHeight = useMemo(() => {
     const height = parseInt(query.height)

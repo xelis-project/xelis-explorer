@@ -89,7 +89,7 @@ function Blocks() {
   const { firstPageLoad } = usePageLoad()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
-  const [query, setQuery] = useQueryString()
+  const [query, setQuery] = useQueryString({})
   const { t } = useLang()
   const { theme: currentTheme } = useTheme()
 
