@@ -430,7 +430,8 @@ function Block() {
           },
           {
             key: `version`,
-            title: t(`Version`)
+            title: t(`Version`),
+            render: (value) => value || `--`
           }
         ]}
         data={[block]}

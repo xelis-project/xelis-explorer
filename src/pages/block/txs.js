@@ -70,7 +70,7 @@ function Transactions(props) {
   }, [block, pageState, nodeSocket.readyState])
 
   useEffect(() => {
-    if (block) load()
+    if (Object.keys(block).length > 0) load()
   }, [block, load])
 
   return <div className={style.container}>
