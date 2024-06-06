@@ -145,7 +145,7 @@ export function RecentStats(props) {
     blocks.forEach(block => {
       if (Object.keys(block).length == 0) return
 
-      stats.txs += (block.txs_hashes || 0).length
+      stats.txs += (block.txs_hashes || []).length
       stats.size += block.total_size_in_bytes || 0
       stats.fees += block.total_fees || 0
       stats.reward += block.reward || 0

@@ -271,7 +271,7 @@ function useOffCanvasTable(props) {
       headers={[t(`Topo Height`), t(`Type`), t(`Hash`), t(`Txs`), t(`Age`)]}
       list={filteredBlocks} emptyText={t('No blocks')} colSpan={5}
       onItem={(block, index) => {
-        const txCount = block.txs_hashes.length
+        const txCount = (block.txs_hashes || []).length
         const blockType = getBlockType(block, stableHeight, heightBlocks)
         return <tr key={block.hash} onClick={() => onBlockClick(block)}>
           <td>

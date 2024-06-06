@@ -168,7 +168,7 @@ function TxsHistoryChart(props) {
   const chartRef = useRef()
 
   const totalTxs = useMemo(() => {
-    return blocks.reduce((t, block) => t + block.txs_hashes.length, 0)
+    return blocks.reduce((t, block) => t + (block.txs_hashes || []).length, 0)
   }, [blocks])
 
   const data = useMemo(() => {
@@ -178,7 +178,7 @@ function TxsHistoryChart(props) {
     })
 
     const data = lastBlocks.map((block) => {
-      return block.txs_hashes.length
+      return (block.txs_hashes || []).length
     })
 
     return {
@@ -317,7 +317,7 @@ function ExecutedTxs(props) {
     blocks.reverse()
     const txBlockMap = new Map()
     blocks.forEach(block => {
-      block.txs_hashes.forEach(txId => {
+      (block.txs_hashes || []).forEach(txId => {
         txBlockMap.set(txId, block)
       })
     })
