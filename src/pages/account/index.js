@@ -2,152 +2,24 @@ import { useParams } from 'react-router'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
-import { css } from 'goober'
 import { Link } from 'react-router-dom'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
+import { RPCEvent } from '@xelis/sdk/daemon/types'
+import useQueryString from 'g45-react/hooks/useQueryString'
 
 import TableFlex from '../../components/tableFlex'
 import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, reduceText } from '../../utils'
-import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
-import useQueryString from 'g45-react/hooks/useQueryString'
 import Hashicon from '../../components/hashicon'
-import { scaleOnHover } from '../../style/animate'
 import AddressQRCodeModal from './addr_qrcode_modal'
 import EncryptedAmountModal from './encrypted_amount_modal'
-import { RPCEvent } from '@xelis/sdk/daemon/types'
 import { pools } from '../../utils/pools'
 
-const style = {
-  container: css`
-    h2 {
-      margin: 0 0 .5em 0;
-      font-weight: bold;
-      font-size: 1.5em;
-    }
-
-    .page-content {
-      display: flex;
-      gap: 1em;
-      flex-direction: column;
-
-      ${theme.query.minDesktop} {
-        flex-direction: row;
-      }
-    }
-
-    .account {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .history-table {
-      flex: 3;
-
-      > div > :nth-child(2) {
-        margin-top: .5em;
-        display: flex;
-        gap: .5em;
-
-        button {
-          display: flex;
-          gap: .5em;
-          align-items: center;
-          border-radius: 25px;
-          border: thin solid var(--text-color);
-          transition: .1s all;
-          background: none;
-          color: var(--text-color);
-          cursor: pointer;
-          padding: 0.5em 1em;
-          font-weight: bold;
-        }
-      }
-    }
-
-    .from-to {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-    }
-  `,
-  account: css`
-    display: flex;
-    gap: 1em;
-    flex-direction: column;
-    background-color: var(--table-td-bg-color);
-    padding: 1em;
-    border-top: .3em solid var(--table-th-bg-color);
-    border-radius: .5em;
-
-    .top-content {
-      display: flex;
-      gap: 1em;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .hashicon {
-      padding: 1em;
-      border-radius: 50%;
-      background-color: #333333;
-      display: flex;
-      justify-content: center;
-      margin: 0 auto;
-    }
-
-    .addr {
-      max-width: 300px;
-      margin: 0 auto;
-      word-break: break-all;
-      text-align: center;
-      font-size: 1.3em;
-    }
-
-    .buttons {
-      position: absolute;
-      right: 0;
-
-      button {
-        display: flex;
-        gap: .5em;
-        align-items: center;
-        background: transparent;
-        border: thin solid var(--text-color);
-        border-radius: 0.5em;
-        padding: 0.25em;
-        color: var(--text-color);
-        font-size: 1em;
-        cursor: pointer;
-        ${scaleOnHover()}
-      }
-    }
-
-    .item {
-      display: flex;
-      gap: .5em;
-      flex-direction: column;
-
-      .subtitle {
-        color: var(--muted-color);
-        font-size: 1em;
-      }
-
-      .value {
-        font-size: 1.4em;
-      }
-
-      .subvalue {
-        font-size: .8em;
-        margin-top: 0.25em;
-      }
-    }
-  `
-}
+import style from './style'
 
 /*
 // removed ssr for the time being
@@ -280,53 +152,53 @@ function Account() {
   const balance = account.balance || {}
   const finalBalance = balance.final_balance || {}
   const commitment = finalBalance.commitment || []
-  
+
   let title = t('Account {}', [reduceText(addr)])
   if (pools[addr]) {
     title = `${title} (${pools[addr]})`
   }
 
-  return <div className={style.container}>
+  return <div>
     <PageTitle title={title}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
-    <div className="page-content">
-      <div className="account">
-        <div className={style.account}>
-          <div className="top-content">
-            <div className="buttons">
+    <div className={style.account.container}>
+      <div className={style.account.left}>
+        <div className={style.account.leftBg}>
+          <div className={style.accountDetails.container}>
+            <div className={style.accountDetails.qrCode}>
               <button onClick={() => setQRCodeVisible(true)}>
                 <Icon name="qrcode" />
               </button>
             </div>
-            <div className="hashicon">
+            <div className={style.accountDetails.hashicon}>
               <Hashicon value={addr} size={50} />
             </div>
-            <div className="addr">
+            <div className={style.accountDetails.addr}>
               {addr}
             </div>
           </div>
-          <div className="item">
-            <div className="subtitle">{t('Asset')}</div>
-            <div className="value">
+          <div className={style.account.item.container}>
+            <div className={style.account.item.title}>{t('Asset')}</div>
+            <div className={style.account.item.value}>
               <Dropdown items={dropdownAssets} onChange={onAssetChange}
                 size={.8} value={XELIS_ASSET} />
             </div>
           </div>
-          <div className="item">
-            <div className="subtitle">{t('Balance')}</div>
-            <div className="value">
+          <div className={style.account.item.container}>
+            <div className={style.account.item.title}>{t('Balance')}</div>
+            <div className={style.account.item.value}>
               <EncryptedAmountModal title={t(`Balance`)} commitment={commitment} />
             </div>
           </div>
-          <div className="item">
-            <div className="subtitle">{t('Last Activity')}</div>
-            <div className="value">
+          <div className={style.account.item.container}>
+            <div className={style.account.item.title}>{t('Last Activity')}</div>
+            <div className={style.account.item.value}>
               {account.topoheight ? <>
                 <div>
                   <Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} />
                 </div>
-                <div className="subvalue">
+                <div className={style.account.item.subvalue}>
                   <Link to={`/blocks/${account.topoheight}`}>
                     {account.topoheight.toLocaleString()}
                   </Link>
@@ -334,18 +206,18 @@ function Account() {
               </> : `--`}
             </div>
           </div>
-          <div className="item">
-            <div className="subtitle">{t('Nonce')}</div>
-            <div className="value">{account.nonce >= 0 ? account.nonce : `--`}</div>
+          <div className={style.account.item.container}>
+            <div className={style.account.item.title}>{t('Nonce')}</div>
+            <div className={style.account.item.value}>{account.nonce >= 0 ? account.nonce : `--`}</div>
           </div>
-          <div className="item">
-            <div className="subtitle">{t('Registered')}</div>
-            <div className="value">
+          <div className={style.account.item.container}>
+            <div className={style.account.item.title}>{t('Registered')}</div>
+            <div className={style.account.item.value}>
               {account.registered ? <>
                 <div>
                   {new Date(account.registered.timestamp).toLocaleString()}
                 </div>
-                <div className="subvalue">
+                <div className={style.account.item.subvalue}>
                   <Link to={`/blocks/${account.registered.topoheight}`}>
                     {account.registered.topoheight.toLocaleString()}
                   </Link>
@@ -355,7 +227,7 @@ function Account() {
           </div>
         </div>
       </div>
-      <div className="history-table">
+      <div className={style.account.right}>
         <History addr={addr} asset={asset} assetData={assetData}
           account={account} loadAccount={loadAccount} />
       </div>
@@ -553,7 +425,7 @@ function History(props) {
             switch (itemType) {
               case "INCOMING":
                 const { from } = item.incoming
-                return <div className="from-to">
+                return <div className={style.account.fromTo}>
                   <Hashicon value={from} size={25} />
                   <Link to={`/accounts/${from}`}>
                     {reduceText(from, 0, 7)}
@@ -561,7 +433,7 @@ function History(props) {
                 </div>
               case "OUTGOING":
                 const { to } = item.outgoing
-                return <div className="from-to">
+                return <div className={style.account.fromTo}>
                   <Hashicon value={to} size={25} />
                   <Link to={`/accounts/${to}`}>
                     {reduceText(to, 0, 7)}
@@ -608,7 +480,7 @@ function History(props) {
           }
         }
       ]} data={history} />
-    <div>
+    <div className={style.pagination}>
       {pageState.pages.length > 0 && <Button icon="arrow-left" onClick={() => {
         const newPageState = Object.assign({}, pageState)
         newPageState.pages.pop()

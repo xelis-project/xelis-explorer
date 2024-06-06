@@ -1,7 +1,7 @@
 import { keyframes } from 'goober'
 
 export const scaleOnHover = (props) => {
-  let { scale = '.98', duration = '.25s' } = props || {}
+  let { scale = '.98', duration = '.1s' } = props || {}
   return `
     transition: ${duration} transform;
 
@@ -53,7 +53,7 @@ const opacityKeyframes = (from, to) => keyframes`
 `
 
 export const opacity = (props) => {
-  const { from = 0, to = 1, duration = `.25s` } = props || {}
+  const { from = 0, to = 1, duration = `.1s` } = props || {}
   return `
     animation: ${opacityKeyframes(from, to)} ${duration} linear both;
   `
