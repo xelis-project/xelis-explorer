@@ -5,6 +5,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 import theme from '../style/theme'
 import useTheme from '../hooks/useTheme'
 import { scaleOnHover } from '../style/animate'
+import layoutStyle from '../style/layout'
 
 const style = {
   container: css`
@@ -103,7 +104,7 @@ function Footer(props) {
   const { t } = useLang()
 
   return <div className={style.container}>
-    <div className="layout-max-width">
+    <div className={layoutStyle.maxWidth}>
       <div>
         <div>{title}</div>
         <div>

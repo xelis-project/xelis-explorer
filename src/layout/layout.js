@@ -9,7 +9,7 @@ import Footer from './footer'
 import NodeStatus from '../layout/node_status'
 import packageJSON from '../../package.json'
 import Background from './background'
-import { style as layoutStyle } from '../style/layout'
+import layoutStyle from '../style/layout'
 
 const style = {
   header: css`
@@ -63,11 +63,11 @@ function Layout() {
   }, [t])
 
   return <>
-    <div className={`${layoutStyle.container}`}>
+    <div className={layoutStyle.container}>
       <Background />
       <NodeStatus />
-      <div className={layoutStyle.layoutFlex}>
-        <div className="layout-max-width">
+      <div className={layoutStyle.flex}>
+        <div className={layoutStyle.maxWidth}>
           <Header title={t(`Explorer`)} links={links} className={style.header} />
           <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
