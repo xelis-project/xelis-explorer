@@ -9,17 +9,6 @@ import { scaleOnHover } from '../style/animate'
 import theme from '../style/theme'
 
 const style = {
-  button: css`
-    padding: 0.4em 0.5em;
-    background: #00000029;
-    border-radius: 0.5em;
-    display: flex;
-    cursor: pointer;
-    border: none;
-    color: var(--text-color);
-    font-size: 1.5em;
-    ${scaleOnHover({ scale: `.94` })};
-  `,
   container: css`
     --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#dddddd', dark: '#212121' })};
 
@@ -53,35 +42,44 @@ const style = {
       transform: translateY(0);
       opacity: 1;
     }
+  `,
+  bottomButtons: css`
+    display: flex;
+    gap: .5em;
+    margin-top: 1em;
+    flex-direction: column;
+  `,
+  button: css`
+    padding: 0.4em 0.5em;
+    background: #00000029;
+    border-radius: 0.5em;
+    display: flex;
+    cursor: pointer;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5em;
+    ${scaleOnHover({ scale: `.94` })};
+  `,
+  links: css`
+    display: flex;
+    flex-direction: column;
+    gap: .25em;
 
-    > :nth-child(1) {
+    > a {
+      text-decoration: none;
+      color: var(--header-nav-color);
+      user-select: none;
+      cursor: pointer;
+      padding: 0.5em 0.7em;
       display: flex;
-      flex-direction: column;
-      gap: .25em;
-
-      > a {
-        text-decoration: none;
-        color: var(--header-nav-color);
-        user-select: none;
-        cursor: pointer;
-        padding: 0.5em 0.7em;
-        display: flex;
-        gap: 0.5em;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 5px;
-    
-        &:hover, &.active {
-          background-color: var(--header-nav-active-color);
-        }
+      gap: 0.5em;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 5px;
+  
+      &:hover, &.active {
+        background-color: var(--header-nav-active-color);
       }
-    }
-
-    > :nth-child(2) {
-      display: flex;
-      gap: .5em;
-      margin-top: 1em;
-      flex-direction: column;
     }
   `
 }
@@ -117,7 +115,7 @@ function MobileMenu(props) {
       <Icon name="bars" />
     </button>
     <div data-open={menuOpen} className={style.container}>
-      <div>
+      <div className={style.links}>
         {links.map((item) => {
           const { title, path, icon } = item
           return <NavLink key={path} to={path}>
@@ -126,7 +124,7 @@ function MobileMenu(props) {
           </NavLink>
         })}
       </div>
-      <div>
+      <div className={style.bottomButtons}>
         <LangDropdown size={0.9} />
         <ThemeDropdown size={0.9} />
       </div>

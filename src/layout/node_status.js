@@ -31,71 +31,66 @@ const style = {
         transform: scale(.9);
       }
     }
-    
-    .status {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-      border-bottom-left-radius: 1em;
-      border-bottom-right-radius: 1em;
-      padding: .5em 1em;
-      text-transform: uppercase;
-      font-size: .9em;
-      font-weight: bold;
-      background-color: var(--text-color);
-      color: var(--bg-color);
-      user-select: none;
-      box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
+  `,
+  status: css`
+    display: flex;
+    gap: .5em;
+    align-items: center;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    padding: .5em 1em;
+    text-transform: uppercase;
+    font-size: .9em;
+    font-weight: bold;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    user-select: none;
+    box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
+  `,
+  dot: {
+    container: css`
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    `,
+    connected: css`
+      background-color: var(--success-color);
+    `,
+    connecting: css`
+      background-color: var(--bg-color);
+    `,
+    error: css`
+      background-color: var(--error-color);
+    `
+  },
+  disconnect: css`
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 1em;
+    border-radius: .5em;
+    max-width: 35em;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 1.5em 1em 1em 1em;
+    box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
+    gap: .75em;
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-  
-        &[data-status="connected"] {
-          background-color: var(--success-color);
-        }
-  
-        &[data-status="connecting"] {
-          background-color: var(--bg-color);
-        }
-  
-        &[data-status="error"] {
-          background-color: var(--error-color);
-        }
-      }
+    &:before {
+      content: "";
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-bottom: 15px solid var(--text-color);
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      margin-left: -11px;
     }
-
-    .disconnect {
-      background-color: var(--text-color);
-      color: var(--bg-color);
-      padding: 1em;
-      border-radius: .5em;
-      max-width: 35em;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      margin: 1.5em 1em 1em 1em;
-      box-shadow: 0 0 20px 0px rgb(0 0 0 / 20%);
-      gap: .75em;
-
-      .endpoint {
-        padding: .5em;
-        background: var(--bg-color);
-        color: var(--muted-color);
-      }
-
-      &:before {
-        content: "";
-        border-left: 11px solid transparent;
-        border-right: 11px solid transparent;
-        border-bottom: 15px solid var(--text-color);
-        position: absolute;
-        top: -14px;
-        left: 50%;
-        margin-left: -11px;
-      }
-    }
+  `,
+  endpoint: css`
+    padding: .5em;
+    background: var(--bg-color);
+    color: var(--muted-color);
   `
 }
 
@@ -108,8 +103,8 @@ function NodeStatus() {
   const { settings } = useSettings()
   const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
 
-  let status = <div className="status">
-    <div className="dot" data-status="connected" />
+  let status = <div className={style.status}>
+    <div className={`${style.dot.container} ${style.dot.connected}`} />
     <div>{t('Connected')}</div>
   </div>
 
@@ -119,24 +114,24 @@ function NodeStatus() {
       text = t(`Reconnecting ({})`, [connectionTries])
     }
 
-    status = <div className="status">
-      <div className="dot" data-status="connecting" />
+    status = <div className={style.status}>
+      <div className={`${style.dot.container} ${style.dot.connecting}`} />
       <div>{text}<DotLoading /></div>
     </div>
   }
 
   if (readyState === WebSocket.CLOSED || readyState === WebSocket.CLOSING) {
     status = <>
-      <div onClick={() => location.reload()} className="status" style={{ cursor: 'pointer' }}
+      <div onClick={() => location.reload()} className={style.status} style={{ cursor: 'pointer' }}
         title={t('Click to reload.')}>
-        <div className="dot" data-status="error" />
+        <div className={`${style.dot.container} ${style.dot.error}`} />
         <div>{t('Disconnected')}</div>
       </div>
-      <div className="disconnect">
+      <div className={style.disconnect}>
         <div>
           {t(`Despite multiple reconnection attempts, the client was unable to establish a successful connection.`)}
         </div>
-        <div className="endpoint">{endpoint}</div>
+        <div className={style.endpoint}>{endpoint}</div>
         <div>{t(`Reload the page or go to`)}&nbsp;<Link to="/settings">{t(`Settings`)}</Link>&nbsp;{t(`to change the endpoint.`)}</div>
       </div>
     </>

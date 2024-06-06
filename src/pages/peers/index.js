@@ -65,7 +65,7 @@ const style = {
       padding: 0.3em 0.6em;
       font-weight: bold;
       cursor: pointer;
-      ${scaleOnHover()}
+      ${scaleOnHover()};
     }
   `,
   map: css`

@@ -60,7 +60,7 @@ const style = {
       align-items: center;
       justify-content: center;
       color: var(--bg-color);
-      ${scaleOnHover({ scale: .9 })}
+      ${scaleOnHover({ scale: .9 })};
     }
   `,
   status: css`

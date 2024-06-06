@@ -146,7 +146,7 @@ export default {
         font-size: .8em;
         width: 2.5em;
         height: 2.5em;
-        ${scaleOnHover()}
+        ${scaleOnHover()};
       }
     `
   },
@@ -167,7 +167,7 @@ export default {
       cursor: pointer;
       padding: 0.5em 1em;
       font-weight: bold;
-      ${scaleOnHover()}
+      ${scaleOnHover()};
     }
   `
 }

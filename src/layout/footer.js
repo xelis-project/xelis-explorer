@@ -91,7 +91,7 @@ const style = {
         transition: .25s all;
         border-radius: .5em;
         text-align:left;
-        ${scaleOnHover({ scale: .93 })}
+        ${scaleOnHover({ scale: .93 })};
       }
     }
   `

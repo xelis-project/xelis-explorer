@@ -34,7 +34,7 @@ export default {
       padding: .5em .7em;
       border-radius: .5em;
       text-decoration: none;
-      ${scaleOnHover()}
+      ${scaleOnHover()};
     `
   },
   miner: css`

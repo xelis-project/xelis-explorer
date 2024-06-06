@@ -31,7 +31,7 @@ export default {
     z-index: 1;
 
     [data-opacity="true"] {
-      ${opacity()}
+      ${opacity()};
     }
   `,
 }

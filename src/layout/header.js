@@ -11,81 +11,84 @@ const style = {
     align-items: start;
     position: relative;
     gap: 2em;
-
-    .menu {
-      display: flex;
-      gap: .5em;
-      justify-content: center;
-      width: 100%;
-      flex-wrap: wrap;
-
-      ${theme.query.maxDesktop} {
-        display: none;
-      }
-
-      > a {
-        display: flex;
-        gap: .5em;
-        text-decoration: none;
-        align-items: center;
-        background-color: var(--stats-bg-color);
-        color: var(--text-color);
-        border-radius: .5em;
-        padding: .6em .8em;
-        opacity: .7;
-        transition: all .1s;
-        font-size: 1.1em;
-
-        &:hover {
-          opacity: 1;
-          transform: translate(0, 2px);
-        }
-
-        &.active {
-          opacity: 1;
-        }
-      }
-    }
-
-    .mobile-menu {
-      ${theme.query.minDesktop} {
-        display: none;
-      }
-    }
   `,
-  logo: css`
+  menu: css`
     display: flex;
     gap: .5em;
-    font-size: 1.2em;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
-    font-weight: bold;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
 
-    ${theme.query.minDesktop} {
+    ${theme.query.maxDesktop} {
       display: none;
     }
 
-    .logo {
+    > a {
+      display: flex;
+      gap: .5em;
+      text-decoration: none;
+      align-items: center;
+      background-color: var(--stats-bg-color);
+      color: var(--text-color);
+      border-radius: .5em;
+      padding: .6em .8em;
+      opacity: .7;
+      transition: all .1s;
+      font-size: 1.1em;
+
+      &:hover {
+        opacity: 1;
+        transform: translate(0, 2px);
+      }
+
+      &.active {
+        opacity: 1;
+      }
+    }
+  `,
+  mobileMenu: css`
+    ${theme.query.minDesktop} {
+      display: none;
+    }
+  `,
+  logo: {
+    container: css`
+      display: flex;
+      gap: .5em;
+      font-size: 1.2em;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: bold;
+
+      ${theme.query.minDesktop} {
+        display: none;
+      }
+    `,
+    image: css`
       width: 30px;
       height: 30px;
       display: block;
       background-size: contain;
       background-repeat: no-repeat;
-      background-image: ${theme.apply({ xelis: `url('public/img/white_background_black_logo.svg')`, light: `url('public/img/black_background_white_logo.svg')`, dark: `url('public/img/white_background_black_logo.svg')`, })};
-    }
-  `
+      background-image: ${theme.apply({
+        xelis: `url('public/img/white_background_black_logo.svg')`, 
+        light: `url('public/img/black_background_white_logo.svg')`, 
+        dark: `url('public/img/white_background_black_logo.svg')`, 
+      })};
+    `
+  }
 }
 
 function Header(props) {
   const { title, links, className, ...restProps } = props
 
   return <div className={`${style.container} ${className}`} {...restProps}>
-    <Link to="/" className={style.logo}>
-      <div className="logo"></div>
+    <Link to="/" className={style.logo.container}>
+      <div className={style.logo.image}></div>
       <div>{title}</div>
     </Link>
-    <div className="menu">
+    <div className={style.menu}>
       {links.map((item) => {
         const { title, path, icon } = item
         return <NavLink key={path} to={path}>
@@ -94,7 +97,7 @@ function Header(props) {
         </NavLink>
       })}
     </div>
-    <div className="mobile-menu">
+    <div className={style.mobileMenu}>
       <MobileMenu links={links} />
     </div>
   </div>

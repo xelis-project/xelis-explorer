@@ -69,7 +69,7 @@ const style = {
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      ${scaleOnHover({ scale: .9 })}
+      ${scaleOnHover({ scale: .9 })};
     }
   `,
   navControls: css`

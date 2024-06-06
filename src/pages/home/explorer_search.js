@@ -57,7 +57,7 @@ const style = {
         justify-content: center;
         font-weight: bold;
         transition: .1s transform;
-        ${scaleOnHover({ scale: .9 })}
+        ${scaleOnHover({ scale: .9 })};
   
         span {
           display: none;
@@ -88,7 +88,7 @@ const style = {
       z-index: 1;
       backdrop-filter: blur(5px);
       background-color: rgb(0 0 0 / 40%);
-      ${opacity()}
+      ${opacity()};
     }
   `,
 }
