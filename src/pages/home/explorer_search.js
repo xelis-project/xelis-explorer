@@ -8,7 +8,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 
 import Button from '../../components/button'
 import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
+import { opacity, scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -41,9 +41,10 @@ const style = {
   
       button {
         position: absolute;
-        right: 0.4em;
-        top: 0.4em;
-        font-size: 1em;
+        top: 0;
+        right: 0;
+        margin: .4em;
+        font-size: 1.1em;
         cursor: pointer;
         background-color: var(--text-color);
         color: var(--bg-color);
@@ -87,6 +88,7 @@ const style = {
       z-index: 1;
       backdrop-filter: blur(5px);
       background-color: rgb(0 0 0 / 40%);
+      ${opacity()}
     }
   `,
 }
@@ -102,8 +104,9 @@ export function ExplorerSearch() {
 
     e.preventDefault()
     const formData = new FormData(e.target)
-    const searchValue = formData.get(`search`)
+    let searchValue = formData.get(`search`)
     if (searchValue === ``) return
+    searchValue = searchValue.trim()
 
     // go to account with address
     if (searchValue.length === 63) {
@@ -111,16 +114,26 @@ export function ExplorerSearch() {
     }
 
     if (searchValue.length === 64) {
-      const [err, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
+      const [err1, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
         hash: searchValue
       }))
+      if (err1) console.log(err1)
+
       if (block) {
         // go to block with block hash
         return navigate(`/blocks/${searchValue}`)
-      } else {
+      }
+
+      const [err2, tx] = await to(nodeSocket.daemon.methods.getTransaction(searchValue))
+      if (err2) console.log(err2)
+
+      if (tx) {
         // go to tx with tx hash
         return navigate(`/txs/${searchValue}`)
       }
+
+      // go to block anyway and show error there
+      return navigate(`/blocks/${searchValue}`)
     }
 
     if (!isNaN(parseInt(searchValue))) {
@@ -139,18 +152,18 @@ export function ExplorerSearch() {
     setFocus(false)
   }, [])
 
-  return <form onSubmit={search}>
-    <div className={style.container}>
-      <div className="title">{t('XELIS Explorer')}</div>
-      {isFocus && <div className={`backdrop`} />}
+  return <div className={style.container}>
+    <div className="title">{t('XELIS Explorer')}</div>
+    {isFocus && <div className={`backdrop`} />}
+    <form onSubmit={search} onBlur={onBlur}>
       <div className="input">
-        <input onFocus={onFocus} onBlur={onBlur} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
+        <input onFocus={onFocus} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
           autoComplete="off" autoCapitalize="off" />
-        <Button type="submit" aria-label="Search">
+        <Button type="submit" aria-label="Search" onMouseDown={(e) => e.preventDefault()}>
           <Icon name="search" />
           <span>{t('Search')}</span>
         </Button>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 }
