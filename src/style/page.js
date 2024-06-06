@@ -1,20 +1,6 @@
-import { css, glob } from 'goober'
+import { glob } from 'goober'
 
 import theme from './theme'
-
-export const typography = css`
-  h1 {
-    margin: 1.5em 0 .5em 0;
-    font-weight: bold;
-    font-size: 2em;
-  }
-
-  h2 {
-    margin: 1em 0 .5em 0;
-    font-weight: bold;
-    font-size: 1.5em;
-  }
-`
 
 glob`
   * {
@@ -47,10 +33,6 @@ glob`
     &:hover {
       color: var(--link-hover-color);
     }
-  }
-
-  strong {
-    font-weight: bold;
   }
 
   ${theme.query.minLarge} {
