@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
-import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import prettyMs from 'pretty-ms'
@@ -11,79 +10,12 @@ import { useLang } from 'g45-react/hooks/useLang'
 import Table from '../../components/table'
 import { formatXelis, reduceText } from '../../utils'
 import Chart from '../../components/chart'
-import theme from '../../style/theme'
 import { useRecentBlocks } from '../../pages/home'
 import useTheme from '../../hooks/useTheme'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 
-const style = {
-  container: css`
-    h2 {
-      margin: 1.5em 0 .5em 0;
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-
-    input {
-      padding: 0.7em;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 1.2em;
-      background-color: ${theme.apply({ xelis: `rgb(0 0 0 / 20%)`, light: `rgb(255 255 255 / 20%)`, dark: `rgb(0 0 0 / 20%)` })};
-      color: var(--text-color);
-      width: 100%;
-      border: thin solid ${theme.apply({ xelis: `#7afad3`, light: `#cbcbcb`, dark: `#373737` })};
-
-      &::placeholder {
-        color: ${theme.apply({ xelis: `rgb(255 255 255 / 20%)`, light: `rgb(0 0 0 / 30%)`, dark: `rgb(255 255 255 / 20%)` })};
-        opacity: 1;
-      }
-    }
-
-    > :nth-child(2) {
-      > :nth-child(1) {
-        margin-bottom: 2em;
-        background-color: var(--stats-bg-color);
-        padding: 1em;
-        border-radius: .5em;
-        display: flex;
-        gap: 1em;
-        flex-direction: column;
-
-        canvas {
-          max-height: 10em;
-        }
-      }
-    }
-
-    > div > :nth-child(3) {
-      display: flex;
-      gap: 1em;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 1em;
-
-      ${theme.query.minLarge} {
-        flex-direction: row;
-      }
-
-      > div {
-        flex: 1;
-        
-        > div {
-          max-height: 30em;
-        }
-      }
-    }
-  `,
-  account: css`
-    display: flex;
-    gap: .5em;
-    align-items: center;
-  `,
-}
+import style from './style'
 
 function MemPool() {
   const [memPool, setMemPool] = useState([])
@@ -143,15 +75,15 @@ function MemPool() {
     })
   }, [memPool, filterTx])
 
-  return <div className={style.container}>
+  return <div>
     <PageTitle title={t('Mempool')} subtitle={t('Past, pending and executed transactions.')}
       metaDescription={t('View pending transactions and network congestion. Verify if your transaction was executed.')} />
     <div>
       <TxsHistoryChart />
-      <input type="text" placeholder={t('Type your account address or transaction hash to filter the list below.')} onChange={(e) => {
-        setFilterTx(e.target.value)
-      }} />
-      <div>
+      <input className={style.searchInput} type="text"
+        placeholder={t('Type your account address or transaction hash to filter the list below.')}
+        onChange={(e) => setFilterTx(e.target.value)} />
+      <div className={style.tables}>
         <PendingTxs memPool={filteredMempool} err={err} loading={loading} />
         <ExecutedTxs filterTx={filterTx} setMemPool={setMemPool} topoheight={topoheight} />
       </div>
@@ -248,7 +180,7 @@ function TxsHistoryChart(props) {
     }
   }, [])
 
-  return <div>
+  return <div className={style.chart}>
     <div>{t('Last 20 blocks ({} txs)', [totalTxs])}</div>
     <Chart ref={chartRef} type="line" data={data} options={options} />
   </div>
@@ -260,7 +192,7 @@ function PendingTxs(props) {
   const { t } = useLang()
 
   return <div>
-    <h2>{t('Pending Transactions ({})', [memPool.length.toLocaleString()])}</h2>
+    <h2 className={style.title}>{t('Pending Transactions ({})', [memPool.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={memPool} loading={loading} err={err} colSpan={4} emptyText={t('No transactions')}
@@ -386,7 +318,7 @@ function ExecutedTxs(props) {
   }, [txs, filterTx])
 
   return <div>
-    <h2>{t('Executed Transactions ({})', [filteredTxs.length.toLocaleString()])}</h2>
+    <h2 className={style.title}>{t('Executed Transactions ({})', [filteredTxs.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Topo Height`), t(`Hash`), t(`Signer`), t(`Fees`), t(`Age`)]}
       list={filteredTxs} loading={loading} err={err} colSpan={5}
@@ -405,7 +337,7 @@ function ExecutedTxs(props) {
             <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
           </td>
           <td>
-            <div className={style.account}>
+            <div className={style.addr}>
               <Hashicon value={tx.source} size={20} />
               <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
             </div>
@@ -458,7 +390,7 @@ function OrphanedTxs(props) {
   }, [topoheight])
 
   return <div>
-    <h2>{t('Orphaned Transactions ({})', [txs.length.toLocaleString()])}</h2>
+    <h2 className={style.title}>{t('Orphaned Transactions ({})', [txs.length.toLocaleString()])}</h2>
     <Table
       headers={[t(`Topo Ref`), t(`Hash`), , t(`Signer`), t(`Nonce`), t(`Age`)]}
       list={txs} loading={false} err={err} colSpan={5}
@@ -477,7 +409,7 @@ function OrphanedTxs(props) {
             <Link to={`/txs/${tx.hash}`}>{reduceText(tx.hash)}</Link>
           </td>
           <td>
-            <div className={style.account}>
+            <div className={style.addr}>
               <Hashicon value={tx.source} size={20} />
               <Link to={`/accounts/${tx.source}`}>{reduceText(tx.source, 0, 7)}</Link>
             </div>
