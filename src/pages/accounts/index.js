@@ -12,22 +12,16 @@ import useQueryString from 'g45-react/hooks/useQueryString'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import Pagination, { getPaginationRange } from '../../components/pagination'
-import { XELIS_ASSET, formatXelis } from '../../utils'
+import { XELIS_ASSET } from '../../utils'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import EncryptedAmountModal from '../account/encrypted_amount_modal'
 
 const style = {
-  container: css`
-    > :nth-child(2) {
-      margin-bottom: 1em;
-    }
-
-    .addr {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-    }
+  addr: css`
+    display: flex;
+    gap: .5em;
+    align-items: center;
   `
 }
 
@@ -143,7 +137,7 @@ function Accounts() {
     loadAccounts()
   }, [pageState])
 
-  return <div className={style.container}>
+  return <div>
     <PageTitle title={t('Accounts')} subtitle={t('{} registered accounts', [accountCount.toLocaleString()])}
       metaDescription={t('List of registered accounts. Check addresses and more.')} />
     <TableFlex loading={loading} err={err}
@@ -153,7 +147,7 @@ function Accounts() {
           key: 'addr',
           title: t('Address'),
           render: (value) => {
-            return <div className="addr">
+            return <div className={style.addr}>
               <Hashicon value={value} size={25} />
               <Link to={`/accounts/${value}`}>
                 {value}

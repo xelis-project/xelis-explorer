@@ -24,11 +24,6 @@ import Hashicon from '../../components/hashicon'
 import { formatMiner } from '../../utils/pools'
 
 const style = {
-  container: css`
-    > :nth-child(2) {
-      margin-bottom: 1em;
-    }
-  `,
   miner: css`
     display: flex;
     gap: .5em;
@@ -211,7 +206,7 @@ function Blocks() {
   let stableLineRendered = false
   let hasUnstableblocks = false
 
-  return <div className={style.container}>
+  return <div>
     <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
     <TableFlex mobileFormat={false} data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}

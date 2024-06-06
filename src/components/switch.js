@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Icon from 'g45-react/components/fontawesome_icon'
 
 const defaultStyle = {
-  switch: css`
+  container: css`
     width: 2.5em;
     height: 1.5em;
     min-width: 2.5em;
@@ -13,27 +13,26 @@ const defaultStyle = {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+  `,
+  switch: css`
+    background-color: var(--bg-color);
+    width: 50%;
+    border-radius: 50%;
+    height: 80%;
+    transition: all .25s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform: translate(10%, 0);
 
-    > div {
-      background-color: var(--bg-color);
-      width: 50%;
-      border-radius: 50%;
-      height: 80%;
-      transition: all .25s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      transform: translate(10%, 0);
+    &[data-checked="true"] {
+      transform: translate(90%, 0);
+    }
 
-      &[data-checked="true"] {
-        transform: translate(90%, 0);
-      }
-
-      > i {
-        position: absolute;
-        font-size: .5em;
-      }
+    > i {
+      position: absolute;
+      font-size: .5em;
     }
   `
 }
@@ -42,11 +41,11 @@ function Switch(props) {
   const { styling = defaultStyle } = props
   const [checked, setChecked] = useState(props.checked)
 
-  return <div className={styling.switch} onClick={() => {
+  return <div className={styling.container} onClick={() => {
     setChecked(!checked)
     if (typeof props.onChange === `function`) props.onChange(!checked)
   }}>
-    <div data-checked={checked}>
+    <div className={styling.switch} data-checked={checked}>
       <Icon name={checked ? `check` : `close`} />
     </div>
   </div>

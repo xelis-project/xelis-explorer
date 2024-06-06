@@ -16,25 +16,25 @@ export const defaultStyle = {
     gap: .7em;
     align-items: center;
     flex-wrap: wrap;
+    margin-top: 1em;
+    `,
+  button: css`
+    border-radius: 1em;
+    border: thin solid var(--text-color);
+    cursor: pointer;
+    padding: .5em 1em;
+    font-weight: bold;
+    transition: .1s all;
+    background: none;
+    color: var(--text-color);
+    
+    &[data-active="true"] {
+      background-color: var(--text-color);
+      color: var(--bg-color);
+    }
 
-    button {
-      border-radius: 1em;
-      border: thin solid var(--text-color);
-      cursor: pointer;
-      padding: .5em 1em;
-      font-weight: bold;
-      transition: .1s all;
-      background: none;
-      color: var(--text-color);
-
-      &.active {
-        background-color: var(--text-color);
-        color: var(--bg-color);
-      }
-
-      &:hover {
-        opacity: .7;
-      }
+    &:hover {
+      opacity: .7;
     }
   `,
   count: css`
@@ -81,7 +81,9 @@ function Pagination(props) {
 
   return <div className={`${styling.pagination} ${className}`} {...restProps}>
     <Dropdown items={dropdownSizes} onChange={changeSize} value={state.size} />
-    <button onClick={setFirstPage} disabled={!canFirstPage} className={!canFirstPage ? `active` : ``}>1</button>
+    <button className={styling.button} onClick={setFirstPage} disabled={!canFirstPage} data-active={!canFirstPage}>
+      1
+    </button>
     {(() => {
       const items = []
 
@@ -93,7 +95,7 @@ function Pagination(props) {
       }
 
       for (let i = start; i < end; i++) {
-        items.push(<button key={i} onClick={() => setPage(i)} className={i == state.page ? `active` : ``}>
+        items.push(<button className={styling.button} key={i} onClick={() => setPage(i)} data-active={i == state.page}>
           {i}
         </button>)
       }
@@ -104,7 +106,9 @@ function Pagination(props) {
 
       return items
     })()}
-    {pageCount > 1 && <button onClick={setLastPage} disabled={!canLastPage} className={!canLastPage ? `active` : ``}>{pageCount}</button>}
+    {pageCount > 1 && <button className={styling.button} onClick={setLastPage} disabled={!canLastPage} data-active={!canLastPage}>
+      {pageCount}
+    </button>}
     <div className={styling.count}>{`${(count || 0).toLocaleString()} ${countText}`}</div>
   </div>
 }

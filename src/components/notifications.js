@@ -9,7 +9,7 @@ const storeNotifications = store.namespace(`notifications`)
 
 const Context = createContext(null)
 
-const style = {
+const defaultStyle = {
   container: css`
     position: absolute;
     right: 0;
@@ -20,44 +20,41 @@ const style = {
     flex-direction: column;
     z-index: 1;
     /*background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, .1) 100%);*/
-
-    > div {
-      background: var(--bg-color);
-      padding: 1em;
-      border-radius: .5em;
-      width: 15em;
-      color: var(--text-color);
-      ${slideX({ from: `100%`, to: `0%`, duration: `0.1s` })}
-
-      .header {
-        display: flex;
-        gap: 1em;
-        justify-content: space-between;
-        margin-bottom: .5em;
-
-        > div {
-          display: flex;
-          gap: .5em;
-        }
-
-        button {
-          color: var(--text-color);
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          font-size: 1.1em;
-        }
-      }
-
-      .description {
-        color: var(--muted-color);
-      }
-    }
+  `,
+  notification: css`
+    background: var(--bg-color);
+    padding: 1em;
+    border-radius: .5em;
+    width: 15em;
+    color: var(--text-color);
+    ${slideX({ from: `100%`, to: `0%`, duration: `0.1s` })}
+  `,
+  header: css`
+    display: flex;
+    gap: 1em;
+    justify-content: space-between;
+    margin-bottom: .5em;
+    align-items: center;
+  `,
+  title: css`
+    display: flex;
+    gap: .5em;
+    align-items: center;
+  `,
+  closeButton: css`
+    color: var(--text-color);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+  `,
+  description: css`
+    color: var(--muted-color);
   `
 }
 
 export const NotificationProvider = (props) => {
-  const { children } = props
+  const { children, styling = defaultStyle } = props
 
   const [notifications, setNotifications] = useState(() => {
     const data = storeNotifications.getAll()
@@ -91,20 +88,20 @@ export const NotificationProvider = (props) => {
 
   return <Context.Provider value={{ pushNotification, deleteNotification }}>
     {children}
-    <div className={style.container}>
+    <div className={styling.container}>
       {notifications.map((notification) => {
         const { key, icon, title, description } = notification
-        return <div key={key}>
-          <div className="header">
-            <div>
+        return <div key={key} className={styling.notification}>
+          <div className={styling.header}>
+            <div className={styling.title}>
               {icon && <Icon name={icon} />}
               <div>{title}</div>
             </div>
-            <button onClick={() => deleteNotification(key)}>
+            <button onClick={() => deleteNotification(key)} className={styling.closeButton}>
               <Icon name="close" />
             </button>
           </div>
-          <div className="description">
+          <div className={styling.description}>
             {description}
           </div>
         </div>

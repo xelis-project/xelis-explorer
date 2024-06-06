@@ -14,19 +14,18 @@ const defaultStyle = {
     align-items: center;
     justify-content: center;
     z-index: 1;
-
-    > div {
-      background-color: rgb(0 0 0 / 70%);
-      max-width: 300px;
-      justify-content: center;
-      align-items: center;
-      display: flex;
-      gap: 1em;
-      border-radius: 15px;
-      padding: 1em;
-      color: white;
-      font-weight: bold;
-    }
+  `,
+  loading: css`
+    background-color: rgb(0 0 0 / 70%);
+    max-width: 300px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    gap: 1em;
+    border-radius: 15px;
+    padding: 1em;
+    color: white;
+    font-weight: bold;
   `
 }
 
@@ -49,7 +48,7 @@ function PageLoading(props) {
   if (!visible) return null
 
   return <div className={styling.container} {...restProps}>
-    <div>
+    <div className={styling.loading}>
       <Icon name="circle-notch" className="fa-spin" />
       <div>{t(`LOADING`)}</div>
     </div>
