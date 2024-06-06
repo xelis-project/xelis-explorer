@@ -5,14 +5,14 @@ import Icon from 'g45-react/components/fontawesome_icon'
 import theme from '../style/theme'
 
 const defaultStyle = {
+  container: css`
+    --dropdown-bg-color: ${theme.apply({ xelis: '#101010', dark: 'var(--bg-color)', light: 'var(--bg-color)' })};
+    --dropdown-text-color: var(--text-color);
+    position: relative;
+    white-space: nowrap;
+    color: var(--text-color);
+  `,
   dropdown: css`
-  --dropdown-bg-color: ${theme.apply({ xelis: '#101010', dark: 'var(--bg-color)', light: 'var(--bg-color)' })};
-  --dropdown-text-color: var(--text-color);
-  position: relative;
-  white-space: nowrap;
-  color: var(--text-color);
-
-  > :nth-child(1) {
     padding: .5em;
     border: thin solid var(--dropdown-text-color);
     background-color: var(--dropdown-bg-color);
@@ -24,75 +24,62 @@ const defaultStyle = {
     align-items: center;
     position: relative;
     font-weight: bold;
-
-    > :nth-child(1) {
-      overflow: hidden;
-      user-select: none;
-    }
-
-    > :nth-child(2) {
-      transition: .25s all;
-    }
-  }
-
-  > :nth-child(2) {
+  `,
+  value: css`
+    overflow: hidden;
+    user-select: none;
+  `,
+  list: css`
     position: absolute;
     width: 100%;
     clip-path: inset(-.5em 0 0 0);
     visibility: hidden;
     z-index: 1;
-  
-    > div {
-      border: thin solid var(--dropdown-text-color);
-      background-color: var(--dropdown-bg-color);
-      overflow: auto;
-      transition: .25s all;
-      max-height: 10em;
-      margin-top: -.5em;
-      padding-top: .5em;
-      border-bottom-right-radius: 15px;
-      border-top: none;
-      border-bottom-left-radius: 15px;
-      transform-origin: top;
-      transform: translateY(-100%);
 
-      > div {
-        user-select: none;
-        padding: .5em;
-        cursor: pointer;
-
-        &[data-separator="true"] {
-          border-bottom: thin solid var(--dropdown-text-color);
-          opacity: .5;
-          background-color: inherit;
-          color: inherit;
-          cursor: inherit;
-        }
-      }
+    &[data-open="true"] {
+      visibility: visible;
     }
-  }
-  
-  &[data-open="true"] {
-    > :nth-child(1) > :nth-child(2) {
+  `,
+  items: css`
+    border: thin solid var(--dropdown-text-color);
+    background-color: var(--dropdown-bg-color);
+    overflow: auto;
+    transition: .25s all;
+    max-height: 10em;
+    margin-top: -.5em;
+    padding-top: .5em;
+    border-bottom-right-radius: 15px;
+    border-top: none;
+    border-bottom-left-radius: 15px;
+    transform-origin: top;
+    transform: translateY(-100%);
+
+    &[data-open="true"] {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  `,
+  item: css`
+    user-select: none;
+    padding: .5em;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--dropdown-text-color);
+      color: var(--dropdown-bg-color);
+    }
+  `,
+  separator: css`
+    border-bottom: thin solid var(--dropdown-text-color);
+    opacity: .5;
+    background-color: inherit;
+    color: inherit;
+    cursor: inherit;
+  `,
+  icon: css`
+    &[data-open="true"] {
       transform: rotate(180deg);
     }
-
-    > :nth-child(2) {
-      visibility: visible;
-
-      > div {
-        transform: translateY(0);
-        opacity: 1;
-
-        > div {
-          &:hover {
-            background-color: var(--dropdown-text-color);
-            color: var(--dropdown-bg-color);
-          }
-        }
-      }
-    }
-  }
   `
 }
 
@@ -133,21 +120,21 @@ function Dropdown(props) {
     return items.find((item) => item.key === selectedKey)
   }, [selectedKey, items])
 
-  return <div ref={dropdownRef} data-open={open} className={defaultStyle.dropdown} style={{ fontSize: `${size}em` }} {...restProps}>
-    <div onClick={() => setOpen(!open)}>
-      <div>{selectedItem ? <>{prefix}{selectedItem.text}</> : notSelectedText}</div>
+  return <div ref={dropdownRef} className={styling.container} style={{ fontSize: `${size}em` }} {...restProps}>
+    <div onClick={() => setOpen(!open)} className={styling.dropdown}>
+      <div className={styling.value}>{selectedItem ? <>{prefix}{selectedItem.text}</> : notSelectedText}</div>
       <Icon name="arrow-down" />
     </div>
-    <div>
-      <div>
+    <div data-open={open} className={styling.list}>
+      <div data-open={open} className={styling.items}>
         {items.map((item) => {
           if (item.type === `separator`) {
-            return <div key={item.key} data-separator="true">
+            return <div key={item.key} className={styling.separator}>
               {item.text}
             </div>
           }
 
-          return <div key={item.key} onClick={() => onSelect(item)}>
+          return <div key={item.key} onClick={() => onSelect(item)} className={styling.item}>
             {item.text}
           </div>
         })}
