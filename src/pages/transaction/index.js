@@ -3,7 +3,6 @@ import { useParams } from 'react-router'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
-import { css } from 'goober'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import { useLang } from 'g45-react/hooks/useLang'
@@ -19,42 +18,7 @@ import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import EncryptedAmountModal from '../account/encrypted_amount_modal'
 
-const style = {
-  container: css`
-    h2 {
-      margin: 1em 0 .5em 0;
-      font-weight: bold;
-      font-size: 1.5em;
-    }
-
-    .error {
-      padding: 1em;
-      color: white;
-      font-weight: bold;
-      background-color: var(--error-color);
-    }
-
-    .addr {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-    }
-
-    .reference {
-      display: flex;
-      flex-direction: column;
-      gap: .5em;
-    }
-
-    .discarded {
-      color: var(--error-color);
-    }
-
-    .not-executed-yet {
-      color: var(--warning-color);
-    }
-  `
-}
+import style from './style'
 
 function loadTransaction_SSR({ hash }) {
   const defaultResult = { loaded: false, err: null, tx: {} }
@@ -121,29 +85,34 @@ function Transaction() {
     `
   }, [tx, t])
 
-  return <div className={style.container}>
+  return <div>
     <PageLoading loading={loading} />
     <PageTitle title={t('Transaction {}', [reduceText(tx.hash || ``, 4, 4)])}
       metaTitle={t('Transaction {}', [tx.hash || ''])}
       metaDescription={description} />
-    {err && <div className="error">{displayError(err)}</div>}
+    {err && <div className={style.error}>{displayError(err)}</div>}
     <div>
       <TableFlex
         headers={[
           {
             key: 'hash',
             title: t('Hash'),
+            render: (value) => value || `--`
           },
           {
             key: 'source',
             title: t('Signer'),
             render: (value) => {
-              return <div className="addr">
-                <Hashicon value={value} size={25} />
-                <Link to={`/accounts/${value}`}>
-                  {value}
-                </Link>
-              </div>
+              if (value) {
+                return <div className={style.addr}>
+                  <Hashicon value={value} size={25} />
+                  <Link to={`/accounts/${value}`}>
+                    {value}
+                  </Link>
+                </div>
+              }
+
+              return `--`
             }
           },
           {
@@ -152,45 +121,51 @@ function Transaction() {
             render: (value) => {
               if (value === true) return t(`Yes`)
               if (value === false) return t(`No`)
-              return ``
+              return `--`
             }
           },
           {
             key: 'signature',
             title: t('Signature'),
+            render: (value) => value || `--`
           },
           {
             key: 'ref',
             title: t('Reference'),
             render: (_, item) => {
-              const { hash, topoheight } = item.reference || {}
+              if (item.reference) {
+                const { hash, topoheight } = item.reference
 
-              return <div>
-                <Link to={`/blocks/${hash}`}>
-                  {hash}
-                </Link>&nbsp;
-                {topoheight && <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
-                  ({topoheight.toLocaleString()})
-                </span>}
-              </div>
+                return <div>
+                  <Link to={`/blocks/${hash}`}>
+                    {hash}
+                  </Link>&nbsp;
+                  {topoheight && <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
+                    ({topoheight.toLocaleString()})
+                  </span>}
+                </div>
+              }
+
+              return `--`
             }
           },
           {
             key: 'fee',
             title: t('Fee'),
-            render: (value) => value && formatXelis(value)
+            render: (value) => value ? formatXelis(value) : `--`
           },
           {
             key: 'nonce',
             title: t('Nonce'),
+            render: (value) => value || `--`
           },
           {
             key: 'executed_in_block',
             title: t('Executed In'),
             render: (value, item) => {
               if (value) return <Link to={`/blocks/${value}`}>{value}</Link>
-              if (item.in_mempool) return <div className="not-executed-yet">{t(`Not executed yet.`)}</div>
-              return <div className="discarded">{t('Discarded / not executed.')}</div>
+              if (item.in_mempool) return <div className={style.notExecutedYet}>{t(`Not executed yet.`)}</div>
+              return <div className={style.discarded}>{t('Discarded / not executed.')}</div>
             }
           },
         ]}
@@ -216,7 +191,7 @@ function Transfers(props) {
   }, [])
 
   return <div>
-    <h2>{t('Transfers')}</h2>
+    <h2 className={style.title}>{t('Transfers')}</h2>
     <Table
       headers={[t(`Asset`), t(`Amount`), t(`Recipient`), t(`Extra Data`)]}
       list={transfers} emptyText={t('No transfers')} colSpan={4}
@@ -229,7 +204,7 @@ function Transfers(props) {
               <EncryptedAmountModal title={t(`Amount`)} commitment={commitment} />
             </td>
             <td>
-              <div className="addr">
+              <div className={style.addr}>
                 <Hashicon value={destination} size={25} />
                 <Link to={`/accounts/${destination}`}>
                   {reduceText(destination, 0, 7)}
@@ -252,7 +227,7 @@ function Burns(props) {
   const { t } = useLang()
 
   return <div>
-    <h2>{t('Burns')}</h2>
+    <h2 className={style.title}>{t('Burns')}</h2>
     <Table
       headers={[t(`Asset`), t(`Amount`)]}
       list={burns} emptyText={t('No burns')} colSpan={2}
@@ -308,7 +283,7 @@ function InBlocks(props) {
   }, [loadTxBlocks])
 
   return <div>
-    <h2>{t('In Blocks')}</h2>
+    <h2 className={style.title}>{t('In Blocks')}</h2>
     <Table
       headers={[t(`Topo Height`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Timestamp`), t(`Txs`)]}
       list={blocks} loading={loading} err={err} emptyText={t('No blocks')} colSpan={7}
