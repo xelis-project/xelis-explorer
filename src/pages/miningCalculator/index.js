@@ -1,4 +1,3 @@
-import { css } from 'goober'
 import { useMemo, useState } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
 import prettyMs from 'pretty-ms'
@@ -6,94 +5,8 @@ import prettyMs from 'pretty-ms'
 import { useNetworkInfo } from '../home'
 import { BLOCK_TIME, formatDifficulty, formatHashRate, formatXelis } from '../../utils'
 import PageTitle from '../../layout/page_title'
-import theme from '../../style/theme'
 
-const style = {
-  container: css`
-    .box {
-      background: var(--stats-bg-color);
-      padding: 1.5em;
-      border-top-right-radius: 1em;
-      border-top-left-radius: 1em;
-    }
-
-    .network-hashrate {
-      font-size: 1.2em;
-      border-radius: 1em;
-      margin-bottom: 1em;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      display: flex;
-      justify-content: space-between;
-    }
-    
-    .input-calculator {
-      position: relative;
-      display: flex;
-      align-items: center;
-
-      input {
-        width: 100%;
-        padding: 1em 1.5em;
-        font-size: 1.1em;
-        border-radius: 30px;
-        outline: none;
-        color: var(--text-color);
-        background-color: var(--stats-bg-color);
-        border: none;
-        font-weight: bold;
-      }
-
-      select {
-        position: absolute;
-        right: 2em;
-        font-size: 1.1em;
-        border: none;
-        background: transparent;
-        color: var(--text-color);
-        cursor: pointer;
-        outline: none;
-
-        option {
-          background: var(--bg-color);
-        }
-      }
-    }
-
-    .mining-reward {
-      background: ${theme.apply({ xelis: `#000000c9`, dark: `#000000c9`, light: `#ffffff7a` })};
-      padding: 1em;
-      border-bottom-right-radius: 1em;
-      border-bottom-left-radius: 1em;
-
-      .time-find-block {
-        text-decoration: underline;
-      }
-
-      > :nth-child(1) {
-        font-size: 1.3em;
-        margin-bottom: .5em;
-      }
-
-      > :nth-child(2) {
-        margin-bottom: 1em;
-        color: var(--muted-color);
-      }
-
-      > :nth-child(4) {
-        list-style-type: disc;
-        padding-left: 1em;
-        padding-top: .5em;
-        line-height: 1.3em;
-        margin-bottom: 1em;
-      }
-
-      > :nth-child(5) {
-        color: var(--muted-color);
-      }
-    }
-  `
-}
+import style from './style'
 
 function MiningCalculator() {
   const { info } = useNetworkInfo()
@@ -134,15 +47,15 @@ function MiningCalculator() {
     }
   }, [miningData, hashRate, hashRateUnit])
 
-  return <div className={style.container}>
+  return <div>
     <PageTitle title={t(`Mining Calculator`)} />
     <div>
-      <div className="box">
-        <div className="network-hashrate">
+      <div className={style.box.container}>
+        <div className={style.box.networkHashrate}>
           <div>{t(`Network hashrate`)}</div>
           <div>{formatHashRate(info.difficulty)}</div>
         </div>
-        <div className="input-calculator">
+        <div className={style.box.inputCalculator}>
           <input type="text" onChange={(e) => {
             const value = parseFloat(e.target.value)
             setHashRate(isNaN(value) ? '' : value)
@@ -158,21 +71,23 @@ function MiningCalculator() {
           </select>
         </div>
       </div>
-      <div className="mining-reward">
+      <div className={style.miningReward.container}>
         {hashRate && <>
-          <div>
-            {t(`With {}H/s, you can probably find a block every`, [formatDifficulty(hashRate * hashRateUnit)])} <span className="time-find-block">{prettyMs(rewardData.timeUntilBlock * 1000 || 0, { compact: true })}</span>.
+          <div className={style.miningReward.result}>
+            {t(`With {}H/s, you can probably find a block every`, [formatDifficulty(hashRate * hashRateUnit)])} <span className={style.miningReward.timeBlock}>{prettyMs(rewardData.timeUntilBlock * 1000 || 0, { compact: true })}</span>.
           </div>
-          <div>{t(`More precisely every {} with each block at {}.`, [prettyMs(rewardData.timeUntilBlock * 1000 || 0), formatXelis(miningData.blockReward)])}</div>
+          <div className={style.miningReward.specify}>
+            {t(`More precisely every {} with each block at {}.`, [prettyMs(rewardData.timeUntilBlock * 1000 || 0), formatXelis(miningData.blockReward)])}
+          </div>
           <div>{t(`This represent around:`)}</div>
-          <ul>
+          <ul className={style.miningReward.timeReward}>
             <li>{formatXelis(rewardData.rewardPerHour)} / {t(`hour`)}</li>
             <li>{formatXelis(rewardData.rewardPerDay)} / {t(`day`)}</li>
             <li>{formatXelis(rewardData.rewardPerWeek)} / {t(`week`)}</li>
             <li>{formatXelis(rewardData.rewardPerMonth)} / {t(`month`)}</li>
             <li>{formatXelis(rewardData.rewardPerYear)} / {t(`year`)}</li>
           </ul>
-          <div>
+          <div className={style.miningReward.explanation}>
             {t(`XELIS operates using BlockDAG, meaning it's possible to have multiple block at the same height. These are called side blocks, and their rewards are lower than those of normal blocks. 
             This is not taken into account in the calculator. 
             The lower emission curve per block is also not taking into account when calculating for longer period.`)}
