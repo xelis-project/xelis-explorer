@@ -40,8 +40,9 @@ const style = {
     margin-bottom: 2em;
     padding-bottom: 1em;
     overflow-x: auto;
-
-    &.no-animation * {
+  `,
+  noAnimation: css`
+    * {
       animation-duration: 0s !important;
     }
   `,
@@ -64,10 +65,9 @@ const style = {
         border-top: 3px solid var(--block-border-color);
         border-left: none;
       }
-
-      &.animate {
-        ${bounceIn({ duration: `.8s` })};
-      }
+    `,
+    animate: css`
+      ${bounceIn({ duration: `.8s` })};
     `,
     title: css`
       color: var(--text-color);
@@ -115,12 +115,12 @@ export function RecentBlocks(props) {
 
   return <div>
     <div className={style.title}>{t('Recent Blocks')}</div>
-    <div className={`${style.blocks} ${!newBlockHash ? `no-animation` : ``}`}>
+    <div className={`${style.blocks} ${!newBlockHash ? style.noAnimation : ``}`}>
       {recentBlocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
-        const animateClassName = newBlockHash === block.hash ? `animate` : null
+        const animateClassName = newBlockHash === block.hash ? style.block.animate : null
         const topo = block.topoheight ? block.topoheight.toLocaleString() : ``
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={`${style.block.container} ${animateClassName}`}>

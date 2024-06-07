@@ -11,52 +11,48 @@ import Button from '../../components/button'
 import { getBlockType } from './index'
 import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
+import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
     overflow-y: auto;
+  `,
+  actionButtons: css`
+    padding: 1em;
+    gap: 1em;
+    display: flex;
 
-    table td {
-      word-break: break-all;
-    }
-
-    > :nth-child(1) {
-      padding: 1em;
-      gap: 1em;
+    button {
+      border: none;
+      border-radius: 30px;
+      padding: .5em 1em;
+      background-color: var(--text-color);
+      color: var(--bg-color);
+      cursor: pointer;
       display: flex;
-
-      button {
-        border: none;
-        border-radius: 30px;
-        padding: .5em 1em;
-        background-color: var(--text-color);
-        color: var(--bg-color);
-        cursor: pointer;
-        display: flex;
-        gap: .5em;
-        align-items: center;
-        font-size: .9em;
-      }
+      gap: .5em;
+      align-items: center;
+      font-size: .9em;
+      ${scaleOnHover()};
     }
+  `,
+  items: css`
+    padding: 1em;
+    background-color: var(--bg-color);
+    
+    > div {
+      margin-bottom: 1.5em;
 
-    > :nth-child(2) {
-      padding: 1em;
-      background-color: var(--bg-color);
-      
-      > div {
-        margin-bottom: 1.5em;
+      > :nth-child(1) {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: .5em;
+      }
 
-        > :nth-child(1) {
-          font-size: 1.2em;
-          font-weight: bold;
-          margin-bottom: .5em;
-        }
-
-        > :nth-child(2) {
-          font-size: 1.2em;
-          word-break: break-all;
-          color: var(--muted-color);
-        }
+      > :nth-child(2) {
+        font-size: 1.2em;
+        word-break: break-all;
+        color: var(--muted-color);
       }
     }
   `
@@ -98,7 +94,7 @@ function useOffCanvasBlock(props) {
 
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
     {block && <>
-      <div>
+      <div className={style.actionButtons}>
         <Button onClick={() => setOpened(false)} icon="close" />
         {formattedBlock.hasPreviousBlock && <Button onClick={() => loadBlock(block.topoheight - 1)} icon="arrow-left">
           {t('Previous Block')}
@@ -107,7 +103,7 @@ function useOffCanvasBlock(props) {
           {t('Next Block')}
         </Button>}
       </div>
-      <div>
+      <div className={style.items}>
         <div>
           <div>{t('Hash')}</div>
           <div>
