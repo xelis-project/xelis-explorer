@@ -54,19 +54,16 @@ export const defaultStyle = {
       display: none;
     }
   `,
+  hide: css`
+    display: none;
+
+    ${theme.query.minDesktop} {
+      display: block;
+    }
+  `,
   desktop: css`
     overflow: auto;
     border-radius: .5em;
-
-    &.hide {
-      display: none;
-    }
-
-    ${theme.query.minDesktop} {
-      &.hide {
-        display: block;
-      }
-    }
 
     table {
       border-collapse: collapse;
@@ -126,7 +123,10 @@ export const defaultStyle = {
       }
     }
 
-    table tbody.td-100 td {
+    table tbody.td-100 
+  `,
+  fullWidthTd: css`
+    td {
       width: 100%;
       word-break: break-all;
       white-space: pre-wrap;
@@ -187,7 +187,7 @@ function TableFlex(props) {
         {emptyText}
       </div>}
     </div>}
-    <div className={`${styling.desktop} ${mobileFormat ? `hide` : ``}`}>
+    <div className={`${styling.desktop} ${mobileFormat ? styling.hide : ``}`}>
       <table>
         {(displayTable || data.length !== 1) && <thead>
           <tr>
@@ -209,7 +209,7 @@ function TableFlex(props) {
             </td>}
           </tr>
         </tbody>
-        <tbody style={loadingStyle} className={!displayTable ? 'td-100' : ''}>
+        <tbody style={loadingStyle} className={!displayTable ? styling.fullWidthTd : ''}>
           {!displayTable && data.length === 1 && <>
             {headers.map((header, index) => {
               const item = data[0]
