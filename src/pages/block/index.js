@@ -2,19 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
-import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { displayError, formatHashRate, formatSize, formatXelis, formatBlock, reduceText, formatDifficulty } from '../../utils'
+import { displayError, isHash, formatSize, formatXelis, formatBlock, reduceText, formatDifficulty } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import Button from '../../components/button'
 import Transactions from './txs'
-import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../hooks/nodeRPC'
 import PageTitle from '../../layout/page_title'
@@ -23,75 +20,7 @@ import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import { pools } from '../../utils/pools'
 
-const style = {
-  container: css`
-    .error {
-      padding: 1em;
-      color: white;
-      font-weight: bold;
-      background-color: var(--error-color);
-      margin-bottom: 1em;
-      border-radius: .5em;
-    }
-
-    .miner {
-      display: flex;
-      gap: .5em;
-      align-items: center;
-    }
-
-    .tips {
-      display: flex;
-      gap: .25em;
-      flex-direction: column;
-    }
-
-    .controls {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 2em;
-      gap: 1em;
-
-      > :nth-child(1) {
-        line-height: 1.3em;
-      }
-
-      ${theme.query.minDesktop} {
-        flex-direction: row;
-        align-items: start;
-        justify-content: space-between;
-      }
-
-      .buttons {
-        display: flex;
-        gap: 1em;
-
-        a {
-          border-radius: 30px;
-          background-color: var(--text-color);
-          color: var(--bg-color);
-          padding: .5em 1em;
-          display: flex;
-          gap: .5em;
-          align-items: center;
-          white-space: nowrap;
-          text-decoration: none;
-          ${scaleOnHover}
-
-          ${theme.query.maxDesktop} {
-            > div {
-              display: none;
-            }
-          }
-        }
-      }
-    }
-  `
-}
-
-function isHash(id) {
-  return (/[a-z]/i.test(id))
-}
+import style from './style'
 
 function loadBlock_SSR({ id }) {
   const defaultResult = { loaded: false, err: null, block: {}, topoheight: 0 }
@@ -197,21 +126,21 @@ function Block() {
     `
   }, [block, formattedBlock, t])
 
-  return <div className={style.container}>
+  return <div>
     <PageLoading loading={loading} />
     <div>
       <PageTitle title={t('Block {}', [reduceText(block.hash || '')])}
         metaDescription={description}
       />
-      {err && <div className="error">{displayError(err)}</div>}
-      {!err && <div className="controls">
+      {err && <div className={style.err}>{displayError(err)}</div>}
+      {!err && <div className={style.header.container}>
         <div>
           {!loading && <>
             {t('This block was mined by {}. It currently has {} confirmations. The miner of this block earned {}.',
               [formattedBlock.miner, formattedBlock.confirmations, formattedBlock.reward])}
           </>}
         </div>
-        <div className="buttons">
+        <div className={style.header.buttons}>
           <Button link={`/dag?height=${block.height}`} icon="network-wired">DAG</Button>
           {formattedBlock.hasPreviousBlock && <Button link={`/blocks/${block.topoheight - 1}`} icon="arrow-left">
             <div>{t('Previous Block')}</div>
@@ -299,7 +228,7 @@ function Block() {
             render: (value) => {
               if (!value) return `--`
 
-              return <div className="miner">
+              return <div className={style.miner}>
                 <Hashicon value={value} size={25} />
                 <Link to={`/accounts/${value}`}>
                   {value}

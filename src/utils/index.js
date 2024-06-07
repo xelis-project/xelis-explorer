@@ -148,3 +148,7 @@ export const fetchGeoLocation = async (ips) => {
     return Promise.reject(e)
   }
 }
+
+export const isHash = (id) => {
+  return (/[a-z]/i.test(id))
+}
