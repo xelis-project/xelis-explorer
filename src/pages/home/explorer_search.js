@@ -13,84 +13,81 @@ import { opacity, scaleOnHover } from '../../style/animate'
 const style = {
   container: css`
     margin: 5em 0;
+  `,
+  title: css`
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-align: center;
+  `,
+  backdrop: css`
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    background-color: rgb(0 0 0 / 40%);
+    ${opacity()};
+  `,
+  form: css`
+    position: relative;
+    z-index: 2;
+    max-width: 50em;
+    margin: 0 auto;
 
-    .title {
-      font-size: 3em;
+    input {
+      width: 100%;
+      padding: 1em 1.5em;
+      font-size: 1.1em;
+      border-radius: 30px;
+      outline: none;
+      color: var(--text-color);
+      background-color: var(--stats-bg-color);
+      border: none;
       font-weight: bold;
-      margin-bottom: 1em;
-      text-align: center;
     }
 
-    .input {
-      position: relative;
-      z-index: 2;
-      max-width: 50em;
-      margin: 0 auto;
+    button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: .4em;
+      font-size: 1.1em;
+      cursor: pointer;
+      background-color: var(--text-color);
+      color: var(--bg-color);
+      border-radius: 50%;
+      height: 76%;
+      min-width: 46px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: .1s transform;
+      ${scaleOnHover({ scale: .9 })};
 
-      input {
-        width: 100%;
-        padding: 1em 1.5em;
-        font-size: 1.1em;
-        border-radius: 30px;
-        outline: none;
-        color: var(--text-color);
-        background-color: var(--stats-bg-color);
-        border: none;
-        font-weight: bold;
+      span {
+        display: none;
       }
-  
-      button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        margin: .4em;
-        font-size: 1.1em;
-        cursor: pointer;
-        background-color: var(--text-color);
-        color: var(--bg-color);
-        border-radius: 50%;
-        height: 76%;
-        min-width: 46px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        transition: .1s transform;
-        ${scaleOnHover({ scale: .9 })};
-  
-        span {
+
+      ${theme.query.minDesktop} {
+        width: inherit;
+        padding: 0 2em;
+        border-radius: 30px;
+
+        i {
           display: none;
         }
-  
-        ${theme.query.minDesktop} {
-          width: inherit;
-          padding: 0 2em;
-          border-radius: 30px;
-  
-          i {
-            display: none;
-          }
-  
-          span {
-            display: block;
-          }
+
+        span {
+          display: block;
         }
       }
     }
-
-    .backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      z-index: 1;
-      backdrop-filter: blur(5px);
-      background-color: rgb(0 0 0 / 40%);
-      ${opacity()};
-    }
-  `,
+  `
 }
 
 export function ExplorerSearch() {
@@ -153,17 +150,15 @@ export function ExplorerSearch() {
   }, [])
 
   return <div className={style.container}>
-    <div className="title">{t('XELIS Explorer')}</div>
-    {isFocus && <div className={`backdrop`} />}
-    <form onSubmit={search} onBlur={onBlur}>
-      <div className="input">
-        <input onFocus={onFocus} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
-          autoComplete="off" autoCapitalize="off" />
-        <Button type="submit" aria-label="Search" onMouseDown={(e) => e.preventDefault()}>
-          <Icon name="search" />
-          <span>{t('Search')}</span>
-        </Button>
-      </div>
+    <div className={style.title}>{t('XELIS Explorer')}</div>
+    {isFocus && <div className={style.backdrop} />}
+    <form onSubmit={search} onBlur={onBlur} className={style.form}>
+      <input onFocus={onFocus} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
+        autoComplete="off" autoCapitalize="off" />
+      <Button type="submit" aria-label="Search" onMouseDown={(e) => e.preventDefault()}>
+        <Icon name="search" />
+        <span>{t('Search')}</span>
+      </Button>
     </form>
   </div>
 }

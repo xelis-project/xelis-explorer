@@ -14,14 +14,13 @@ import { scaleOnHover } from '../../style/animate'
 import { useTheme } from '../../hooks/useTheme'
 
 const style = {
-  container: css`
-    .title {
-      margin: 2em 0 1em 0;
-      font-weight: bold;
-      font-size: 1.5em;
-    }
-
-    .network-stats {
+  title: css`
+    margin: 2em 0 1em 0;
+    font-weight: bold;
+    font-size: 1.5em;
+  `,
+  networkStats: {
+    container: css`
       background-color: var(--stats-bg-color);
       padding: 2em;
       border-radius: .5em;
@@ -46,54 +45,49 @@ const style = {
         font-size: 1.2em;
         ${scaleOnHover}
       }
+    `,
+    title: css`
+      margin-bottom: 1em;
+      font-weight: bold;
+      font-size: 2em;
+    `,
+    items: css`
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1em;
 
-      .title {
-        margin-bottom: 1em;
+      ${theme.query.minDesktop} {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 2em;
+      }
+    `,
+    item: {
+      container: css`
+        padding: 1em 0;
+      `,
+      title: css`
+        margin-bottom: .5em;
+        font-size: .9em;
+        color: var(--muted-color);
+      `,
+      value: css`
         font-weight: bold;
         font-size: 2em;
-      }
-
-      .items {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1em;
-    
-        ${theme.query.minDesktop} {
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 2em;
-        }
-    
-        > div {
-          padding: 1em 0;
-    
-          > :nth-child(1) {
-            margin-bottom: .5em;
-            font-size: .9em;
-            color: var(--muted-color);
-          }
-    
-          > :nth-child(2) {
-            font-weight: bold;
-            font-size: 2em;
-          }
-        }
-      }
-
-      .last-update {
-        position: absolute;
-        top: 0;
-        right: 0;
-        margin: 2em;
-        color: var(--muted-color);
-        font-weight: bold;
-      }
-
-      .mini-chart {
-        max-height: 3em;
-        margin-top: 0.25em;
-      }
+      `
     }
+  },
+  lastUpdate: css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 2em;
+    color: var(--muted-color);
+    font-weight: bold;
   `,
+  miniChart: css`
+    max-height: 3em;
+    margin-top: 0.25em;
+  `
 }
 
 
@@ -151,23 +145,23 @@ export function NetworkStats(props) {
 
       { title: t(`Difficulty`), render: () => formatDifficulty(data.difficulty).toLocaleString() },
       { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty) },
-      { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true })},
+      { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true }) },
     ]
   }, [info, blocks, currentTheme, t, p2pStatus])
 
-  return <div className={style.container}>
-    <div className="title">{t('Network Stats')}</div>
-    <div className="network-stats">
-      <div className="last-update" title={t(`Last update since`)}>
+  return <div>
+    <div className={style.title}>{t('Network Stats')}</div>
+    <div className={style.networkStats.container}>
+      <div className={style.lastUpdate} title={t(`Last update since`)}>
         <Age ssrKey="network-update" timestamp={lastUpdate} update />
       </div>
-      <div className="items">
+      <div className={style.networkStats.items}>
         {stats.map((item) => {
           let value = null
           if (typeof item.render === 'function') value = item.render()
-          return <div key={item.title}>
-            <div>{item.title}</div>
-            <div>{info ? value : '--'}</div>
+          return <div key={item.title} className={style.networkStats.item.container}>
+            <div className={style.networkStats.item.title}>{item.title}</div>
+            <div className={style.networkStats.item.value}>{info ? value : '--'}</div>
           </div>
         })}
       </div>

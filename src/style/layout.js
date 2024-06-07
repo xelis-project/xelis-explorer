@@ -8,7 +8,7 @@ export default {
     position: relative;
     height: 100%;
   `,
-  maxWidth: css`
+  pageMaxWidth: css`
     margin: 0 auto;
     max-width: 1200px;
     width: 100%;
@@ -22,7 +22,7 @@ export default {
       max-width: 1400px;
     }
   `,
-  flex: css`
+  pageFlex: css`
     display: flex;
     flex-direction: column;
     justify-content: space-between;

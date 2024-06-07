@@ -66,8 +66,8 @@ function Layout() {
     <div className={layoutStyle.container}>
       <Background />
       <NodeStatus />
-      <div className={layoutStyle.flex}>
-        <div className={layoutStyle.maxWidth}>
+      <div className={layoutStyle.pageFlex}>
+        <div className={layoutStyle.pageMaxWidth}>
           <Header title={t(`Explorer`)} links={links} className={style.header} />
           <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />

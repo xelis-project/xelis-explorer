@@ -9,125 +9,80 @@ import theme from '../../style/theme'
 import { formatMiner } from '../../utils/pools'
 
 const style = {
-  container: css`
-    .title {
-      margin-bottom: 1em;
-      font-weight: bold;
-      font-size: 1.5em;
-  
-      > div {
-        font-size: .7em;
-        font-weight: normal;
-        margin-top: 5px;
-        color: var(--muted-color);
-      }
-    }
-
-    .recent-stats {
+  title: css`
+    margin-bottom: 1em;
+    font-weight: bold;
+    font-size: 1.5em;
+  `,
+  subtitle: css`
+    font-size: .7em;
+    font-weight: normal;
+    margin-top: 5px;
+    color: var(--muted-color);
+  `,
+  box: {
+    container: css`
+      background-color: var(--stats-bg-color);
+      border-radius: .5em;
+      padding: 1em;
+      min-width: 150px;
+      min-width: 9em;
+      flex-shrink: 0;
       display: flex;
-      gap: 1em;
-      margin-bottom: 1em;
-      padding-bottom: 1em;
-      overflow: auto;
+      flex-direction: column;
+      gap: .5em;
+    `,
+    title: css`
+      color: var(--muted-color);
+      font-size: 1em;
+    `,
+    value: css`
+      font-size: 1.6em;
+    `,
+    content: css`
+      margin-top: .5em;
+      display: flex;
+    `
+  },
+  stats: css`
+    display: flex;
+    gap: 1em;
+    overflow: auto;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+  `,
+  charts: css`
+    display: flex;
+    gap: 2em;
+    flex-direction: column;
 
-      > div {
-        padding: 1em;
-        background-color: var(--stats-bg-color);
-        min-width: 9em;
-        flex-shrink: 0;
-        border-radius: .5em;
-
-        > :nth-child(1) {
-          color: var(--muted-color);
-          font-size: .9em;
-          margin-bottom: .5em;
-        }
-
-        > :nth-child(2) {
-          font-size: 1.6em;
-        }
-      }
+    ${theme.query.minDesktop} {
+      flex-direction: row;
     }
 
-    .charts {
+    > div {
+      flex: 1;
+    }
+
+    > :nth-child(2) {
       display: flex;
       gap: 2em;
       flex-direction: column;
 
-      ${theme.query.minDesktop} {
-        flex-direction: row;
-      }
-
       > div {
         flex: 1;
       }
-
-      > :nth-child(2) {
-        display: flex;
-        gap: 2em;
-        flex-direction: column;
-      }
-
-      .chart-container {
-        padding: 2em;
-        border-radius: .5em;
-        background-color: var(--stats-bg-color);
-
-        > :nth-child(1) {
-          color: var(--muted-color);
-          margin-bottom: .5em;
-        }
-
-        > :nth-child(2) {
-          font-size: 1.5em;
-          margin-bottom: .5em;
-        }
-
-        > :nth-child(4) {
-          font-size: 1em;
-          margin-top: .5em;
-          color: var(--muted-color);
-        }
-      }
-    }
-
-    .miners-distribution {
-      display: flex;
-      flex-direction: column;
-      border-left: .3em solid var(--block-border-color);
-      background-color: var(--stats-bg-color);
-      border-radius: .25em;
-
-      > div {
-        display: flex;
-        align-items: center;
-
-        > :nth-child(1) {
-          padding: .7em;
-          min-width: 140px;
-          background-color: var(--block-bg-color);
-          display: flex;
-          align-items: center;
-          gap: .5em;
-        }
-
-        > :nth-child(2) {
-          flex: 1;
-
-          > div {
-            padding: .7em;
-            color: white;
-            overflow: hidden;
-            font-weight: bold;
-            white-space: nowrap;
-            transition: all .25s;
-            border-top-right-radius: .25em;
-            border-bottom-right-radius: .25em;
-          }
-        }
-      }
     }
   `
+}
+
+function Box(props) {
+  const { title, value, children } = props
+  return <div className={style.box.container}>
+    <div className={style.box.title}>{title}</div>
+    <div className={style.box.value}>{value}</div>
+    {children}
+  </div>
 }
 
 const defaultStats = {
@@ -160,30 +115,18 @@ export function RecentStats(props) {
     return { ...stats, miners }
   }, [blocks])
 
-  return <div className={style.container}>
-    <div className="title">
+  return <div>
+    <div className={style.title}>
       {t('Recent Stats')}
-      <div>Last {blocks.length} blocks</div>
+      <div className={style.subtitle}>Last {blocks.length} blocks</div>
     </div>
-    <div className="recent-stats">
-      <div>
-        <div>{t('Txs')}</div>
-        <div>{stats.txs}</div>
-      </div>
-      <div>
-        <div>{t('Size')}</div>
-        <div>{formatSize(stats.size)}</div>
-      </div>
-      <div>
-        <div>{t('Fees')}</div>
-        <div>{formatXelis(stats.fees, { withSuffix: false })}</div>
-      </div>
-      <div>
-        <div>{t('Reward')}</div>
-        <div>{formatXelis(stats.reward, { withSuffix: false })}</div>
-      </div>
+    <div className={style.stats}>
+      <Box title={t(`Txs`)} value={stats.txs} />
+      <Box title={t(`Size`)} value={formatSize(stats.size)} />
+      <Box title={t(`Fees`)} value={formatXelis(stats.fees, { withSuffix: false })} />
+      <Box title={t(`Reward`)} value={formatXelis(stats.reward, { withSuffix: false })} />
     </div>
-    <div className="charts">
+    <div className={style.charts}>
       <MinersDistributionChart miners={stats.miners} numBlocks={blocks.length} />
       <div>
         <HashrateChart blocks={blocks} info={info} />
@@ -247,11 +190,11 @@ function MinersDistributionChart(props) {
     }
   }, [miners])
 
-  return <div className="chart-container">
-    <div>{t(`Mining Distribution`)}</div>
-    <div>{t(`{} miners on the last {} blocks`, [Object.keys(miners).length, numBlocks])}</div>
+  const value = t(`{} miners on the last {} blocks`, [Object.keys(miners).length, numBlocks])
+
+  return <Box title={t(`Mining Distribution`)} value={value}>
     <Chart type="doughnut" options={options} data={data} />
-  </div>
+  </Box>
 }
 
 function HashrateChart(props) {
@@ -313,20 +256,19 @@ function HashrateChart(props) {
     }
   }, [blocks, info])
 
-  return <div className="chart-container">
-    <div>{t(`Hashrate`)}</div>
-    <div>{formatHashRate(info.difficulty)}</div>
+  return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty)}>
     <Chart type="line" options={options} data={data} />
     <div>
       {t(`
       Drastic swings in the nethash are caused by the Kalman Filter. 
       For a more accurate representation of nethash and additional information about the filter, check the links below.
       `)}
-      <br /><br />
+    </div>
+    <div>
       <a href="https://stats.xelis.io/mining" target="_blank">{t(`Average Nethash`)}</a>&nbsp;&nbsp;
       <a href="https://docs.xelis.io/features/difficulty-adjustment" target="_blank">{t(`Difficulty adjustment`)}</a>
     </div>
-  </div>
+  </Box>
 }
 
 function BlockTimesChart(props) {
@@ -386,9 +328,9 @@ function BlockTimesChart(props) {
     }
   }, [blocks])
 
-  return <div className="chart-container">
-    <div>{t(`Block Time`)}</div>
-    <div>{t(`{} avg`, [prettyMs(info.average_block_time || 0, { compact: true })])}</div>
+  const value = t(`{} avg`, [prettyMs(info.average_block_time || 0, { compact: true })])
+
+  return <Box title={t(`Block Time`)} value={value}>
     <Chart type="bar" options={options} data={data} />
-  </div>
+  </Box>
 }
