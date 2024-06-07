@@ -8,8 +8,8 @@ import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
 import Icon from 'g45-react/components/fontawesome_icon'
 import TWEEN from '@tweenjs/tween.js'
-import Chart from '../../components/chart'
 
+import Chart from '../../components/chart'
 import TableFlex from '../../components/tableFlex'
 import Table from '../../components/table'
 import { fetchGeoLocation, groupBy, parseAddressWithPort, reduceText } from '../../utils'
@@ -21,6 +21,7 @@ import FlagIcon from '../../components/flagIcon'
 import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
+import MapLoad from './mapLoad'
 
 const style = {
   container: css`
@@ -183,58 +184,6 @@ const style = {
 
     > :nth-child(3) {
       max-height: 40em;
-    }
-  `,
-  mapLoad: css`
-    position: absolute;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    top: 0;
-    z-index: 999;
-
-    .content {
-      background-color: black;
-      padding: .5em;
-      border-radius: .5em;
-      display: flex;
-      gap: .25em;
-
-      .line {
-        width: .5em;
-        height: 1.5em;
-        background-color: white;
-        border-radius: .5em;
-        animation-name: scale;
-        animation-duration: .75s;
-        animation-iteration-count: infinite;
-      }
-
-      > :nth-child(1) {
-        animation-delay: 0;
-      }
-
-      > :nth-child(2) {
-        animation-delay: .25s;
-      }
-
-      > :nth-child(3) {
-        animation-delay: .5s;
-      }
-
-      @keyframes scale {
-        0% {
-          transform: scaleY(1);
-        }
-        20% {
-          transform: scaleY(.8);
-        }
-        40% {
-          transform: scaleY(1);
-        }
-      }
     }
   `,
   chart: css`
@@ -885,18 +834,7 @@ function MapPeers(props) {
   return <div className={style.map}>
     {mapContainer && <MapControls controls={controls} setControls={setControls} mapRef={mapRef} />}
     {mapContainer}
-    <MapLoad peersLoading={peersLoading} geoLoading={geoLoading} />
-  </div>
-}
-
-function MapLoad(props) {
-  const { peersLoading, geoLoading } = props
-  return (peersLoading || geoLoading) && <div className={style.mapLoad}>
-    <div className="content">
-      <div className="line" />
-      <div className="line" />
-      <div className="line" />
-    </div>
+    <MapLoad loading={peersLoading || geoLoading} />
   </div>
 }
 
