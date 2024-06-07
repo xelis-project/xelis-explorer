@@ -12,6 +12,99 @@ const style = {
     padding: 2em 0;
     background-color: ${theme.apply({ xelis: `rgb(14 30 32 / 40%)`, dark: `rgb(0 0 0 / 10%)`, light: `rgb(255 255 255 / 10%)` })};
     margin-top: 5em;
+  `,
+  content: css`
+    display: flex;
+    gap: 2em;
+    flex-direction: column;
+    
+    ${theme.query.minDesktop} {
+      flex-direction: row;
+    }
+  `,
+  sectionTitle: css`
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 1em;
+    position: relative;
+  `,
+  description: css`
+    margin-bottom: .5em;
+  `,
+  version: css`
+    color: var(--muted-color);
+  `,
+  buttons: css`
+    display: flex;
+    gap: .5em;
+    flex-direction: column;
+    
+    button {
+      font-weight: bold;
+      border: none;
+      padding: .7em;
+      cursor: pointer;
+      color: var(--bg-color);
+      background-color: var(--text-color);
+      transition: .1s transform;
+      border-radius: .5em;
+      font-size: .9em;
+      text-align: left;
+      min-width: 120px;
+      ${scaleOnHover()};
+    }
+  `,
+  pages: css`
+    display: flex;
+    gap: .5em;
+    flex-direction: column;
+    
+    ${theme.query.minDesktop} {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2em;
+      row-gap: .5em;
+    }
+  `,
+  links: css`
+    display: flex;
+    gap: .5em;
+    flex-direction: column;
+  `,
+  hyperlinks: css`
+    a {
+      ${theme.query.maxDesktop} {
+        background: #00000073;
+        padding: .75em;
+        border-radius: .5em;
+        font-size: 1.1em;
+        text-decoration: none;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        opacity: .6;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      ${theme.query.minDesktop} {
+        text-decoration: none;
+        display: flex;
+        gap: .5em;
+        justify-content: start;
+        white-space: nowrap;
+      }
+    }
+  `
+}
+
+const style2 = {
+  container: css`
+    padding: 2em 0;
+    background-color: ${theme.apply({ xelis: `rgb(14 30 32 / 40%)`, dark: `rgb(0 0 0 / 10%)`, light: `rgb(255 255 255 / 10%)` })};
+    margin-top: 5em;
 
     a {
       text-decoration: none;
@@ -104,41 +197,44 @@ function Footer(props) {
   const { t } = useLang()
 
   return <div className={style.container}>
-    <div className={layoutStyle.maxWidth}>
+    <div className={`${style.content} ${layoutStyle.pageMaxWidth}`}>
       <div>
-        <div>{title}</div>
+        <div className={style.sectionTitle}>{title}</div>
         <div>
-          {description}
-          <div>{version}</div>
+          <div className={style.description}>{description}</div>
+          <div className={style.version}>{version}</div>
         </div>
       </div>
       <div>
-        <div>{t('PAGES')}</div>
-        <div>
+        <div className={style.sectionTitle}>{t('PAGES')}</div>
+        <div className={`${style.pages} ${style.hyperlinks}`}>
           {pages.map((page) => {
-            const { link, title } = page
-            return <Link key={link} to={link}>{title}</Link>
+            const { path, title, icon } = page
+            return <Link key={path} to={path}>
+              <div>{title}</div>
+              <div>{icon}</div>
+            </Link>
           })}
         </div>
       </div>
       <div>
-        <div>{t('THEME')}</div>
-        <div>
+        <div className={style.sectionTitle}>{t('THEME')}</div>
+        <div className={style.buttons}>
           <button onClick={() => setTheme('xelis')}>{t('Default')}</button>
           <button onClick={() => setTheme('dark')}>{t('Dark')}</button>
           <button onClick={() => setTheme('light')}>{t('Light')}</button>
         </div>
       </div>
       <div>
-        <div>{t('LINKS')}</div>
-        <div>
+        <div className={style.sectionTitle}>{t('LINKS')}</div>
+        <div className={`${style.links} ${style.hyperlinks}`}>
           {links.map((link) => {
             const { href, title, icon } = link
 
-            return <div key={href}>
-              <a href={href} target="_blank">{title}</a>
-              {icon}
-            </div>
+            return <a key={href} href={href} target="_blank">
+              <div>{title}</div>
+              <div>{icon}</div>
+            </a>
           })}
         </div>
       </div>
