@@ -52,6 +52,10 @@ const style = {
       text-align: left;
       min-width: 120px;
       ${scaleOnHover()};
+
+      ${theme.query.minDesktop} {
+        padding: .45em .6em;
+      }
     }
   `,
   pages: css`
@@ -73,6 +77,10 @@ const style = {
   `,
   hyperlinks: css`
     a {
+      i {
+        color: var(--text-color);
+      }
+
       ${theme.query.maxDesktop} {
         background: #00000073;
         padding: .75em;
@@ -95,96 +103,6 @@ const style = {
         gap: .5em;
         justify-content: start;
         white-space: nowrap;
-      }
-    }
-  `
-}
-
-const style2 = {
-  container: css`
-    padding: 2em 0;
-    background-color: ${theme.apply({ xelis: `rgb(14 30 32 / 40%)`, dark: `rgb(0 0 0 / 10%)`, light: `rgb(255 255 255 / 10%)` })};
-    margin-top: 5em;
-
-    a {
-      text-decoration: none;
-    }
-
-    > div {
-      display: grid;
-      gap: 2em;
-      grid-template-columns: 1fr;
-
-      ${theme.query.minMobile} {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      ${theme.query.minDesktop} {
-        grid-template-columns: 3fr 1fr 1fr 1fr;
-      }
-
-      > div {
-        > :nth-child(1) {
-          font-weight: bold;
-          font-size: 1.2em;
-          margin-bottom: .5em;
-          position: relative;
-        }
-      }
-
-      > :nth-child(1) {
-        flex: .7;
-
-        > :nth-child(2) {
-          color: var(--muted-color);
-          display: flex;
-          gap: .5em;
-          flex-direction: column;
-        }
-      }
-
-      > :nth-child(2) {
-        > :nth-child(2) {
-          display: grid;
-          gap: .5em;
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-
-      > :nth-child(3) {
-        > :nth-child(2) {
-          display: flex;
-          gap: .5em;
-          flex-wrap: wrap;
-          flex-direction: row;
-        }
-      }
-
-      > :nth-child(4) {
-        > :nth-child(2) {
-          display: flex;
-          gap: .5em;
-          flex-direction: column;
-
-          > div {
-            display: flex;
-            gap: .5em;
-            align-items: center;
-          }
-        }
-      }
-      
-      button {
-        font-weight: bold;
-        border: none;
-        padding: .5em .7em;
-        cursor: pointer;
-        color: var(--bg-color);
-        background-color: var(--text-color);
-        transition: .25s all;
-        border-radius: .5em;
-        text-align:left;
-        ${scaleOnHover({ scale: .93 })};
       }
     }
   `

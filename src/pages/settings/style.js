@@ -11,7 +11,7 @@ export default {
     margin-top: 2em;
   `,
   formInput: css`
-    background: linear-gradient(to right, #ffffff1c, transparent);
+    background: linear-gradient(to right, #a7a7a71c, transparent);
     padding: 1em;
     border-radius: .5em;
     display: flex;
