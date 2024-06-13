@@ -42,7 +42,7 @@
     "three": "^0.150.1"
   },
   "devDependencies": {
-    "g45-react": "^0.1.12",
+    "g45-react": "^0.1.14",
     "shx": "^0.3.4",
     "wrangler": "^3.60.1"
   }

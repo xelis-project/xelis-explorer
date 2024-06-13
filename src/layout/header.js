@@ -3,6 +3,14 @@ import { Link, NavLink } from 'react-router-dom'
 
 import theme from '../style/theme'
 import MobileMenu from './mobile_menu'
+import logoBlackUrl from '../../assets/black_background_white_logo.svg'
+import logoWhiteUrl from '../../assets/white_background_black_logo.svg'
+
+export const logoBgUrl = theme.apply({
+  xelis: `url('${logoWhiteUrl}')`,
+  light: `url('${logoBlackUrl}')`,
+  dark: `url('${logoWhiteUrl}')`,
+})
 
 const style = {
   container: css`
@@ -71,11 +79,7 @@ const style = {
       display: block;
       background-size: contain;
       background-repeat: no-repeat;
-      background-image: ${theme.apply({
-        xelis: `url('public/img/white_background_black_logo.svg')`, 
-        light: `url('public/img/black_background_white_logo.svg')`, 
-        dark: `url('public/img/white_background_black_logo.svg')`, 
-      })};
+      background-image: ${logoBgUrl};
     `
   }
 }

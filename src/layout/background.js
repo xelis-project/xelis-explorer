@@ -1,23 +1,9 @@
 import { css } from 'goober'
 
 import theme from '../style/theme'
+import noiseUrl from '../../assets/noise.jpg'
 
 const style = {
-  /*
-  // Static version
-  background: css`
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: ${theme.apply({ xelis: `url('public/img/bg_xelis.jpg')`, dark: `url('public/img/bg_xelis_dark.jpg')`, light: `url('public/img/bg_xelis_light.jpg')` })};
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: top center;
-    z-index: -1;
-  `,
-  */
   darker: css`
     position: absolute;
     top: 0;
@@ -31,7 +17,7 @@ const style = {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url(public/img/noise.jpg);
+    background-image: url('${noiseUrl}');
     opacity: 0.06;
   `,
   circle: css`
