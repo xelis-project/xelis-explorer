@@ -233,7 +233,9 @@ function Block() {
                 <Link to={`/accounts/${value}`}>
                   {value}
                 </Link>
-                {pools[value] && `(${pools[value]})`}
+                {pools[value] && <div className={style.minerName}>
+                  {pools[value]}
+                </div>}
               </div>
             }
           },

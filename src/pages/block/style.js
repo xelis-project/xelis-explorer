@@ -17,6 +17,13 @@ export default {
     gap: .5em;
     align-items: center;
   `,
+  minerName: css`
+    white-space: nowrap;
+    background: #656565;
+    padding: .5em 1em;
+    border-radius: .5em;
+    color: white;
+  `,
   tips: css`
     display: flex;
     gap: .25em;
