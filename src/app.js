@@ -7,7 +7,7 @@ import { PreloadFonts } from 'g45-react/components/fontawesome_icon'
 import { ThemeProvider } from './hooks/useTheme'
 import { SettingsProvider } from './hooks/useSettings'
 import { NotificationProvider } from './components/notifications'
-import { PreloadAssets, favicon } from './layout'
+import { PreloadAssets, favicon } from './layout/utils'
 
 import "reset-css/reset.css"
 
