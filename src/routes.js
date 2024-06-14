@@ -1,5 +1,5 @@
 import App from './app'
-import Layout from './layout/layout'
+import Layout from './layout'
 
 import Block from './pages/block'
 import Blocks from './pages/blocks'

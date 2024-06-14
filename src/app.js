@@ -3,12 +3,12 @@ import { Outlet } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { extractCss, setup } from 'goober'
 import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
+import { PreloadFonts } from 'g45-react/components/fontawesome_icon'
 
 import { ThemeProvider } from './hooks/useTheme'
 import useSettings, { SettingsProvider, settingsKeys } from './hooks/useSettings'
 import { NotificationProvider } from './components/notifications'
-import { PreloadAssets } from './components/preload'
-import { favicon } from './components/favicon'
+import { PreloadAssets, favicon } from './layout'
 
 import "reset-css/reset.css"
 
@@ -37,6 +37,7 @@ function SubApp() {
       <style>{css}</style> {/* Don't use id="_goober" or css will flicker. Probably an issue with goober reseting css.*/}
     </Helmet>
     <PreloadAssets />
+    <PreloadFonts />
     <Outlet />
   </NodeSocketProvider>
 }

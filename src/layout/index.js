@@ -3,13 +3,32 @@ import { useMemo, useRef } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { css } from 'goober'
+import { Helmet } from 'react-helmet-async'
+import { preloadSVG, preloadIMG } from 'g45-react/utils/preload'
 
 import Header from './header'
 import Footer from './footer'
-import NodeStatus from '../layout/node_status'
+import NodeStatus from './node_status'
 import packageJSON from '../../package.json'
 import Background from './background'
 import layoutStyle from '../style/layout'
+
+import noiseUrl from '../../assets/noise.jpg'
+import logoBlackUrl from '../../assets/black_background_white_logo.svg'
+import logoWhiteUrl from '../../assets/white_background_black_logo.svg'
+import faviconUrl from '../../assets/favicon.ico'
+
+export const favicon = () => {
+  return <link rel="icon" href={faviconUrl} sizes="any" />
+}
+
+export const PreloadAssets = () => {
+  return <Helmet>
+    {preloadSVG(logoBlackUrl)}
+    {preloadSVG(logoWhiteUrl)}
+    {preloadIMG(noiseUrl)}
+  </Helmet>
+}
 
 const style = {
   header: css`

@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 
 import theme from '../style/theme'
 import MobileMenu from './mobile_menu'
+
 import logoBlackUrl from '../../assets/black_background_white_logo.svg'
 import logoWhiteUrl from '../../assets/white_background_black_logo.svg'
 
