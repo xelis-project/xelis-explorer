@@ -10,7 +10,7 @@ import hashIt from 'hash-it'
 import useQueryString from 'g45-react/hooks/useQueryString'
 
 import TableFlex from '../../components/tableFlex'
-import { daemonRPC } from '../../hooks/nodeRPC'
+import { daemonRPC } from '../../node_rpc'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import { XELIS_ASSET } from '../../utils'
 import PageTitle from '../../layout/page_title'

@@ -1,4 +1,7 @@
-import App, { SubApp } from './app'
+import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
+import { Outlet } from 'react-router-dom'
+
+import App from './app'
 import Layout from './layout'
 
 import Block from './pages/block'
@@ -15,9 +18,21 @@ import Peers from './pages/peers'
 import MiningCalculator from './pages/miningCalculator'
 import HeightBlocks from './pages/heightBlocks'
 
+import { defaultSettings, settingsKeys } from './settings'
+import useSettings from './hooks/useSettings'
+
+export function SubApp() {
+  const { settings } = useSettings()
+  const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
+
+  return <NodeSocketProvider endpoint={endpoint}>
+    <Outlet />
+  </NodeSocketProvider>
+}
+
 const routes = [
   {
-    element: <App title="XELIS Explorer">
+    element: <App title="XELIS Explorer" defaultSettings={defaultSettings}>
       <SubApp />
     </App>,
     children: [

@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import useSettings, { defaultSettings, settingsKeys } from '../../hooks/useSettings'
+import useSettings from '../../hooks/useSettings'
+import { defaultSettings, settingsKeys } from '../../settings'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
 import ThemeDropdown from './theme_dropdown'

@@ -11,7 +11,7 @@ import { RecentBlocks } from './recent_blocks'
 import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
-import { daemonRPC } from '../../hooks/nodeRPC'
+import { daemonRPC } from '../../node_rpc'
 
 const BLOCK_ITERATIONS = 5
 

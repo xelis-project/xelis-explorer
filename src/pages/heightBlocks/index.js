@@ -7,7 +7,7 @@ import to from 'await-to-js'
 import { useLang } from 'g45-react/hooks/useLang'
 import Icon from 'g45-react/components/fontawesome_icon'
 
-import { daemonRPC } from '../../hooks/nodeRPC'
+import { daemonRPC } from '../../node_rpc'
 import PageTitle from '../../layout/page_title'
 import { formatSize, formatXelis, reduceText } from '../../utils'
 import { getBlockColor } from '../dag/blockColor'

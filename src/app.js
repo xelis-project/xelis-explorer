@@ -2,11 +2,10 @@ import { createElement } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { extractCss, setup } from 'goober'
-import { NodeSocketProvider } from '@xelis/sdk/react/daemon'
 import { PreloadFonts } from 'g45-react/components/fontawesome_icon'
 
 import { ThemeProvider } from './hooks/useTheme'
-import useSettings, { SettingsProvider, settingsKeys } from './hooks/useSettings'
+import { SettingsProvider } from './hooks/useSettings'
 import { NotificationProvider } from './components/notifications'
 import { PreloadAssets, favicon } from './layout'
 
@@ -20,17 +19,8 @@ setup(createElement) // this is for goober styled() func
 
 let css = ``
 
-export function SubApp() {
-  const { settings } = useSettings()
-  const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
-
-  return <NodeSocketProvider endpoint={endpoint}>
-    <Outlet />
-  </NodeSocketProvider>
-}
-
 function App(props) {
-  const { children, title } = props
+  const { children, title, defaultSettings } = props
 
   if (!css) {
     css = extractCss()
@@ -45,7 +35,7 @@ function App(props) {
     <PreloadAssets />
     <PreloadFonts />
     <ThemeProvider>
-      <SettingsProvider>
+      <SettingsProvider defaultSettings={defaultSettings}>
         <NotificationProvider>
           {children ? children : <Outlet />}
         </NotificationProvider>

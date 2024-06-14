@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 
 import DotLoading from '../components/dotLoading'
 import theme from '../style/theme'
-import useSettings, { settingsKeys } from '../hooks/useSettings'
+import useSettings from '../hooks/useSettings'
+import { settingsKeys } from '../settings'
 
 const style = {
   container: css`
