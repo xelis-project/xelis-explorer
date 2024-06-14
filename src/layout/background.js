@@ -6,17 +6,19 @@ import noiseUrl from '../../assets/noise.jpg'
 const style = {
   darker: css`
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background: black;
     opacity: 0.1;
+    min-width: 100%;
+    min-height: 100%;
+    width: 100vw;
+    height: 100vh;
   `,
   noise: css`
     position: absolute;
-    width: 100%;
-    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-image: url('${noiseUrl}');
     opacity: 0.06;
   `,
