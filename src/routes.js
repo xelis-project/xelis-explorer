@@ -1,4 +1,4 @@
-import App from './app'
+import App, { SubApp } from './app'
 import Layout from './layout'
 
 import Block from './pages/block'
@@ -17,7 +17,9 @@ import HeightBlocks from './pages/heightBlocks'
 
 const routes = [
   {
-    element: <App />,
+    element: <App title="XELIS Explorer">
+      <SubApp />
+    </App>,
     children: [
       {
         element: <Layout />,

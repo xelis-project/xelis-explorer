@@ -20,36 +20,38 @@ setup(createElement) // this is for goober styled() func
 
 let css = ``
 
-function SubApp() {
+export function SubApp() {
   const { settings } = useSettings()
   const endpoint = settings[settingsKeys.NODE_WS_ENDPOINT]
+
+  return <NodeSocketProvider endpoint={endpoint}>
+    <Outlet />
+  </NodeSocketProvider>
+}
+
+function App(props) {
+  const { children, title } = props
 
   if (!css) {
     css = extractCss()
   }
 
-  //const { theme: currentTheme } = useTheme()
-
-  return <NodeSocketProvider endpoint={endpoint}>
-    <Helmet titleTemplate='%s · XELIS Explorer'>
+  return <>
+    <Helmet titleTemplate={title ? `%s · ${title}` : undefined}>
       <meta name="theme-color" content="#7afad3" />
       {favicon()}
       <style>{css}</style> {/* Don't use id="_goober" or css will flicker. Probably an issue with goober reseting css.*/}
     </Helmet>
     <PreloadAssets />
     <PreloadFonts />
-    <Outlet />
-  </NodeSocketProvider>
-}
-
-function App(props) {
-  return <ThemeProvider>
-    <SettingsProvider>
-      <NotificationProvider>
-        <SubApp />
-      </NotificationProvider>
-    </SettingsProvider>
-  </ThemeProvider>
+    <ThemeProvider>
+      <SettingsProvider>
+        <NotificationProvider>
+          {children ? children : <Outlet />}
+        </NotificationProvider>
+      </SettingsProvider>
+    </ThemeProvider>
+  </>
 }
 
 export default App
