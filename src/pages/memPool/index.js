@@ -130,7 +130,14 @@ function TxsHistoryChart(props) {
 
   const options = useMemo(() => {
     const formatTimestamp = (timestamp) => {
-      return prettyMs(new Date().getTime() - timestamp, { secondsDecimalDigits: 0 })
+      try {
+        const age = Date.now() - timestamp
+        return prettyMs(parseInt(age), { secondsDecimalDigits: 0 })
+      } catch {
+        // timestamp could be NaN or not a number
+        // use try catch and avoid trow "Expected a finite number" by prettyMs()
+        return 0
+      }
     }
 
     return {
