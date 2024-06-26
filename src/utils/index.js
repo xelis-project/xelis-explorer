@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js'
 import bytes from 'bytes'
-import hashIt from 'hash-it'
 
 export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
   if (typeof text !== 'string') return text
@@ -19,9 +18,12 @@ export const shiftNumber = (value, decimals) => {
   return new BigNumber(value || 0).shiftedBy(-decimals)
 }
 
+// ENV is defined with esbuild from g45-react package
+export const XELIS_PREFIX = ENV === `testnet` ? `XET` : `XEL`
+
 export const formatXelis = (value, { withSuffix = true } = {}) => {
   const number = formatAsset(value, XELIS_DECIMALS)
-  return `${number}${withSuffix ? ` XEL` : ``}`
+  return `${number}${withSuffix ? ` ${XELIS_PREFIX}` : ``}`
 }
 
 export const formatAsset = (value, decimals) => {
