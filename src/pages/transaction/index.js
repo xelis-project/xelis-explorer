@@ -155,6 +155,11 @@ function Transaction() {
             render: (value) => value ? formatXelis(value) : `--`
           },
           {
+            key: 'size',
+            title: t('Size'),
+            render: (value) => value ? formatSize(value) : `--`
+          },
+          {
             key: 'nonce',
             title: t('Nonce'),
             render: (value) => value || `--`
