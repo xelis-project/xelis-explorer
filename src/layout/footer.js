@@ -44,16 +44,17 @@ const style = {
       border: none;
       padding: .7em;
       cursor: pointer;
-      color: var(--bg-color);
-      background-color: var(--text-color);
+      color: var(--text-color);
+      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)`})};
       transition: .1s transform;
       border-radius: .5em;
       font-size: .9em;
       text-align: left;
-      min-width: 120px;
+      min-width: 100px;
       ${scaleOnHover()};
 
       ${theme.query.minDesktop} {
+        font-size: .8em;
         padding: .45em .6em;
       }
     }
