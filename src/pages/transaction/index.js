@@ -74,9 +74,6 @@ function Transaction() {
   let transfers = []
   if (tx.data && tx.data.transfers) transfers = tx.data.transfers
 
-  let burns = []
-  if (tx.data && tx.data.burn) burns = [tx.data.burn]
-
   const description = useMemo(() => {
     return `
       ${t('Transaction {}.', [tx.hash || `?`])}
@@ -178,7 +175,7 @@ function Transaction() {
         rowKey="hash"
       />
       <Transfers transfers={transfers} />
-      <Burns burns={burns} />
+      <Burn tx={tx} />
       <InBlocks tx={tx} />
     </div>
   </div>
@@ -196,7 +193,7 @@ function Transfers(props) {
   }, [])
 
   return <div>
-    <h2 className={style.title}>{t('Transfers')}</h2>
+    <h2 className={style.title}>{t('Transfers ({})', [transfers.length])}</h2>
     <Table
       headers={[t(`Asset`), t(`Amount`), t(`Recipient`), t(`Extra Data`)]}
       list={transfers} emptyText={t('No transfers')} colSpan={4}
@@ -226,16 +223,19 @@ function Transfers(props) {
   </div>
 }
 
-function Burns(props) {
-  const { burns } = props
+function Burn(props) {
+  const { tx } = props
 
   const { t } = useLang()
 
+  let burns = []
+  if (tx.data && tx.data.burn) burns = [tx.data.burn]
+
   return <div>
-    <h2 className={style.title}>{t('Burns')}</h2>
+    <h2 className={style.title}>{t('Burn')}</h2>
     <Table
       headers={[t(`Asset`), t(`Amount`)]}
-      list={burns} emptyText={t('No burns')} colSpan={2}
+      list={burns} emptyText={t('No burn')} colSpan={2}
       onItem={(item, index) => {
         const { amount, asset } = item
         return <tr key={index}>
