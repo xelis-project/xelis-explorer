@@ -71,9 +71,6 @@ function Transaction() {
     loadTx()
   }, [loadTx])
 
-  let transfers = []
-  if (tx.data && tx.data.transfers) transfers = tx.data.transfers
-
   const description = useMemo(() => {
     return `
       ${t('Transaction {}.', [tx.hash || `?`])}
@@ -174,7 +171,7 @@ function Transaction() {
         data={[tx]}
         rowKey="hash"
       />
-      <Transfers transfers={transfers} />
+      <Transfers tx={tx} />
       <Burn tx={tx} />
       <InBlocks tx={tx} />
     </div>
@@ -182,7 +179,7 @@ function Transaction() {
 }
 
 function Transfers(props) {
-  const { transfers } = props
+  const { tx } = props
 
   const { t } = useLang()
 
@@ -191,6 +188,10 @@ function Transfers(props) {
     const hexData = (extraData || []).map((value) => `${value.toString(16)}`).join(``)
     return reduceText(hexData, 0, 20)
   }, [])
+
+  let transfers = []
+  if (tx.data && tx.data.transfers) transfers = tx.data.transfers
+  if (transfers.length === 0) return null // completely hide if empty
 
   return <div>
     <h2 className={style.title}>{t('Transfers ({})', [transfers.length])}</h2>
@@ -230,6 +231,7 @@ function Burn(props) {
 
   let burns = []
   if (tx.data && tx.data.burn) burns = [tx.data.burn]
+  if (burns.length === 0) return null // completely hide if empty
 
   return <div>
     <h2 className={style.title}>{t('Burn')}</h2>
