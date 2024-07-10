@@ -96,7 +96,18 @@ const style = {
       font-size: .9em;
       margin-top: .4em;
       color: var(--link-color);
-    `
+    `,
+    /*blockType: css`
+      position: absolute;
+      bottom: -.6rem;
+      background: #0c0c0c;
+      padding: .25rem .5rem;
+      border-radius: .25rem;
+      font-size: .9rem;
+      transform: translateX(-50%);
+      left: 50%;
+      color: var(--muted-color);
+    `*/
   }
 }
 
@@ -121,8 +132,7 @@ export function RecentBlocks(props) {
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
         const animateClassName = newBlockHash === block.hash ? style.block.animate : null
-        const topo = block.topoheight ? block.topoheight.toLocaleString() : ``
-
+        const topo = block.topoheight ? block.topoheight.toLocaleString() : `?`
         return <Link to={`/blocks/${block.hash}`} key={key} className={`${style.block.container} ${animateClassName}`}>
           <div className={style.block.title}>{t('Block {}', [topo])}</div>
           <div className={style.block.info}>{txCount} txs | {size}</div>

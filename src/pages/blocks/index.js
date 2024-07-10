@@ -172,15 +172,20 @@ function Blocks() {
 
   useNodeSocketSubscribe({
     event: RPCEvent.BlockOrdered,
-    onData: (_, data) => {
+    onData: async (_, data) => {
       // dont't update blocks if we are not on first page
       if (pageState.page > 1) return
 
       const { topoheight, block_hash, block_type } = data
+
+      const [err, blockData] = await to(nodeSocket.daemon.methods.getBlockByHash({ hash: block_hash }))
+      if (err) return console.log(err)
+
       setBlocks((blocks) => blocks.map(block => {
         if (block.hash === block_hash) {
-          block.topoheight = topoheight
-          block.block_type = block_type
+          //block.topoheight = topoheight
+          //block.block_type = block_type
+          block = blockData
         }
         return block
       }))
