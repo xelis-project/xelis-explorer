@@ -13,7 +13,7 @@ function MiningCalculator() {
   const { t } = useLang()
 
   const [hashRate, setHashRate] = useState()
-  const [hashRateUnit, setHashRateUnit] = useState(1000000) // MH/s
+  const [hashRateUnit, setHashRateUnit] = useState(1000) // KH/s
 
   const miningData = useMemo(() => {
     if (!info) return null
@@ -60,7 +60,7 @@ function MiningCalculator() {
             const value = parseFloat(e.target.value)
             setHashRate(isNaN(value) ? '' : value)
           }} placeholder={t(`Your hashrate`)} />
-          <select defaultValue="1000000" onChange={(e) => {
+          <select value={hashRateUnit} onChange={(e) => {
             setHashRateUnit(parseInt(e.target.value))
           }}>
             <option value="1">H/s</option>
