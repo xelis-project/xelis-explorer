@@ -61,8 +61,13 @@ const style = {
       cursor: pointer;
       ${slideX({ from: `-100%`, to: `0%`, duration: `.25s` })}
 
+      &:hover {
+        transform: scale(.9);
+        animation-fill-mode: unset; /* important or the animation overwrite the transform */
+      }
+
       ${theme.query.minDesktop} {
-        border-top: 3px solid var(--block-border-color);
+        border-top: .4em solid var(--block-border-color);
         border-left: none;
       }
     `,
@@ -131,9 +136,14 @@ export function RecentBlocks(props) {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
-        const animateClassName = newBlockHash === block.hash ? style.block.animate : null
         const topo = block.topoheight ? block.topoheight.toLocaleString() : `?`
-        return <Link to={`/blocks/${block.hash}`} key={key} className={`${style.block.container} ${animateClassName}`}>
+        
+        let blockClassName = style.block.container
+        if (newBlockHash === block.hash) {
+          blockClassName += ` ${style.block.animate}`
+        }
+
+        return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}>
           <div className={style.block.title}>{t('Block {}', [topo])}</div>
           <div className={style.block.info}>{txCount} txs | {size}</div>
           <div className={style.block.miner}>

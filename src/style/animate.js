@@ -23,7 +23,7 @@ const slideXKeyframes = (from, to) => keyframes`
 export const slideX = (props) => {
   const { from = `0%`, to = `100%`, duration = `.25s` } = props || {}
   return `
-    animation: ${slideXKeyframes(from, to)} ${duration} linear both;
+    animation: ${slideXKeyframes(from, to)} ${duration} forwards;
   `
 }
 
@@ -39,7 +39,7 @@ const slideYKeyframes = (from, to) => keyframes`
 export const slideY = (props) => {
   const { from = `0%`, to = `100%`, duration = `.25s`, easing = `linear` } = props || {}
   return `
-    animation: ${slideYKeyframes(from, to)} ${duration} ${easing} both;
+    animation: ${slideYKeyframes(from, to)} ${duration} ${easing} forwards;
   `
 }
 
@@ -55,7 +55,7 @@ const opacityKeyframes = (from, to) => keyframes`
 export const opacity = (props) => {
   const { from = 0, to = 1, duration = `.1s` } = props || {}
   return `
-    animation: ${opacityKeyframes(from, to)} ${duration} linear both;
+    animation: ${opacityKeyframes(from, to)} ${duration} forwards;
   `
 }
 
@@ -99,6 +99,6 @@ const bounceInKeyframes = keyframes`
 export const bounceIn = (props) => {
   const { duration = `.25s` } = props || {}
   return `
-    animation: ${bounceInKeyframes} ${duration} both;
+    animation: ${bounceInKeyframes} ${duration} forwards;
   `
 }
