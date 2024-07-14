@@ -5,7 +5,7 @@ import theme from '../../style/theme'
 export default {
   box: {
     container: css`
-      background: var(--stats-bg-color);
+      background: var(--content-bg-color);
       padding: 1.5em;
       border-top-right-radius: 1em;
       border-top-left-radius: 1em;
@@ -31,7 +31,7 @@ export default {
         border-radius: 30px;
         outline: none;
         color: var(--text-color);
-        background-color: var(--stats-bg-color);
+        background-color: var(--content-bg-color);
         border: none;
         font-weight: bold;
       }

@@ -15,7 +15,7 @@ export default {
       border-radius: 1em;
       justify-content: space-between;
       align-items: center;
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       overflow: auto;
       white-space: nowrap;
     `,

@@ -18,7 +18,7 @@ const opacity = theme.apply({
 const style = {
   container: css`
     padding: 2em 0;
-    background-color: var(--stats-bg-color);
+    background-color: var(--content-bg-color);
     margin-top: 5em;
 
     ${theme.query.minDesktop} {

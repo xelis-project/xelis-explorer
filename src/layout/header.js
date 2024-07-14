@@ -37,7 +37,7 @@ const style = {
       gap: .5em;
       text-decoration: none;
       align-items: center;
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       color: var(--text-color);
       border-radius: .5em;
       padding: .6em .8em;

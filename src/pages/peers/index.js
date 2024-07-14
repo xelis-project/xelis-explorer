@@ -198,7 +198,7 @@ const style = {
     }
 
     > div {
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       padding: 1em;
       border-radius: .5em;
       display: flex;

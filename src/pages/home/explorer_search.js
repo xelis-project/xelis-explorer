@@ -44,7 +44,7 @@ const style = {
       border-radius: 30px;
       outline: none;
       color: var(--text-color);
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       border: none;
       font-weight: bold;
     }

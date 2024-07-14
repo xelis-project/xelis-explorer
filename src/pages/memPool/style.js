@@ -26,7 +26,7 @@ export default {
   `,
   chart: css`
     margin-bottom: 2em;
-    background-color: var(--stats-bg-color);
+    background-color: var(--content-bg-color);
     padding: 1em;
     border-radius: .5em;
     display: flex;

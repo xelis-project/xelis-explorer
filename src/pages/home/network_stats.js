@@ -21,7 +21,7 @@ const style = {
   `,
   networkStats: {
     container: css`
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       padding: 2em;
       border-radius: .5em;
       position: relative;

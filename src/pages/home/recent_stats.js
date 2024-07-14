@@ -22,7 +22,7 @@ const style = {
   `,
   box: {
     container: css`
-      background-color: var(--stats-bg-color);
+      background-color: var(--content-bg-color);
       border-radius: .5em;
       padding: 1em;
       min-width: 150px;
