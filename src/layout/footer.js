@@ -1,17 +1,29 @@
 import { css } from 'goober'
 import { Link } from 'react-router-dom'
 import { useLang } from 'g45-react/hooks/useLang'
+import Icon from 'g45-react/components/fontawesome_icon'
 
 import theme from '../style/theme'
 import useTheme from '../hooks/useTheme'
 import { scaleOnHover } from '../style/animate'
 import layoutStyle from '../style/layout'
+import { logoBgUrl } from './header'
+
+const opacity = theme.apply({
+  xelis: `.6`,
+  light: `.8`,
+  dark: `.6`,
+})
 
 const style = {
   container: css`
     padding: 2em 0;
-    background-color: ${theme.apply({ xelis: `rgb(14 30 32 / 40%)`, dark: `rgb(0 0 0 / 10%)`, light: `rgb(255 255 255 / 10%)` })};
+    background-color: var(--stats-bg-color);
     margin-top: 5em;
+
+    ${theme.query.minDesktop} {
+      padding: 5em 0;
+    }
   `,
   content: css`
     display: flex;
@@ -20,42 +32,77 @@ const style = {
     
     ${theme.query.minDesktop} {
       flex-direction: row;
+      gap: 5em;
+      flex-wrap: wrap;
+    }
+
+    @media only screen and (min-width: 1100px) {
+      flex-wrap: nowrap;
     }
   `,
-  sectionTitle: css`
+  title: css`
     font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 1em;
+    font-size: 1.5em;
+    margin-bottom: .75em;
     position: relative;
+    display: flex;
+    gap: .5em;
+    align-items: center;
+  `,
+  logo: css`
+    width: 30px;
+    height: 30px;
+    display: block;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: ${logoBgUrl};
   `,
   description: css`
     margin-bottom: .5em;
+    opacity: ${opacity};
   `,
   version: css`
-    color: var(--muted-color);
+    border: 2px solid var(--text-color);
+    display: inline-flex;
+    padding: .5em 1em;
+    border-radius: .5em;
+    margin-top: 1em;
+    font-weight: bold;
+    opacity: ${opacity};
   `,
   buttons: css`
     display: flex;
-    gap: .5em;
+    gap: .6em;
     flex-direction: column;
     
     button {
-      font-weight: bold;
-      border: none;
+      border: 2px solid transparent;
       padding: .7em;
       cursor: pointer;
       color: var(--text-color);
       background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)`})};
-      transition: .1s transform;
       border-radius: .5em;
-      font-size: .9em;
       text-align: left;
-      min-width: 100px;
-      ${scaleOnHover()};
+      min-width: 130px;
+      transition: all .25s;
+      display: flex;
+      gap: .5em;
+      align-items: center;
+      justify-content: space-between;
+      font-size: inherit;
+      opacity: ${opacity};
+
+      &:hover {
+        opacity: 1 !important;
+      }
+
+      &[data-active="true"] {
+        border: 2px solid var(--text-color);
+        opacity: .8;
+      }
 
       ${theme.query.minDesktop} {
-        font-size: .8em;
-        padding: .45em .6em;
+        padding: .4em .8em;
       }
     }
   `,
@@ -66,7 +113,7 @@ const style = {
     
     ${theme.query.minDesktop} {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: auto auto;
       column-gap: 2em;
       row-gap: .5em;
     }
@@ -78,30 +125,25 @@ const style = {
   `,
   hyperlinks: css`
     a {
-      i {
-        color: var(--text-color);
-      }
+      color: var(--text-color);
+      transition: all .25s;
+      opacity: ${opacity};
+      padding: .75em;
+      border-radius: .5em;
+      text-decoration: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)`})};
 
-      ${theme.query.maxDesktop} {
-        background: #00000073;
-        padding: .75em;
-        border-radius: .5em;
-        font-size: 1.1em;
-        text-decoration: none;
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        opacity: .6;
-
-        &:hover {
-          opacity: 1;
-        }
+      &:hover {
+        opacity: 1;
       }
 
       ${theme.query.minDesktop} {
-        text-decoration: none;
-        display: flex;
+        background: none;
         gap: .5em;
+        padding: 0;
         justify-content: start;
         white-space: nowrap;
       }
@@ -112,20 +154,23 @@ const style = {
 function Footer(props) {
   const { title, description, version, pages = [], links = [] } = props
 
-  const { setTheme } = useTheme()
+  const { setTheme, theme: currentTheme } = useTheme()
   const { t } = useLang()
 
   return <div className={style.container}>
     <div className={`${style.content} ${layoutStyle.pageMaxWidth}`}>
       <div>
-        <div className={style.sectionTitle}>{title}</div>
+        <div className={style.title}>
+          <div className={style.logo}></div>
+          {title}
+        </div>
         <div>
           <div className={style.description}>{description}</div>
           <div className={style.version}>{version}</div>
         </div>
       </div>
       <div>
-        <div className={style.sectionTitle}>{t('PAGES')}</div>
+        <div className={style.title}>{t('PAGES')}</div>
         <div className={`${style.pages} ${style.hyperlinks}`}>
           {pages.map((page) => {
             const { path, title, icon } = page
@@ -137,15 +182,21 @@ function Footer(props) {
         </div>
       </div>
       <div>
-        <div className={style.sectionTitle}>{t('THEME')}</div>
+        <div className={style.title}>{t('THEME')}</div>
         <div className={style.buttons}>
-          <button onClick={() => setTheme('xelis')}>{t('Default')}</button>
-          <button onClick={() => setTheme('dark')}>{t('Dark')}</button>
-          <button onClick={() => setTheme('light')}>{t('Light')}</button>
+          <button onClick={() => setTheme('xelis')} data-active={currentTheme === `xelis`}>
+            {t('Default')}<Icon name="palette" />
+          </button>
+          <button onClick={() => setTheme('dark')} data-active={currentTheme === `dark`}>
+            {t('Dark')}<Icon name="moon" />
+          </button>
+          <button onClick={() => setTheme('light')} data-active={currentTheme === `light`}>
+            {t('Light')}<Icon name="sun" />
+          </button>
         </div>
       </div>
       <div>
-        <div className={style.sectionTitle}>{t('LINKS')}</div>
+        <div className={style.title}>{t('LINKS')}</div>
         <div className={`${style.links} ${style.hyperlinks}`}>
           {links.map((link) => {
             const { href, title, icon } = link
