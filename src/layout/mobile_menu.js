@@ -1,35 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { css } from 'goober'
 
 import LangDropdown from '../pages/settings/lang_dropdown'
 import ThemeDropdown from '../pages/settings/theme_dropdown'
-import { scaleOnHover } from '../style/animate'
 import theme from '../style/theme'
+import { style as headerStyle } from './header'
 
 const style = {
   container: css`
-    --header-nav-active-color: ${theme.apply({ xelis: '#172926', light: '#dddddd', dark: '#212121' })};
-
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 1em;
+    padding: 3em 1.5em;
     display: flex;
     flex-direction: column;
-    background-color: ${theme.apply({ xelis: `rgb(29 59 55 / 80%)`, light: `rgb(250 250 250 / 80%)`, dark: `rgb(16 16 16 / 80%)` })};
     gap: .25em;
     z-index: 3;
     font-size: 1.2em;
     opacity: 0;
     transform: translateY(-100%);
     transition: all .25s;
-    backdrop-filter: blur(5px);
-    box-shadow: 0px -10px 20px 0px rgb(28 28 28 / 50%);
-    border-bottom-left-radius: .5em;
-    border-bottom-right-radius: .5em;
+    backdrop-filter: blur(${theme.apply({ xelis: `40px`, light: `30px`, dark: `40px` })});
+    height: 100%;
+    bottom: 0;
 
     ${theme.query.minDesktop} {
       max-width: 225px;
@@ -49,7 +45,7 @@ const style = {
     margin-top: 1em;
     flex-direction: column;
   `,
-  button: css`
+  menuButton: css`
     padding: 0.4em 0.5em;
     background: #00000029;
     border-radius: 0.5em;
@@ -58,63 +54,84 @@ const style = {
     border: none;
     color: var(--text-color);
     font-size: 1.5em;
-    ${scaleOnHover({ scale: `.94` })};
+
+    &:hover {
+      transform: scale(.95);
+    }
+  `,
+  closeButton: css`
+    position: fixed;
+    top: .5em;
+    right: .5em;
+    border-radius: 0.5em;
+    background: none;
+    display: flex;
+    cursor: pointer;
+    border: none;
+    color: var(--text-color);
+    font-size: 2em;
+    transition: .1s transform;
+    opacity: .6;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(.95);
+    }
   `,
   links: css`
     display: flex;
     flex-direction: column;
-    gap: .25em;
+    gap: 1.5em;
 
     > a {
       text-decoration: none;
-      color: var(--header-nav-color);
       user-select: none;
       cursor: pointer;
-      padding: 0.5em 0.7em;
       display: flex;
-      gap: 0.5em;
+      gap: .5em;
       align-items: center;
-      justify-content: space-between;
-      border-radius: 5px;
+      border-radius: .5em;
+      color: var(--text-color);
+      opacity: .6;
+      font-size: 1.2em;
   
       &:hover, &.active {
-        background-color: var(--header-nav-active-color);
+        opacity: 1;
       }
     }
+  `,
+  menu: css`
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5em;
   `
 }
 
 function MobileMenu(props) {
-  const { links = [] } = props
+  const { title, links = [] } = props
 
-  const menuRef = useRef()
   const location = useLocation()
 
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const clickOutside = (e) => {
-      if (!menuRef.current.contains(e.target)) {
-        setMenuOpen(false)
-      }
-    }
-
-    window.addEventListener(`click`, clickOutside)
-
-    return () => {
-      window.removeEventListener(`click`, clickOutside)
-    }
-  }, [menuOpen])
-
-  useEffect(() => {
     setMenuOpen(false)
   }, [location])
 
-  return <div ref={menuRef}>
-    <button className={style.button} aria-label="Menu" onClick={() => setMenuOpen(!menuOpen)}>
-      <Icon name="bars" />
-    </button>
+  return <>
+    <div className={style.menu}>
+      <Link to="/" className={headerStyle.logo.container}>
+        <div className={headerStyle.logo.image}></div>
+        <div>{title}</div>
+      </Link>
+      <button className={style.menuButton} aria-label="Menu" onClick={() => setMenuOpen(true)}>
+        <Icon name="bars" />
+      </button>
+    </div>
     <div data-open={menuOpen} className={style.container}>
+      <button className={style.closeButton} aria-label="Close" onClick={() => setMenuOpen(false)}>
+        <Icon name="close" />
+      </button>
       <div className={style.links}>
         {links.map((item) => {
           const { title, path, icon } = item
@@ -124,12 +141,8 @@ function MobileMenu(props) {
           </NavLink>
         })}
       </div>
-      <div className={style.bottomButtons}>
-        <LangDropdown size={0.9} />
-        <ThemeDropdown size={0.9} />
-      </div>
     </div>
-  </div>
+  </>
 }
 
 export default MobileMenu

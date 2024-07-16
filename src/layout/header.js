@@ -1,8 +1,10 @@
 import { css } from 'goober'
 import { Link, NavLink } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 
 import theme from '../style/theme'
 import MobileMenu from './mobile_menu'
+import layoutStyle from '../style/layout'
 
 import logoBlackUrl from '../../assets/black_background_white_logo.svg'
 import logoWhiteUrl from '../../assets/white_background_black_logo.svg'
@@ -13,44 +15,56 @@ export const logoBgUrl = theme.apply({
   dark: `url('${logoWhiteUrl}')`,
 })
 
-const style = {
-  container: css`
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    position: relative;
-    gap: 2em;
-  `,
-  menu: css`
-    display: flex;
-    gap: .5em;
-    justify-content: center;
-    width: 100%;
-    flex-wrap: wrap;
+export const style = {
+  header: css`
+    padding: 1.5em 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: .25s all;
+    
+    > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 1.5em;
+    }
 
     ${theme.query.maxDesktop} {
       display: none;
     }
+  `,
+  headerBg: css`
+    background-color: ${theme.apply({ xelis: `rgb(25 41 41 / 50%)`, light: `rgb(255 255 255 / 0%)`, dark: `rgb(0 0 0 / 40%)` })};
+    backdrop-filter: blur(${theme.apply({ xelis: `40px`, light: `20px`, dark: `40px` })});
+  `,
+  list: css`
+    display: flex;
+    gap: .75em;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 
     > a {
       display: flex;
       gap: .5em;
       text-decoration: none;
       align-items: center;
-      background-color: var(--content-bg-color);
+      background-color: rgb(255 255 255 / 10%);
       color: var(--text-color);
+      opacity: .7;
       border-radius: .5em;
       padding: .6em .8em;
-      opacity: .7;
       transition: all .1s;
-      font-size: 1.1em;
+      font-size: 1em;
 
       &:hover {
+        background-color: rgb(255 255 255 / 20%);
         opacity: 1;
-        transform: translate(0, 2px);
+        transform: scale(.96);
       }
 
       &.active {
+        background-color: rgb(255 255 255 / 20%);
         opacity: 1;
       }
     }
@@ -69,10 +83,6 @@ const style = {
       text-decoration: none;
       color: var(--text-color);
       font-weight: bold;
-
-      ${theme.query.minDesktop} {
-        display: none;
-      }
     `,
     image: css`
       width: 30px;
@@ -86,26 +96,46 @@ const style = {
 }
 
 function Header(props) {
-  const { title, links, className, ...restProps } = props
+  const { title, links, ...restProps } = props
+  const [headerClass, setHeaderClass] = useState(style.header)
 
-  return <div className={`${style.container} ${className}`} {...restProps}>
-    <Link to="/" className={style.logo.container}>
-      <div className={style.logo.image}></div>
-      <div>{title}</div>
-    </Link>
-    <div className={style.menu}>
-      {links.map((item) => {
-        const { title, path, icon } = item
-        return <NavLink key={path} to={path}>
+  useEffect(() => {
+    const onScroll = (e) => {
+      if (e.target.scrollTop > 0) {
+        setHeaderClass(`${style.header} ${style.headerBg}`)
+      } else {
+        setHeaderClass(style.header)
+      }
+    }
+
+    document.body.addEventListener(`scroll`, onScroll)
+    return () => {
+      document.body.removeEventListener(`scroll`, onScroll)
+    }
+  }, [])
+
+  return <>
+    <div className={headerClass} {...restProps}>
+      <div className={layoutStyle.pageMaxWidth}>
+        <Link to="/" className={style.logo.container}>
+          <div className={style.logo.image}></div>
           <div>{title}</div>
-          {icon}
-        </NavLink>
-      })}
+        </Link>
+        <div className={style.list}>
+          {links.map((item) => {
+            const { title, path, icon } = item
+            return <NavLink key={path} to={path}>
+              <div>{title}</div>
+              {icon}
+            </NavLink>
+          })}
+        </div>
+      </div>
     </div>
     <div className={style.mobileMenu}>
-      <MobileMenu links={links} />
+      <MobileMenu title={title} links={links} />
     </div>
-  </div>
+  </>
 }
 
 export default Header

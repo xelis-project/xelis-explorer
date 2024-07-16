@@ -2,7 +2,6 @@ import { Outlet, useLocation } from 'react-router'
 import { useMemo, useRef } from 'react'
 import { useLang } from 'g45-react/hooks/useLang'
 import Icon from 'g45-react/components/fontawesome_icon'
-import { css } from 'goober'
 
 import Header from './header'
 import Footer from './footer'
@@ -10,12 +9,6 @@ import NodeStatus from './node_status'
 import packageJSON from '../../package.json'
 import Background from './background'
 import layoutStyle from '../style/layout'
-
-const style = {
-  header: css`
-    padding-top: 4em;
-  `
-}
 
 function Layout() {
   const location = useLocation()
@@ -58,8 +51,8 @@ function Layout() {
       <Background />
       <NodeStatus />
       <div className={layoutStyle.pageFlex}>
+        <Header title={t(`Explorer`)} links={links} />
         <div className={layoutStyle.pageMaxWidth}>
-          <Header title={t(`Explorer`)} links={links} className={style.header} />
           <div data-opacity={!firstLoad} key={location.key}> {/* Keep location key to re-trigger page transition animation */}
             <Outlet />
           </div>
