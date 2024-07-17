@@ -22,7 +22,7 @@ const style = {
     container: css`
       background-color: var(--content-bg-color);
       padding: 2em;
-      border-radius: .5em;
+      border-radius: 1em;
       position: relative;
 
       ${theme.query.minLarge} {

@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import to from 'await-to-js'
-import { css } from 'goober'
+
 import 'leaflet/dist/leaflet.css'
 import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
@@ -18,202 +18,9 @@ import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
 import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
-import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import MapLoad from './mapLoad'
-
-const style = {
-  container: css`
-    > :nth-child(2) {
-      background: var(--table-td-bg-color);
-      padding: 1em;
-      border-radius: 0.5em;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      font-size: .9em;
-      display: flex;
-      gap: .5em;
-    }
-
-    > :nth-child(3) {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-  
-      h2 {
-        font-size: 1.2em;
-        font-weight: bold;
-        margin-top: 1em;
-      }
-    }
-  `,
-  tableRowLocation: css`
-    display: flex;
-    gap: .5em;
-    align-items: center;
-
-    ${theme.query.maxMobile} {
-      flex-wrap: wrap;
-    }
-
-    button {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border: none;
-      font-size: .7em;
-      border-radius: 15px;
-      padding: 0.3em 0.6em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: .1s all;
-
-      &:hover {
-        transform: scale(.98);
-      }
-    }
-  `,
-  map: css`
-    position: relative;
-    z-index: 0;
-    width: 100%; 
-    height: 15em;
-    background-color: var(--bg-color);
-    border-radius: .5em;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    
-    ${theme.query.minDesktop} {
-      height: 30em;
-    }
-
-    .leaflet-container {
-      outline: none;
-      width: 100%; 
-      height: 100%;
-      border-radius: .5em;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      background: ${theme.apply({ xelis: `#262626`, dark: `#262626`, light: `#d5dadc` })};
-    }
-
-    .leaflet-popup-content-wrapper {
-      border-radius: .5em;
-    }
-
-    .leaflet-popup-content {
-      margin: 1em;
-
-      > :nth-child(1) {
-        font-weight: bold;
-        padding-bottom: .5em;
-        font-size: 1.1em;
-      }
-
-      > :nth-child(2) {
-        font-size: .9em;
-        max-height: 5em;
-        overflow: auto;
-        padding-right: 1em;
-      }
-    }
-  `,
-  mapControls: css`
-    position: absolute;
-    right: 0;
-    z-index: 99999;
-    padding: 1em;
-    display: flex;
-    gap: .5em;
-    flex-direction: column;
-
-    > div {
-      display: flex;
-      gap: 0.5em;
-      align-items: center;
-      font-weight: bold;
-      font-size: .9em;
-      justify-content: right;
-    }
-
-    button {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border: none;
-      border-radius: 15px;
-      padding: 0.3em 0.6em;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  `,
-  peerList: css`
-    input {
-      padding: 0.7em;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 1.2em;
-      background-color: ${theme.apply({ xelis: `rgb(0 0 0 / 20%)`, light: `rgb(255 255 255 / 20%)`, dark: `rgb(0 0 0 / 20%)` })};
-      color: var(--text-color);
-      width: 100%;
-      border: thin solid ${theme.apply({ xelis: `#7afad3`, light: `#cbcbcb`, dark: `#373737` })};
-
-      &::placeholder {
-        color: ${theme.apply({ xelis: `rgb(255 255 255 / 20%)`, light: `rgb(0 0 0 / 30%)`, dark: `rgb(255 255 255 / 20%)` })};
-        opacity: 1;
-      }
-    }
-
-    > :nth-child(1) {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-      margin-bottom: 1em;
-
-      ${theme.query.minDesktop} {
-        flex-direction: row;
-      }
-
-      > :nth-child(2) {
-        display: flex;
-        gap: 0.5em;
-        flex-direction: column;
-        min-width: 10em;
-      }
-    }
-
-    > :nth-child(2) {
-      margin-bottom: .5em;
-    }
-
-    > :nth-child(3) {
-      max-height: 40em;
-    }
-  `,
-  chart: css`
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr;
-    gap: 1em;
-
-    ${theme.query.minDesktop} {
-      grid-template-rows: 1fr 1fr;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    > div {
-      background-color: var(--content-bg-color);
-      padding: 1em;
-      border-radius: .5em;
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-
-      canvas {
-        max-height: 15em;
-      }
-    }
-  `
-}
+import style from './style'
 
 function useNetworkData() {
   const nodeSocket = useNodeSocket()
@@ -531,15 +338,34 @@ function TablePeers(props) {
   const list = groupPeers.slice(0, 100)
 
   return <div className={style.peerList}>
-    <div>
+    <div className={style.peerStats}>
+      <div>
+        <div>Sync</div>
+        <div>{peerStats[0]}</div>
+      </div>
+      <div>
+        <div>Desync</div>
+        <div>{peerStats[1]}</div>
+      </div>
+      <div>
+        <div>Full Ledger</div>
+        <div>{peerStats[2]}</div>
+      </div>
+      <div>
+        <div>Pruned Ledger</div>
+        <div>{peerStats[3]}</div>
+      </div>
+      <div>
+        <div>Same version ({networkData.data.version})</div>
+        <div>{peerStats[4]}</div>
+      </div>
+    </div>
+    <div className={style.peerInput}>
       <input type="text" onChange={onFilterIP} placeholder={t(`Type to filter peers by address.`)} />
       <div>
         <div>Group by</div>
         <Dropdown items={groupItems} onChange={({ key }) => setGroupKey(key)} value={groupKey} />
       </div>
-    </div>
-    <div>
-      {t(`{} synced | {} desync | {} full ledger | {} pruned ledger | {} on the same version`, peerStats)}
     </div>
     <Table
       headers={[
@@ -983,9 +809,27 @@ function PeersStats(props) {
         legend: {
           display: false,
         },
+      },
+      scales: {
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+          },
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+          }
+        }
       }
     }
-  }, [])
+  }, [currentTheme])
 
   const pieOptions = useMemo(() => {
     return {
@@ -1004,48 +848,42 @@ function PeersStats(props) {
   const continentData = useMemo(() => {
     return {
       labels: data.continentData.labels,
-      datasets: [
-        {
-          data: data.continentData.data,
-          borderWidth: 0,
-        }
-      ]
+      datasets: [{
+        data: data.continentData.data,
+        borderWidth: 0,
+        backgroundColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+      }],
     }
-  }, [data.continentData])
+  }, [data.continentData, currentTheme])
 
   const countryData = useMemo(() => {
     return {
       labels: data.countryData.labels,
-      datasets: [
-        {
-          data: data.countryData.data,
-          borderWidth: 0,
-        }
-      ]
+      datasets: [{
+        data: data.countryData.data,
+        borderWidth: 0,
+        backgroundColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+      }],
     }
-  }, [data.countryData])
+  }, [data.countryData, currentTheme])
 
   const heightData = useMemo(() => {
     return {
       labels: data.heightData.labels,
-      datasets: [
-        {
-          data: data.heightData.data,
-          borderWidth: 0,
-        }
-      ]
+      datasets: [{
+        data: data.heightData.data,
+        borderWidth: 0,
+      }]
     }
   }, [data.heightData])
 
   const versionData = useMemo(() => {
     return {
       labels: data.versionData.labels,
-      datasets: [
-        {
-          data: data.versionData.data,
-          borderWidth: 0,
-        }
-      ]
+      datasets: [{
+        data: data.versionData.data,
+        borderWidth: 0,
+      }]
     }
   }, [data.versionData])
 

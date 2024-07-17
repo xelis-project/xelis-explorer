@@ -18,7 +18,7 @@ const style = {
     display: flex;
     flex-direction: column;
     gap: .25em;
-    z-index: 3;
+    z-index: 100;
     font-size: 1.2em;
     opacity: 0;
     transform: translateY(-100%);

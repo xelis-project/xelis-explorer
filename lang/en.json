@@ -96,7 +96,7 @@
   "Past, pending and executed transactions.": "Past, pending and executed transactions.",
   "View pending transactions and network congestion. Verify if your transaction was executed.": "View pending transactions and network congestion. Verify if your transaction was executed.",
   "Type your account address or transaction hash to filter the list below.": "Type your account address or transaction hash to filter the list below.",
-  "Last 20 blocks ({} txs)": "Last 20 blocks ({} txs)",
+  "Last 100 blocks ({} txs)": "Last 100 blocks ({} txs)",
   "Pending Transactions ({})": "Pending Transactions ({})",
   "Executed Transactions ({})": "Executed Transactions ({})",
   "Topo": "Topo",

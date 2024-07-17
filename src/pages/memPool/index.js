@@ -118,11 +118,10 @@ function TxsHistoryChart(props) {
       datasets: [{
         label: 'Txs',
         data,
-        backgroundColor: currentTheme === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
-        fill: true,
+        backgroundColor: `transparent`,
         borderWidth: 4,
         tension: .3,
-        pointRadius: 2,
+        pointRadius: 0,
         borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
       }]
     }
@@ -158,6 +157,9 @@ function TxsHistoryChart(props) {
       },
       scales: {
         y: {
+          grid: {
+            display: false,
+          },
           beginAtZero: true,
           ticks: {
             color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
@@ -165,6 +167,9 @@ function TxsHistoryChart(props) {
           }
         },
         x: {
+          grid: {
+            display: false,
+          },
           ticks: {
             color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
             callback: function (value, index, ticks) {
@@ -175,7 +180,7 @@ function TxsHistoryChart(props) {
         }
       }
     }
-  }, [])
+  }, [currentTheme])
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -188,7 +193,7 @@ function TxsHistoryChart(props) {
   }, [])
 
   return <div className={style.chart}>
-    <div>{t('Last 20 blocks ({} txs)', [totalTxs])}</div>
+    <div>{t('Last 100 blocks ({} txs)', [totalTxs])}</div>
     <Chart ref={chartRef} type="line" data={data} options={options} />
   </div>
 }

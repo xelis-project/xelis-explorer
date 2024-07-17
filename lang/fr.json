@@ -95,7 +95,7 @@
   "Past, pending and executed transactions.": "Transactions passées, en attente et exécutées.",
   "View pending transactions and network congestion. Verify if your transaction was executed.": "Consultez les transactions en attente et la congestion du réseau. Vérifiez si votre transaction a été exécutée.",
   "Type your account address or transaction hash to filter the list below.": "Saisissez votre adresse de compte ou le hachage de transaction pour filtrer la liste ci-dessous.",
-  "Last 20 blocks ({} txs)": "Derniers 20 blocs ({} tx)",
+  "Last 100 blocks ({} txs)": "Derniers 100 blocs ({} tx)",
   "Pending Transactions ({})": "Transactions en attente ({})",
   "Executed Transactions ({})": "Transactions exécutées ({})",
   "Topo": "Topo",

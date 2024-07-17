@@ -100,14 +100,15 @@ function Header(props) {
   const [headerClass, setHeaderClass] = useState(style.header)
 
   useEffect(() => {
-    const onScroll = (e) => {
-      if (e.target.scrollTop > 0) {
+    const onScroll = () => {
+      if (document.body.scrollTop > 0) {
         setHeaderClass(`${style.header} ${style.headerBg}`)
       } else {
         setHeaderClass(style.header)
       }
     }
 
+    onScroll()
     document.body.addEventListener(`scroll`, onScroll)
     return () => {
       document.body.removeEventListener(`scroll`, onScroll)

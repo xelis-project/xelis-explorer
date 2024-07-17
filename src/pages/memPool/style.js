@@ -5,7 +5,7 @@ import theme from '../../style/theme'
 export default {
   searchInput: css`
     padding: 0.7em;
-    border-radius: 10px;
+    border-radius: .5em;
     border: none;
     outline: none;
     font-size: 1.2em;
@@ -27,8 +27,8 @@ export default {
   chart: css`
     margin-bottom: 2em;
     background-color: var(--content-bg-color);
-    padding: 1em;
-    border-radius: .5em;
+    padding: 1.5em;
+    border-radius: 1em;
     display: flex;
     gap: 1em;
     flex-direction: column;

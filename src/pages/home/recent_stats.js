@@ -7,6 +7,7 @@ import { formatHashRate, formatSize, formatXelis } from '../../utils'
 import Chart from '../../components/chart'
 import theme from '../../style/theme'
 import { formatMiner } from '../../utils/pools'
+import useTheme from '../../hooks/useTheme'
 
 const style = {
   title: css`
@@ -23,9 +24,8 @@ const style = {
   box: {
     container: css`
       background-color: var(--content-bg-color);
-      border-radius: .5em;
-      padding: 1em;
-      min-width: 150px;
+      border-radius: .75em;
+      padding: 1.5em;
       min-width: 9em;
       flex-shrink: 0;
       display: flex;
@@ -42,11 +42,15 @@ const style = {
     content: css`
       margin-top: .5em;
       display: flex;
+    `,
+    description: css`
+      color: var(--muted-color);
+      font-size: .9em;
     `
   },
   stats: css`
     display: flex;
-    gap: 1em;
+    gap: 1.5em;
     overflow: auto;
     padding-bottom: 1em;
     margin-bottom: 1em;
@@ -201,6 +205,7 @@ function HashrateChart(props) {
   const { blocks, info } = props
 
   const { t } = useLang()
+  const { theme: currentTheme } = useTheme()
 
   const options = useMemo(() => {
     return {
@@ -221,13 +226,25 @@ function HashrateChart(props) {
       },
       scales: {
         y: {
+          grid: {
+            display: false,
+          },
           ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
             callback: (value) => formatHashRate(value),
+          },
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
           }
         }
       }
     }
-  }, [])
+  }, [currentTheme])
 
   const data = useMemo(() => {
     const labels = []
@@ -248,17 +265,19 @@ function HashrateChart(props) {
       datasets: [
         {
           data,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: `start`
+          backgroundColor: `transparent`,
+          borderWidth: 4,
+          tension: .3,
+          pointRadius: 0,
+          borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
         }
       ]
     }
-  }, [blocks, info])
+  }, [blocks, info, currentTheme])
 
   return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty)}>
     <Chart type="line" options={options} data={data} />
-    <div>
+    <div className={style.box.description}>
       {t(`
       Drastic swings in the nethash are caused by the Kalman Filter. 
       For a more accurate representation of nethash and additional information about the filter, check the links below.
@@ -275,6 +294,7 @@ function BlockTimesChart(props) {
   const { blocks, info } = props
 
   const { t } = useLang()
+  const { theme: currentTheme } = useTheme()
 
   const options = useMemo(() => {
     return {
@@ -295,13 +315,25 @@ function BlockTimesChart(props) {
       },
       scales: {
         y: {
+          grid: {
+            display: false,
+          },
           ticks: {
             callback: (value) => prettyMs(value),
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+          }
+        },
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
           }
         }
       }
     }
-  }, [])
+  }, [currentTheme])
 
   const data = useMemo(() => {
     const labels = []
@@ -320,13 +352,14 @@ function BlockTimesChart(props) {
 
     return {
       labels,
-      datasets: [
-        {
-          data,
-        }
-      ]
+      datasets: [{ 
+        data,
+        tension: .3,
+        borderWidth: 0,
+        backgroundColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+      }]
     }
-  }, [blocks])
+  }, [blocks, currentTheme])
 
   const value = t(`{} avg`, [prettyMs(info.average_block_time || 0, { compact: true })])
 

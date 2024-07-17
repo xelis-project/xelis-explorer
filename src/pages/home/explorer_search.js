@@ -26,16 +26,21 @@ const style = {
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 1;
+    z-index: 50;
     backdrop-filter: blur(5px);
     background-color: rgb(0 0 0 / 40%);
     ${opacity()};
   `,
   form: css`
     position: relative;
-    z-index: 2;
     max-width: 50em;
     margin: 0 auto;
+    transition: .25s all;
+
+    &[data-focus="true"] {
+      z-index: 60;
+      transform: scale(1.05);
+    }
 
     input {
       width: 100%;
@@ -155,7 +160,7 @@ export function ExplorerSearch() {
   return <div className={style.container}>
     <div className={style.title}>{t('XELIS Explorer')}</div>
     {isFocus && <div className={style.backdrop} />}
-    <form onSubmit={search} onBlur={onBlur} className={style.form}>
+    <form onSubmit={search} onBlur={onBlur} data-focus={isFocus} className={style.form}>
       <input onFocus={onFocus} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
         autoComplete="off" autoCapitalize="off" />
       <Button type="submit" aria-label="Search" onMouseDown={(e) => e.preventDefault()}>
