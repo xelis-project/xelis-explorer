@@ -1,7 +1,6 @@
 import { css } from 'goober'
 
 import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
 
 export default {
   error: css`
@@ -56,7 +55,11 @@ export default {
         align-items: center;
         white-space: nowrap;
         text-decoration: none;
-        ${scaleOnHover}
+        transition: .1s all;
+
+        &:hover {
+          transform: scale(.98);
+        }
 
         ${theme.query.maxDesktop} {
           > div {

@@ -20,7 +20,6 @@ import useOffCanvasBlock from './offCanvasBlock'
 import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
 import BottomInfo from './bottomInfo'
-import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
 
 const style = {
@@ -60,7 +59,11 @@ const style = {
       align-items: center;
       justify-content: center;
       color: var(--bg-color);
-      ${scaleOnHover({ scale: .9 })};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.9);
+      }
     }
   `,
   status: css`

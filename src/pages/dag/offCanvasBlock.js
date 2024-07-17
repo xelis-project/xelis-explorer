@@ -11,7 +11,6 @@ import Button from '../../components/button'
 import { getBlockType } from './index'
 import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
-import { scaleOnHover } from '../../style/animate'
 
 const style = {
   container: css`
@@ -33,7 +32,11 @@ const style = {
       gap: .5em;
       align-items: center;
       font-size: .9em;
-      ${scaleOnHover()};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.98);
+      }
     }
   `,
   items: css`

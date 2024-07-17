@@ -10,7 +10,6 @@ import Age from 'g45-react/components/age'
 
 import { formatHashRate, formatXelis, formatDifficulty } from '../../utils'
 import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
 import { useTheme } from '../../hooks/useTheme'
 
 const style = {
@@ -43,7 +42,11 @@ const style = {
         text-decoration: none;
         margin-top: 2em;
         font-size: 1.2em;
-        ${scaleOnHover}
+        transition: .1s all;
+
+        &:hover {
+          transform: scale(.98);
+        }
       }
     `,
     title: css`

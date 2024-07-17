@@ -12,7 +12,6 @@ import { getBlockType } from './index'
 import Button from '../../components/button'
 import { getBlockColor } from './blockColor'
 import useTheme from '../../hooks/useTheme'
-import { scaleOnHover } from '../../style/animate'
 import Switch from '../../components/switch'
 import Dropdown from '../../components/dropdown'
 
@@ -69,7 +68,11 @@ const style = {
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      ${scaleOnHover({ scale: .9 })};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.9);
+      }
     }
   `,
   navControls: css`
@@ -95,7 +98,11 @@ const style = {
         background-color: var(--text-color);
         color: var(--bg-color);
         cursor: pointer;
-        ${scaleOnHover}
+        transition: .1s all;
+
+        &:hover {
+          transform: scale(.98);
+        }
       }
     }
   `

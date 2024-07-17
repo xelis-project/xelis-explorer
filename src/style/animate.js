@@ -1,16 +1,5 @@
 import { keyframes } from 'goober'
 
-export const scaleOnHover = (props) => {
-  let { scale = '.98', duration = '.1s' } = props || {}
-  return `
-    transition: ${duration} transform;
-
-    &:hover {
-      transform: scale(${scale});
-    }
-  `
-}
-
 const slideXKeyframes = (from, to) => keyframes`
   0% {
     transform: translateX(${from});

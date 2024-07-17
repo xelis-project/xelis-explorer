@@ -5,7 +5,6 @@ import Icon from 'g45-react/components/fontawesome_icon'
 
 import theme from '../style/theme'
 import useTheme from '../hooks/useTheme'
-import { scaleOnHover } from '../style/animate'
 import layoutStyle from '../style/layout'
 import { logoBgUrl } from './header'
 

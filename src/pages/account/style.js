@@ -1,6 +1,5 @@
 import { css } from 'goober'
 import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
 
 export default {
   addrModal: {
@@ -148,7 +147,11 @@ export default {
         font-size: .8em;
         width: 2.5em;
         height: 2.5em;
-        ${scaleOnHover()};
+        transition: .1s all;
+
+        &:hover {
+          transform: scale(.98);
+        }
       }
     `
   },
@@ -169,7 +172,11 @@ export default {
       cursor: pointer;
       padding: 0.5em 1em;
       font-weight: bold;
-      ${scaleOnHover()};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.98);
+      }
     }
   `
 }

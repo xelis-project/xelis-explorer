@@ -1,5 +1,4 @@
 import { css } from 'goober'
-import { scaleOnHover } from '../../style/animate'
 
 export default {
   list: css`
@@ -34,7 +33,11 @@ export default {
       padding: .5em .7em;
       border-radius: .5em;
       text-decoration: none;
-      ${scaleOnHover()};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.98);
+      }
     `
   },
   miner: css`

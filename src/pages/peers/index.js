@@ -18,7 +18,6 @@ import useTheme from '../../hooks/useTheme'
 import Switch from '../../components/switch'
 import PageTitle from '../../layout/page_title'
 import FlagIcon from '../../components/flagIcon'
-import { scaleOnHover } from '../../style/animate'
 import theme from '../../style/theme'
 import Dropdown from '../../components/dropdown'
 import MapLoad from './mapLoad'
@@ -66,7 +65,11 @@ const style = {
       padding: 0.3em 0.6em;
       font-weight: bold;
       cursor: pointer;
-      ${scaleOnHover()};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.98);
+      }
     }
   `,
   map: css`

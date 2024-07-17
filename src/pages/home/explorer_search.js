@@ -8,7 +8,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 
 import Button from '../../components/button'
 import theme from '../../style/theme'
-import { opacity, scaleOnHover } from '../../style/animate'
+import { opacity } from '../../style/animate'
 
 const style = {
   container: css`
@@ -66,8 +66,11 @@ const style = {
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      transition: .1s transform;
-      ${scaleOnHover({ scale: .9 })};
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.9);
+      }
 
       span {
         display: none;

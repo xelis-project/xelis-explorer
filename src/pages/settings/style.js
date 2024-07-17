@@ -1,7 +1,6 @@
 import { css } from 'goober'
 
 import theme from '../../style/theme'
-import { scaleOnHover } from '../../style/animate'
 
 export default {
   formItems: css`
@@ -63,7 +62,14 @@ export default {
       font-weight: bold;
       font-size: 1em;
       align-items: center;
-      ${scaleOnHover}
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      transition: .1s all;
+
+      &:hover {
+        transform: scale(.98);
+      }
     }
   `
 }
