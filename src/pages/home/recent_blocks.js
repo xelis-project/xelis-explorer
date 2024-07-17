@@ -4,11 +4,13 @@ import { useMemo } from 'react'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 
-import { formatSize } from '../../utils'
+import { formatSize, formatXelis } from '../../utils'
 import theme from '../../style/theme'
 import { bounceIn, slideX } from '../../style/animate'
 import Hashicon from '../../components/hashicon'
 import { formatMiner } from '../../utils/pools'
+import { getBlockColor } from '../dag/blockColor'
+import { useTheme } from '../../hooks/useTheme'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -51,7 +53,7 @@ const style = {
       padding: 1em;
       min-width: 9em;
       background-color: var(--block-bg-color);
-      border-left: .3em solid var(--block-border-color);
+      border-left: .3em solid;
       border-radius: .25em;
       position: relative;
       flex-shrink: 0;
@@ -67,7 +69,7 @@ const style = {
       }
 
       ${theme.query.minDesktop} {
-        border-top: .4em solid var(--block-border-color);
+        border-top: .4em solid;
         border-left: none;
       }
     `,
@@ -120,6 +122,7 @@ export function RecentBlocks(props) {
   const { blocks, newBlock } = props
 
   const { t } = useLang()
+  const { theme: currentTheme } = useTheme()
 
   const newBlockHash = useMemo(() => {
     if (newBlock) return newBlock.hash
@@ -137,13 +140,17 @@ export function RecentBlocks(props) {
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0)
         const topo = block.topoheight ? block.topoheight.toLocaleString() : `?`
-        
+
         let blockClassName = style.block.container
         if (newBlockHash === block.hash) {
           blockClassName += ` ${style.block.animate}`
         }
 
-        return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}>
+        const blockColor = getBlockColor(currentTheme, block.block_type)
+        const title = t(`This is a {} block and the reward is {}.`, [block.block_type, formatXelis(block.reward)])
+
+        return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}
+          style={{ borderColor: blockColor }} title={title}>
           <div className={style.block.title}>{t('Block {}', [topo])}</div>
           <div className={style.block.info}>{txCount} txs | {size}</div>
           <div className={style.block.miner}>

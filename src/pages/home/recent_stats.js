@@ -8,6 +8,7 @@ import Chart from '../../components/chart'
 import theme from '../../style/theme'
 import { formatMiner } from '../../utils/pools'
 import useTheme from '../../hooks/useTheme'
+import { getBlockColor } from '../dag/blockColor'
 
 const style = {
   title: css`
@@ -55,6 +56,12 @@ const style = {
     padding-bottom: 1em;
     margin-bottom: 1em;
   `,
+  blockTypes: css`
+    display: grid;
+    row-gap: .25em;
+    column-gap: 1.5em;
+    grid-template-columns: 1fr 1fr;
+  `,
   charts: css`
     display: flex;
     gap: 2em;
@@ -84,23 +91,26 @@ function Box(props) {
   const { title, value, children } = props
   return <div className={style.box.container}>
     <div className={style.box.title}>{title}</div>
-    <div className={style.box.value}>{value}</div>
+    {value && <div className={style.box.value}>{value}</div>}
     {children}
   </div>
 }
 
 const defaultStats = {
-  txs: 0, size: 0, fees: 0, miners: {}, reward: 0,
+  txs: 0, size: 0, fees: 0, miners: {}, reward: 0, blockTypes: {}
 }
 
 export function RecentStats(props) {
   const { blocks, info } = props
 
   const { t } = useLang()
+  const { theme: currentTheme } = useTheme()
 
   const stats = useMemo(() => {
     let stats = Object.assign({}, defaultStats)
     let miners = {}
+    let blockTypes = { 'Normal': 0, 'Sync': 0, 'Side': 0, 'Orphaned': 0 }
+
     blocks.forEach(block => {
       if (Object.keys(block).length == 0) return
 
@@ -114,9 +124,11 @@ export function RecentStats(props) {
       } else {
         miners[block.miner]++
       }
+
+      blockTypes[block.block_type]++
     })
 
-    return { ...stats, miners }
+    return { ...stats, miners, blockTypes }
   }, [blocks])
 
   return <div>
@@ -127,8 +139,25 @@ export function RecentStats(props) {
     <div className={style.stats}>
       <Box title={t(`Txs`)} value={stats.txs} />
       <Box title={t(`Size`)} value={formatSize(stats.size)} />
-      <Box title={t(`Fees`)} value={formatXelis(stats.fees, { withSuffix: false })} />
+      {/* Commenting out because fee is not supplied by the node and is always zero */}
+      {/*<Box title={t(`Fees`)} value={formatXelis(stats.fees, { withSuffix: false })} />*/}
       <Box title={t(`Reward`)} value={formatXelis(stats.reward, { withSuffix: false })} />
+      <Box title={t(`Block Types`)}>
+        <div className={style.blockTypes}>
+          <div style={{ color: getBlockColor(currentTheme, `Normal`) }}>
+            {t(`Normal`)} ({stats.blockTypes[`Normal`]})
+          </div>
+          <div style={{ color: getBlockColor(currentTheme, `Sync`) }}>
+            {t(`Sync`)} ({stats.blockTypes[`Sync`]})
+          </div>
+          <div style={{ color: getBlockColor(currentTheme, `Side`) }}>
+            {t(`Side`)} ({stats.blockTypes[`Side`]})
+          </div>
+          <div style={{ color: getBlockColor(currentTheme, `Orphaned`) }}>
+            {t(`Orphaned`)} ({stats.blockTypes[`Orphaned`]})
+          </div>
+        </div>
+      </Box>
     </div>
     <div className={style.charts}>
       <MinersDistributionChart miners={stats.miners} numBlocks={blocks.length} />
@@ -352,7 +381,7 @@ function BlockTimesChart(props) {
 
     return {
       labels,
-      datasets: [{ 
+      datasets: [{
         data,
         tension: .3,
         borderWidth: 0,
