@@ -218,7 +218,11 @@ function Block() {
             key: 'height',
             title: t('Height'),
             render: (value, item) => {
-              if (value != null) return value.toLocaleString()
+              if (value != null) {
+                return <Link to={`/height/${value}`}>
+                  {value.toLocaleString()}
+                </Link>
+              }
               return `--`
             }
           },

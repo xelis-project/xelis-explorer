@@ -10,6 +10,7 @@ import Icon from 'g45-react/components/fontawesome_icon'
 import { daemonRPC } from '../../node_rpc'
 import PageTitle from '../../layout/page_title'
 import { formatSize, formatXelis, reduceText } from '../../utils'
+import { formatMiner } from '../../utils/pools'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import Hashicon from '../../components/hashicon'
@@ -72,8 +73,8 @@ function HeightBlocks() {
 
   return <div>
     <PageTitle title={t('Height {}', [parseInt(height).toLocaleString()])}
-      subtitle={t(`List of blocks at this height`)}
-      metaDescription={t(`List of blocks at height {}`, [height.toLocaleString()])}
+      subtitle={t(`List of blocks at this height.`)}
+      metaDescription={t(`List of blocks at height {}.`, [height.toLocaleString()])}
     />
     <div className={style.list}>
       {blocks.map((block) => {
@@ -114,7 +115,7 @@ function HeightBlocks() {
             <div className={style.item.title}>{t(`Miner`)}</div>
             <div className={`${style.miner} ${style.item.value}`}>
               <Hashicon value={block.miner} size={20} />
-              <Link to={`/accounts/${block.miner}`}>{reduceText(block.miner, 0, 7)}</Link>
+              <Link to={`/accounts/${block.miner}`}>{formatMiner(block.miner)}</Link>
             </div>
           </div>
           <Link className={style.item.button} to={`/blocks/${block.topoheight}`}>
