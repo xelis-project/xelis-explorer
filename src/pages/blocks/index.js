@@ -204,10 +204,6 @@ function Blocks() {
     loadBlocks()
   }, [pageState])
 
-  const heightBlocks = useMemo(() => {
-    return [...groupBy(blocks, (b) => b.height).entries()]
-  }, [blocks])
-
   let stableLineRendered = false
   let hasUnstableblocks = false
 
@@ -264,7 +260,7 @@ function Blocks() {
           key: 'block_type',
           title: t('Type'),
           render: (_, block) => {
-            const blockType = getBlockType(block, stableheight, heightBlocks)
+            const blockType = getBlockType(blocks, block, stableheight)
             const color = getBlockColor(currentTheme, blockType)
             return <span style={{ color }}>{blockType}</span>
           }

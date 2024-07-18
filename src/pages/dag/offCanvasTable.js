@@ -128,10 +128,10 @@ function HeightRangeInput(props) {
 }
 
 function useOffCanvasTable(props) {
-  const { info, blocks, onBlockClick, heightBlocks } = props
+  const { info, blocks, onBlockClick } = props
 
   const height = info.height
-  const stableHeight = info.stableHeight
+  const stableHeight = info.stableheight
 
   const { theme: currentTheme } = useTheme()
   const { t } = useLang()
@@ -279,7 +279,7 @@ function useOffCanvasTable(props) {
       list={filteredBlocks} emptyText={t('No blocks')} colSpan={5}
       onItem={(block, index) => {
         const txCount = (block.txs_hashes || []).length
-        const blockType = getBlockType(block, stableHeight, heightBlocks)
+        const blockType = getBlockType(blocks, block, stableHeight)
         return <tr key={block.hash} onClick={() => onBlockClick(block)}>
           <td>
             <span>{(block.topoheight || 0).toLocaleString()}</span>&nbsp;

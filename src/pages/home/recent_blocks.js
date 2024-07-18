@@ -11,6 +11,7 @@ import Hashicon from '../../components/hashicon'
 import { formatMiner } from '../../utils/pools'
 import { getBlockColor } from '../dag/blockColor'
 import { useTheme } from '../../hooks/useTheme'
+import { getBlockType } from '../dag'
 
 theme.xelis`
   --block-bg-color: #0c0c0c;
@@ -119,7 +120,7 @@ const style = {
 }
 
 export function RecentBlocks(props) {
-  const { blocks, newBlock } = props
+  const { blocks, newBlock, info } = props
 
   const { t } = useLang()
   const { theme: currentTheme } = useTheme()
@@ -146,8 +147,9 @@ export function RecentBlocks(props) {
           blockClassName += ` ${style.block.animate}`
         }
 
-        const blockColor = getBlockColor(currentTheme, block.block_type)
-        const title = t(`This is a {} block and the reward is {}.`, [block.block_type, formatXelis(block.reward)])
+        const blockType = getBlockType(blocks, block, info.stableheight)
+        const blockColor = getBlockColor(currentTheme, blockType)
+        const title = t(`This is a {} block and the reward is {}.`, [blockType, formatXelis(block.reward)])
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}
           style={{ borderColor: blockColor }} title={title}>

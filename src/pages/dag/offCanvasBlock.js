@@ -62,10 +62,10 @@ const style = {
 }
 
 function useOffCanvasBlock(props) {
-  const { info, heightBlocks } = props
+  const { info, blocks } = props
 
   const topoheight = info.topoheight
-  const stableHeight = info.stableHeight
+  const stableHeight = info.stableheight
   const [block, setBlock] = useState()
   const [opened, setOpened] = useState(false)
   const [err, setErr] = useState()
@@ -93,7 +93,7 @@ function useOffCanvasBlock(props) {
     setBlock(data)
   }, [nodeSocket.readyState])
 
-  const blockType = block ? getBlockType(block, stableHeight, heightBlocks) : ``
+  const blockType = block ? getBlockType(blocks, block, stableHeight) : `?`
 
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
     {block && <>

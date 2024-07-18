@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
@@ -22,6 +22,8 @@ export function useRecentBlocks() {
 
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
+
+  const blocksRef = useRef(serverResult.blocks)
   const [blocks, setBlocks] = useState(serverResult.blocks)
   const [newBlock, setNewBlock] = useState()
 
@@ -48,11 +50,12 @@ export function useRecentBlocks() {
         end_topoheight: topoheight - x
       }))
       if (err2) return resErr(err2)
-  
+
       blocks = blocks.concat(bls.reverse())
     }
     setLoading(false)
-    setBlocks(blocks)
+    blocksRef.current = blocks
+    setBlocks(blocksRef.current)
   }, [nodeSocket.readyState])
 
   useEffect(() => {
@@ -62,11 +65,14 @@ export function useRecentBlocks() {
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,
     onData: (_, newBlock) => {
-      setBlocks((blocks) => {
-        if (blocks.findIndex(block => block.hash === newBlock.hash) !== -1) return blocks
-        return [newBlock, ...blocks]
-      })
-      setNewBlock(newBlock)
+      const block = blocksRef.current.find(block => block.hash === newBlock.hash)
+      if (!block) {
+        blocksRef.current.unshift(newBlock)
+        blocksRef.current.pop()
+
+        setBlocks(blocksRef.current)
+        setNewBlock(newBlock)
+      }
     }
   }, [])
 
@@ -77,14 +83,16 @@ export function useRecentBlocks() {
       const [err, blockData] = await to(nodeSocket.daemon.methods.getBlockByHash({ hash: block_hash }))
       if (err) return console.log(err)
 
-      setBlocks((blocks) => blocks.map(block => {
+      blocksRef.current = blocksRef.current.map(block => {
         if (block.hash === block_hash) {
           //block.topoheight = topoheight
           //block.block_type = block_type
           block = blockData
         }
         return block
-      }))
+      })
+
+      setBlocks(blocksRef.current)
     }
   }, [])
 
@@ -95,23 +103,25 @@ export function useRecentBlocks() {
       const [err, blockData] = await to(nodeSocket.daemon.methods.getBlockByHash({ hash: block_hash }))
       if (err) return console.log(err)
 
-      setBlocks((blocks) => blocks.map(block => {
+      blocksRef.current = blocksRef.current.map(block => {
         if (block.hash === block_hash) {
           //block.topoheight = topoheight
           //block.block_type = block_type
           block = blockData
         }
         return block
-      }))
+      })
+
+      setBlocks(blocksRef.current)
     }
   }, [])
 
-  useEffect(() => {
-    if (blocks.length > 20*BLOCK_ITERATIONS) {
-      blocks.pop()
-      setBlocks([...blocks])
+  /*useEffect(() => {
+    if (blocks.length > 20 * BLOCK_ITERATIONS) {
+      blocksRef.current.pop()
+      setBlocks(blocksRef.current)
     }
-  }, [blocks])
+  }, [blocks])*/
 
   return { err, loading, blocks, newBlock }
 }
@@ -173,11 +183,11 @@ function Home() {
 
   return <div>
     <Helmet>
-      <title>Home</title>
+      <title>{t(`Home`)}</title>
       <meta name="description" content={t('Dive into the XELIS Explorer. Navigate the blockchain, verify transactions, and access specific metadata.')} />
     </Helmet>
     <ExplorerSearch />
-    <RecentBlocks blocks={blocks} newBlock={newBlock} />
+    <RecentBlocks blocks={blocks} newBlock={newBlock} info={info} />
     <RecentStats blocks={blocks} info={info} />
     <NetworkStats blocks={blocks} info={info} />
   </div>

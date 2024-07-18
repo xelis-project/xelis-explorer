@@ -74,20 +74,16 @@ const style = {
   `
 }
 
-export function getBlockType(block, stableHeight, heightBlocks) {
-  // block is Sync when he is alone at a stable height
-  let totalBlocksAtHeight = 0
-
-  for (let i = 0; i < heightBlocks.length; i++) {
-    const [height, blocks] = heightBlocks[i]
-    if (height === block.height) {
-      totalBlocksAtHeight = blocks.length
-      break
+export function getBlockType(blocks, block, stableHeight) {
+  let heightCount = 0
+  for (let i = 0; i < blocks.length; i++) {
+    if (blocks[i].height === block.height) {
+      heightCount++
     }
   }
 
   if (
-    totalBlocksAtHeight <= 1 &&
+    heightCount <= 1 &&
     block.block_type === BlockType.Normal &&
     block.height <= stableHeight
   ) {
@@ -162,7 +158,7 @@ function InstancedLines(props) {
 }
 
 function InstancedBlocks(props) {
-  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor, heightBlocks } = props
+  const { blocks = [], newBlock, hoveredBlock, setHoveredBlock, offCanvasBlock, stableHeight, setCursor } = props
 
   const { theme: currentTheme } = useTheme()
   const geometry = useMemo(() => new RoundedBoxGeometry(1, 1, 1), [])
@@ -250,7 +246,7 @@ function InstancedBlocks(props) {
   return <Instances material={material} geometry={geometry}>
     {blocks.map((block) => {
       const { x, y, data } = block
-      const blockType = getBlockType(data, stableHeight, heightBlocks)
+      const blockType = getBlockType(blocks, data, stableHeight)
 
       let scaleValue = scale[data.hash] || 1
       if (hoveredBlock && data.hash === hoveredBlock.data.hash) scaleValue = 1.3
@@ -307,7 +303,7 @@ function DAG() {
 
   const offCanvasBlock = useOffCanvasBlock({
     info,
-    heightBlocks
+    blocks
   })
 
   const offCanvasTable = useOffCanvasTable({
@@ -316,7 +312,6 @@ function DAG() {
     onBlockClick: (block) => {
       offCanvasBlock.open(block)
     },
-    heightBlocks
   })
 
   const loadInfo = useCallback(async () => {
