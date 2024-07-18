@@ -1,6 +1,6 @@
 import { useParams } from 'react-router'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import Age from 'g45-react/components/age'
@@ -132,6 +132,39 @@ function Account() {
     loadAccount()
   }, [loadAccount])
 
+  const description = useMemo(() => {
+    return t(`Account history of {}.`, [addr])
+  }, [addr, t])
+
+  let title = t('Account {}', [reduceText(addr)])
+  if (pools[addr]) {
+    title = `${title} (${pools[addr]})`
+  }
+
+  return <div>
+    <PageTitle title={title}
+      metaTitle={t('Account {}', [addr || ''])}
+      metaDescription={description} />
+    <div className={style.account.container}>
+      <div className={style.account.left}>
+        <AccountInfo account={account} addr={addr} accountAssets={accountAssets} />
+      </div>
+      <div className={style.account.right}>
+        <History addr={addr} asset={asset} assetData={assetData}
+          account={account} loadAccount={loadAccount} />
+      </div>
+    </div>
+    <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
+  </div>
+}
+
+export default Account
+
+function AccountInfo(props) {
+  const { account, addr, accountAssets } = props
+
+  const { t } = useLang()
+
   const onAssetChange = useCallback((item) => {
     setAsset(item.key)
   }, [])
@@ -145,98 +178,73 @@ function Account() {
     })
   }, [accountAssets])
 
-  const description = useMemo(() => {
-    return t(`Account history of {}.`, [addr])
-  }, [addr, t])
-
   const balance = account.balance || {}
   const finalBalance = balance.final_balance || {}
   const commitment = finalBalance.commitment || []
 
-  let title = t('Account {}', [reduceText(addr)])
-  if (pools[addr]) {
-    title = `${title} (${pools[addr]})`
-  }
-
-  return <div>
-    <PageTitle title={title}
-      metaTitle={t('Account {}', [addr || ''])}
-      metaDescription={description} />
-    <div className={style.account.container}>
-      <div className={style.account.left}>
-        <div className={style.account.leftBg}>
-          <div className={style.accountDetails.container}>
-            <div className={style.accountDetails.qrCode}>
-              <button onClick={() => setQRCodeVisible(true)}>
-                <Icon name="qrcode" />
-              </button>
-            </div>
-            <div className={style.accountDetails.hashicon}>
-              <Hashicon value={addr} size={50} />
-            </div>
-            <div className={style.accountDetails.addr}>
-              {addr}
-            </div>
-          </div>
-          <div className={style.account.item.container}>
-            <div className={style.account.item.title}>{t('Asset')}</div>
-            <div className={style.account.item.value}>
-              <Dropdown items={dropdownAssets} onChange={onAssetChange}
-                size={.8} value={XELIS_ASSET} />
-            </div>
-          </div>
-          <div className={style.account.item.container}>
-            <div className={style.account.item.title}>{t('Balance')}</div>
-            <div className={style.account.item.value}>
-              <EncryptedAmountModal title={t(`Balance`)} commitment={commitment} />
-            </div>
-          </div>
-          <div className={style.account.item.container}>
-            <div className={style.account.item.title}>{t('Last Activity')}</div>
-            <div className={style.account.item.value}>
-              {account.topoheight ? <>
-                <div>
-                  <Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} />
-                </div>
-                <div className={style.account.item.subvalue}>
-                  <Link to={`/blocks/${account.topoheight}`}>
-                    {account.topoheight.toLocaleString()}
-                  </Link>
-                </div>
-              </> : `--`}
-            </div>
-          </div>
-          <div className={style.account.item.container}>
-            <div className={style.account.item.title}>{t('Nonce')}</div>
-            <div className={style.account.item.value}>{account.nonce >= 0 ? account.nonce : `--`}</div>
-          </div>
-          <div className={style.account.item.container}>
-            <div className={style.account.item.title}>{t('Registered')}</div>
-            <div className={style.account.item.value}>
-              {account.registered ? <>
-                <div>
-                  {new Date(account.registered.timestamp).toLocaleString()}
-                </div>
-                <div className={style.account.item.subvalue}>
-                  <Link to={`/blocks/${account.registered.topoheight}`}>
-                    {account.registered.topoheight.toLocaleString()}
-                  </Link>
-                </div>
-              </> : `--`}
-            </div>
-          </div>
-        </div>
+  return <div className={style.account.leftBg}>
+    <div className={style.accountDetails.container}>
+      <div className={style.accountDetails.qrCode}>
+        <button onClick={() => setQRCodeVisible(true)}>
+          <Icon name="qrcode" />
+        </button>
       </div>
-      <div className={style.account.right}>
-        <History addr={addr} asset={asset} assetData={assetData}
-          account={account} loadAccount={loadAccount} />
+      <div className={style.accountDetails.hashicon}>
+        <Hashicon value={addr} size={50} />
+      </div>
+      <div className={style.accountDetails.addr}>
+        {addr}
       </div>
     </div>
-    <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Asset')}</div>
+      <div className={style.account.item.value}>
+        <Dropdown items={dropdownAssets} onChange={onAssetChange}
+          size={.8} value={XELIS_ASSET} />
+      </div>
+    </div>
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Balance')}</div>
+      <div className={style.account.item.value}>
+        <EncryptedAmountModal title={t(`Balance`)} commitment={commitment} />
+      </div>
+    </div>
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Last Activity')}</div>
+      <div className={style.account.item.value}>
+        {account.topoheight ? <>
+          <div>
+            <Age timestamp={account.timestamp} update format={{ compact: false, secondsDecimalDigits: 0 }} />
+          </div>
+          <div className={style.account.item.subvalue}>
+            <Link to={`/blocks/${account.topoheight}`}>
+              {account.topoheight.toLocaleString()}
+            </Link>
+          </div>
+        </> : `--`}
+      </div>
+    </div>
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Nonce')}</div>
+      <div className={style.account.item.value}>{account.nonce >= 0 ? account.nonce : `--`}</div>
+    </div>
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Registered')}</div>
+      <div className={style.account.item.value}>
+        {account.registered ? <>
+          <div>
+            {new Date(account.registered.timestamp).toLocaleString()}
+          </div>
+          <div className={style.account.item.subvalue}>
+            <Link to={`/blocks/${account.registered.topoheight}`}>
+              {account.registered.topoheight.toLocaleString()}
+            </Link>
+          </div>
+        </> : `--`}
+      </div>
+    </div>
   </div>
 }
-
-export default Account
 
 /*
 function loadAccountHistory_SSR() {

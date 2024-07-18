@@ -81,11 +81,10 @@ export default {
       padding: 1em;
       border-top: .3em solid var(--table-th-bg-color);
       border-radius: .5em;
-      position: sticky;
-      top: 1em;
     `,
     right: css`
       flex: 3;
+      overflow: auto;
     `,
     fromTo: css`
       display: flex;
