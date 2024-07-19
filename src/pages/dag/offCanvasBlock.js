@@ -6,6 +6,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { formatBlock, formatXelis, formatDifficulty } from '../../utils'
+import { pools } from '../../utils/pools'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { getBlockType } from './index'
@@ -94,6 +95,7 @@ function useOffCanvasBlock(props) {
   }, [nodeSocket.readyState])
 
   const blockType = block ? getBlockType(blocks, block, stableHeight) : `?`
+  const pool = block ? pools[block.miner] : null
 
   const render = <OffCanvas position="left" maxWidth={500} opened={opened} className={style.container}>
     {block && <>
@@ -134,7 +136,7 @@ function useOffCanvasBlock(props) {
           <div>{(block.height || 0).toLocaleString()}</div>
         </div>
         <div>
-          <div>{t('Miner')}</div>
+          <div>{t('Miner')}{pool && <span> ({pool.name})</span>}</div>
           <div>
             <Link to={`/accounts/${block.miner}`}>{block.miner}</Link>
           </div>
