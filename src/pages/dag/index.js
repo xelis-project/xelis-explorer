@@ -70,7 +70,19 @@ const style = {
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: 2.5em;
+    margin-top: 4em;
+  `,
+  nodeStatusContainer: css`
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    width: 100%;
+    max-width: 25em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1em;
   `
 }
 
@@ -523,7 +535,9 @@ function DAG() {
     {offCanvasTable.render}
     {offCanvasBlock.render}
     <BottomInfo info={info} />
-    <NodeStatus />
+    <div className={style.nodeStatusContainer}>
+      <NodeStatus />
+    </div>
     <div className={style.status}>
       {(blocks.length > 0 && !offCanvasTable.paused) && <>
         {t('Last block ')}
