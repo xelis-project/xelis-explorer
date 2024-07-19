@@ -46,7 +46,7 @@ const style = {
       width: 100%;
       padding: 1em 1.5em;
       font-size: 1.1em;
-      border-radius: 30px;
+      border-radius: 2em;
       outline: none;
       color: var(--text-color);
       background-color: var(--content-bg-color);
@@ -58,23 +58,28 @@ const style = {
       position: absolute;
       top: 0;
       right: 0;
-      margin: .4em;
-      font-size: 1.1em;
+      font-size: 1.2em;
       cursor: pointer;
-      background-color: var(--text-color);
+      background-color: #f1f1f1;
       color: var(--bg-color);
-      border-radius: 50%;
-      height: 76%;
+      height: 100%;
       min-width: 46px;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      transition: .1s all;
+      transition: .2s all;
+      padding: 0 2em;
+      border-radius: 2em;
+      /* border-top-left-radius: 0; */
+      /* border-bottom-left-radius: 0; */
+      background: ${theme.apply({ xelis: '#172a29', dark: '#0c0c0c', light: '#e7e7e7' })};
+      color: var(--text-color);
 
       &:hover {
-        transform: scale(.9);
+        background-color: var(--text-color);
+        color: var(--bg-color);
       }
 
       span {
@@ -82,10 +87,6 @@ const style = {
       }
 
       ${theme.query.minDesktop} {
-        width: inherit;
-        padding: 0 2em;
-        border-radius: 30px;
-
         i {
           display: none;
         }

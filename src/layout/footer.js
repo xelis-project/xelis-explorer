@@ -79,7 +79,7 @@ const style = {
       padding: .7em;
       cursor: pointer;
       color: var(--text-color);
-      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)`})};
+      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)` })};
       border-radius: .5em;
       text-align: left;
       min-width: 130px;
@@ -133,7 +133,7 @@ const style = {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)`})};
+      background-color: ${theme.apply({ xelis: `rgb(241 241 241 / 6%)`, dark: `rgb(241 241 241 / 6%)`, light: `rgb(8 8 8 / 6%)` })};
 
       &:hover {
         opacity: 1;
@@ -157,54 +157,56 @@ function Footer(props) {
   const { t } = useLang()
 
   return <div className={style.container}>
-    <div className={`${style.content} ${layoutStyle.pageMaxWidth}`}>
-      <div>
-        <div className={style.title}>
-          <div className={style.logo}></div>
-          {title}
+    <div className={layoutStyle.pageMaxWidth}>
+      <div className={style.content}>
+        <div>
+          <div className={style.title}>
+            <div className={style.logo}></div>
+            {title}
+          </div>
+          <div>
+            <div className={style.description}>{description}</div>
+            <div className={style.version}>{version}</div>
+          </div>
         </div>
         <div>
-          <div className={style.description}>{description}</div>
-          <div className={style.version}>{version}</div>
+          <div className={style.title}>{t('PAGES')}</div>
+          <div className={`${style.pages} ${style.hyperlinks}`}>
+            {pages.map((page) => {
+              const { path, title, icon } = page
+              return <Link key={path} to={path}>
+                <div>{title}</div>
+                <div>{icon}</div>
+              </Link>
+            })}
+          </div>
         </div>
-      </div>
-      <div>
-        <div className={style.title}>{t('PAGES')}</div>
-        <div className={`${style.pages} ${style.hyperlinks}`}>
-          {pages.map((page) => {
-            const { path, title, icon } = page
-            return <Link key={path} to={path}>
-              <div>{title}</div>
-              <div>{icon}</div>
-            </Link>
-          })}
+        <div>
+          <div className={style.title}>{t('THEME')}</div>
+          <div className={style.buttons}>
+            <button onClick={() => setTheme('xelis')} data-active={currentTheme === `xelis`}>
+              {t('Default')}<Icon name="palette" />
+            </button>
+            <button onClick={() => setTheme('dark')} data-active={currentTheme === `dark`}>
+              {t('Dark')}<Icon name="moon" />
+            </button>
+            <button onClick={() => setTheme('light')} data-active={currentTheme === `light`}>
+              {t('Light')}<Icon name="sun" />
+            </button>
+          </div>
         </div>
-      </div>
-      <div>
-        <div className={style.title}>{t('THEME')}</div>
-        <div className={style.buttons}>
-          <button onClick={() => setTheme('xelis')} data-active={currentTheme === `xelis`}>
-            {t('Default')}<Icon name="palette" />
-          </button>
-          <button onClick={() => setTheme('dark')} data-active={currentTheme === `dark`}>
-            {t('Dark')}<Icon name="moon" />
-          </button>
-          <button onClick={() => setTheme('light')} data-active={currentTheme === `light`}>
-            {t('Light')}<Icon name="sun" />
-          </button>
-        </div>
-      </div>
-      <div>
-        <div className={style.title}>{t('LINKS')}</div>
-        <div className={`${style.links} ${style.hyperlinks}`}>
-          {links.map((link) => {
-            const { href, title, icon } = link
+        <div>
+          <div className={style.title}>{t('LINKS')}</div>
+          <div className={`${style.links} ${style.hyperlinks}`}>
+            {links.map((link) => {
+              const { href, title, icon } = link
 
-            return <a key={href} href={href} target="_blank">
-              <div>{title}</div>
-              <div>{icon}</div>
-            </a>
-          })}
+              return <a key={href} href={href} target="_blank">
+                <div>{title}</div>
+                <div>{icon}</div>
+              </a>
+            })}
+          </div>
         </div>
       </div>
     </div>

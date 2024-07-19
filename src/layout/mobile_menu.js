@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { css } from 'goober'
@@ -39,11 +39,15 @@ const style = {
       opacity: 1;
     }
   `,
-  bottomButtons: css`
+  dropdowns: css`
     display: flex;
-    gap: .5em;
-    margin-top: 1em;
+    gap: 1em;
+    margin-top: 2em;
     flex-direction: column;
+
+    > div {
+      font-size: 1.1em;
+    }
   `,
   menuButton: css`
     padding: 0.4em 0.5em;
@@ -140,6 +144,10 @@ function MobileMenu(props) {
             {icon}
           </NavLink>
         })}
+      </div>
+      <div className={style.dropdowns}>
+        <LangDropdown />
+        <ThemeDropdown />
       </div>
     </div>
   </>

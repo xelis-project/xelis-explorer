@@ -18,7 +18,7 @@ function ThemeDropdown(props) {
     ]
   }, [t])
 
-  return <Dropdown items={themes} value={currentTheme} size={size} onChange={(item) => {
+  return <Dropdown items={themes} value={currentTheme} onChange={(item) => {
     setTheme(item.key)
   }} />
 }

@@ -203,8 +203,7 @@ function AccountInfo(props) {
     <div className={style.account.item.container}>
       <div className={style.account.item.title}>{t('Asset')}</div>
       <div className={style.account.item.value}>
-        <Dropdown items={dropdownAssets} onChange={onAssetChange}
-          size={.8} value={XELIS_ASSET} />
+        <Dropdown items={dropdownAssets} onChange={onAssetChange} value={XELIS_ASSET} />
       </div>
     </div>
     <div className={style.account.item.container}>

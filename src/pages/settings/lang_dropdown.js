@@ -5,7 +5,6 @@ import Dropdown from '../../components/dropdown'
 import FlagIcon from '../../components/flagIcon'
 
 function LangDropdown(props) {
-  const { size } = props
   const { t, langKey, setLangKey } = useLang()
 
   const languages = useMemo(() => {
@@ -16,7 +15,7 @@ function LangDropdown(props) {
     ]
   }, [t])
 
-  return <Dropdown items={languages} value={langKey || `en`} size={size} onChange={(item) => {
+  return <Dropdown items={languages} value={langKey || `en`} onChange={(item) => {
     setLangKey(item.key)
   }} />
 }

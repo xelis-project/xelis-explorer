@@ -55,14 +55,14 @@ function Settings() {
         <label>{t('Language')}</label>
         <span>{t('Select your preferred language.')}</span>
         <div style={{ maxWidth: `15em` }}>
-          <LangDropdown size={1.1} />
+          <LangDropdown />
         </div>
       </div>
       <div className={style.formInput}>
         <label>{t('Theme')}</label>
         <span>{t('Select your preferred theme.')}</span>
         <div style={{ maxWidth: `15em` }}>
-          <ThemeDropdown size={1.1} />
+          <ThemeDropdown />
         </div>
       </div>
     </div>

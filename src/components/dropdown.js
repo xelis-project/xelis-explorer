@@ -3,7 +3,6 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import Icon from 'g45-react/components/fontawesome_icon'
 
 import theme from '../style/theme'
-import style from '../pages/block/style'
 
 const defaultStyle = {
   container: css`
@@ -91,7 +90,7 @@ const defaultStyle = {
 }
 
 function Dropdown(props) {
-  const { items = [], onChange, value, size = 1,
+  const { items = [], onChange, value,
     notSelectedText = `Choose an option`, prefix = ``, styling = defaultStyle, ...restProps } = props
 
   const [selectedKey, setSelectedKey] = useState(value)
@@ -127,7 +126,7 @@ function Dropdown(props) {
     return items.find((item) => item.key === selectedKey)
   }, [selectedKey, items])
 
-  return <div ref={dropdownRef} className={styling.container} style={{ fontSize: `${size}em` }} {...restProps}>
+  return <div ref={dropdownRef} className={styling.container} {...restProps}>
     <div onClick={() => setOpen(!open)} className={styling.dropdown} data-open={open}>
       <div className={styling.value}>{selectedItem ? <>{prefix}{selectedItem.text}</> : notSelectedText}</div>
       <Icon name="arrow-down" className={styling.arrowIcon} data-open={open} />
