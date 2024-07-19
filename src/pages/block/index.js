@@ -238,7 +238,7 @@ function Block() {
                   {value}
                 </Link>
                 {pools[value] && <div className={style.minerName}>
-                  {pools[value]}
+                  {pools[value].name}
                 </div>}
               </div>
             }

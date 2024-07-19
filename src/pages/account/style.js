@@ -108,7 +108,21 @@ export default {
         font-size: .8em;
         margin-top: 0.25em;
       `
-    }
+    },
+    pool: css`
+      border-radius: .75em;
+      padding: 1em;
+      background: var(--content-bg-color);
+      margin-bottom: 1em;
+      line-height: 1.2em;
+      display: flex;
+      gap: 1em;
+      align-items: center;
+
+      i {
+        font-size: 2em;
+      }
+    `
   },
   accountDetails: {
     container: css`

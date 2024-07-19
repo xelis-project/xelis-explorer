@@ -136,15 +136,19 @@ function Account() {
     return t(`Account history of {}.`, [addr])
   }, [addr, t])
 
-  let title = t('Account {}', [reduceText(addr)])
-  if (pools[addr]) {
-    title = `${title} (${pools[addr]})`
-  }
+  const pool = pools[addr]
 
   return <div>
-    <PageTitle title={title}
+    <PageTitle title={t('Account {}', [reduceText(addr)])}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
+    {pool && <div className={style.account.pool}>
+      <Icon name="tag" />
+      <div>
+        {t(`This is a known address owned by ${pool.name}.`)}<br />
+        {pool.link && <>{t(`You can visit the website at `)}<a href={pool.link} target="_blank">{pool.link}</a>.</>}
+      </div>
+    </div>}
     <div className={style.account.container}>
       <div className={style.account.left}>
         <AccountInfo account={account} addr={addr} accountAssets={accountAssets} setQRCodeVisible={setQRCodeVisible} />
