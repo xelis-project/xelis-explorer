@@ -53,9 +53,9 @@ const defaultStyle = {
     overflow: auto;
     transition: .25s all;
     max-height: 10em;
-    border-bottom-right-radius: 15px;
+    border-bottom-right-radius: .5em;
     border-top: none;
-    border-bottom-left-radius: 15px;
+    border-bottom-left-radius: .5em;
     transform-origin: top;
     transform: translateY(-100%);
 

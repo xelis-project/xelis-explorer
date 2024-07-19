@@ -42,7 +42,7 @@ export default {
       color: var(--muted-color);
     `,
     button: css`
-      border: thin solid var(--muted-color);
+      border: 2px solid var(--muted-color);
       background: transparent;
       padding: .5em;
       border-radius: .5em;
@@ -54,7 +54,7 @@ export default {
       transition: all .25s;
       
       &:hover {
-        border: thin solid var(--text-color);
+        border: 2px solid var(--text-color);
         color: var(--text-color);
       }
     `,
@@ -138,7 +138,7 @@ export default {
       
       button {
         border-radius: 50%;
-        border: thin solid var(--text-color);
+        border: 2px solid var(--text-color);
         transition: .1s transform;
         background: none;
         color: var(--text-color);
@@ -164,7 +164,7 @@ export default {
       gap: .5em;
       align-items: center;
       border-radius: 25px;
-      border: thin solid var(--text-color);
+      border: 2px solid var(--text-color);
       transition: .1s all;
       background: none;
       color: var(--text-color);
