@@ -3,6 +3,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import Icon from 'g45-react/components/fontawesome_icon'
 
 import theme from '../style/theme'
+import style from '../pages/block/style'
 
 const defaultStyle = {
   container: css`
@@ -13,9 +14,9 @@ const defaultStyle = {
     color: var(--text-color);
   `,
   dropdown: css`
-    padding: .5em;
-    border: thin solid var(--dropdown-text-color);
-    background-color: var(--dropdown-bg-color);
+    padding: .5em .6em;
+    border: 2px solid var(--dropdown-text-color);
+    background: var(--content-bg-color);
     border-radius: .5em;
     cursor: pointer;
     display: flex;
@@ -24,6 +25,11 @@ const defaultStyle = {
     align-items: center;
     position: relative;
     font-weight: bold;
+
+    &[data-open="true"] {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
   `,
   value: css`
     overflow: hidden;
@@ -32,7 +38,7 @@ const defaultStyle = {
   list: css`
     position: absolute;
     width: 100%;
-    clip-path: inset(-.5em 0 0 0);
+    clip-path: inset(0 0 0 0);
     visibility: hidden;
     z-index: 1;
 
@@ -41,13 +47,12 @@ const defaultStyle = {
     }
   `,
   items: css`
-    border: thin solid var(--dropdown-text-color);
-    background-color: var(--dropdown-bg-color);
+    border: 2px solid var(--dropdown-text-color);
+    background: var(--content-bg-color);
+    backdrop-filter: blur(5px);
     overflow: auto;
     transition: .25s all;
     max-height: 10em;
-    margin-top: -.5em;
-    padding-top: .5em;
     border-bottom-right-radius: 15px;
     border-top: none;
     border-bottom-left-radius: 15px;
@@ -76,7 +81,9 @@ const defaultStyle = {
     color: inherit;
     cursor: inherit;
   `,
-  icon: css`
+  arrowIcon: css`
+    transition: .25s all;
+
     &[data-open="true"] {
       transform: rotate(180deg);
     }
@@ -121,9 +128,9 @@ function Dropdown(props) {
   }, [selectedKey, items])
 
   return <div ref={dropdownRef} className={styling.container} style={{ fontSize: `${size}em` }} {...restProps}>
-    <div onClick={() => setOpen(!open)} className={styling.dropdown}>
+    <div onClick={() => setOpen(!open)} className={styling.dropdown} data-open={open}>
       <div className={styling.value}>{selectedItem ? <>{prefix}{selectedItem.text}</> : notSelectedText}</div>
-      <Icon name="arrow-down" />
+      <Icon name="arrow-down" className={styling.arrowIcon} data-open={open} />
     </div>
     <div data-open={open} className={styling.list}>
       <div data-open={open} className={styling.items}>

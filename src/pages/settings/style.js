@@ -10,11 +10,11 @@ export default {
     margin-top: 2em;
   `,
   formInput: css`
-    background: linear-gradient(to right, #a7a7a71c, transparent);
     padding: 1em;
     border-radius: .5em;
     display: flex;
     flex-direction: column;
+    background: rgb(167 167 167 / 10%);
 
     label {
       font-weight: bold;

@@ -20,7 +20,7 @@ export const defaultStyle = {
     `,
   button: css`
     border-radius: 1em;
-    border: thin solid var(--text-color);
+    border: 2px solid var(--text-color);
     cursor: pointer;
     padding: .5em 1em;
     font-weight: bold;
