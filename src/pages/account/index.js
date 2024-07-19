@@ -147,7 +147,7 @@ function Account() {
       metaDescription={description} />
     <div className={style.account.container}>
       <div className={style.account.left}>
-        <AccountInfo account={account} addr={addr} accountAssets={accountAssets} />
+        <AccountInfo account={account} addr={addr} accountAssets={accountAssets} setQRCodeVisible={setQRCodeVisible} />
       </div>
       <div className={style.account.right}>
         <History addr={addr} asset={asset} assetData={assetData}
@@ -161,7 +161,7 @@ function Account() {
 export default Account
 
 function AccountInfo(props) {
-  const { account, addr, accountAssets } = props
+  const { account, addr, accountAssets, setQRCodeVisible } = props
 
   const { t } = useLang()
 
