@@ -182,14 +182,15 @@ export default {
     > div {
       display: flex;
       gap: .5em;
+      align-items: center;
 
       > :nth-child(1) {
         color: var(--muted-color);
-        font-size: .9em;
+        font-size: 1em;
       }
 
       > :nth-child(2) {
-        font-size: 1.1em;
+        font-size: 1.4em;
       }
     }
   `,
