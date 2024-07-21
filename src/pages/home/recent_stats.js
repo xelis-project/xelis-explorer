@@ -9,6 +9,7 @@ import theme from '../../style/theme'
 import { formatMiner } from '../../utils/pools'
 import useTheme from '../../hooks/useTheme'
 import { getBlockColor } from '../dag/blockColor'
+import { getBlockType } from '../dag'
 
 const style = {
   title: css`
@@ -125,11 +126,13 @@ export function RecentStats(props) {
         miners[block.miner]++
       }
 
-      blockTypes[block.block_type]++
+
+      const blockType = getBlockType(blocks, block, info.stableheight)
+      blockTypes[blockType]++
     })
 
     return { ...stats, miners, blockTypes }
-  }, [blocks])
+  }, [blocks, info])
 
   return <div>
     <div className={style.title}>
