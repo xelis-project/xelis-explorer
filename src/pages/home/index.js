@@ -116,13 +116,6 @@ export function useRecentBlocks() {
     }
   }, [])
 
-  /*useEffect(() => {
-    if (blocks.length > 20 * BLOCK_ITERATIONS) {
-      blocksRef.current.pop()
-      setBlocks(blocksRef.current)
-    }
-  }, [blocks])*/
-
   return { err, loading, blocks, newBlock }
 }
 

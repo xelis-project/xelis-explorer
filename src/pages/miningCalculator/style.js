@@ -10,15 +10,34 @@ export default {
       border-top-right-radius: 1em;
       border-top-left-radius: 1em;
     `,
-    networkHashrate: css`
-      font-size: 1.2em;
-      border-radius: 1em;
-      margin-bottom: 1em;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      display: flex;
-      justify-content: space-between;
-    `,
+    networkHashrate: {
+      container: css`
+        font-size: 1.2em;
+        border-radius: 1em;
+        margin-bottom: 1em;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        display: flex;
+        justify-content: space-between;
+      `,
+      value: css`
+        display: flex;
+        font-size: .9em;
+        align-items: center;
+        border-radius: .5em;
+        border: 2px solid var(--content-bg-color);
+
+        > :nth-child(1) {
+          padding: .5em .75em;
+          color: var(--muted-color);
+        }
+
+        > :nth-child(2) {
+          padding: .5em .75em;
+          background: var(--content-bg-color);
+        }
+      `
+    },
     inputCalculator: css`
       position: relative;
       display: flex;
