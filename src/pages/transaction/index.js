@@ -6,6 +6,7 @@ import { useNodeSocket } from '@xelis/sdk/react/daemon'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import { useLang } from 'g45-react/hooks/useLang'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import Table from '../../components/table'
 import { formatXelis, reduceText, displayError, formatSize } from '../../utils'
@@ -39,6 +40,7 @@ function Transaction() {
 
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
+  const locale = useLocale()
 
   const { firstPageLoad } = usePageLoad()
   const serverResult = loadTransaction_SSR({ hash })
@@ -135,7 +137,7 @@ function Transaction() {
                     {hash}
                   </Link>&nbsp;
                   {topoheight && <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
-                    ({topoheight.toLocaleString()})
+                    {topoheight.toLocaleString(locale)}
                   </span>}
                 </div>
               }
@@ -262,7 +264,6 @@ function InBlocks(props) {
   const loadTxBlocks = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-
     setLoading(true)
     setErr(null)
 
@@ -292,11 +293,10 @@ function InBlocks(props) {
   return <div>
     <h2 className={style.title}>{t('In Blocks')}</h2>
     <Table
-      headers={[t(`Topo Height`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Timestamp`), t(`Txs`)]}
+      headers={[t(`Topo Height`), t(`Hash`), t(`Type`), t(`Size`), t(`Fees`), t(`Txs`)]}
       list={blocks} loading={loading} err={err} emptyText={t('No blocks')} colSpan={7}
       onItem={(item, index) => {
         const size = formatSize(item.total_size_in_bytes)
-        const time = new Date(item.timestamp).toLocaleString()
         const txCount = (item.txs_hashes || []).length.toLocaleString()
         return <tr key={item.hash}>
           <td>
@@ -308,7 +308,6 @@ function InBlocks(props) {
           <td style={{ color: getBlockColor(currentTheme, item.block_type) }}>{item.block_type}</td>
           <td>{size}</td>
           <td>{formatXelis(item.total_fees)}</td>
-          <td>{time}</td>
           <td>{txCount}</td>
         </tr>
       }}

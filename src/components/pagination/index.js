@@ -43,8 +43,8 @@ export const defaultStyle = {
 }
 
 function Pagination(props) {
-  const { count, state = { page: 1, size: 20 }, setState, sizes = [5, 10, 20],
-    countText = `items`, className = ``, styling = defaultStyle, ...restProps } = props
+  const { count, state = { page: 1, size: 20 }, setState, sizes = [5, 10, 20], className = ``,
+    styling = defaultStyle, formatCount, ...restProps } = props
 
   const pageCount = useMemo(() => {
     const pages = Math.ceil((count || 0) / state.size)
@@ -109,7 +109,9 @@ function Pagination(props) {
     {pageCount > 1 && <button className={styling.button} onClick={setLastPage} disabled={!canLastPage} data-active={!canLastPage}>
       {pageCount}
     </button>}
-    <div className={styling.count}>{`${(count || 0).toLocaleString()} ${countText}`}</div>
+    <div className={styling.count}>
+      {typeof formatCount === `function` ? formatCount(count || 0) : `${count || 0}`}
+    </div>
   </div>
 }
 

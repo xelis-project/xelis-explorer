@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { displayError, isHash, formatSize, formatXelis, formatBlock, reduceText, formatDifficulty } from '../../utils'
 import PageLoading from '../../components/pageLoading'
@@ -70,6 +71,7 @@ function Block() {
   const [block, setBlock] = useState(serverResult.block)
   const [topoheight, setTopoheight] = useState(serverResult.topoheight)
   const { theme: currentTheme } = useTheme()
+  const locale = useLocale()
 
   const loadBlock = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -109,10 +111,7 @@ function Block() {
     loadBlock()
   }, [loadBlock, firstPageLoad])
 
-  const formattedBlock = useMemo(() => {
-    if (!block) return {}
-    return formatBlock(block, topoheight)
-  }, [block, topoheight])
+  const formattedBlock = formatBlock({ block, topoheight, locale })
 
   const description = useMemo(() => {
     if (!block.hash) {
@@ -178,7 +177,12 @@ function Block() {
             title: t('Timestamp'),
             render: (_, item) => {
               if (item.timestamp != null) {
-                return `${formattedBlock.date} (${item.timestamp})`
+                return <div>
+                  <div>UTC: {new Date(item.timestamp).toLocaleString(locale, { timeZone: `UTC` })}</div>
+                  <div>Unix: {item.timestamp}</div>
+                  {/* Use Suspense for client side only because we cannot determine the timezone from server side and avoid ssr hydration error */}
+                  <div>Local: <Suspense>{new Date(item.timestamp).toLocaleString()}</Suspense></div>
+                </div>
               }
 
               return `--`
@@ -200,7 +204,7 @@ function Block() {
             title: t('Confirmations'),
             render: (value, item) => {
               if (item.hash) {
-                return formattedBlock.confirmations.toLocaleString()
+                return formattedBlock.confirmations.toLocaleString(locale)
               }
 
               return `--`
@@ -210,7 +214,7 @@ function Block() {
             key: 'topoheight',
             title: t('Topo Height'),
             render: (value, item) => {
-              if (value != null) return value.toLocaleString()
+              if (value != null) return value.toLocaleString(locale)
               return `--`
             }
           },
@@ -220,7 +224,7 @@ function Block() {
             render: (value, item) => {
               if (value != null) {
                 return <Link to={`/height/${value}`}>
-                  {value.toLocaleString()}
+                  {value.toLocaleString(locale)}
                 </Link>
               }
               return `--`
@@ -260,7 +264,7 @@ function Block() {
             title: t('Miner Reward'),
             render: (value) => {
               if (value) {
-                return formatXelis(value)
+                return formatXelis(value, { locale })
               }
 
               return `--`
@@ -271,7 +275,7 @@ function Block() {
             title: t('Dev Reward'),
             render: (value) => {
               if (value) {
-                return formatXelis(value)
+                return formatXelis(value, { locale })
               }
 
               return `--`
@@ -282,7 +286,7 @@ function Block() {
             title: t('Supply'),
             render: (value) => {
               if (value) {
-                return formatXelis(value)
+                return formatXelis(value, { locale })
               }
 
               return `--`
@@ -299,7 +303,7 @@ function Block() {
             render: (value) => {
               if (value) {
                 return <div title={value}>
-                  {formatDifficulty(value)}
+                  {formatDifficulty(value, { locale })}
                 </div>
               }
 
@@ -312,7 +316,7 @@ function Block() {
             render: (value) => {
               if (value) {
                 return <div title={value}>
-                  {formatDifficulty(value)}
+                  {formatDifficulty(value, { locale })}
                 </div>
               }
 
@@ -343,7 +347,7 @@ function Block() {
           {
             key: 'total_size_in_bytes',
             title: t('Size'),
-            render: (value) => formatSize(value) || `--`
+            render: (value) => formattedBlock.size || `--`
           },
           {
             key: 'tips',

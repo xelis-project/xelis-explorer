@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
-
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
+
 import { formatBlock, formatXelis, formatDifficulty } from '../../utils'
 import { pools } from '../../utils/pools'
 import OffCanvas from '../../components/offCanvas'
@@ -79,10 +79,7 @@ function useOffCanvasBlock(props) {
     setOpened(true)
   }, [])
 
-  const formattedBlock = useMemo(() => {
-    if (!block) return {}
-    return formatBlock(block, topoheight || 0)
-  }, [block, topoheight])
+  const formattedBlock = formatBlock({ block, topoheight })
 
   const loadBlock = useCallback(async (topoheight) => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -121,7 +118,11 @@ function useOffCanvasBlock(props) {
         </div>
         <div>
           <div>{t('Timestamp')}</div>
-          <div title={block.timestamp || 0}>{formattedBlock.date}</div>
+          <div title={block.timestamp || 0}>
+            <div>UTC: {new Date(block.timestamp).toLocaleString(undefined, { timeZone: `UTC` })}</div>
+            <div>Unix: {block.timestamp}</div>
+            <div>Local: {new Date(block.timestamp).toLocaleString()}</div>
+          </div>
         </div>
         <div>
           <div>{t('Confirmations')}</div>

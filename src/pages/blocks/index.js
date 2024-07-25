@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { css } from 'goober'
@@ -10,12 +10,13 @@ import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
 import useQueryString from 'g45-react/hooks/useQueryString'
 import hashIt from 'hash-it'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { formatHashRate, formatSize, formatXelis, groupBy, reduceText } from '../../utils'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../node_rpc'
-import { slideX, slideY } from '../../style/animate'
+import { slideX } from '../../style/animate'
 import PageTitle from '../../layout/page_title'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
@@ -86,6 +87,7 @@ function Blocks() {
   const [loading, setLoading] = useState()
   const [query, setQuery] = useQueryString({})
   const { t } = useLang()
+  const locale = useLocale()
   const { theme: currentTheme } = useTheme()
 
   const [pageState, _setPageState] = useState(() => {
@@ -208,7 +210,7 @@ function Blocks() {
   let hasUnstableblocks = false
 
   return <div>
-    <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString()])}
+    <PageTitle title={t('Blocks')} subtitle={t(`{} mined blocks`, [blockCount.toLocaleString(locale)])}
       metaDescription={t('List of mined blocks. Access block heights, timestamps and transaction counts.')} />
     <TableFlex mobileFormat={false} data={blocks} rowKey="hash" err={err} loading={loading} emptyText={t('No blocks')}
       rowClassName={(block) => {
@@ -238,7 +240,7 @@ function Blocks() {
             // don't use `if (value) {}` because zero needs to pass (genenis block)
             if (value != null) {
               return <Link to={`/blocks/${value}`}>
-                {value.toLocaleString()}
+                {value.toLocaleString(locale)}
               </Link>
             }
             return `--`
@@ -250,7 +252,7 @@ function Blocks() {
           render: (value) => {
             if (value != null) {
               return <Link to={`/height/${value}`}>
-                {value.toLocaleString()}
+                {value.toLocaleString(locale)}
               </Link>
             }
             return `--`
@@ -270,7 +272,7 @@ function Blocks() {
           title: t('Txs'),
           render: (value) => {
             const txCount = (value || []).length
-            return txCount.toLocaleString()
+            return txCount.toLocaleString(locale)
           }
         },
         {
@@ -281,7 +283,7 @@ function Blocks() {
         {
           key: 'total_size_in_bytes',
           title: t('Size'),
-          render: (value) => formatSize(value)
+          render: (value) => formatSize(value, { locale })
         },
         {
           key: 'hash',
@@ -313,16 +315,18 @@ function Blocks() {
         {
           key: 'reward',
           title: t('Reward'),
-          render: (value) => formatXelis(value)
+          render: (value) => formatXelis(value, { locale })
         },
         {
           key: 'difficulty',
           title: t('Network Diff'),
-          render: (value) => formatHashRate(value)
+          render: (value) => formatHashRate(value, { locale })
         }
       ]}
     />
-    <Pagination state={pageState} setState={setPageState} countText={t('blocks')} count={blockCount} />
+    <Pagination state={pageState} setState={setPageState} count={blockCount}
+      formatCount={(count) => t('{} blocks', [count.toLocaleString(locale)])}
+    />
   </div>
 }
 

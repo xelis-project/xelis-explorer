@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 import prettyMs from 'pretty-ms'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { formatHashRate, formatSize, formatXelis } from '../../utils'
 import Chart from '../../components/chart'
@@ -105,6 +106,7 @@ export function RecentStats(props) {
   const { blocks, info } = props
 
   const { t } = useLang()
+  const locale = useLocale()
   const { theme: currentTheme } = useTheme()
 
   const stats = useMemo(() => {
@@ -141,10 +143,10 @@ export function RecentStats(props) {
     </div>
     <div className={style.stats}>
       <Box title={t(`Txs`)} value={stats.txs} />
-      <Box title={t(`Size`)} value={formatSize(stats.size)} />
+      <Box title={t(`Size`)} value={formatSize(stats.size, { locale })} />
       {/* Commenting out because fee is not supplied by the node and is always zero */}
-      {/*<Box title={t(`Fees`)} value={formatXelis(stats.fees, { withSuffix: false })} />*/}
-      <Box title={t(`Reward`)} value={formatXelis(stats.reward, { withSuffix: false })} />
+      {/*<Box title={t(`Fees`)} value={formatXelis(stats.fees, { withSuffix: false, locale })} />*/}
+      <Box title={t(`Reward`)} value={formatXelis(stats.reward, { withSuffix: false, locale })} />
       <Box title={t(`Block Types`)}>
         <div className={style.blockTypes}>
           <div style={{ color: getBlockColor(currentTheme, `Normal`) }}>
@@ -237,6 +239,7 @@ function HashrateChart(props) {
   const { blocks, info } = props
 
   const { t } = useLang()
+  const locale = useLocale()
   const { theme: currentTheme } = useTheme()
 
   const options = useMemo(() => {
@@ -251,7 +254,7 @@ function HashrateChart(props) {
         tooltip: {
           callbacks: {
             label: function (ctx) {
-              return formatHashRate(ctx.raw)
+              return formatHashRate(ctx.raw, { locale })
             }
           }
         }
@@ -263,7 +266,7 @@ function HashrateChart(props) {
           },
           ticks: {
             color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
-            callback: (value) => formatHashRate(value),
+            callback: (value) => formatHashRate(value, { locale }),
           },
         },
         x: {
@@ -307,7 +310,7 @@ function HashrateChart(props) {
     }
   }, [blocks, info, currentTheme])
 
-  return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty)}>
+  return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty, { locale })}>
     <Chart type="line" options={options} data={data} />
     <div className={style.box.description}>
       {t(`

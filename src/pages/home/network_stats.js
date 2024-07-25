@@ -7,6 +7,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import Icon from 'g45-react/components/fontawesome_icon'
 import { useLang } from 'g45-react/hooks/useLang'
 import Age from 'g45-react/components/age'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { formatHashRate, formatXelis, formatDifficulty } from '../../utils'
 import theme from '../../style/theme'
@@ -98,6 +99,7 @@ export function NetworkStats(props) {
   const { blocks, info } = props
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
+  const locale = useLocale()
 
   const [p2pStatus, setP2PStatus] = useState({})
   const { theme: currentTheme } = useTheme()
@@ -131,23 +133,23 @@ export function NetworkStats(props) {
     const data = info || {}
 
     const maxSupply = data.maximum_supply || 0
-    const mined = ((data.circulating_supply || 0) * 100 / (maxSupply || 1)).toFixed(2)
+    const mined = ((data.circulating_supply || 0) * 100 / (maxSupply || 1))
 
     return [
-      { title: t(`Max Supply`), render: () => formatXelis(maxSupply, { withSuffix: false }) },
-      { title: t(`Circulating Supply`), render: () => formatXelis(data.circulating_supply, { withSuffix: false }) },
-      { title: t(`Mined`), render: () => `${mined}%` },
+      { title: t(`Max Supply`), render: () => formatXelis(maxSupply, { withSuffix: false, locale }) },
+      { title: t(`Circulating Supply`), render: () => formatXelis(data.circulating_supply, { withSuffix: false, locale }) },
+      { title: t(`Mined`), render: () => `${mined.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` },
 
-      { title: t(`Topo Height`), render: () => (data.topoheight || 0).toLocaleString() },
-      { title: t(`Block Reward`), render: () => formatXelis(data.block_reward, { withSuffix: false }) },
-      { title: t(`Mempool`), render: () => `${data.mempool_size || 0} tx` },
+      { title: t(`Topo Height`), render: () => (data.topoheight || 0).toLocaleString(locale) },
+      { title: t(`Block Reward`), render: () => formatXelis(data.block_reward, { withSuffix: false, locale }) },
+      { title: t(`Mempool`), render: () => `${(data.mempool_size || 0).toLocaleString(locale)} tx` },
 
-      { title: t(`Height`), render: () => (data.height || 0).toLocaleString() },
-      { title: t(`Stable Height`), render: () => (data.stableheight || 0).toLocaleString() },
-      { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString() },
+      { title: t(`Height`), render: () => (data.height || 0).toLocaleString(locale) },
+      { title: t(`Stable Height`), render: () => (data.stableheight || 0).toLocaleString(locale) },
+      { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString(locale) },
 
-      { title: t(`Difficulty`), render: () => formatDifficulty(data.difficulty).toLocaleString() },
-      { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty) },
+      { title: t(`Difficulty`), render: () => formatDifficulty(data.difficulty, { locale })},
+      { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty, { locale }) },
       { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true }) },
     ]
   }, [info, blocks, currentTheme, t, p2pStatus])

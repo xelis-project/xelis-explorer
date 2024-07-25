@@ -4,6 +4,7 @@ import prettyMs from 'pretty-ms'
 import { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
 import { RPCEvent } from '@xelis/sdk/daemon/types'
 import Age from 'g45-react/components/age'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { useNetworkInfo } from '../home'
 import { BLOCK_TIME, formatDifficulty, formatHashRate, formatXelis } from '../../utils'
@@ -14,6 +15,7 @@ import style from './style'
 function MiningCalculator() {
   const { info, loadInfo } = useNetworkInfo()
   const { t } = useLang()
+  const locale = useLocale()
 
   const [hashRate, setHashRate] = useState()
   const [hashRateUnit, setHashRateUnit] = useState(1000) // KH/s
@@ -51,7 +53,7 @@ function MiningCalculator() {
           <div>{t(`Network hashrate`)}</div>
           <div className={style.box.networkHashrate.value}>
             <div><Age ssrKey="hashrate-update" timestamp={lastUpdate} update /></div>
-            <div>{formatHashRate(info.difficulty)}</div>
+            <div>{formatHashRate(info.difficulty, { locale })}</div>
           </div>
         </div>
         <div className={style.box.inputCalculator}>
@@ -62,7 +64,7 @@ function MiningCalculator() {
           <select value={hashRateUnit} onChange={(e) => {
             setHashRateUnit(parseInt(e.target.value))
           }}>
-            <option value="1"><div>H/s</div></option>
+            <option value="1">H/s</option>
             <option value="1000">KH/s</option>
             <option value="1000000">MH/s</option>
             <option value="1000000000">GH/s</option>
@@ -73,7 +75,7 @@ function MiningCalculator() {
       <div className={style.miningReward.container}>
         {hashRate != null && <>
           <div className={style.miningReward.result}>
-            {t(`With {}H/s, you can probably find a block every`, [formatDifficulty(hashRate * hashRateUnit)])} <span className={style.miningReward.timeBlock}>{prettyMs(rewardData.timeUntilBlock * 1000 || 0, { compact: true })}</span>.
+            {t(`With {}H/s, you can probably find a block every`, [formatDifficulty(hashRate * hashRateUnit, { locale })])} <span className={style.miningReward.timeBlock}>{prettyMs(rewardData.timeUntilBlock * 1000 || 0, { compact: true })}</span>.
           </div>
           <div className={style.miningReward.specify}>
             {t(`More precisely every {} with each block mining reward at {}.`, [prettyMs(rewardData.timeUntilBlock * 1000 || 0), formatXelis(info.miner_reward)])}

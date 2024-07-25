@@ -3,6 +3,7 @@ import { css } from 'goober'
 import { useMemo } from 'react'
 import Age from 'g45-react/components/age'
 import { useLang } from 'g45-react/hooks/useLang'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import { formatSize, formatXelis } from '../../utils'
 import theme from '../../style/theme'
@@ -124,6 +125,7 @@ export function RecentBlocks(props) {
 
   const { t } = useLang()
   const { theme: currentTheme } = useTheme()
+  const locale = useLocale()
 
   const newBlockHash = useMemo(() => {
     if (newBlock) return newBlock.hash
@@ -139,8 +141,8 @@ export function RecentBlocks(props) {
       {recentBlocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
-        const size = formatSize(block.total_size_in_bytes || 0)
-        const topo = block.topoheight ? block.topoheight.toLocaleString() : `?`
+        const size = formatSize(block.total_size_in_bytes || 0, { locale })
+        const topo = block.topoheight ? block.topoheight.toLocaleString(locale) : `?`
 
         let blockClassName = style.block.container
         if (newBlockHash === block.hash) {
@@ -149,7 +151,7 @@ export function RecentBlocks(props) {
 
         const blockType = getBlockType(blocks, block, info.stableheight)
         const blockColor = getBlockColor(currentTheme, blockType)
-        const title = t(`This is a {} block and the reward is {}.`, [blockType, formatXelis(block.reward)])
+        const title = t(`This is a {} block and the reward is {}.`, [blockType, formatXelis(block.reward, { locale })])
 
         return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}
           style={{ borderColor: blockColor }} title={title}>
@@ -160,9 +162,7 @@ export function RecentBlocks(props) {
             {block.miner ? formatMiner(block.miner) : '--'}
           </div>
           <div className={style.block.age}>
-            {block.timestamp ?
-              <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
-              : '--'}
+            <Age timestamp={block.timestamp} update format={{ secondsDecimalDigits: 0 }} />
           </div>
         </Link>
       })}

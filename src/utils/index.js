@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import bytes from 'bytes'
+import prettyBytes from 'pretty-bytes'
 
 export const reduceText = (text, maxLeft = 5, maxRight = 5) => {
   if (typeof text !== 'string') return text
@@ -21,13 +21,15 @@ export const shiftNumber = (value, decimals) => {
 // ENV is defined with esbuild from g45-react package
 export const XELIS_PREFIX = ENV === `testnet` ? `XET` : `XEL`
 
-export const formatXelis = (value, { withSuffix = true } = {}) => {
-  const number = formatAsset(value, XELIS_DECIMALS)
+export const formatXelis = (value, { locale, withSuffix } = {}) => {
+  if (!withSuffix) withSuffix = true
+
+  const number = formatAsset({ value, decimals: XELIS_DECIMALS, locale })
   return `${number}${withSuffix ? ` ${XELIS_PREFIX}` : ``}`
 }
 
-export const formatAsset = (value, decimals) => {
-  return shiftNumber(value, decimals).toNumber().toLocaleString(undefined, { maximumFractionDigits: decimals })
+export const formatAsset = ({ value, decimals, locale }) => {
+  return shiftNumber(value, decimals).toNumber().toLocaleString(locale, { maximumFractionDigits: decimals })
 }
 
 /*
@@ -40,8 +42,8 @@ export const formatAsset = (value, asset) => {
   }
 }*/
 
-export const formatSize = (value, options = { unitSeparator: ` ` }) => {
-  return bytes.format(value, options)
+export const formatSize = (value, options) => {
+  return prettyBytes(value || 0, options)
 }
 
 export const groupBy = (list, getKey) => {
@@ -71,38 +73,42 @@ const HASH_UNIT_ARRAY = [
 
 export const BLOCK_TIME = 15 // in seconds
 
-export const formatHashRate = (difficulty) => {
+export const formatHashRate = (difficulty, { locale } = {}) => {
   let value = new BigNumber(difficulty, 10).div(BLOCK_TIME)
-  return `${formatDifficulty(value.toString())}H/s`
+  return `${formatDifficulty(value.toString(), { locale })}H/s`
 }
 
-export const formatDifficulty = (difficulty, { decimals = 2, withSuffix = true } = {}) => {
+export const formatDifficulty = (difficulty, { locale, decimals } = {}) => {
+  if (!decimals) decimals = 2
+
   let suffix = ``
   let value = new BigNumber(difficulty, 10)
 
   for (let i = 0; i < HASH_UNIT_ARRAY.length; i++) {
     const item = HASH_UNIT_ARRAY[i]
     if (value >= item.unit) {
-      if (withSuffix) suffix = item.suffix
+      suffix = item.suffix
       value = value.div(item.unit)
       break
     }
   }
 
-  return `${value.toFixed(decimals)} ${suffix}`
+  return `${value.toNumber().toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} ${suffix}`
 }
 
-export const formatBlock = (block, topoheight) => {
+export const formatBlock = ({ block, topoheight, locale }) => {
+  if (!block) return {}
+
   return {
-    date: new Date(block.timestamp).toLocaleString(),
+    utcDate: new Date(block.timestamp).toLocaleString(locale, { timeZone: `UTC` }),
     miner: reduceText(block.miner),
-    totalFees: formatXelis(block.total_fees), // if available (include_txs?)
-    reward: formatXelis(block.reward),
+    totalFees: formatXelis(block.total_fees, { locale }), // if available (include_txs?)
+    reward: formatXelis(block.reward, { locale }),
     confirmations: block.topoheight != null ? topoheight - block.topoheight : 0,
-    size: formatSize(block.total_size_in_bytes),
+    size: formatSize(block.total_size_in_bytes, { locale }),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
-    hashRate: formatHashRate(block.difficulty),
+    hashRate: formatHashRate(block.difficulty, { locale }),
   }
 }
 

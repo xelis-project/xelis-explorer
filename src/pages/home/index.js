@@ -12,6 +12,7 @@ import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
 import { daemonRPC } from '../../node_rpc'
+import { formatSize } from '../../utils'
 
 const BLOCK_ITERATIONS = 5
 

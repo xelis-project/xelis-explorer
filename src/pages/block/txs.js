@@ -106,7 +106,9 @@ function Transactions(props) {
         </React.Fragment>
       }}
     />
-    <Pagination state={pageState} setState={setPageState} countText="txs" count={txCount} />
+    <Pagination state={pageState} setState={setPageState} count={txCount}
+      formatCount={(count) => t('{} txs', [count.toLocaleString()])}
+    />
   </div>
 }
 

@@ -8,6 +8,7 @@ import { useServerData } from 'g45-react/hooks/useServerData'
 import { useLang } from 'g45-react/hooks/useLang'
 import hashIt from 'hash-it'
 import useQueryString from 'g45-react/hooks/useQueryString'
+import useLocale from 'g45-react/hooks/useLocale'
 
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../node_rpc'
@@ -69,6 +70,7 @@ function Accounts() {
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
   const { t } = useLang()
+  const locale = useLocale()
 
   const [query, setQuery] = useQueryString({})
 
@@ -138,7 +140,7 @@ function Accounts() {
   }, [pageState])
 
   return <div>
-    <PageTitle title={t('Accounts')} subtitle={t('{} registered accounts', [accountCount.toLocaleString()])}
+    <PageTitle title={t('Accounts')} subtitle={t('{} registered accounts', [accountCount.toLocaleString(locale)])}
       metaDescription={t('List of registered accounts. Check addresses and more.')} />
     <TableFlex loading={loading} err={err}
       emptyText={t('No accounts')} rowKey="addr"
@@ -160,7 +162,7 @@ function Accounts() {
           title: t('Topo Height'),
           render: (_, item) => {
             const { topoheight } = item.balance || {}
-            return topoheight ? topoheight.toLocaleString() : `--`
+            return topoheight ? topoheight.toLocaleString(locale) : `--`
           }
         },
         {
@@ -173,7 +175,9 @@ function Accounts() {
           }
         }
       ]} data={accounts} />
-    <Pagination state={pageState} setState={setPageState} countText={t('accounts')} count={accountCount} />
+    <Pagination state={pageState} setState={setPageState} count={accountCount}
+      formatCount={(count) => t('{} accounts', [count.toLocaleString(locale)])}
+    />
   </div>
 }
 
