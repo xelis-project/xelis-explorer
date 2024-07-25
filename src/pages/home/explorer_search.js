@@ -31,10 +31,27 @@ const style = {
     background-color: rgb(0 0 0 / 40%);
     ${opacity()};
   `,
-  form: css`
-    position: relative;
+  heightContainer: css`
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin-top: 1em;
+
+    ${theme.query.minDesktop} {
+      flex-direction: row;
+    }
+
+    > * {
+      flex: 1;
+    }
+  `
+  ,
+  inputs: css`
     max-width: 50em;
     margin: 0 auto;
+  `,
+  form: css`
+    position: relative;
     transition: .25s all;
 
     &[data-focus="true"] {
@@ -104,49 +121,82 @@ export function ExplorerSearch() {
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
 
-  const search = useCallback(async (e) => {
+  const goToBlockHeight = useCallback((value) => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
+    if (!isNaN(parseInt(value))) {
+      // go to block with topoheight
+      return navigate(`/height/${value}`)
+    }
+  }, [nodeSocket])
 
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    let searchValue = formData.get(`search`)
-    if (searchValue === ``) return
-    searchValue = searchValue.trim()
+  const goToBlockTopoHeight = useCallback((value) => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    if (!isNaN(parseInt(value))) {
+      // go to block with topoheight
+      return navigate(`/blocks/${value}`)
+    }
+  }, [nodeSocket])
+
+  const searchBlock = useCallback(async (value) => {
+    if (nodeSocket.readyState !== WebSocket.OPEN) return
+
+    if (value === ``) return
+    value = value.trim()
 
     // go to account with address
-    if (searchValue.length === 63) {
-      return navigate(`/accounts/${searchValue}`)
+    if (value.length === 63) {
+      return navigate(`/accounts/${value}`)
     }
 
-    if (searchValue.length === 64) {
+    if (value.length === 64) {
       const [err1, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
-        hash: searchValue
+        hash: value
       }))
       if (err1) console.log(err1)
 
       if (block) {
         // go to block with block hash
-        return navigate(`/blocks/${searchValue}`)
+        return navigate(`/blocks/${value}`)
       }
 
-      const [err2, tx] = await to(nodeSocket.daemon.methods.getTransaction(searchValue))
+      const [err2, tx] = await to(nodeSocket.daemon.methods.getTransaction(value))
       if (err2) console.log(err2)
 
       if (tx) {
         // go to tx with tx hash
-        return navigate(`/txs/${searchValue}`)
+        return navigate(`/txs/${value}`)
       }
 
       // go to block anyway and show error there
-      return navigate(`/blocks/${searchValue}`)
-    }
-
-    if (!isNaN(parseInt(searchValue))) {
-      // go to block with topoheight
-      return navigate(`/blocks/${searchValue}`)
+      return navigate(`/blocks/${value}`)
     }
   }, [nodeSocket.readyState])
+
+  return <div className={style.container}>
+    <div className={style.title}>{t('XELIS Explorer')}</div>
+    <div className={style.inputs}>
+      <FormInput onSubmit={searchBlock} type="text" placeholder={t(`Search block hash, transaction or account address.`)}>
+        <Icon name="search" />
+        <span>{t('SEARCH')}</span>
+      </FormInput>
+      <div className={style.heightContainer}>
+        <FormInput onSubmit={goToBlockTopoHeight} type="number" placeholder={t(`Block topo height`)}>
+          <Icon name="arrow-right" />
+          <span>{t('GO')}</span>
+        </FormInput>
+        <FormInput onSubmit={goToBlockHeight} type="number" placeholder={t(`Block height`)}>
+          <Icon name="arrow-right" />
+          <span>{t('GO')}</span>
+        </FormInput>
+      </div>
+    </div>
+  </div>
+}
+
+function FormInput(props) {
+  const { type, placeholder, children, onSubmit } = props
 
   const [isFocus, setFocus] = useState(false)
 
@@ -158,16 +208,22 @@ export function ExplorerSearch() {
     setFocus(false)
   }, [])
 
-  return <div className={style.container}>
-    <div className={style.title}>{t('XELIS Explorer')}</div>
+  const _onSubmit = useCallback((e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    let value = formData.get(`value`)
+
+    if (typeof onSubmit === `function`) onSubmit(value)
+  }, [onSubmit])
+
+  return <>
     {isFocus && <div className={style.backdrop} />}
-    <form onSubmit={search} onBlur={onBlur} data-focus={isFocus} className={style.form}>
-      <input onFocus={onFocus} type="text" name="search" placeholder={t('Search block hash / topo, transaction or account address.')}
+    <form onSubmit={_onSubmit} onBlur={onBlur} data-focus={isFocus} className={style.form}>
+      <input onFocus={onFocus} type={type} name="value" placeholder={placeholder}
         autoComplete="off" autoCapitalize="off" />
-      <Button type="submit" aria-label="Search" onMouseDown={(e) => e.preventDefault()}>
-        <Icon name="search" />
-        <span>{t('Search')}</span>
+      <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
+        {children}
       </Button>
     </form>
-  </div>
+  </>
 }
