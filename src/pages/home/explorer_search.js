@@ -184,17 +184,17 @@ export function ExplorerSearch() {
       <input onFocus={onFocus} value={searchValue} onChange={onSearchValueChange} type="text" name="value"
         placeholder={t(`Search block, transaction or account address.`)} autoComplete="off" autoCapitalize="off" />
       {!isBlockNumber && <div className={style.searchButton}>
-        <Button type="submit" onMouseClick={(e) => e.preventDefault()}>
+        <Button type="submit" onClick={(e) => e.preventDefault()}>
           <Icon name="search" />
           <span>{t('SEARCH')}</span>
         </Button>
       </div>}
       {isBlockNumber && <div className={style.blockHeightButtons}>
-        <Button type="submit" onMouseClick={goToBlockTopoHeight}>
+        <Button type="submit" onClick={goToBlockTopoHeight}>
           <Icon name="cube" />
           <span>{t('Topo')}</span>
         </Button>
-        <Button type="submit" onMouseClick={goToBlockHeight}>
+        <Button type="submit" onClick={goToBlockHeight}>
           <Icon name="cubes" />
           <span>{t('Height')}</span>
         </Button>
