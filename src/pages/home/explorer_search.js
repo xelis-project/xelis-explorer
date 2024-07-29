@@ -147,11 +147,6 @@ export function ExplorerSearch() {
     if (value === ``) return
     value = value.trim()
 
-    // go to account with address
-    if (value.length === 63) {
-      return navigate(`/accounts/${value}`)
-    }
-
     if (value.length === 64) {
       const [err1, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
         hash: value
@@ -172,8 +167,14 @@ export function ExplorerSearch() {
       }
     }
 
+    // check account address
+    const [err1, _] = await to(nodeSocket.daemon.methods.validateAddress({ address: value, allow_integrated: false }))
+    if (!err1) {
+      return navigate(`/accounts/${value}`)
+    }
+
     if (isBlockNumber) {
-      navigate(`/height/${value}`)
+      return navigate(`/height/${value}`)
     }
   }, [nodeSocket.readyState, searchValue, isBlockNumber])
 
@@ -184,7 +185,7 @@ export function ExplorerSearch() {
       <input onFocus={onFocus} value={searchValue} onChange={onSearchValueChange} type="text" name="value"
         placeholder={t(`Search block, transaction or account address.`)} autoComplete="off" autoCapitalize="off" />
       {!isBlockNumber && <div className={style.searchButton}>
-        <Button type="submit" onClick={(e) => e.preventDefault()}>
+        <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
           <Icon name="search" />
           <span>{t('SEARCH')}</span>
         </Button>
