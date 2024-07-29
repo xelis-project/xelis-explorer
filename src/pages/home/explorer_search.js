@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
@@ -31,25 +31,6 @@ const style = {
     background-color: rgb(0 0 0 / 40%);
     ${opacity()};
   `,
-  heightContainer: css`
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-    margin-top: 1em;
-
-    ${theme.query.minDesktop} {
-      flex-direction: row;
-    }
-
-    > * {
-      flex: 1;
-    }
-  `
-  ,
-  inputs: css`
-    max-width: 50em;
-    margin: 0 auto;
-  `,
   form: css`
     position: relative;
     transition: .25s all;
@@ -72,9 +53,6 @@ const style = {
     }
 
     button {
-      position: absolute;
-      top: 0;
-      right: 0;
       font-size: 1.2em;
       cursor: pointer;
       background-color: #f1f1f1;
@@ -83,35 +61,45 @@ const style = {
       min-width: 46px;
       border: none;
       display: flex;
+      gap: .5em;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       transition: .2s all;
       padding: 0 2em;
       border-radius: 2em;
-      /* border-top-left-radius: 0; */
-      /* border-bottom-left-radius: 0; */
-      background: ${theme.apply({ xelis: '#172a29', dark: '#0c0c0c', light: '#e7e7e7' })};
+      background: ${theme.apply({ xelis: '#101a1a', dark: '#0c0c0c', light: '#e7e7e7' })};
       color: var(--text-color);
 
       &:hover {
         background-color: var(--text-color);
         color: var(--bg-color);
       }
+    }
+  `,
+  searchButton: css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+  `,
+  blockHeightButtons: css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    height: 100%;
 
-      span {
-        display: none;
-      }
+    > :nth-child(1) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      padding: 0 .5em 0 1em;
+    }
 
-      ${theme.query.minDesktop} {
-        i {
-          display: none;
-        }
-
-        span {
-          display: block;
-        }
-      }
+    > :nth-child(2) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      padding: 0 1em 0 .5em;
     }
   `
 }
@@ -121,27 +109,41 @@ export function ExplorerSearch() {
   const nodeSocket = useNodeSocket()
   const { t } = useLang()
 
-  const goToBlockHeight = useCallback((value) => {
+  const [searchValue, setSearchValue] = useState(``)
+  const [isFocus, setFocus] = useState(false)
+
+  const onFocus = useCallback((e) => {
+    setFocus(true)
+  }, [])
+
+  const onBlur = useCallback((e) => {
+    setFocus(false)
+  }, [])
+
+  const isBlockNumber = useMemo(() => {
+    return /^\d+$/.test(searchValue)
+  }, [searchValue])
+
+  const goToBlockHeight = useCallback((e) => {
+    e.preventDefault()
+    navigate(`/height/${searchValue}`)
+  }, [searchValue])
+
+  const goToBlockTopoHeight = useCallback((e) => {
+    e.preventDefault()
+    navigate(`/blocks/${searchValue}`)
+  }, [searchValue])
+
+  const onSearchValueChange = useCallback((e) => {
+    const value = e.target.value
+    setSearchValue(value)
+  }, [])
+
+  const searchBlock = useCallback(async (e) => {
+    e.preventDefault()
     if (nodeSocket.readyState !== WebSocket.OPEN) return
 
-    if (!isNaN(parseInt(value))) {
-      // go to block with topoheight
-      return navigate(`/height/${value}`)
-    }
-  }, [nodeSocket])
-
-  const goToBlockTopoHeight = useCallback((value) => {
-    if (nodeSocket.readyState !== WebSocket.OPEN) return
-
-    if (!isNaN(parseInt(value))) {
-      // go to block with topoheight
-      return navigate(`/blocks/${value}`)
-    }
-  }, [nodeSocket])
-
-  const searchBlock = useCallback(async (value) => {
-    if (nodeSocket.readyState !== WebSocket.OPEN) return
-
+    let value = searchValue
     if (value === ``) return
     value = value.trim()
 
@@ -168,62 +170,35 @@ export function ExplorerSearch() {
         // go to tx with tx hash
         return navigate(`/txs/${value}`)
       }
-
-      // go to block anyway and show error there
-      return navigate(`/blocks/${value}`)
     }
-  }, [nodeSocket.readyState])
+
+    if (isBlockNumber) {
+      navigate(`/height/${value}`)
+    }
+  }, [nodeSocket.readyState, searchValue, isBlockNumber])
 
   return <div className={style.container}>
     <div className={style.title}>{t('XELIS Explorer')}</div>
-    <div className={style.inputs}>
-      <FormInput onSubmit={searchBlock} type="text" placeholder={t(`Search block hash, transaction or account address.`)}>
-        <Icon name="search" />
-        <span>{t('SEARCH')}</span>
-      </FormInput>
-      <div className={style.heightContainer}>
-        <FormInput onSubmit={goToBlockTopoHeight} type="number" placeholder={t(`Block topo height`)}>
-          <Icon name="arrow-right" />
-          <span>{t('GO')}</span>
-        </FormInput>
-        <FormInput onSubmit={goToBlockHeight} type="number" placeholder={t(`Block height`)}>
-          <Icon name="arrow-right" />
-          <span>{t('GO')}</span>
-        </FormInput>
-      </div>
-    </div>
-  </div>
-}
-
-function FormInput(props) {
-  const { type, placeholder, children, onSubmit } = props
-
-  const [isFocus, setFocus] = useState(false)
-
-  const onFocus = useCallback((e) => {
-    setFocus(true)
-  }, [])
-
-  const onBlur = useCallback((e) => {
-    setFocus(false)
-  }, [])
-
-  const _onSubmit = useCallback((e) => {
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    let value = formData.get(`value`)
-
-    if (typeof onSubmit === `function`) onSubmit(value)
-  }, [onSubmit])
-
-  return <>
     {isFocus && <div className={style.backdrop} />}
-    <form onSubmit={_onSubmit} onBlur={onBlur} data-focus={isFocus} className={style.form}>
-      <input onFocus={onFocus} type={type} name="value" placeholder={placeholder}
-        autoComplete="off" autoCapitalize="off" />
-      <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
-        {children}
-      </Button>
+    <form onSubmit={searchBlock} onBlur={onBlur} data-focus={isFocus} className={style.form}>
+      <input onFocus={onFocus} value={searchValue} onChange={onSearchValueChange} type="text" name="value"
+        placeholder={t(`Search block, transaction or account address.`)} autoComplete="off" autoCapitalize="off" />
+      {!isBlockNumber && <div className={style.searchButton}>
+        <Button type="submit" onMouseClick={(e) => e.preventDefault()}>
+          <Icon name="search" />
+          <span>{t('SEARCH')}</span>
+        </Button>
+      </div>}
+      {isBlockNumber && <div className={style.blockHeightButtons}>
+        <Button type="submit" onMouseClick={goToBlockTopoHeight}>
+          <Icon name="cube" />
+          <span>{t('Topo')}</span>
+        </Button>
+        <Button type="submit" onMouseClick={goToBlockHeight}>
+          <Icon name="cubes" />
+          <span>{t('Height')}</span>
+        </Button>
+      </div>}
     </form>
-  </>
+  </div>
 }
