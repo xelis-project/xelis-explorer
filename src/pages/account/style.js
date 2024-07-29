@@ -102,7 +102,7 @@ export default {
         font-size: 1em;
       `,
       value: css`
-        font-size: 1.2em;
+        font-size: 1.1em;
       `,
       subvalue: css`
         font-size: .8em;

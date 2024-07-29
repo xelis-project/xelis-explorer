@@ -63,6 +63,7 @@ function Account() {
   const [accountAssets, setAccountAssets] = useState([XELIS_ASSET])
   const [asset, setAsset] = useState(XELIS_ASSET)
   const [assetData, setAssetData] = useState(XELIS_ASSET_DATA)
+  const [direction, setDirection] = useState(``)
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -151,11 +152,12 @@ function Account() {
     </div>}
     <div className={style.account.container}>
       <div className={style.account.left}>
-        <AccountInfo account={account} addr={addr} accountAssets={accountAssets} setQRCodeVisible={setQRCodeVisible} />
+        <AccountInfo account={account} addr={addr} setAsset={setAsset} asset={asset}
+          direction={direction} setDirection={setDirection} accountAssets={accountAssets} setQRCodeVisible={setQRCodeVisible} />
       </div>
       <div className={style.account.right}>
         <History addr={addr} asset={asset} assetData={assetData}
-          account={account} loadAccount={loadAccount} />
+          account={account} loadAccount={loadAccount} direction={direction} />
       </div>
     </div>
     <AddressQRCodeModal addr={addr} visible={qrCodeVisible} setVisible={setQRCodeVisible} />
@@ -165,7 +167,7 @@ function Account() {
 export default Account
 
 function AccountInfo(props) {
-  const { account, addr, accountAssets, setQRCodeVisible } = props
+  const { account, addr, accountAssets, setQRCodeVisible, asset, setAsset, setDirection, direction } = props
 
   const { t } = useLang()
 
@@ -181,6 +183,24 @@ function AccountInfo(props) {
       }
     })
   }, [accountAssets])
+
+  const dropdownDirectionItems = useMemo(() => {
+    return [{
+      key: ``,
+      text: <><Icon name="arrows-up-down" />&nbsp;&nbsp;{t(`All Directions`)}</>
+    }, {
+      key: `outgoing_flow`,
+      text: <><Icon name="arrow-up" />&nbsp;&nbsp;{t(`Outgoing`)}</>
+    },
+    {
+      key: `incoming_flow`,
+      text: <><Icon name="arrow-down" />&nbsp;&nbsp;{t(`Incoming`)}</>
+    }]
+  }, [])
+
+  const onDirectionChange = useCallback((item) => {
+    setDirection(item.key)
+  }, [])
 
   const balance = account.balance || {}
   const finalBalance = balance.final_balance || {}
@@ -203,7 +223,13 @@ function AccountInfo(props) {
     <div className={style.account.item.container}>
       <div className={style.account.item.title}>{t('Asset')}</div>
       <div className={style.account.item.value}>
-        <Dropdown items={dropdownAssets} onChange={onAssetChange} value={XELIS_ASSET} />
+        <Dropdown items={dropdownAssets} onChange={onAssetChange} value={asset} />
+      </div>
+    </div>
+    <div className={style.account.item.container}>
+      <div className={style.account.item.title}>{t('Direction')}</div>
+      <div className={style.account.item.value}>
+        <Dropdown items={dropdownDirectionItems} onChange={onDirectionChange} value={direction} />
       </div>
     </div>
     <div className={style.account.item.container}>
@@ -269,7 +295,7 @@ function loadAccountHistory_SSR() {
 */
 
 function History(props) {
-  const { asset, assetData, addr, account, loadAccount } = props
+  const { asset, assetData, addr, account, loadAccount, direction } = props
 
   const nodeSocket = useNodeSocket()
 
@@ -315,6 +341,17 @@ function History(props) {
       asset: asset,
     }
 
+    switch (direction) {
+      case `incoming_flow`:
+        params.outgoing_flow = false
+        params.incoming_flow = true
+        break
+      case `outgoing_flow`:
+        params.outgoing_flow = true
+        params.incoming_flow = false
+        break
+    }
+
     const { pages, page } = pageState
     if (pages[page]) {
       params.maximum_topoheight = pages[page]
@@ -336,7 +373,7 @@ function History(props) {
     }
 
     setLoading(false)
-  }, [asset, addr, nodeSocket.readyState, pageState]) // reload if acount balance topoheight changed
+  }, [asset, addr, nodeSocket.readyState, pageState, direction]) // reload if acount balance topoheight changed
 
   useEffect(() => {
     loadHistory()
@@ -369,7 +406,6 @@ function History(props) {
     if (item.dev_fee) return `DEV_FEE`
     return ``
   }, [])
-
   const lastItem = history[history.length - 1]
 
   return <div>
