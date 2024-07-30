@@ -537,7 +537,7 @@ function History(props) {
       }}>
         {t('Previous')}
       </Button>}
-      {((account.registered && lastItem.topoheight > account.registered.topoheight)) &&
+      {((account.registered && lastItem && lastItem.topoheight > account.registered.topoheight)) &&
         <Button icon="arrow-right" iconLocation="right" onClick={() => {
           const newPageState = Object.assign({}, pageState)
           newPageState.pages.push(lastItem.topoheight - 1)
