@@ -131,7 +131,7 @@ function Block() {
       <PageTitle title={t('Block {}', [reduceText(block.hash || '')])}
         metaDescription={description}
       />
-      {err && <div className={style.err}>{displayError(err)}</div>}
+      {err && <div className={style.error}>{displayError(err)}</div>}
       {!err && <div className={style.header.container}>
         <div>
           {!loading && <>
@@ -347,7 +347,7 @@ function Block() {
           {
             key: 'total_size_in_bytes',
             title: t('Size'),
-            render: (value) => formattedBlock.size || `--`
+            render: (value) => value ? formattedBlock.size : `--`
           },
           {
             key: 'tips',

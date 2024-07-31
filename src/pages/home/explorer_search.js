@@ -148,23 +148,16 @@ export function ExplorerSearch() {
     value = value.trim()
 
     if (value.length === 64) {
-      const [err1, block] = await to(nodeSocket.daemon.methods.getBlockByHash({
-        hash: value
-      }))
+      const [err1, tx] = await to(nodeSocket.daemon.methods.getTransaction(value))
       if (err1) console.log(err1)
-
-      if (block) {
-        // go to block with block hash
-        return navigate(`/blocks/${value}`)
-      }
-
-      const [err2, tx] = await to(nodeSocket.daemon.methods.getTransaction(value))
-      if (err2) console.log(err2)
 
       if (tx) {
         // go to tx with tx hash
         return navigate(`/txs/${value}`)
       }
+
+      // go to block with block hash - show error there if not found
+      return navigate(`/blocks/${value}`)
     }
 
     // check account address

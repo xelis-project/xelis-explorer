@@ -45,7 +45,7 @@ function Transaction() {
   const { firstPageLoad } = usePageLoad()
   const serverResult = loadTransaction_SSR({ hash })
 
-  const [err, setErr] = useState()
+  const [err, setErr] = useState(serverResult.err)
   const [loading, setLoading] = useState()
   const [tx, setTx] = useState(serverResult.tx)
 
