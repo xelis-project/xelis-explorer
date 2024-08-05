@@ -22,7 +22,7 @@ import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import { getBlockType } from '../dag'
 import Hashicon from '../../components/hashicon'
-import { formatMiner } from '../../utils/pools'
+import { formatMiner } from '../../utils/known_addrs'
 
 const style = {
   miner: css`

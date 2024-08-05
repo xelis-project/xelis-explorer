@@ -35,6 +35,39 @@ export const pools = {
   },
 }
 
+export const exchanges = {
+  "xel:qcd39a5u8cscztamjuyr7hdj6hh2wh9nrmhp86ljx2sz6t99ndjqqm7wxj8": {
+    name: "TradeOgre",
+    link: "https://tradeogre.com/"
+  },
+  "xel:23hkwe3gvqtjvplttd5ftvf8mepagj3n0rqpw8kp7kn0hwdmmdqsqsqr8p6": {
+    name: "Exbitron",
+    link: "https://exbitron.com/"
+  },
+  "xel:kprzhxdp594m5zczayy9d8cxg3kqu978mwqf9hh8qgume3njc97sqqyhejh": {
+    name: "Xeggex",
+    link: "https://xeggex.com/"
+  },
+  "xel:empagph7k0hmlgzd9vev84cxt9nz52375cftmvkdw56vwa8zhahqqselwez": {
+    name: "NonKYC",
+    link: "https://nonkyc.io/"
+  }
+}
+
+export const addrs = { ...pools, ...exchanges }
+
+export const formatSigner = (addr) => {
+  if (pools[addr]) {
+    return pools[addr].name
+  }
+
+  if (exchanges[addr]) {
+    return exchanges[addr].name
+  }
+
+  return reduceText(addr, 0, 7)
+}
+
 export const formatMiner = (miner) => {
   if (pools[miner]) {
     return pools[miner].name

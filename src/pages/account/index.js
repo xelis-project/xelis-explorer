@@ -17,7 +17,7 @@ import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import AddressQRCodeModal from './addr_qrcode_modal'
 import EncryptedAmountModal from './encrypted_amount_modal'
-import { pools } from '../../utils/pools'
+import { addrs, formatSigner } from '../../utils/known_addrs'
 
 import style from './style'
 
@@ -137,17 +137,17 @@ function Account() {
     return t(`Account history of {}.`, [addr])
   }, [addr, t])
 
-  const pool = pools[addr]
+  const entity = addrs[addr]
 
   return <div>
     <PageTitle title={t('Account {}', [reduceText(addr)])}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
-    {pool && <div className={style.account.pool}>
+    {entity && <div className={style.account.pool}>
       <Icon name="tag" />
       <div>
-        {t(`This is a known address owned by ${pool.name}.`)}<br />
-        {pool.link && <>{t(`You can visit the website at `)}<a href={pool.link} target="_blank">{pool.link}</a>.</>}
+        {t(`This is a known address owned by ${entity.name}.`)}<br />
+        {entity.link && <>{t(`You can visit the website at `)}<a href={entity.link} target="_blank">{entity.link}</a>.</>}
       </div>
     </div>}
     <div className={style.account.container}>
@@ -475,7 +475,7 @@ function History(props) {
                 return <div className={style.account.fromTo}>
                   <Hashicon value={from} size={25} />
                   <Link to={`/accounts/${from}`}>
-                    {reduceText(from, 0, 7)}
+                    {formatSigner(from)}
                   </Link>
                 </div>
               case "OUTGOING":
@@ -483,7 +483,7 @@ function History(props) {
                 return <div className={style.account.fromTo}>
                   <Hashicon value={to} size={25} />
                   <Link to={`/accounts/${to}`}>
-                    {reduceText(to, 0, 7)}
+                    {formatSigner(to)}
                   </Link>
                 </div>
               case "MINING":

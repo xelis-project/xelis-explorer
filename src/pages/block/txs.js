@@ -9,6 +9,7 @@ import { formatXelis, reduceText } from '../../utils'
 import Table from '../../components/table'
 import Pagination, { getPaginationRange } from '../../components/pagination'
 import Hashicon from '../../components/hashicon'
+import { formatSigner } from '../../utils/known_addrs'
 
 const style = {
   container: css`
@@ -97,7 +98,7 @@ function Transactions(props) {
               <div>
                 <Hashicon value={item.source} size={20} />
                 <Link to={`/accounts/${item.source}`}>
-                  {reduceText(item.source, 0, 7)}
+                  {formatSigner(item.source)}
                 </Link>
               </div>
             </td>

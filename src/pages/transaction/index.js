@@ -103,7 +103,7 @@ function Transaction() {
                 return <div className={style.addr}>
                   <Hashicon value={value} size={25} />
                   <Link to={`/accounts/${value}`}>
-                    {value}
+                    {formatSigner(value)}
                   </Link>
                 </div>
               }

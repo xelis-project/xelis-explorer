@@ -6,7 +6,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 import { useNodeSocket } from '@xelis/sdk/react/daemon'
 
 import { formatBlock, formatXelis, formatDifficulty } from '../../utils'
-import { pools } from '../../utils/pools'
+import { pools } from '../../utils/known_addrs'
 import OffCanvas from '../../components/offCanvas'
 import Button from '../../components/button'
 import { getBlockType } from './index'

@@ -19,7 +19,7 @@ import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
-import { pools } from '../../utils/pools'
+import { pools } from '../../utils/known_addrs'
 
 import style from './style'
 
