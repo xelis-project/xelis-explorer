@@ -1,6 +1,6 @@
 {
   "name": "xelis-explorer",
-  "version": "0.2.98",
+  "version": "0.2.99",
   "description": "Official Explorer for XELIS Blockchain.",
   "scripts": {
     "make-lang": "node ./node_modules/g45-react/lang-dict.js --src ./src --outfile ./lang/en.json",

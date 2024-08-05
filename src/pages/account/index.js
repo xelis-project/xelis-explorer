@@ -17,7 +17,7 @@ import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
 import AddressQRCodeModal from './addr_qrcode_modal'
 import EncryptedAmountModal from './encrypted_amount_modal'
-import { addrs, formatSigner } from '../../utils/known_addrs'
+import { addrs, formatAddr } from '../../utils/known_addrs'
 
 import style from './style'
 
@@ -475,7 +475,7 @@ function History(props) {
                 return <div className={style.account.fromTo}>
                   <Hashicon value={from} size={25} />
                   <Link to={`/accounts/${from}`}>
-                    {formatSigner(from)}
+                    {formatAddr(from)}
                   </Link>
                 </div>
               case "OUTGOING":
@@ -483,7 +483,7 @@ function History(props) {
                 return <div className={style.account.fromTo}>
                   <Hashicon value={to} size={25} />
                   <Link to={`/accounts/${to}`}>
-                    {formatSigner(to)}
+                    {formatAddr(to)}
                   </Link>
                 </div>
               case "MINING":

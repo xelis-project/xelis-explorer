@@ -18,7 +18,7 @@ import Hashicon from '../../components/hashicon'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import EncryptedAmountModal from '../account/encrypted_amount_modal'
-import { formatSigner } from '../../utils/known_addrs'
+import { formatAddr } from '../../utils/known_addrs'
 
 import style from './style'
 
@@ -104,7 +104,7 @@ function Transaction() {
                 return <div className={style.addr}>
                   <Hashicon value={value} size={25} />
                   <Link to={`/accounts/${value}`}>
-                    {formatSigner(value)}
+                    {formatAddr(value)}
                   </Link>
                 </div>
               }
@@ -213,7 +213,7 @@ function Transfers(props) {
               <div className={style.addr}>
                 <Hashicon value={destination} size={25} />
                 <Link to={`/accounts/${destination}`}>
-                  {reduceText(destination, 0, 7)}
+                  {formatAddr(destination, 0, 7)}
                 </Link>
               </div>
             </td>

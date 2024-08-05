@@ -56,7 +56,7 @@ export const exchanges = {
 
 export const addrs = { ...pools, ...exchanges }
 
-export const formatSigner = (addr) => {
+export const formatAddr = (addr) => {
   if (pools[addr]) {
     return pools[addr].name
   }

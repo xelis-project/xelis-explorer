@@ -14,7 +14,7 @@ import { useRecentBlocks } from '../../pages/home'
 import useTheme from '../../hooks/useTheme'
 import PageTitle from '../../layout/page_title'
 import Hashicon from '../../components/hashicon'
-import { formatSigner } from '../../utils/known_addrs'
+import { formatAddr } from '../../utils/known_addrs'
 
 import style from './style'
 
@@ -218,7 +218,7 @@ function PendingTxs(props) {
             <div className={style.account}>
               <Hashicon value={item.source} size={20} />
               <Link to={`/accounts/${item.source}`}>
-                {formatSigner(item.source)}
+                {formatAddr(item.source)}
               </Link>
             </div>
           </td>
@@ -354,7 +354,7 @@ function ExecutedTxs(props) {
           <td>
             <div className={style.addr}>
               <Hashicon value={tx.source} size={20} />
-              <Link to={`/accounts/${tx.source}`}>{formatSigner(tx.source, 0, 7)}</Link>
+              <Link to={`/accounts/${tx.source}`}>{formatAddr(tx.source, 0, 7)}</Link>
             </div>
           </td>
           <td>{formatXelis(tx.fee)}</td>
@@ -426,7 +426,7 @@ function OrphanedTxs(props) {
           <td>
             <div className={style.addr}>
               <Hashicon value={tx.source} size={20} />
-              <Link to={`/accounts/${tx.source}`}>{formatSigner(tx.source, 0, 7)}</Link>
+              <Link to={`/accounts/${tx.source}`}>{formatAddr(tx.source, 0, 7)}</Link>
             </div>
           </td>
           <td>{tx.nonce}</td>
