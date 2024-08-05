@@ -5,8 +5,8 @@ export default {
   addrModal: {
     container: css`
       background-color: var(--table-td-bg-color);
-      border-radius: .5em;
-      padding: 1em;
+      border-radius: 1em;
+      padding: 2em;
     `,
     title: css`
       font-size: 1.6em;
@@ -29,15 +29,24 @@ export default {
   amountModal: {
     container: css`
       background-color: var(--table-td-bg-color);
-      border-radius: .5em;
-      padding: 1em;
+      border-radius: 1em;
+      padding: 2em;
+      max-width: 20em;
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      align-items: center;
+      text-align: center;
+
+      svg {
+        max-width: 8em;
+      }
     `,
     title: css`
       font-size: 1.6em;
       margin-bottom: .25em;
-      text-align: center;
     `,
-    value: css`
+    hexCommitment: css`
       word-break: break-all;
       color: var(--muted-color);
     `,

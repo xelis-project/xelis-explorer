@@ -18,6 +18,7 @@ import Hashicon from '../../components/hashicon'
 import { getBlockColor } from '../dag/blockColor'
 import useTheme from '../../hooks/useTheme'
 import EncryptedAmountModal from '../account/encrypted_amount_modal'
+import { formatSigner } from '../../utils/known_addrs'
 
 import style from './style'
 
