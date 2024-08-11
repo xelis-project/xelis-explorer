@@ -26,6 +26,7 @@ const style = {
     backdrop-filter: blur(${theme.apply({ xelis: `40px`, light: `30px`, dark: `40px` })});
     height: 100%;
     bottom: 0;
+    overflow: auto;
 
     ${theme.query.minDesktop} {
       max-width: 225px;

@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { extractCss, setup } from 'goober'
 import { PreloadFonts } from 'g45-react/components/fontawesome_icon'
+import { prefix } from 'goober/prefixer'
 
 import { ThemeProvider } from './hooks/useTheme'
 import { SettingsProvider } from './hooks/useSettings'
@@ -15,7 +16,7 @@ import './style/theme'
 import './style/page'
 import './style/scrollbar'
 
-setup(createElement) // this is for goober styled() func
+setup(createElement, prefix) // this is for goober styled() func
 
 let css = ``
 

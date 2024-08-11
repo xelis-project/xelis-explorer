@@ -82,6 +82,15 @@ const style = {
     top: 0;
     right: 0;
     height: 100%;
+    span {
+      display: none;
+    }
+
+    ${theme.query.minDesktop} {
+      span {
+        display: block;
+      }
+    }
   `,
   blockHeightButtons: css`
     position: absolute;
