@@ -51,6 +51,10 @@ export const exchanges = {
   "xel:empagph7k0hmlgzd9vev84cxt9nz52375cftmvkdw56vwa8zhahqqselwez": {
     name: "NonKYC",
     link: "https://nonkyc.io/"
+  },
+  "xel:lmkvzyslkwg6qslmkfrsq3rjc67lzuqhqyt7lelf0wy96n0ej3usqaeeawa": {
+    name: "CoinEx",
+    link: "https://www.coinex.com"
   }
 }
 
