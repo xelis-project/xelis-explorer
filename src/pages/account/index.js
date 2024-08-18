@@ -163,7 +163,7 @@ function Account() {
       <Icon name="warning" />
       <div>
         {t(`This is an integrated address of`)}<br />
-        <Link to={`/accounts/${integrated}`} className={style.account.infoBreak}>
+        <Link to={`/accounts/${integrated.address}`} className={style.account.infoBreak}>
           {integrated.address}
         </Link>
         <div className={style.account.topSubInfo}>
