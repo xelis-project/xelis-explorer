@@ -55,7 +55,7 @@ function Account() {
   const { t } = useLang()
 
   //const serverResult = loadAccount_SSR({ addr })
-
+  //const [addr, setAddr] = useState(paramAddr)
   const [qrCodeVisible, setQRCodeVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState()
@@ -64,6 +64,7 @@ function Account() {
   const [asset, setAsset] = useState(XELIS_ASSET)
   const [assetData, setAssetData] = useState(XELIS_ASSET_DATA)
   const [direction, setDirection] = useState(``)
+  const [integrated, setIntegrated] = useState()
 
   const loadAccount = useCallback(async () => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return
@@ -76,11 +77,26 @@ function Account() {
       setLoading(false)
     }
 
-    const [err, result] = await to(nodeSocket.daemon.methods.getBalance({
+    const [err, valid] = await to(nodeSocket.daemon.methods.validateAddress({
+      address: addr,
+      allow_integrated: true
+    }))
+    if (err) return resErr(err)
+
+    if (valid.is_integrated) {
+      const [err, integrated] = await to(nodeSocket.daemon.methods.splitAddress({
+        address: addr,
+      }))
+      if (err) return resErr(err)
+      setIntegrated(integrated.address)
+    }
+
+    const [err1, result] = await to(nodeSocket.daemon.methods.getBalance({
       address: addr,
       asset: asset,
     }))
-    if (err) return resErr(err)
+    //console.log(err1)
+    if (err1) return resErr(err1)
 
     const [err2, result2] = await to(nodeSocket.daemon.methods.getNonce({
       address: addr,
@@ -143,6 +159,13 @@ function Account() {
     <PageTitle title={t('Account {}', [reduceText(addr)])}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
+    {integrated && <div className={style.account.pool}>
+      <Icon name="warning" />
+      <div>
+        {t(`This is an integrated address of`)}<br />
+        <div><Link to={`/accounts/${integrated}`}>{integrated}</Link></div>
+      </div>
+    </div>}
     {entity && <div className={style.account.pool}>
       <Icon name="tag" />
       <div>

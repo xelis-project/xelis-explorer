@@ -57,7 +57,7 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
   return useServerData(`func:loadBlocks(${hashIt(pageState)})`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err, res1] = await to(daemonRPC.getTopoHeight())
+    const [err, res1] = await to(daemonRPC.getTopoheight())
     result.err = err ? err.message : null
     if (err) return result
 
