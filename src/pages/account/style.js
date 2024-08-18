@@ -118,7 +118,7 @@ export default {
         margin-top: 0.25em;
       `
     },
-    pool: css`
+    topInfo: css`
       border-radius: .75em;
       padding: 1em;
       background: var(--content-bg-color);
@@ -131,6 +131,13 @@ export default {
       i {
         font-size: 2em;
       }
+    `,
+    topSubInfo: css`
+      color: var(--muted-color);
+      margin-top: .25em;
+    `,
+    infoBreak: css`
+      word-break: break-all;
     `
   },
   accountDetails: {

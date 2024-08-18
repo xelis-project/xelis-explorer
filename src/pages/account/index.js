@@ -88,7 +88,7 @@ function Account() {
         address: addr,
       }))
       if (err) return resErr(err)
-      setIntegrated(integrated.address)
+      setIntegrated(integrated)
     }
 
     const [err1, result] = await to(nodeSocket.daemon.methods.getBalance({
@@ -159,14 +159,19 @@ function Account() {
     <PageTitle title={t('Account {}', [reduceText(addr)])}
       metaTitle={t('Account {}', [addr || ''])}
       metaDescription={description} />
-    {integrated && <div className={style.account.pool}>
+    {integrated && <div className={style.account.topInfo}>
       <Icon name="warning" />
       <div>
         {t(`This is an integrated address of`)}<br />
-        <div><Link to={`/accounts/${integrated}`}>{integrated}</Link></div>
+        <Link to={`/accounts/${integrated}`} className={style.account.infoBreak}>
+          {integrated.address}
+        </Link>
+        <div className={style.account.topSubInfo}>
+          {t(`Note that all wallet transactions are shown, not just those for this integrated address. The wallet owner is the only one who can determine the transactions for this specific integrated address.`)}
+        </div>
       </div>
     </div>}
-    {entity && <div className={style.account.pool}>
+    {entity && <div className={style.account.topInfo}>
       <Icon name="tag" />
       <div>
         {t(`This is a known address owned by ${entity.name}.`)}<br />
