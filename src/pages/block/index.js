@@ -28,7 +28,7 @@ function loadBlock_SSR({ id }) {
   return useServerData(`func:loadBlock(${id})`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err1, res2] = await to(daemonRPC.getTopoHeight())
+    const [err1, res2] = await to(daemonRPC.getTopoheight())
     result.err = err1 ? err1.message : null
     if (err1) return result
 
