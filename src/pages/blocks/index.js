@@ -70,7 +70,7 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight,
     }))
-    result.err = err2 ? err.message : null
+    result.err = err2 ? err2.message : null
     if (err2) return result
 
     result.totalBlocks = topoheight + 1
