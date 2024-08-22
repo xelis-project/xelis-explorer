@@ -103,7 +103,7 @@ function Account() {
     }))
     if (err2) return resErr(err2)
 
-    const [err3, result3] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+    const [err3, result3] = await to(nodeSocket.daemon.methods.getBlockAtTopoheight({
       topoheight: result.topoheight,
       include_txs: false
     }))
@@ -122,7 +122,7 @@ function Account() {
     const [err6, result6] = await to(nodeSocket.daemon.methods.getAccountRegistrationTopoheight(addr))
     if (err6) return resErr(err6)
 
-    const [err7, result7] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+    const [err7, result7] = await to(nodeSocket.daemon.methods.getBlockAtTopoheight({
       topoheight: result6,
       include_txs: false
     }))

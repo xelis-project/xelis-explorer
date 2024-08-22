@@ -38,7 +38,7 @@ export function useRecentBlocks() {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoheight())
     if (err1) return resErr(err1)
 
     let blocks = []

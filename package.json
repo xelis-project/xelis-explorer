@@ -1,6 +1,6 @@
 {
   "name": "xelis-explorer",
-  "version": "0.2.105",
+  "version": "0.2.106",
   "description": "Official Explorer for XELIS Blockchain.",
   "scripts": {
     "make-lang": "node ./node_modules/g45-react/lang-dict.js --src ./src --outfile ./lang/en.json",
@@ -18,7 +18,7 @@
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@tweenjs/tween.js": "^21.0.0",
-    "@xelis/sdk": "^0.9.10",
+    "@xelis/sdk": "^0.9.11",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
     "chart.js": "^4.2.1",

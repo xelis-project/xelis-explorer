@@ -138,7 +138,7 @@ export function ExplorerSearch() {
     navigate(`/height/${searchValue}`)
   }, [searchValue])
 
-  const goToBlockTopoHeight = useCallback((e) => {
+  const goToBlockTopoheight = useCallback((e) => {
     e.preventDefault()
     navigate(`/blocks/${searchValue}`)
   }, [searchValue])
@@ -193,7 +193,7 @@ export function ExplorerSearch() {
         </Button>
       </div>}
       {isBlockNumber && <div className={style.blockHeightButtons}>
-        <Button type="submit" onClick={goToBlockTopoHeight}>
+        <Button type="submit" onClick={goToBlockTopoheight}>
           <Icon name="cube" />
           <span>{t('Topo')}</span>
         </Button>

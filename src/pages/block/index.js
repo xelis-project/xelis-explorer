@@ -43,7 +43,7 @@ function loadBlock_SSR({ id }) {
 
       result.block = res1.result
     } else {
-      const [err1, res1] = await to(daemonRPC.getBlockAtTopoHeight({
+      const [err1, res1] = await to(daemonRPC.getBlockAtTopoheight({
         topoheight: parseInt(id)
       }))
       result.err = err1 ? err1.message : null
@@ -84,7 +84,7 @@ function Block() {
       setLoading(false)
     }
 
-    const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+    const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoheight())
     if (err) return resErr(err)
     setTopoheight(topoheight)
 
@@ -95,7 +95,7 @@ function Block() {
       if (err) return resErr(err)
       setBlock(block)
     } else {
-      const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+      const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoheight({
         topoheight: parseInt(id)
       }))
       if (err) return resErr(err)

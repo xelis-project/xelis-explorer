@@ -37,7 +37,7 @@ function MemPool() {
       setErr(err)
     }
 
-    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+    const [err1, topoheight] = await to(nodeSocket.daemon.methods.getTopoheight())
     if (err1) return resErr(err2)
     setTopoheight(topoheight)
 
@@ -61,7 +61,7 @@ function MemPool() {
   useNodeSocketSubscribe({
     event: RPCEvent.NewBlock,
     onData: async () => {
-      const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoHeight())
+      const [err, topoheight] = await to(nodeSocket.daemon.methods.getTopoheight())
       if (err) return console.log(err)
       setTopoheight(topoheight)
     }
@@ -295,7 +295,7 @@ function ExecutedTxs(props) {
         let newPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.tx_hash) {
-            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoheight({
               topoheight: data.topoheight
             }))
             if (err) return setErr(err)
@@ -382,7 +382,7 @@ function OrphanedTxs(props) {
         let newPool = []
         pool.forEach(async tx => {
           if (tx.hash === data.hash) {
-            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoHeight({
+            const [err, block] = await to(nodeSocket.daemon.methods.getBlockAtTopoheight({
               topoheight: tx.reference.topoheight
             }))
             if (err) return setErr(err)
