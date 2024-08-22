@@ -3,6 +3,7 @@ import { css } from 'goober'
 import { useLang } from 'g45-react/hooks/useLang'
 import prettyMs from 'pretty-ms'
 import useLocale from 'g45-react/hooks/useLocale'
+import BigNumber from 'bignumber.js'
 
 import { formatHashRate, formatSize, formatXelis } from '../../utils'
 import Chart from '../../components/chart'
@@ -284,16 +285,21 @@ function HashrateChart(props) {
   const data = useMemo(() => {
     const labels = []
     const data = []
+    const cumulativeAvg = []
 
+    let sum = new BigNumber(0);
     const sortedBlocks = Object.assign([], blocks).sort((a, b) => a.topoheight - b.topoheight)
-    sortedBlocks.forEach((block) => {
+    sortedBlocks.forEach((block, i) => {
       labels.push(block.topoheight)
       data.push(block.difficulty)
+      sum = sum.plus(new BigNumber(block.difficulty))
+      cumulativeAvg.push(sum.div(i + 1).toString())
     })
 
     // add last fake block to show current diff
     labels.push(info.topoheight + 1)
     data.push(info.difficulty)
+    cumulativeAvg.push(sum.div(blocks.length).toString())
 
     return {
       labels,
@@ -305,6 +311,14 @@ function HashrateChart(props) {
           tension: .3,
           pointRadius: 0,
           borderColor: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
+        },
+        {
+          data: cumulativeAvg,
+          backgroundColor: `transparent`,
+          borderWidth: 4,
+          tension: .3,
+          pointRadius: 0,
+          borderColor: currentTheme === 'light' ? `rgba(28, 28, 28, 0.4)` : `rgba(241, 241, 241, 0.4)`,
         }
       ]
     }
