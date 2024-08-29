@@ -55,6 +55,10 @@ export const exchanges = {
   "xel:lmkvzyslkwg6qslmkfrsq3rjc67lzuqhqyt7lelf0wy96n0ej3usqaeeawa": {
     name: "CoinEx",
     link: "https://www.coinex.com"
+  },
+  "xel:aee43hxxe8tzl0lrjq25dsj8rhvev2jseeyk6xydx9ltuj4fyezqqcmg5zq": {
+    name: "MEXC",
+    link: "https://www.mexc.com/"
   }
 }
 
