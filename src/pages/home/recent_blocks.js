@@ -132,13 +132,10 @@ export function RecentBlocks(props) {
     return ``
   }, [newBlock])
 
-  let recentBlocks = blocks
-  if (recentBlocks.length === 0) recentBlocks = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
-
   return <div>
     <div className={style.title}>{t('Recent Blocks')}</div>
     <div className={`${style.blocks} ${!newBlockHash ? style.noAnimation : ``}`}>
-      {recentBlocks.map((block, index) => {
+      {blocks.map((block, index) => {
         const key = `${index}${block.hash}` //+ Math.random() // random key to force re-render and repeat animation
         const txCount = (block.txs_hashes || []).length
         const size = formatSize(block.total_size_in_bytes || 0, { locale })
@@ -152,7 +149,6 @@ export function RecentBlocks(props) {
         const blockType = getBlockType(blocks, block, info.stableheight)
         const blockColor = getBlockColor(currentTheme, blockType)
         const title = t(`This is a {} block and the reward is {}.`, [blockType, formatXelis(block.reward, { locale })])
-
         return <Link to={`/blocks/${block.hash}`} key={key} className={blockClassName}
           style={{ borderColor: blockColor }} title={title}>
           <div className={style.block.title}>{t('Block {}', [topo])}</div>
