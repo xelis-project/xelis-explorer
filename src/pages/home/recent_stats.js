@@ -327,10 +327,7 @@ function HashrateChart(props) {
   return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty, { locale })}>
     <Chart type="line" options={options} data={data} />
     <div className={style.box.description}>
-      {t(`
-      Drastic swings in the nethash are caused by the Kalman Filter. 
-      For a more accurate representation of nethash and additional information about the filter, check the links below.
-      `)}
+      {t(`Drastic swings in the nethash are caused by the Kalman Filter. For a more accurate representation of nethash and additional information about the filter, check the links below.`)}
     </div>
     <div>
       <a href="https://stats.xelis.io/mining" target="_blank">{t(`Average Nethash`)}</a>&nbsp;&nbsp;
