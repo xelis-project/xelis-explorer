@@ -29,6 +29,10 @@ export const pools = {
     name: `HeroMiners`,
     link: `https://xelis.herominers.com/`,
   },
+  "xel:4r46fyhkhltjacaaqkr3vxhldf0stwpm3a8uku2ukztk74t88gpsqdlfua7": {
+    name: `HeroMiners`,
+    link: `https://xelis.herominers.com/`,
+  },
   "xel:ufyp55hz5uzxk3d5m4k9h3ahe4k604hthkndt22w4hxmc877lftqqsq5h6n": {
     name: `SoloPool`,
     link: `https://xel.solopool.org/`,
