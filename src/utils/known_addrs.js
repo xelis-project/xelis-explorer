@@ -52,8 +52,16 @@ export const exchanges = {
     name: "Xeggex",
     link: "https://xeggex.com/"
   },
+  "xel:mre0qr55dc8kllhyl9q52ssay6sx48sksahrajq5cccux3j9ku8sql8frhn": {
+    name: "XeggeX - Hot Wallet",
+    link: "https://xeggex.com/"
+  },
   "xel:empagph7k0hmlgzd9vev84cxt9nz52375cftmvkdw56vwa8zhahqqselwez": {
     name: "NonKYC",
+    link: "https://nonkyc.io/"
+  },
+  "xel:ht09c5z4h59nra9hdnnmyyjxyu4ac4dncwfxygrjxps9twv4apwqq3pvzs8": {
+    name: "NonKYC - Hot Wallet",
     link: "https://nonkyc.io/"
   },
   "xel:lmkvzyslkwg6qslmkfrsq3rjc67lzuqhqyt7lelf0wy96n0ej3usqaeeawa": {
