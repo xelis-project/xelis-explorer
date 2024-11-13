@@ -541,7 +541,7 @@ function History(props) {
                 return formatXelis(dev_fee.reward)
               case "BURN":
                 const { burn } = item
-                return formatAsset(burn.amount, decimals)
+                return formatAsset({ value: burn.amount, decimals })
               default:
                 return null
             }
