@@ -9,7 +9,7 @@ import { useLang } from 'g45-react/hooks/useLang'
 import useLocale from 'g45-react/hooks/useLocale'
 
 import Table from '../../components/table'
-import { formatXelis, reduceText, displayError, formatSize } from '../../utils'
+import { formatXelis, reduceText, displayError, formatSize, formatAssetName } from '../../utils'
 import PageLoading from '../../components/pageLoading'
 import TableFlex from '../../components/tableFlex'
 import { daemonRPC } from '../../node_rpc'
@@ -205,7 +205,7 @@ function Transfers(props) {
         const { commitment, asset, extra_data, destination } = item
         return <React.Fragment key={index}>
           <tr key={index}>
-            <td>{reduceText(asset)}</td>
+            <td>{formatAssetName(asset)}</td>
             <td>
               <EncryptedAmountModal title={t(`Amount`)} commitment={commitment} />
             </td>
@@ -244,7 +244,7 @@ function Burn(props) {
       onItem={(item, index) => {
         const { amount, asset } = item
         return <tr key={index}>
-          <td>{reduceText(asset)}</td>
+          <td>{formatAssetName(asset)}</td>
           <td>{formatXelis(amount)}</td> {/* We assume it's native asset for now */}
         </tr>
       }}

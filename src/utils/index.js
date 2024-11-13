@@ -32,15 +32,14 @@ export const formatAsset = ({ value, decimals, locale }) => {
   return shiftNumber(value, decimals).toNumber().toLocaleString(locale, { maximumFractionDigits: decimals })
 }
 
-/*
-export const formatAsset = (value, asset) => {
+export const formatAssetName = (asset) => {
   switch (asset) {
     case XELIS_ASSET:
-      return formatXelis(value)
+      return `${reduceText(asset)} (XEL)`
     default:
-      return `${value} (${reduceText(asset)})`
+      return reduceText(asset)
   }
-}*/
+}
 
 export const formatSize = (value, options) => {
   return prettyBytes(value || 0, options)
