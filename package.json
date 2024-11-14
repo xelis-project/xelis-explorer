@@ -24,7 +24,7 @@
     "chart.js": "^4.2.1",
     "flag-icons": "^6.11.2",
     "framer-motion-3d": "^10.1.0",
-    "goober": "^2.1.10",
+    "goober": "2.1.10",
     "hash-it": "^6.0.0",
     "isomorphic-ws": "^5.0.0",
     "leaflet": "github:g45t345rt/Leaflet",
