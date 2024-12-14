@@ -2,7 +2,7 @@
 
 Real-time Blockchain Explorer for XELIS using JavaScript and WebSocket.
 
-<https://explorer.xelis.io>  
+<https://mempool.space/>  
 
 - Real-time statistics with WebSockets.
 - Navigate all blocks of the entire blockchain (if node isn't pruned).
@@ -13,7 +13,7 @@ Real-time Blockchain Explorer for XELIS using JavaScript and WebSocket.
 - Live mempool.
 - BlockDAG viewer.
 
-Testnet: <https://testnet-explorer.xelis.io>
+Testnet: <https://mempool.space/>
 
 ## Development
 
