@@ -71,6 +71,10 @@ export const exchanges = {
   "xel:aee43hxxe8tzl0lrjq25dsj8rhvev2jseeyk6xydx9ltuj4fyezqqcmg5zq": {
     name: "MEXC",
     link: "https://www.mexc.com/"
+  },
+  "xel:zeqtkurmcucg79tleqqhcv776sja2rss0ydxn2cy6a5xv9lauvyqq5h2lpk": {
+    name: "Biconomy",
+    link: "https://biconomy.com/"
   }
 }
 
