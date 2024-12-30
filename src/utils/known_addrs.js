@@ -37,6 +37,10 @@ export const pools = {
     name: `SoloPool`,
     link: `https://xel.solopool.org/`,
   },
+  "xel:eg2aasm87vnj06jh9c5jwudsw3v086zwwdz0kje0h6vvshu3d56squ32t7m": {
+    name: `WoolyPooly`,
+    link: `https://woolypooly.com/`,
+  }
 }
 
 export const exchanges = {
