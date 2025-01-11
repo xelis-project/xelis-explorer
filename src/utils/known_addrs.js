@@ -40,6 +40,14 @@ export const pools = {
   "xel:eg2aasm87vnj06jh9c5jwudsw3v086zwwdz0kje0h6vvshu3d56squ32t7m": {
     name: `WoolyPooly`,
     link: `https://woolypooly.com/`,
+  },
+  "xel:wzscp02r4vug8wqpd0fzayxa5l4d2s63sfulad3anwtcvgru23eqqlc74yq": {
+    name: `Xelski`,
+    link: `https://xelskipool.xyz/`,
+  },
+  "xel:cc6qh3px26tlq3zp2tmf4lku7t3edhk4kg8e0eskjvq05h9yv9tqqczqh59": {
+    name: `Suprnova`,
+    link: `https://xel.suprnova.cc/`,
   }
 }
 
