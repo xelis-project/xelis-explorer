@@ -48,6 +48,10 @@ export const pools = {
   "xel:cc6qh3px26tlq3zp2tmf4lku7t3edhk4kg8e0eskjvq05h9yv9tqqczqh59": {
     name: `Suprnova`,
     link: `https://xel.suprnova.cc/`,
+  },
+  "xel:pj6lg4dz7hwc4ylpsy9c73d2ergqehu8yuc70zdgqqjkp0zhg4vqq8lkyhk": {
+    name: `ExPool`,
+    link: `https://expool.net/pool/xelis/`,
   }
 }
 
