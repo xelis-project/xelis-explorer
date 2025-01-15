@@ -91,6 +91,10 @@ export const exchanges = {
   "xel:zeqtkurmcucg79tleqqhcv776sja2rss0ydxn2cy6a5xv9lauvyqq5h2lpk": {
     name: "Biconomy",
     link: "https://biconomy.com/"
+  },
+  "xel:4cqe028p90z25yp2594j63jlmz8lvuj2n5ujzeatxvp5vqe9v4tqqqf6mhw": {
+    name: "XT",
+    link: "https://www.xt.com/"
   }
 }
 
