@@ -28,28 +28,28 @@ function loadBlock_SSR({ id }) {
   return useServerData(`func:loadBlock(${id})`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err1, res2] = await to(daemonRPC.getTopoheight())
+    const [err1, topoheight] = await to(daemonRPC.getTopoheight())
     result.err = err1 ? err1.message : null
     if (err1) return result
 
-    result.topoheight = res2.result
+    result.topoheight = topoheight
 
     if (isHash(id)) {
-      const [err1, res1] = await to(daemonRPC.getBlockByHash({
+      const [err1, block] = await to(daemonRPC.getBlockByHash({
         hash: id
       }))
       result.err = err1 ? err1.message : null
       if (err1) return result
 
-      result.block = res1.result
+      result.block = block
     } else {
-      const [err1, res1] = await to(daemonRPC.getBlockAtTopoheight({
+      const [err1, block] = await to(daemonRPC.getBlockAtTopoheight({
         topoheight: parseInt(id)
       }))
       result.err = err1 ? err1.message : null
       if (err1) return result
 
-      result.block = res1.result
+      result.block = block
     }
 
     result.loaded = true

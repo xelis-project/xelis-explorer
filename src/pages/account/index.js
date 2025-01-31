@@ -28,20 +28,20 @@ function loadAccount_SSR({ addr }) {
   const defaultResult = { loaded: false, err: null, account: {} }
   return useServerData(`func:loadAccount(${addr})`, async () => {
     const result = Object.assign({}, defaultResult)
-    const [err, res] = await to(daemonRPC.getLastBalance({
+    const [err, balance] = await to(daemonRPC.getLastBalance({
       address: addr,
       asset: XELIS_ASSET,
     }))
     result.err = err
     if (err) return result
 
-    const [err2, res2] = await to(daemonRPC.getNonce({
+    const [err2, nonce] = await to(daemonRPC.getNonce({
       address: addr,
     }))
     result.err = err2
     if (err2) return result2
 
-    result.account = { addr, balance: res.result, nonce: res2.result }
+    result.account = { addr, balance, nonce }
     result.loaded = true
     return result
   }, defaultResult)
@@ -309,13 +309,13 @@ function loadAccountHistory_SSR() {
   return useServerData(`func:loadAccountHistory`, async () => {
     let result = Object.assign({}, defaultResult)
 
-    const [err, res] = await to(daemonRPC.getAccountHistory({
+    const [err, history] = await to(daemonRPC.getAccountHistory({
       address
     }))
     result.err = err
     if (err) return result
 
-    result.history = res.result
+    result.history = history
     result.loaded = true
     return result
   }, [])

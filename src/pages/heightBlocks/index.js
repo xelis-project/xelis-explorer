@@ -23,11 +23,11 @@ function loadHeightBlocks_SSR({ height }) {
   return useServerData(`func:loadHeightBlocks(${height})`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err1, res1] = await to(daemonRPC.getBlocksAtHeight({ height: parseInt(height) }))
+    const [err1, blocks] = await to(daemonRPC.getBlocksAtHeight({ height: parseInt(height) }))
     result.err = err1 ? err1.message : null
     if (err1) return result
 
-    result.blocks = res1.result
+    result.blocks = blocks
     result.loaded = true
     return result
   }, defaultResult)

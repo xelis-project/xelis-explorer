@@ -26,11 +26,11 @@ function loadTransaction_SSR({ hash }) {
   const defaultResult = { loaded: false, err: null, tx: {} }
   return useServerData(`func:loadTransaction(${hash})`, async () => {
     const result = Object.assign({}, defaultResult)
-    const [err, res] = await to(daemonRPC.getTransaction(hash))
+    const [err, tx] = await to(daemonRPC.getTransaction(hash))
     result.err = err ? err.message : null
     if (err) return result
 
-    result.tx = res.result
+    result.tx = tx
     result.loaded = true
     return result
   }, defaultResult)

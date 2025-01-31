@@ -31,29 +31,29 @@ function loadAccounts_SSR({ pageState }) {
   return useServerData(`func:loadAccounts(${hashIt(pageState)})`, async () => {
     let result = Object.assign({}, defaultResult)
 
-    const [err1, res1] = await to(daemonRPC.countAccounts())
+    const [err1, totalAccounts] = await to(daemonRPC.countAccounts())
     result.err = err1 ? err1.message : null
     if (err1) return result
-    result.totalAccounts = res1.result
+    result.totalAccounts = totalAccounts
 
     let pagination = getPaginationRange(pageState)
 
-    const [err2, res2] = await to(daemonRPC.getAccounts({
+    let [err2, addresses] = await to(daemonRPC.getAccounts({
       skip: Math.max(0, pagination.start - 1),
       maximum: pageState.size
     }))
     result.err = err2 ? err2.message : null
     if (err2) return result
-    const addresses = res2.result || []
+    addresses = addresses || []
 
     const accounts = []
     for (let i = 0; i < addresses.length; i++) {
       const addr = addresses[i]
-      const [err, res] = await to(daemonRPC.getBalance({
+      const [err, balance] = await to(daemonRPC.getBalance({
         address: addr,
         asset: XELIS_ASSET
       }))
-      accounts.push({ addr, balance: (res || {}).result })
+      accounts.push({ addr, balance })
     }
 
     result.loaded = true

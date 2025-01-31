@@ -39,14 +39,14 @@ function useNetworkData() {
       setLoading(false)
     }
 
-    const [err, res] = await to(nodeSocket.daemon.methods.p2pStatus())
+    const [err, status] = await to(nodeSocket.daemon.methods.p2pStatus())
     if (err) return resErr(err)
 
-    const [err2, res2] = await to(nodeSocket.daemon.methods.getInfo())
+    const [err2, info] = await to(nodeSocket.daemon.methods.getInfo())
     if (err2) return resErr(err)
 
     setLoading(false)
-    setData({ ...res, ...res2 })
+    setData({ ...status, ...info })
   }, [nodeSocket.readyState])
 
   useEffect(() => {

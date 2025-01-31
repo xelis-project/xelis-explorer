@@ -41,11 +41,11 @@ export function loadStableHeight_SSR() {
   return useServerData(`func:stableheight`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err, res] = await to(daemonRPC.getStableHeight())
+    const [err, stableheight] = await to(daemonRPC.getStableHeight())
     result.err = err ? err.message : null
     if (err) return result
 
-    result.stableheight = res.result
+    result.stableheight = stableheight
     result.loaded = true
     return result
   }, defaultResult)
@@ -57,16 +57,15 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
   return useServerData(`func:loadBlocks(${hashIt(pageState)})`, async () => {
     const result = Object.assign({}, defaultResult)
 
-    const [err, res1] = await to(daemonRPC.getTopoheight())
+    const [err, topoheight] = await to(daemonRPC.getTopoheight())
     result.err = err ? err.message : null
     if (err) return result
 
-    const topoheight = res1.result
     let pagination = getPaginationRange(pageState)
     let startTopoheight = Math.max(0, topoheight - pagination.end)
     let endTopoheight = topoheight - pagination.start
 
-    const [err2, res2] = await to(daemonRPC.getBlocksRangeByTopoheight({
+    const [err2, blocks] = await to(daemonRPC.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight,
     }))
@@ -74,7 +73,7 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
     if (err2) return result
 
     result.totalBlocks = topoheight + 1
-    result.blocks = res2.result.reverse()
+    result.blocks = blocks.reverse()
     result.loaded = true
 
     return result

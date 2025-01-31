@@ -18,7 +18,7 @@
     "@react-three/drei": "^9.57.0",
     "@react-three/fiber": "^8.11.9",
     "@tweenjs/tween.js": "^21.0.0",
-    "@xelis/sdk": "^0.9.11",
+    "@xelis/sdk": "^0.10.0",
     "await-to-js": "^3.0.0",
     "bignumber.js": "^9.1.2",
     "chart.js": "^4.2.1",
