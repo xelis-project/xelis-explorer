@@ -94,7 +94,7 @@ function Box(props) {
   const { title, value, children } = props
   return <div className={style.box.container}>
     <div className={style.box.title}>{title}</div>
-    {value && <div className={style.box.value}>{value}</div>}
+    <div className={style.box.value}>{value}</div>
     {children}
   </div>
 }
