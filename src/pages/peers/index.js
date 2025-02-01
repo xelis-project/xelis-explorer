@@ -95,7 +95,6 @@ function Peers() {
     setPeersLoading(false)
 
     // max 25 ips per fetch
-    setGeoLoading(true)
     const batch = 25
     let geoLocation = {}
 
@@ -104,6 +103,7 @@ function Peers() {
     })
 
     let fetches = Math.ceil(ipList.length / batch)
+    setGeoLoading(fetches > 0)
 
     const fetchIps = async (ips) => {
       const [err, data] = await to(fetchGeoLocation(ips))
