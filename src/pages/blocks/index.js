@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import to from 'await-to-js'
 import { css } from 'goober'
 import { useNodeSocket, useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
-import { RPCEvent } from '@xelis/sdk/daemon/types'
+import { RPCEvent, RPCMethod } from '@xelis/sdk/daemon/types'
 import { usePageLoad } from 'g45-react/hooks/usePageLoad'
 import { useServerData } from 'g45-react/hooks/useServerData'
 import Age from 'g45-react/components/age'
@@ -51,9 +51,8 @@ export function loadStableHeight_SSR() {
   }, defaultResult)
 }
 
-export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
-  const defaultResult = { totalBlocks: 0, blocks: defaultBlocks, err: null, loaded: false }
-
+export function loadBlocks_SSR({ pageState }) {
+  const defaultResult = { totalBlocks: 0, blocks: [], err: null, loaded: false }
   return useServerData(`func:loadBlocks(${hashIt(pageState)})`, async () => {
     const result = Object.assign({}, defaultResult)
 
@@ -61,19 +60,37 @@ export function loadBlocks_SSR({ pageState, defaultBlocks = [] }) {
     result.err = err ? err.message : null
     if (err) return result
 
-    let pagination = getPaginationRange(pageState)
-    let startTopoheight = Math.max(0, topoheight - pagination.end)
-    let endTopoheight = topoheight - pagination.start
+    //let pagination = getPaginationRange(pageState)
+    //let startTopoheight = Math.max(0, topoheight - pagination.end)
+    //let endTopoheight = topoheight - pagination.start
 
-    const [err2, blocks] = await to(daemonRPC.getBlocksRangeByTopoheight({
+    // can only request 20 items from api
+    let iterations = pageState.size / 20
+    const size = Math.min(pageState.size, 20)
+    let requests = []
+    for (let i = 1; i <= iterations; i++) {
+      let pagination = getPaginationRange({ page: i, size })
+      let startTopoheight = Math.max(0, topoheight - pagination.end)
+      let endTopoheight = topoheight - pagination.start
+      requests.push({
+        method: RPCMethod.GetBlocksRangeByTopoheight, params: {
+          start_topoheight: startTopoheight,
+          end_topoheight: endTopoheight
+        },
+      })
+    }
+
+    const [err2, items] = await to(daemonRPC.batchRequest(requests))
+    /*const [err2, blocks] = await to(daemonRPC.getBlocksRangeByTopoheight({
       start_topoheight: startTopoheight,
       end_topoheight: endTopoheight,
-    }))
+    }))*/
     result.err = err2 ? err2.message : null
     if (err2) return result
-
     result.totalBlocks = topoheight + 1
-    result.blocks = blocks.reverse()
+    //result.blocks = blocks.reverse()
+    result.blocks = items.map(x => x.reverse()).flat()
+    console.log(result.blocks.length)
     result.loaded = true
 
     return result

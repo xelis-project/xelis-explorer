@@ -12,14 +12,13 @@ import { NetworkStats } from './network_stats'
 import { RecentStats } from './recent_stats'
 import { loadBlocks_SSR } from '../blocks'
 import { daemonRPC } from '../../node_rpc'
-import { formatSize } from '../../utils'
 
 const BLOCK_ITERATIONS = 5
 
 export function useRecentBlocks() {
   const nodeSocket = useNodeSocket()
 
-  const serverResult = loadBlocks_SSR({ pageState: { page: 1, size: 20 } })
+  const serverResult = loadBlocks_SSR({ pageState: { page: 1, size: 20 * BLOCK_ITERATIONS } })
 
   const [loading, setLoading] = useState()
   const [err, setErr] = useState()
