@@ -439,7 +439,12 @@ function History(props) {
     if (`deploy_contract` in item) return `DEPLOY_CONTRACT`
     return ``
   }, [])
-  const lastItem = history[history.length - 1]
+
+
+  const lastTopoheight = useMemo(() => {
+    const item = history[history.length - 1]
+    if (item && item.length > 0) return item[1][0].topoheight
+  }, [history])
 
   const getLink = useCallback((item) => {
     const hType = getType(item)
@@ -586,10 +591,10 @@ function History(props) {
       }}>
         {t('Previous')}
       </Button>}
-      {((account.registered && lastItem && lastItem.topoheight > account.registered.topoheight)) &&
+      {((account.registered && lastTopoheight && lastTopoheight > account.registered.topoheight)) &&
         <Button icon="arrow-right" iconLocation="right" onClick={() => {
           const newPageState = Object.assign({}, pageState)
-          newPageState.pages.push(lastItem.topoheight - 1)
+          newPageState.pages.push(lastTopoheight - 1)
           newPageState.page++
 
           setPageState(newPageState)
