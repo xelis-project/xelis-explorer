@@ -427,7 +427,7 @@ function History(props) {
         }
       }
     }
-  }, [account, pageState])
+  }, [account, pageState, loadAccount, loadHistory])
 
   const getType = useCallback((item) => {
     if (item.mining) return `MINING`
