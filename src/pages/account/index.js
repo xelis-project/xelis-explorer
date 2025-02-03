@@ -435,6 +435,8 @@ function History(props) {
     if (item.outgoing) return `OUTGOING`
     if (item.incoming) return `INCOMING`
     if (item.dev_fee) return `DEV_FEE`
+    if (item.invoke_contract) return `INVOKE_CONTRACT`
+    if (`deploy_contract` in item) return `DEPLOY_CONTRACT`
     return ``
   }, [])
   const lastItem = history[history.length - 1]
@@ -464,6 +466,10 @@ function History(props) {
         return <><Icon name="wallet" />&nbsp;&nbsp;{t(`DEV FEE`)}</>
       case "BURN":
         return <><Icon name="fire" />&nbsp;&nbsp;{t(`BURN`)}</>
+      case "INVOKE_CONTRACT":
+        return <><Icon name="file-contract" />&nbsp;&nbsp;{t(`INVOKE CONTRACT`)}</>
+      case "DEPLOY_CONTRACT":
+        return <><Icon name="upload" />&nbsp;&nbsp;{t(`DEPLOY CONTRACT`)}</>
       default:
         return null
     }
@@ -514,7 +520,7 @@ function History(props) {
         const { burn } = item
         return formatAsset({ value: burn.amount, decimals })
       default:
-        return null
+        return `--`
     }
   }, [assetData])
 
