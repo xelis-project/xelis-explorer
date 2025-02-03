@@ -215,7 +215,7 @@ function PendingTxs(props) {
             <Link to={`/txs/${item.hash}`}>{reduceText(item.hash)}</Link>
           </td>
           <td>
-            <div className={style.account}>
+            <div className={style.addr}>
               <Hashicon value={item.source} size={20} />
               <Link to={`/accounts/${item.source}`}>
                 {formatAddr(item.source)}
