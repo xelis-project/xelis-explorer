@@ -207,5 +207,43 @@ export default {
         transform: scale(.98);
       }
     }
-  `
+  `,
+  transfers: {
+    rows: css`
+      visibility: hidden;
+      position: fixed;
+
+      &[data-visible="true"] {
+        visibility: visible;
+        position: inherit;
+      }
+    `,
+    container: css`
+      overflow: auto;
+      max-height: 350px;
+      filter: contrast(0.95);
+    `,
+    item: css`
+      display: flex;
+      gap: .5em;
+      align-items: center;
+    `,
+    button: css`
+      padding: 0.3em .5em;
+      border: 2px solid var(--text-color);
+      border-radius: .5em;
+      cursor: pointer;
+      background: none;
+      color: var(--text-color);
+      display: flex;
+      gap: .5em;
+      align-items: center;
+      opacity: .6;
+      transition: .25s all;
+
+      &:hover {
+        opacity: 1;
+      }
+    `
+  }
 }

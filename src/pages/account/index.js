@@ -1,6 +1,6 @@
 import { useParams } from 'react-router'
 import useNodeSocket, { useNodeSocketSubscribe } from '@xelis/sdk/react/daemon'
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import to from 'await-to-js'
 import { Link } from 'react-router-dom'
 import Age from 'g45-react/components/age'
@@ -10,7 +10,7 @@ import { RPCEvent } from '@xelis/sdk/daemon/types'
 import useQueryString from 'g45-react/hooks/useQueryString'
 
 import TableFlex from '../../components/tableFlex'
-import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, reduceText } from '../../utils'
+import { XELIS_ASSET, XELIS_ASSET_DATA, formatAsset, formatXelis, groupBy, reduceText } from '../../utils'
 import Dropdown from '../../components/dropdown'
 import Button from '../../components/button'
 import PageTitle from '../../layout/page_title'
@@ -20,6 +20,7 @@ import EncryptedAmountModal from './encrypted_amount_modal'
 import { addrs, formatAddr } from '../../utils/known_addrs'
 
 import style from './style'
+import Table from '../../components/table'
 
 /*
 // removed ssr for the time being
@@ -395,7 +396,9 @@ function History(props) {
       const [err2, result2] = await to(nodeSocket.daemon.methods.getAccountHistory(params))
       if (err2) return resErr(err2)
 
-      setHistory(result2)
+      // group same hash meaning in the same tx
+      const group = groupBy(result2, (x) => x.hash)
+      setHistory([...group])
     } else {
       setHistory([])
     }
@@ -436,125 +439,137 @@ function History(props) {
   }, [])
   const lastItem = history[history.length - 1]
 
+  const getLink = useCallback((item) => {
+    const hType = getType(item)
+
+    if (hType === 'INCOMING' || hType === 'OUTGOING' || hType === 'BURN') {
+      return `/txs/${item.hash}`
+    }
+
+    if (hType === 'MINING') {
+      return `/blocks/${item.hash}`
+    }
+  }, [])
+
+  const displayType = useCallback((item) => {
+    const hType = getType(item)
+    switch (hType) {
+      case "OUTGOING":
+        return <><Icon name="arrow-up" />&nbsp;&nbsp;{t(`SEND`)}</>
+      case "INCOMING":
+        return <><Icon name="arrow-down" />&nbsp;&nbsp;{t(`RECEIVE`)}</>
+      case "MINING":
+        return <><Icon name="microchip" />&nbsp;&nbsp;{t(`MINING`)}</>
+      case "DEV_FEE":
+        return <><Icon name="wallet" />&nbsp;&nbsp;{t(`DEV FEE`)}</>
+      case "BURN":
+        return <><Icon name="fire" />&nbsp;&nbsp;{t(`BURN`)}</>
+      default:
+        return null
+    }
+  }, [])
+
+  const displayTransfer = useCallback((item) => {
+    const hType = getType(item)
+    switch (hType) {
+      case "INCOMING":
+        const { from } = item.incoming
+        return <div className={style.account.fromTo}>
+          <Hashicon value={from} size={25} />
+          <Link to={`/accounts/${from}`}>
+            {formatAddr(from)}
+          </Link>
+        </div>
+      case "OUTGOING":
+        const { to } = item.outgoing
+        return <div className={style.account.fromTo}>
+          <Hashicon value={to} size={25} />
+          <Link to={`/accounts/${to}`}>
+            {formatAddr(to)}
+          </Link>
+        </div>
+      case "MINING":
+      case "DEV_FEE":
+        return `Coinbase`
+      default:
+        return `--`
+    }
+  }, [])
+
+  const displayAmount = useCallback((item) => {
+    const hType = getType(item)
+    const { decimals } = assetData
+    switch (hType) {
+      case "OUTGOING":
+        return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
+      case "INCOMING":
+        return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
+      case "MINING":
+        const { mining } = item
+        return formatXelis(mining.reward)
+      case "DEV_FEE":
+        const { dev_fee } = item
+        return formatXelis(dev_fee.reward)
+      case "BURN":
+        const { burn } = item
+        return formatAsset({ value: burn.amount, decimals })
+      default:
+        return null
+    }
+  }, [assetData])
+
+  const [showTransfers, setShowTransfers] = useState([])
+  const toggleTransfer = useCallback((hash) => {
+    if (showTransfers.indexOf(hash) === -1) {
+      setShowTransfers([...showTransfers, hash])
+    } else {
+      setShowTransfers(showTransfers.filter(h => h !== hash))
+    }
+  }, [showTransfers])
+
   return <div>
-    <TableFlex loading={loading} err={err} rowKey={(item, index) => {
-      return `${item.hash}_${index}`
-    }}
-      emptyText={t('No history')} keepTableDisplay
-      headers={[
-        {
-          key: "topoheight",
-          title: t('Topo Height'),
-          render: (value) => {
-            return <Link to={`/blocks/${value}`}>
-              {value.toLocaleString()}
-            </Link>
-          }
-        },
-        {
-          key: "hash",
-          title: t('Hash'),
-          render: (value, item) => {
-            let link = ``
-            const itemType = getType(item)
+    <Table list={history} emptyText={t('No history')} loading={loading} err={err}
+      headers={[t(`Topo Height`), t(`Hash`), t(`Type`), t(`Transfers`), t(`Amount`), t(`Age`)]} colSpan={6}
+      onItem={(item) => {
+        const hash = item[0]
+        const list = item[1]
+        const value = list[0]
+        const { topoheight, block_timestamp } = list[0]
+        const visibleTransfers = showTransfers.indexOf(hash) !== -1
 
-            if (itemType === 'INCOMING' || itemType === 'OUTGOING' || itemType === 'BURN') {
-              link = `/txs/${value}`
-            }
-
-            if (itemType === 'MINING') {
-              link = `/blocks/${value}`
-            }
-
-            return <Link to={link}>
-              {reduceText(value)}
-            </Link>
-          }
-        },
-        {
-          key: "type",
-          title: t('Type'),
-          render: (_, item) => {
-            const itemType = getType(item)
-            switch (itemType) {
-              case "OUTGOING":
-                return <><Icon name="arrow-up" />&nbsp;&nbsp;{t(`SEND`)}</>
-              case "INCOMING":
-                return <><Icon name="arrow-down" />&nbsp;&nbsp;{t(`RECEIVE`)}</>
-              case "MINING":
-                return <><Icon name="microchip" />&nbsp;&nbsp;{t(`MINING`)}</>
-              case "DEV_FEE":
-                return <><Icon name="wallet" />&nbsp;&nbsp;{t(`DEV FEE`)}</>
-              case "BURN":
-                return <><Icon name="fire" />&nbsp;&nbsp;{t(`BURN`)}</>
-              default:
-                return null
-            }
-          }
-        },
-        {
-          key: "from_to",
-          title: t('From / To'),
-          render: (_, item) => {
-            const itemType = getType(item)
-            switch (itemType) {
-              case "INCOMING":
-                const { from } = item.incoming
-                return <div className={style.account.fromTo}>
-                  <Hashicon value={from} size={25} />
-                  <Link to={`/accounts/${from}`}>
-                    {formatAddr(from)}
-                  </Link>
-                </div>
-              case "OUTGOING":
-                const { to } = item.outgoing
-                return <div className={style.account.fromTo}>
-                  <Hashicon value={to} size={25} />
-                  <Link to={`/accounts/${to}`}>
-                    {formatAddr(to)}
-                  </Link>
-                </div>
-              case "MINING":
-              case "DEV_FEE":
-                return `Coinbase`
-              default:
-                return `--`
-            }
-          }
-        },
-        {
-          key: "amount",
-          title: t('Amount'),
-          render: (_, item) => {
-            const itemType = getType(item)
-            const { decimals } = assetData
-            switch (itemType) {
-              case "OUTGOING":
-                return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
-              case "INCOMING":
-                return <><Icon name="lock" />&nbsp;&nbsp;{t(`ENCRYPTED`)}</>
-              case "MINING":
-                const { mining } = item
-                return formatXelis(mining.reward)
-              case "DEV_FEE":
-                const { dev_fee } = item
-                return formatXelis(dev_fee.reward)
-              case "BURN":
-                const { burn } = item
-                return formatAsset({ value: burn.amount, decimals })
-              default:
-                return null
-            }
-          }
-        },
-        {
-          key: "block_timestamp",
-          title: t('Age'),
-          render: (value) => {
-            return <Age timestamp={value} update />
-          }
-        }
-      ]} data={history} />
+        return <React.Fragment key={hash}>
+          <tr>
+            <td>
+              <Link to={`/blocks/${topoheight}`}>
+                {topoheight.toLocaleString()}
+              </Link>
+            </td>
+            <td>
+              <Link to={getLink(value)}>
+                {reduceText(hash)}
+              </Link>
+            </td>
+            <td>
+              {displayType(value)}
+            </td>
+            <td>
+              {list.length === 1 && displayTransfer(value)}
+              {list.length > 1 && <button className={style.transfers.button} onClick={() => toggleTransfer(hash)}>
+                {t(`{} transfers`, [list.length])}
+                <Icon name={visibleTransfers ? `arrow-up` : `arrow-down`} />
+              </button>}
+            </td>
+            <td>
+              {displayAmount(value)}
+            </td>
+            <td>
+              <Age timestamp={block_timestamp} update />
+            </td>
+          </tr>
+          {list.length > 1 && <TransferRows items={list} visible={visibleTransfers} />}
+        </React.Fragment>
+      }}
+    />
     <div className={style.pagination}>
       {pageState.pages.length > 0 && <Button icon="arrow-left" onClick={() => {
         const newPageState = Object.assign({}, pageState)
@@ -578,4 +593,36 @@ function History(props) {
       }
     </div>
   </div>
+}
+
+function TransferRows(props) {
+  const { items, visible } = props
+
+  const getAddr = useCallback((item) => {
+    if (item.incoming) return item.incoming.from
+    if (item.outgoing) return item.outgoing.to
+  }, [])
+
+  return <tr className={style.transfers.rows} data-visible={visible}>
+    <td colSpan={6}>
+      <div className={style.transfers.container}>
+        <table>
+          <tbody>
+            {items.map((item, index) => {
+              const addr = getAddr(item)
+              return <tr key={index}>
+                <td>{index}</td>
+                <td>
+                  {visible && <Hashicon value={addr} size={25} />}
+                </td>
+                <td>
+                  <Link to={`/accounts/${addr}`}>{addr}</Link>
+                </td>
+              </tr>
+            })}
+          </tbody>
+        </table>
+      </div>
+    </td>
+  </tr>
 }
