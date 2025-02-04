@@ -104,7 +104,7 @@ function Transaction() {
                 return <div className={style.addr}>
                   <Hashicon value={value} size={25} />
                   <Link to={`/accounts/${value}`}>
-                    {formatAddr(value)}
+                    {value}
                   </Link>
                 </div>
               }
@@ -127,23 +127,29 @@ function Transaction() {
             render: (value) => value || `--`
           },
           {
-            key: 'ref',
-            title: t('Reference'),
+            key: 'ref_hash',
+            title: t('Ref (hash)'),
             render: (_, item) => {
-              if (item.reference) {
-                const { hash, topoheight } = item.reference
+              if (!item.reference) return `--`
+              const { hash } = item.reference
+              if (!hash) return `--`
 
-                return <div>
-                  <Link to={`/blocks/${hash}`}>
-                    {hash}
-                  </Link>&nbsp;
-                  {topoheight && <span title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
-                    {topoheight.toLocaleString(locale)}
-                  </span>}
-                </div>
-              }
+              return <Link to={`/blocks/${hash}`}>
+                {hash}
+              </Link>
+            }
+          },
+          {
+            key: 'ref_topo',
+            title: t('Ref (topo)'),
+            render: (_, item) => {
+              if (!item.reference) return `--`
+              const { topoheight } = item.reference
+              if (!topoheight) return `--`
 
-              return `--`
+              return <Link to={`/blocks/${topoheight}`} title={t(`The topoheight was set to this block hash when building the transaction. It may be incorrect due to DAG reorg.`)}>
+                {topoheight.toLocaleString(locale)}
+              </Link>
             }
           },
           {
@@ -159,6 +165,11 @@ function Transaction() {
           {
             key: 'nonce',
             title: t('Nonce'),
+            render: (value) => value != null ? value : `--`
+          },
+          {
+            key: 'version',
+            title: t(`Version`),
             render: (value) => value || `--`
           },
           {
