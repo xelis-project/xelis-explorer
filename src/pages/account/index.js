@@ -437,6 +437,7 @@ function History(props) {
     if (item.dev_fee) return `DEV_FEE`
     if (item.invoke_contract) return `INVOKE_CONTRACT`
     if (`deploy_contract` in item) return `DEPLOY_CONTRACT`
+    if (item.multi_sig) return `MULTI_SIG`
     return ``
   }, [])
 
@@ -449,12 +450,14 @@ function History(props) {
   const getLink = useCallback((item) => {
     const hType = getType(item)
 
-    if (hType === 'INCOMING' || hType === 'OUTGOING' || hType === 'BURN') {
-      return `/txs/${item.hash}`
-    }
-
-    if (hType === 'MINING') {
-      return `/blocks/${item.hash}`
+    switch (hType) {
+      case 'INCOMING':
+      case 'OUTGOING':
+      case 'BURN':
+      case 'MULTI_SIG':
+        return `/txs/${item.hash}`
+      case 'MINING':
+        return `/blocks/${item.hash}`
     }
   }, [])
 
@@ -475,6 +478,8 @@ function History(props) {
         return <><Icon name="file-contract" />&nbsp;&nbsp;{t(`INVOKE CONTRACT`)}</>
       case "DEPLOY_CONTRACT":
         return <><Icon name="upload" />&nbsp;&nbsp;{t(`DEPLOY CONTRACT`)}</>
+      case "MULTI_SIG":
+        return <><Icon name="pen" />&nbsp;&nbsp;{t(`MULTI SIG`)}</>
       default:
         return null
     }
@@ -502,6 +507,8 @@ function History(props) {
       case "MINING":
       case "DEV_FEE":
         return `Coinbase`
+      case "MULTI_SIG":
+        return `${(item.multi_sig.participants || []).length} participants`
       default:
         return `--`
     }
