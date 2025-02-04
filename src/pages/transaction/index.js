@@ -185,6 +185,7 @@ function Transaction() {
         data={[tx]}
         rowKey="hash"
       />
+      <MultiSig tx={tx} />
       <Transfers tx={tx} />
       <Burn tx={tx} />
       <InBlocks tx={tx} />
@@ -321,6 +322,46 @@ function InBlocks(props) {
           <td>{size}</td>
           <td>{formatXelis(item.total_fees)}</td>
           <td>{txCount}</td>
+        </tr>
+      }}
+    />
+  </div>
+}
+
+function MultiSig(props) {
+  const { tx } = props
+  const { t } = useLang()
+
+  let multi_sig = tx.data ? tx.data.multi_sig : null
+  if (!multi_sig) return
+
+
+  return <div>
+    <h2 className={style.title}>{t('MultiSig Setup')}</h2>
+    <TableFlex
+      data={[{
+        treshold: multi_sig.threshold,
+        participants: (multi_sig.participants || []).length
+      }]}
+      headers={[
+        {
+          key: 'treshold',
+          title: t('Min Threshold')
+        },
+        {
+          key: 'participants',
+          title: t('Participants')
+        },
+      ]}
+    /><br />
+    <Table
+      headers={[t(`#`), t(`Address`)]}
+      list={multi_sig.participants} emptyText={t('No participants')} colSpan={2}
+      onItem={(addr, index) => {
+        let sAddr = addr.join('')
+        return <tr key={sAddr}>
+          <td>{index}</td>
+          <td>{sAddr}</td>
         </tr>
       }}
     />
