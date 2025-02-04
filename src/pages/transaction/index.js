@@ -186,6 +186,7 @@ function Transaction() {
         rowKey="hash"
       />
       <MultiSig tx={tx} />
+      <MultiSigSetup tx={tx} />
       <Transfers tx={tx} />
       <Burn tx={tx} />
       <InBlocks tx={tx} />
@@ -332,6 +333,29 @@ function MultiSig(props) {
   const { tx } = props
   const { t } = useLang()
 
+  if (!tx.multisig) return
+  const signatures = tx.multisig.signatures || []
+
+  return <div>
+    <h2 className={style.title}>{t('MultiSig')}</h2>
+    <Table
+      headers={[`#`, t(`Signature`)]}
+      list={signatures} emptyText={t('No signatures')} colSpan={2}
+      onItem={(sig) => {
+        const { id, signature } = sig
+        return <tr key={id}>
+          <td>{id}</td>
+          <td>{signature}</td>
+        </tr>
+      }}
+    />
+  </div>
+}
+
+function MultiSigSetup(props) {
+  const { tx } = props
+  const { t } = useLang()
+
   let multi_sig = tx.data ? tx.data.multi_sig : null
   if (!multi_sig) return
 
@@ -355,7 +379,7 @@ function MultiSig(props) {
       ]}
     /><br />
     <Table
-      headers={[t(`#`), t(`Address`)]}
+      headers={[`#`, t(`Address`)]}
       list={multi_sig.participants} emptyText={t('No participants')} colSpan={2}
       onItem={(addr, index) => {
         let sAddr = addr.join('')
