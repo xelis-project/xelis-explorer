@@ -56,6 +56,10 @@ export const pools = {
   "xel:zmxrlpt55tcp450008teu28enz36lwxmwc8tfhxfdw5u5dg33uesqvjz4dt": {
     name: `MinerLab`,
     link: `https://xelis.minerlab.io/`
+  },
+  "xel:m3k3g0ay4p2jah9kujx09f4rkyj8pq22xfem9vdspd7s2hq6z9vsq4xlvn0": {
+    name: `LuckyPool`,
+    link: `https://xelis.luckypool.io/`
   }
 }
 
