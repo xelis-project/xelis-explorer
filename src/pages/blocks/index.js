@@ -78,6 +78,8 @@ export function loadBlocks_SSR({ pageState }) {
           end_topoheight: endTopoheight
         },
       })
+
+      if (startTopoheight === 0) break
     }
 
     const [err2, items] = await to(daemonRPC.batchRequest(requests))
