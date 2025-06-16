@@ -18,6 +18,8 @@ import { formatAddr } from '../../utils/known_addrs'
 
 import style from './style'
 
+const TXS_MAX = 20;
+
 function MemPool() {
   const [memPool, setMemPool] = useState([])
   const [topoheight, setTopoheight] = useState()
@@ -41,9 +43,18 @@ function MemPool() {
     if (err1) return resErr(err2)
     setTopoheight(topoheight)
 
-    const [err2, data] = await to(nodeSocket.daemon.methods.getMempoolSummary())
+    let transactions = [];
+    const [err2, data] = await to(nodeSocket.daemon.methods.getMempoolSummary({ maximum: TXS_MAX, skip: 0 }))
     if (err2) return resErr(err2)
-    setMemPool(data.transactions)
+    transactions = data.transactions;
+
+    const batch = Math.ceil(data.total / TXS_MAX)
+    for (let i = 1; i < batch; i++) {
+      const [err3, data] = await to(nodeSocket.daemon.methods.getMempoolSummary({ maximum: TXS_MAX, skip: i * TXS_MAX }))
+      if (err3) return resErr(err3)
+      transactions = [...transactions, data.transactions]
+    }
+
     setLoading(false)
   }, [nodeSocket.readyState])
 
