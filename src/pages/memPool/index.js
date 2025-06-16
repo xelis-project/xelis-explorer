@@ -43,7 +43,7 @@ function MemPool() {
 
     const [err2, data] = await to(nodeSocket.daemon.methods.getMemPool())
     if (err2) return resErr(err2)
-    setMemPool(data)
+    setMemPool(data.transactions)
     setLoading(false)
   }, [nodeSocket.readyState])
 
