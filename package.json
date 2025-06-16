@@ -11,7 +11,7 @@
     "build-cf:dev-pages": "npm run build-dev:cf -- --define ./env/cf_dev.json",
     "build-cf:testnet-pages": "npm run build-prod:cf -- --define ./env/cf_testnet.json",
     "build-cf:mainnet-pages": "npm run build-prod:cf -- --define ./env/cf_mainnet.json",
-    "start": "npm run bundle -- --type cf_worker --dev --watch --sourcemap --define ./env/local_dev.json"
+    "start": "npm run bundle -- --type cf_worker --dev --watch --sourcemap --define ./env/cf_testnet.json"
   },
   "dependencies": {
     "@emeraldpay/hashicon": "^0.5.2",

@@ -41,7 +41,7 @@ function MemPool() {
     if (err1) return resErr(err2)
     setTopoheight(topoheight)
 
-    const [err2, data] = await to(nodeSocket.daemon.methods.getMemPool())
+    const [err2, data] = await to(nodeSocket.daemon.methods.getMempoolSummary())
     if (err2) return resErr(err2)
     setMemPool(data.transactions)
     setLoading(false)
