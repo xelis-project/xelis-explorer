@@ -1,6 +1,6 @@
 {
   "name": "xelis-explorer",
-  "version": "0.2.116",
+  "version": "0.2.117",
   "description": "Official Explorer for XELIS Blockchain.",
   "scripts": {
     "make-lang": "node ./node_modules/g45-react/lang-dict.js --src ./src --outfile ./lang/en.json",
@@ -8,10 +8,10 @@
     "build-prod:index": "npm run bundle -- --type index --minify",
     "build-prod:node": "npm run bundle -- --type node_server --minify",
     "build-prod:cf": "npm run bundle -- --type cf_worker --minify",
-    "build-cf:dev-pages": "npm run build-dev:cf -- --define ./env/cf_dev.json",
+    "build-cf:dev-pages": "npm run build-dev:cf -- --define ./env/local_dev.json",
     "build-cf:testnet-pages": "npm run build-prod:cf -- --define ./env/cf_testnet.json",
     "build-cf:mainnet-pages": "npm run build-prod:cf -- --define ./env/cf_mainnet.json",
-    "start": "npm run bundle -- --type cf_worker --dev --watch --sourcemap --define ./env/cf_testnet.json"
+    "start": "npm run bundle -- --type cf_worker --dev --watch --sourcemap --define ./env/local_dev.json"
   },
   "dependencies": {
     "@emeraldpay/hashicon": "^0.5.2",
@@ -44,6 +44,6 @@
   "devDependencies": {
     "g45-react": "^0.1.19",
     "shx": "^0.3.4",
-    "wrangler": "^3.60.1"
+    "wrangler": "^4.20.3"
   }
 }
