@@ -70,10 +70,8 @@ const HASH_UNIT_ARRAY = [
   { unit: 1_000, suffix: 'K' }, // KiloHash
 ]
 
-export const BLOCK_TIME = 15 // in seconds
-
-export const formatHashRate = (difficulty, { locale } = {}) => {
-  let value = new BigNumber(difficulty, 10).div(BLOCK_TIME)
+export const formatHashRate = (difficulty, { blockTime, locale }) => {
+  let value = new BigNumber(difficulty, 10).div(blockTime)
   return `${formatDifficulty(value.toString(), { locale })}H/s`
 }
 
@@ -95,7 +93,7 @@ export const formatDifficulty = (difficulty, { locale, decimals } = {}) => {
   return `${value.toNumber().toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} ${suffix}`
 }
 
-export const formatBlock = ({ block, topoheight, locale }) => {
+export const formatBlock = ({ blockTime, block, topoheight, locale }) => {
   if (!block) return {}
 
   return {
@@ -107,7 +105,7 @@ export const formatBlock = ({ block, topoheight, locale }) => {
     size: formatSize(block.total_size_in_bytes, { locale }),
     hasPreviousBlock: block.topoheight > 0,
     hasNextBlock: block.topoheight < topoheight,
-    hashRate: formatHashRate(block.difficulty, { locale }),
+    hashRate: formatHashRate(block.difficulty, { blockTime, locale }),
   }
 }
 
