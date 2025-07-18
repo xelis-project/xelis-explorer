@@ -71,7 +71,7 @@ const HASH_UNIT_ARRAY = [
 ]
 
 export const formatHashRate = (difficulty, { blockTime, locale }) => {
-  let value = new BigNumber(difficulty, 10).div(blockTime)
+  let value = new BigNumber(difficulty, 10).div(blockTime / 1000)
   return `${formatDifficulty(value.toString(), { locale })}H/s`
 }
 

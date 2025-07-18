@@ -24,7 +24,8 @@ function MiningCalculator() {
   const rewardData = useMemo(() => {
     if (!info && !hashRate) return {}
 
-    const timeUntilBlock = ((info.difficulty / info.block_time_target) / ((hashRate || 1) * hashRateUnit)) * info.block_time_target
+    const blockTimeTarget = info.block_time_target / 1000
+    const timeUntilBlock = ((info.difficulty / blockTimeTarget) / ((hashRate || 1) * hashRateUnit)) * blockTimeTarget
     const rewardPerHour = info.miner_reward / (timeUntilBlock / 60 / 60)
 
     return {
