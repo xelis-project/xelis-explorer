@@ -79,7 +79,7 @@ function useOffCanvasBlock(props) {
     setOpened(true)
   }, [])
 
-  const formattedBlock = formatBlock({ block, topoheight })
+  const formattedBlock = formatBlock({ blockTime: info.block_time_target, block, topoheight })
 
   const loadBlock = useCallback(async (topoheight) => {
     if (nodeSocket.readyState !== WebSocket.OPEN) return

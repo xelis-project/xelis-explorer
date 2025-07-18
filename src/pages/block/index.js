@@ -22,6 +22,7 @@ import useTheme from '../../hooks/useTheme'
 import { pools } from '../../utils/known_addrs'
 
 import style from './style'
+import { useNetworkInfo } from '../home'
 
 function loadBlock_SSR({ id }) {
   const defaultResult = { loaded: false, err: null, block: {}, topoheight: 0 }
@@ -62,6 +63,7 @@ function Block() {
 
   const nodeSocket = useNodeSocket()
 
+  const { info } = useNetworkInfo()
   const { firstPageLoad } = usePageLoad()
   const serverResult = loadBlock_SSR({ id })
   const { t } = useLang()
@@ -111,7 +113,7 @@ function Block() {
     loadBlock()
   }, [loadBlock, firstPageLoad])
 
-  const formattedBlock = formatBlock({ block, topoheight, locale })
+  const formattedBlock = formatBlock({ blockTime: info.block_time_target, block, topoheight, locale })
 
   const description = useMemo(() => {
     if (!block.hash) {

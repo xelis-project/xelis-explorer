@@ -267,7 +267,7 @@ function HashrateChart(props) {
           },
           ticks: {
             color: currentTheme === 'light' ? `#1c1c1c` : `#f1f1f1`,
-            callback: (value) => formatHashRate(value, { locale }),
+            callback: (value) => formatHashRate(value, { blockTime: info.block_time_target, locale }),
           },
         },
         x: {
@@ -324,7 +324,7 @@ function HashrateChart(props) {
     }
   }, [blocks, info, currentTheme])
 
-  return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty, { locale })}>
+  return <Box title={t(`Hashrate`)} value={formatHashRate(info.difficulty, { blockTime: info.block_time_target, locale })}>
     <Chart type="line" options={options} data={data} />
     <div className={style.box.description}>
       {t(`Drastic swings in the nethash are caused by the Kalman Filter. For a more accurate representation of nethash and additional information about the filter, check the links below.`)}

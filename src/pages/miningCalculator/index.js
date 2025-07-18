@@ -7,7 +7,7 @@ import Age from 'g45-react/components/age'
 import useLocale from 'g45-react/hooks/useLocale'
 
 import { useNetworkInfo } from '../home'
-import { BLOCK_TIME, formatDifficulty, formatHashRate, formatXelis } from '../../utils'
+import { formatDifficulty, formatHashRate, formatXelis } from '../../utils'
 import PageTitle from '../../layout/page_title'
 
 import style from './style'
@@ -24,7 +24,7 @@ function MiningCalculator() {
   const rewardData = useMemo(() => {
     if (!info && !hashRate) return {}
 
-    const timeUntilBlock = ((info.difficulty / BLOCK_TIME) / ((hashRate || 1) * hashRateUnit)) * BLOCK_TIME
+    const timeUntilBlock = ((info.difficulty / info.block_time_target) / ((hashRate || 1) * hashRateUnit)) * info.block_time_target
     const rewardPerHour = info.miner_reward / (timeUntilBlock / 60 / 60)
 
     return {
@@ -53,7 +53,7 @@ function MiningCalculator() {
           <div>{t(`Network hashrate`)}</div>
           <div className={style.box.networkHashrate.value}>
             <div><Age ssrKey="hashrate-update" timestamp={lastUpdate} update /></div>
-            <div>{formatHashRate(info.difficulty, { locale })}</div>
+            <div>{formatHashRate(info.difficulty, { blockTime: info.block_time_target, locale })}</div>
           </div>
         </div>
         <div className={style.box.inputCalculator}>

@@ -23,6 +23,7 @@ import useTheme from '../../hooks/useTheme'
 import { getBlockType } from '../dag'
 import Hashicon from '../../components/hashicon'
 import { formatMiner } from '../../utils/known_addrs'
+import { useNetworkInfo } from '../home'
 
 const style = {
   miner: css`
@@ -100,6 +101,7 @@ export function loadBlocks_SSR({ pageState }) {
 }
 
 function Blocks() {
+  const { info } = useNetworkInfo()
   const { firstPageLoad } = usePageLoad()
   const [err, setErr] = useState()
   const [loading, setLoading] = useState()
@@ -338,7 +340,7 @@ function Blocks() {
         {
           key: 'difficulty',
           title: t('Network Diff'),
-          render: (value) => formatHashRate(value, { locale })
+          render: (value) => formatHashRate(value, { blockTime: info.block_time_target, locale })
         }
       ]}
     />

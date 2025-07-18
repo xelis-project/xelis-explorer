@@ -149,7 +149,7 @@ export function NetworkStats(props) {
       { title: t(`Peers`), render: () => (p2pStatus.peer_count || 0).toLocaleString(locale) },
 
       { title: t(`Difficulty`), render: () => formatDifficulty(data.difficulty, { locale })},
-      { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty, { locale }) },
+      { title: t(`Hashrate`), render: () => formatHashRate(data.difficulty, { blockTime: info.block_time_target, locale }) },
       { title: t(`Avg Block Time`), render: () => prettyMs((data.average_block_time || 0), { compact: true }) },
     ]
   }, [info, blocks, currentTheme, t, p2pStatus])
