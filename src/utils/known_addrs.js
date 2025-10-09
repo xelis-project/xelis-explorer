@@ -103,6 +103,10 @@ export const exchanges = {
   "xel:4cqe028p90z25yp2594j63jlmz8lvuj2n5ujzeatxvp5vqe9v4tqqqf6mhw": {
     name: "XT",
     link: "https://www.xt.com/"
+  },
+  "xel:z677gw7u6eayct3w34ezg3zzm42sq90txrh5z9hh3ur5puctu4tqqam8akq": {
+    name: "SafeTrade",
+    link: "https://safetrade.com"
   }
 }
 
