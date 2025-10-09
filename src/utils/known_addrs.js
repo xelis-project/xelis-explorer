@@ -60,6 +60,10 @@ export const pools = {
   "xel:m3k3g0ay4p2jah9kujx09f4rkyj8pq22xfem9vdspd7s2hq6z9vsq4xlvn0": {
     name: `LuckyPool`,
     link: `https://xelis.luckypool.io/`
+  },
+  "xel:nsyjvd5an385m30d9cea8mm235ft5euq2mu4rms8z2f43y9kvsfsqtpzln8": {
+    name: "1Miner",
+    link: "https://1miner.net/#xel1"
   }
 }
 
