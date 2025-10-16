@@ -64,6 +64,10 @@ export const pools = {
   "xel:nsyjvd5an385m30d9cea8mm235ft5euq2mu4rms8z2f43y9kvsfsqtpzln8": {
     name: "1Miner",
     link: "https://1miner.net/#xel1"
+  },
+  "xel:xfunc9m338ld2l98rvps54yyg3zgmd26kwrxjtkp7d7m7s97z4nqq5tsfx2": {
+    name: "UnMineable",
+    link: "https://unmineable.com/"
   }
 }
 
