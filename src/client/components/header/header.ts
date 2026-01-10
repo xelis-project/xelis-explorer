@@ -2,6 +2,7 @@ import { App } from '../../app/app';
 import { localization } from '../../localization/localization';
 import icons from '../../assets/svg/icons';
 import { svg_xelis_logo } from '../../assets/svg/xelis';
+import { isTauri } from '@tauri-apps/api/core';
 
 import './header.css';
 
@@ -11,7 +12,7 @@ interface LinkDef {
 }
 
 export const get_menu_links = () => {
-    return {
+    let links = {
         "/": { text: localization.get_text(`DASHBOARD`), icon: icons.dashboard() },
         "/blocks": { text: localization.get_text(`BLOCKS`), icon: icons.blocks() },
         "/transactions": { text: localization.get_text(`TRANSACTIONS`), icon: icons.exchange() },
@@ -23,8 +24,16 @@ export const get_menu_links = () => {
         "/peers": { text: localization.get_text(`PEERS`), icon: icons.network() },
         "/network-upgrades": { text: localization.get_text(`NETWORK UPGRADES`), icon: icons.upgrade() },
         "/settings": { text: localization.get_text(`SETTINGS`), icon: icons.cog() },
-        "/download-app": { text: `Download App`, icon: icons.download_window() },
     } as Record<string, LinkDef>;
+
+    if (!isTauri()) {
+        links = {
+            ...links,
+            "/download-app": { text: `Download App`, icon: icons.download_window() }
+        };
+    }
+
+    return links;
 }
 
 export class Header {
