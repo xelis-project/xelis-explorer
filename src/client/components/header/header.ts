@@ -23,6 +23,7 @@ export const get_menu_links = () => {
         "/peers": { text: localization.get_text(`PEERS`), icon: icons.network() },
         "/network-upgrades": { text: localization.get_text(`NETWORK UPGRADES`), icon: icons.upgrade() },
         "/settings": { text: localization.get_text(`SETTINGS`), icon: icons.cog() },
+        "/download-app": { text: `Download App`, icon: icons.download_window() },
     } as Record<string, LinkDef>;
 }
 

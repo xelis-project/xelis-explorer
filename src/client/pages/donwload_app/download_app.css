@@ -1,0 +1,115 @@
+.xe-download-app {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.xe-download-app-title {
+    font-size: 2rem;
+    max-width: 30rem;
+    text-align: center;
+    margin-top: 1rem;
+    color: white;
+    animation: xe-download-app-title-appear 1s;
+}
+
+@keyframes xe-download-app-title-appear {
+    0% {
+        translate: 0 -100%;
+    }
+
+    100% {
+        translate: 0 0;
+    }
+}
+
+.xe-download-app-btn {
+    padding: 1rem 1.5rem;
+    background-color: #2CFFCF;
+    border-radius: 1rem;
+    border: none;
+    font-size: 1.5rem;
+    font-family: "Jura";
+    margin-top: 2rem;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: bold;
+    transition: .25s translate;
+    animation: xe-download-app-btn-appear .8s ease-in-out;
+}
+
+@keyframes xe-download-app-btn-appear {
+    0% {
+        scale: .7;
+    }
+
+    50% {
+        scale: 1.2;
+    }
+
+    100% {
+        scale: 1;
+    }
+}
+
+.xe-download-app-btn:hover {
+    translate: 0 -5%;
+    opacity: 1;
+    box-shadow: 0 0 30px black;
+}
+
+.xe-download-app-btn svg {
+    width: 2rem;
+    height: 2rem;
+    color: black;
+}
+
+.xe-download-app-images {
+    position: relative;
+    width: 70vw;
+    max-width: 40rem;
+    height: 35rem;
+    margin-top: 3rem;
+}
+
+.xe-download-app-images img {
+    border-radius: .5rem;
+    position: absolute;
+    width: 70vw;
+    max-width: 40rem;
+}
+
+.xe-download-app-images>:nth-child(1) {
+    animation: xe-download-app-img-appear .75s ease-in-out, .75s xe-download-app-img-float 1s ease-in-out infinite alternate;;
+}
+
+.xe-download-app-images>:nth-child(2) {
+    animation: xe-download-app-img-appear 1s ease-in-out, 1s xe-download-app-img-float 1s ease-in-out infinite alternate;
+    top: 3rem;
+    left: 3rem;
+    opacity: .9;
+}
+
+@keyframes xe-download-app-img-appear {
+    0% {
+        translate: 0 100%;
+    }
+
+    100% {
+        translate: 0 0;
+    }
+}
+
+@keyframes xe-download-app-img-float {
+    0% {
+        translate: 0 0;
+    }
+
+    100% {
+        translate: 0 2%;
+    }
+}
