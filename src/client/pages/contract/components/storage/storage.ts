@@ -222,13 +222,14 @@ export class ContractStorageEntries {
         }
     }
 
-    async show_history_for_param(storage_key_param: string) {
+    async show_history_for_param(storage_key_param: string, storage_key_topo_param: string | null) {
         if (!this.contract_hash) {
             return;
         }
 
         const normalized_param = storage_key_param.trim();
         let key_to_use = this.parse_storage_key_param(storage_key_param);
+        const topoheight = storage_key_topo_param ? Number.parseInt(storage_key_topo_param, 10) : undefined;
 
         if (normalized_param.length > 0 && this.last_entries.length > 0) {
             const matching_entry = this.last_entries.find((entry) => {
@@ -243,7 +244,7 @@ export class ContractStorageEntries {
             }
         }
 
-        this.history_modal.show(this.contract_hash, key_to_use);
+        this.history_modal.show(this.contract_hash, key_to_use, Number.isFinite(topoheight) ? topoheight : undefined);
     }
 
     private copy_to_clipboard(text: string, button: HTMLElement) {

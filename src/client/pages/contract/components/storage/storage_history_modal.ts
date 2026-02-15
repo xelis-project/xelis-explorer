@@ -22,6 +22,7 @@ export class StorageHistoryModal {
     private storage_key?: any;
     private history_entries: StorageHistoryEntry[] = [];
     private current_history_index: number = 0;
+    private opened_from_param: boolean = false;
 
     constructor() {
         this.element = document.createElement(`div`);
@@ -72,7 +73,13 @@ export class StorageHistoryModal {
         const next_button = document.createElement(`button`);
         next_button.innerText = localization.get_text(`Next`);
         next_button.classList.add(`xe-storage-history-modal-nav-next`);
-        next_button.addEventListener(`click`, () => this.navigate_history(-1));
+        next_button.addEventListener(`click`, async () => {
+            if (this.opened_from_param) {
+                await this.go_to_latest();
+            } else {
+                await this.navigate_history(-1);
+            }
+        });
         nav.appendChild(next_button);
 
         // Value display
@@ -128,6 +135,40 @@ export class StorageHistoryModal {
         }
     }
 
+    private async go_to_latest() {
+        if (!this.contract_hash || !this.storage_key) {
+            return;
+        }
+
+        try {
+            const node = XelisNode.instance();
+            const current_data = await node.rpc.getContractData({
+                contract: this.contract_hash,
+                key: this.storage_key,
+            }) as any;
+
+            if (current_data && current_data.data !== null && current_data.data !== undefined) {
+                this.history_entries = [
+                    {
+                        topoheight: current_data.topoheight,
+                        previous_topoheight: current_data.previous_topoheight,
+                        value: current_data.data,
+                    }
+                ];
+                this.current_history_index = 0;
+                this.opened_from_param = false;
+                this.update_display();
+                return;
+            }
+        } catch (e) {
+            console.log(`Could not load latest value for storage key ${this.storage_key}:`, e);
+        }
+
+        this.current_history_index = 0;
+        this.opened_from_param = false;
+        this.update_display();
+    }
+
     private update_display() {
         const title = (this.content as any).__title as HTMLElement;
         const key_display = (this.content as any).__key_display as HTMLElement;
@@ -159,7 +200,10 @@ export class StorageHistoryModal {
 
         const has_previous = entry.previous_topoheight !== null && entry.previous_topoheight !== undefined;
         prev_button.disabled = !has_previous;
-        next_button.disabled = this.current_history_index === 0;
+        next_button.disabled = this.opened_from_param ? false : this.current_history_index === 0;
+        next_button.innerText = this.opened_from_param
+            ? localization.get_text(`Latest`)
+            : localization.get_text(`Next`);
 
         // Display value with JSON viewer
         value_container.replaceChildren();
@@ -247,7 +291,7 @@ export class StorageHistoryModal {
         }
     }
 
-    async show(contract_hash: string, storage_key: any) {
+    async show(contract_hash: string, storage_key: any, topoheight?: number) {
         if (this.visible) {
             return;
         }
@@ -256,6 +300,7 @@ export class StorageHistoryModal {
         this.storage_key = storage_key;
         this.current_history_index = 0;
         this.history_entries = [];
+        this.opened_from_param = topoheight !== undefined && Number.isFinite(topoheight);
 
         this.element.style.visibility = `visible`;
         this.element.classList.add(`visible`);
@@ -271,7 +316,7 @@ export class StorageHistoryModal {
         this.visible = true;
 
         try {
-            await this.load_history(contract_hash, storage_key);
+            await this.load_history(contract_hash, storage_key, topoheight);
         } catch (e) {
             value_container.replaceChildren();
             const error = document.createElement(`div`);
@@ -299,26 +344,34 @@ export class StorageHistoryModal {
         }
     }
 
-    private async load_history(contract_hash: string, storage_key: any) {
+    private async load_history(contract_hash: string, storage_key: any, topoheight?: number) {
         const node = XelisNode.instance();
 
-        // First, get current value
-        try {
-            const current_data = await node.rpc.getContractData({
-                contract: contract_hash,
-                key: storage_key,
-            }) as any;
-
-            if (current_data && current_data.data !== null && current_data.data !== undefined) {
-                this.history_entries.push({
-                    topoheight: current_data.topoheight,
-                    previous_topoheight: current_data.previous_topoheight,
-                    value: current_data.data,
-                });
+        if (topoheight !== undefined && Number.isFinite(topoheight)) {
+            try {
+                await this.load_contract_data_at_topoheight(contract_hash, storage_key, topoheight);
+            } catch (e) {
+                console.log(`Could not load value at topoheight ${topoheight} for storage key ${storage_key}:`, e);
             }
-        } catch (e) {
-            // Current value might not exist, that's okay
-            console.log(`Could not load current value for storage key ${storage_key}:`, e);
+        } else {
+            // First, get current value
+            try {
+                const current_data = await node.rpc.getContractData({
+                    contract: contract_hash,
+                    key: storage_key,
+                }) as any;
+
+                if (current_data && current_data.data !== null && current_data.data !== undefined) {
+                    this.history_entries.push({
+                        topoheight: current_data.topoheight,
+                        previous_topoheight: current_data.previous_topoheight,
+                        value: current_data.data,
+                    });
+                }
+            } catch (e) {
+                // Current value might not exist, that's okay
+                console.log(`Could not load current value for storage key ${storage_key}:`, e);
+            }
         }
 
         this.update_display();
