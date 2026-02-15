@@ -8,6 +8,7 @@ import './storage_history_modal.css';
 
 type StorageHistoryEntry = {
     topoheight: number;
+    previous_topoheight?: number;
     value: unknown;
 };
 
@@ -21,6 +22,7 @@ export class StorageHistoryModal {
     private storage_key?: any;
     private history_entries: StorageHistoryEntry[] = [];
     private current_history_index: number = 0;
+    private opened_from_param: boolean = false;
 
     constructor() {
         this.element = document.createElement(`div`);
@@ -61,7 +63,7 @@ export class StorageHistoryModal {
         const prev_button = document.createElement(`button`);
         prev_button.innerText = localization.get_text(`Previous`);
         prev_button.classList.add(`xe-storage-history-modal-nav-prev`);
-        prev_button.addEventListener(`click`, () => this.navigate_history(-1));
+        prev_button.addEventListener(`click`, () => this.navigate_history(1));
         nav.appendChild(prev_button);
 
         const history_indicator = document.createElement(`div`);
@@ -71,7 +73,13 @@ export class StorageHistoryModal {
         const next_button = document.createElement(`button`);
         next_button.innerText = localization.get_text(`Next`);
         next_button.classList.add(`xe-storage-history-modal-nav-next`);
-        next_button.addEventListener(`click`, () => this.navigate_history(1));
+        next_button.addEventListener(`click`, async () => {
+            if (this.opened_from_param) {
+                await this.go_to_latest();
+            } else {
+                await this.navigate_history(-1);
+            }
+        });
         nav.appendChild(next_button);
 
         // Value display
@@ -90,12 +98,75 @@ export class StorageHistoryModal {
         document.body.appendChild(this.element);
     }
 
-    private navigate_history(delta: number) {
+    private async navigate_history(delta: number) {
         const new_index = this.current_history_index + delta;
-        if (new_index >= 0 && new_index < this.history_entries.length) {
+        if (new_index < 0) {
+            return;
+        }
+
+        if (new_index < this.history_entries.length) {
             this.current_history_index = new_index;
             this.update_display();
+            return;
         }
+
+        if (new_index === this.history_entries.length) {
+            const current = this.history_entries[this.history_entries.length - 1];
+            const previous_topoheight = current?.previous_topoheight;
+            if (previous_topoheight === null || previous_topoheight === undefined) {
+                return;
+            }
+
+            if (!this.contract_hash || !this.storage_key) {
+                return;
+            }
+
+            const existing = this.history_entries.find((entry) => entry.topoheight === previous_topoheight);
+            if (!existing) {
+                await this.load_contract_data_at_topoheight(this.contract_hash, this.storage_key, previous_topoheight);
+            }
+
+            if (new_index < this.history_entries.length) {
+                this.current_history_index = new_index;
+            } else {
+                this.current_history_index = this.history_entries.length - 1;
+            }
+            this.update_display();
+        }
+    }
+
+    private async go_to_latest() {
+        if (!this.contract_hash || !this.storage_key) {
+            return;
+        }
+
+        try {
+            const node = XelisNode.instance();
+            const current_data = await node.rpc.getContractData({
+                contract: this.contract_hash,
+                key: this.storage_key,
+            }) as any;
+
+            if (current_data && current_data.data !== null && current_data.data !== undefined) {
+                this.history_entries = [
+                    {
+                        topoheight: current_data.topoheight,
+                        previous_topoheight: current_data.previous_topoheight,
+                        value: current_data.data,
+                    }
+                ];
+                this.current_history_index = 0;
+                this.opened_from_param = false;
+                this.update_display();
+                return;
+            }
+        } catch (e) {
+            console.log(`Could not load latest value for storage key ${this.storage_key}:`, e);
+        }
+
+        this.current_history_index = 0;
+        this.opened_from_param = false;
+        this.update_display();
     }
 
     private update_display() {
@@ -127,8 +198,12 @@ export class StorageHistoryModal {
             this.history_entries.length.toLocaleString()
         ]);
 
-        prev_button.disabled = this.current_history_index === 0;
-        next_button.disabled = this.current_history_index === this.history_entries.length - 1;
+        const has_previous = entry.previous_topoheight !== null && entry.previous_topoheight !== undefined;
+        prev_button.disabled = !has_previous;
+        next_button.disabled = this.opened_from_param ? false : this.current_history_index === 0;
+        next_button.innerText = this.opened_from_param
+            ? localization.get_text(`Latest`)
+            : localization.get_text(`Next`);
 
         // Display value with JSON viewer
         value_container.replaceChildren();
@@ -216,7 +291,7 @@ export class StorageHistoryModal {
         }
     }
 
-    async show(contract_hash: string, storage_key: any) {
+    async show(contract_hash: string, storage_key: any, topoheight?: number) {
         if (this.visible) {
             return;
         }
@@ -225,6 +300,7 @@ export class StorageHistoryModal {
         this.storage_key = storage_key;
         this.current_history_index = 0;
         this.history_entries = [];
+        this.opened_from_param = topoheight !== undefined && Number.isFinite(topoheight);
 
         this.element.style.visibility = `visible`;
         this.element.classList.add(`visible`);
@@ -240,7 +316,7 @@ export class StorageHistoryModal {
         this.visible = true;
 
         try {
-            await this.load_history(contract_hash, storage_key);
+            await this.load_history(contract_hash, storage_key, topoheight);
         } catch (e) {
             value_container.replaceChildren();
             const error = document.createElement(`div`);
@@ -250,89 +326,52 @@ export class StorageHistoryModal {
         }
     }
 
-    private async load_history(contract_hash: string, storage_key: any) {
+    private async load_contract_data_at_topoheight(contract_hash: string, storage_key: any, topoheight: number) {
         const node = XelisNode.instance();
 
-        // First, get current value
-        try {
-            const current_data = await node.rpc.getContractData({
-                contract: contract_hash,
-                key: storage_key,
-            }) as GetContractDataResult;
+        const current_data = await node.rpc.getContractDataAtTopoheight({
+            contract: contract_hash,
+            topoheight: topoheight,
+            key: storage_key,
+        }) as any;
 
-            if (current_data && current_data.data !== null && current_data.data !== undefined) {
-                // Get current topoheight for reference
-                const chain_info_result = await node.rpc.batchRequest([{
-                    method: RPCMethod.GetInfo
-                }]);
-                const chain_info = chain_info_result[0] as GetInfoResult;
-                const current_topoheight = chain_info.topoheight;
-
-                this.history_entries.push({
-                    topoheight: current_topoheight,
-                    value: current_data.data,
-                });
-            }
-        } catch (e) {
-            // Current value might not exist, that's okay
-            console.debug(`Could not load current value for storage key ${storage_key}:`, e);
+        if (current_data && current_data.data !== null && current_data.data !== undefined) {
+            this.history_entries.push({
+                topoheight: topoheight,
+                previous_topoheight: current_data.previous_topoheight,
+                value: current_data.data,
+            });
         }
+    }
 
-        // Try to get historical values at different topoheights
-        // We'll sample a few recent topoheights to show history
-        // Note: This is a simplified approach. A full implementation would
-        // track all changes, but that requires additional RPC methods or indexing.
-        try {
-            const chain_info_result = await node.rpc.batchRequest([{
-                method: RPCMethod.GetInfo
-            }]);
-            const chain_info = chain_info_result[0] as GetInfoResult;
-            const current_topoheight = chain_info.topoheight;
+    private async load_history(contract_hash: string, storage_key: any, topoheight?: number) {
+        const node = XelisNode.instance();
 
-            // Sample a few recent topoheights (every 100 blocks, up to 10 samples)
-            const sample_count = 10;
-            const step = Math.max(1, Math.floor(current_topoheight / sample_count));
-            const samples: number[] = [];
-
-            for (let i = 0; i < sample_count && samples.length < sample_count; i++) {
-                const topoheight = current_topoheight - (i * step);
-                if (topoheight > 0) {
-                    samples.push(topoheight);
-                }
+        if (topoheight !== undefined && Number.isFinite(topoheight)) {
+            try {
+                await this.load_contract_data_at_topoheight(contract_hash, storage_key, topoheight);
+            } catch (e) {
+                console.log(`Could not load value at topoheight ${topoheight} for storage key ${storage_key}:`, e);
             }
+        } else {
+            // First, get current value
+            try {
+                const current_data = await node.rpc.getContractData({
+                    contract: contract_hash,
+                    key: storage_key,
+                }) as any;
 
-            // Fetch historical values (in reverse order, newest first)
-            for (const topoheight of samples.reverse()) {
-                try {
-                    const historical_data = await node.rpc.getContractDataAtTopoheight({
-                        contract: contract_hash,
-                        key: storage_key,
-                        topoheight: topoheight,
-                    }) as GetContractDataResult;
-
-                    if (historical_data && historical_data.data !== null && historical_data.data !== undefined) {
-                        // Avoid duplicates
-                        const existing = this.history_entries.find(
-                            e => e.topoheight === topoheight
-                        );
-                        if (!existing) {
-                            this.history_entries.push({
-                                topoheight,
-                                value: historical_data.data,
-                            });
-                        }
-                    }
-                } catch (e) {
-                    // This topoheight might not have data, skip it
+                if (current_data && current_data.data !== null && current_data.data !== undefined) {
+                    this.history_entries.push({
+                        topoheight: current_data.topoheight,
+                        previous_topoheight: current_data.previous_topoheight,
+                        value: current_data.data,
+                    });
                 }
+            } catch (e) {
+                // Current value might not exist, that's okay
+                console.log(`Could not load current value for storage key ${storage_key}:`, e);
             }
-
-            // Sort by topoheight descending (newest first)
-            this.history_entries.sort((a, b) => b.topoheight - a.topoheight);
-            this.current_history_index = 0;
-        } catch (e) {
-            // If we can't load history, at least show current value if available
-            console.debug(`Could not load history for storage key ${storage_key}:`, e);
         }
 
         this.update_display();

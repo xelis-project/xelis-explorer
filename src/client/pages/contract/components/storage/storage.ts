@@ -30,10 +30,11 @@ export class ContractStorageEntries {
     history_modal: StorageHistoryModal;
 
     private contract_hash?: string;
-    private page_size = 25;
+    private page_size = 10;
     private current_page = 0;
     private has_next_page = false;
     private total_entries_shown = 0;
+    private last_entries: ContractStorageEntry[] = [];
 
     constructor() {
         this.container = new Container();
@@ -206,6 +207,44 @@ export class ContractStorageEntries {
         } catch {
             return String(key);
         }
+    }
+
+    private parse_storage_key_param(raw_key: string): unknown {
+        const trimmed = raw_key.trim();
+        if (trimmed.length === 0) {
+            return ``;
+        }
+
+        try {
+            return JSON.parse(trimmed);
+        } catch {
+            return trimmed;
+        }
+    }
+
+    async show_history_for_param(storage_key_param: string, storage_key_topo_param: string | null) {
+        if (!this.contract_hash) {
+            return;
+        }
+
+        const normalized_param = storage_key_param.trim();
+        let key_to_use = this.parse_storage_key_param(storage_key_param);
+        const topoheight = storage_key_topo_param ? Number.parseInt(storage_key_topo_param, 10) : undefined;
+
+        if (normalized_param.length > 0 && this.last_entries.length > 0) {
+            const matching_entry = this.last_entries.find((entry) => {
+                try {
+                    return this.get_key_string(entry.key) === normalized_param;
+                } catch {
+                    return false;
+                }
+            });
+            if (matching_entry) {
+                key_to_use = matching_entry.key;
+            }
+        }
+
+        this.history_modal.show(this.contract_hash, key_to_use, Number.isFinite(topoheight) ? topoheight : undefined);
     }
 
     private copy_to_clipboard(text: string, button: HTMLElement) {
@@ -426,6 +465,8 @@ export class ContractStorageEntries {
 
             // Debug: log the response to understand the format
             console.log(`Storage entries response for contract ${contract_hash}:`, entries);
+
+            this.last_entries = Array.isArray(entries) ? entries : [];
 
             this.total_entries_shown = Array.isArray(entries) ? entries.length : 0;
             this.has_next_page = this.total_entries_shown === maximum;
