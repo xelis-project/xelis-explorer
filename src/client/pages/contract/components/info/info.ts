@@ -60,10 +60,23 @@ export class ContractInfo {
         this.hash_element.innerHTML = `<a href="/tx/${contract_hash}">${contract_hash}</a></div>`;
 
         const { data } = result;
-        if (data.module) {
+        if (data?.module) {
             this.constant_json_viewer_box.set_data(data.module.constants);
             this.chunks_json_viewer_box.set_data(data.module.chunks);
             this.hook_ids_box.element.innerHTML = JSON.stringify(data.module.hook_chunk_ids || [], null, 2);
+        } else {
+            const warning_element = document.createElement('div');
+            warning_element.style.color = '#ff6b6b';
+            warning_element.style.padding = '1rem';
+            warning_element.style.marginBottom = '1rem';
+            warning_element.style.borderLeft = '4px solid #ff6b6b';
+            warning_element.style.backgroundColor = 'rgba(255, 107, 107, 0.1)';
+            warning_element.innerHTML = localization.get_text('This contract module has been deleted or failed its deploy');
+            this.container.element.insertBefore(warning_element, this.constant_json_viewer_box.box.element);
+            
+            this.constant_json_viewer_box.set_data(null);
+            this.chunks_json_viewer_box.set_data(null);
+            this.hook_ids_box.element.innerHTML = ``;
         }
     }
 }

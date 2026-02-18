@@ -48,6 +48,24 @@
     color: #afafaf;
 }
 
+.xe-contract-assets-list>.xe-contract-assets-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    opacity: 0.8;
+    font-size: 0.875rem;
+    gap: 0;
+}
+
+.xe-contract-assets-empty svg {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 0.75rem;
+}
+
 .xe-contract-assets-list>div>:nth-child(1)>:nth-child(2) {
     font-size: .9rem;
     color: #afafaf;
