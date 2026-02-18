@@ -34,6 +34,12 @@ export class MempoolTxsList {
         const tx_item = new TxItem(`/tx/${tx_block.tx.hash}`);
         tx_item.set(tx_block);
 
+        // do not append if tx is already in the list
+        const exists = this.tx_items.find(x => {
+            if (x.data) return x.data.tx.hash === tx_block.tx.hash
+        });
+        if (exists) return;
+
         this.tx_items.unshift(tx_item);
         this.container.element.insertBefore(tx_item.box.element, this.container.element.firstChild);
     }
