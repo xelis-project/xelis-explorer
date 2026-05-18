@@ -16,7 +16,7 @@ import { reduce_text } from "../../utils/reduce_text";
 import './contract.css';
 
 interface ContractPageServerData {
-    transaction?: TransactionResponse;
+    contract: string;
     contract_module?: GetContractModuleResult;
 }
 
@@ -32,37 +32,8 @@ export class ContractPage extends Page {
     }
 
     static async load_server_data(daemon: DaemonRPC, contract_hash: string) {
-        const server_data = { contract: undefined } as ContractPageServerData;
-
-        {
-            const requests = [
-                {
-                    method: DaemonRPCMethod.GetTransaction,
-                    params: { hash: contract_hash }
-                },
-                {
-                    method: DaemonRPCMethod.GetContractModule,
-                    params: { contract: contract_hash } as GetContractModuleParams
-                },
-            ] as RPCRequest[];
-
-
-            const res = await daemon.batchRequest(requests);
-            res.forEach((result, i) => {
-                if (result instanceof Error) {
-                    throw result;
-                } else {
-                    switch (i) {
-                        case 0: // GetTransaction
-                            server_data.transaction = (result as TransactionResponse);
-                            break;
-                        case 1: // GetContractModule
-                            server_data.contract_module = (result as GetContractModuleResult);
-                            break;
-                    }
-                }
-            });
-        }
+        const server_data = { contract: contract_hash } as ContractPageServerData;
+        server_data.contract_module = await daemon.getContractModule({ contract: contract_hash });
 
         return server_data;
     }
@@ -151,13 +122,20 @@ export class ContractPage extends Page {
         this.contract_info.set_loading(false);
 
         const { server_data } = this.page_data;
-        if (server_data && server_data.contract_module && server_data.transaction) {
+        if (server_data && server_data.contract_module) {
             this.set_element(this.master.element);
 
-            const contract_hash = server_data.transaction.hash;
+            const contract_hash = server_data.contract;
             this.contract_info.set(contract_hash, server_data.contract_module);
             this.contract_assets.load(contract_hash);
-            this.contract_storage_entries.load(contract_hash);
+            await this.contract_storage_entries.load(contract_hash);
+
+            const params = new URLSearchParams(window.location.search);
+            const storage_key_param = params.get(`storageKey`);
+            if (storage_key_param) {
+                const storage_key_topo_param = params.get(`storageKeyTopo`);
+                this.contract_storage_entries.show_history_for_param(storage_key_param, storage_key_topo_param);
+            }
         } else {
             this.set_element(NotFoundPage.instance().element);
         }

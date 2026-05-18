@@ -28,7 +28,7 @@
     align-items: end;
     flex-wrap: wrap;
     justify-content: end;
-    max-width: 50rem;
+    max-width: 60rem;
 }
 
 .xe-header-links>* {
@@ -148,6 +148,7 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-width: 14rem;
 }
 
 .xe-header-text {

@@ -68,12 +68,7 @@ export const blocks = () => {
         </svg>
     `;
 }
-/*
-<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8 10H20L16 6" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 14L4 14L8 18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-*/
+
 export const contract = () => {
     return `
         <svg width="800px" height="800px" viewBox="0 0 1024 1024" fill="currentColor" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -317,6 +312,14 @@ export const error = () => {
     `;
 }
 
+export const download_window = () => {
+    return `
+        <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 26.016q0 2.496 1.76 4.224t4.256 1.76h4.992l-2.496-4h-2.496q-0.832 0-1.44-0.576t-0.576-1.408v-14.016h24v14.016q0 0.832-0.576 1.408t-1.408 0.576h-2.528l-2.496 4h5.024q2.464 0 4.224-1.76t1.76-4.224v-20q0-2.496-1.76-4.256t-4.224-1.76h-20q-2.496 0-4.256 1.76t-1.76 4.256v20zM4 10.016v-4q0-0.832 0.576-1.408t1.44-0.608h20q0.8 0 1.408 0.608t0.576 1.408v4h-24zM6.016 8h1.984v-1.984h-1.984v1.984zM10.016 24l5.984 8 6.016-8h-4v-8h-4v8h-4zM10.016 8h1.984v-1.984h-1.984v1.984zM14.016 8h12v-1.984h-12v1.984z"></path>
+        </svg>
+    `;
+}
+
 export default {
     question_mark_shield, tag, exchange,
     home, empty_box, menu, dashboard, blocks,
@@ -325,5 +328,5 @@ export default {
     reset, save, caret_down, close, tokens,
     wallet, arrow, dual_arrow, lock, upgrade,
     history, checkmark, book, copy, user,
-    page_next, page_end, error
+    page_next, page_end, error, download_window
 };

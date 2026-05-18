@@ -6,6 +6,7 @@ import { format_hash } from '../../../../utils/format_hash';
 import { Box } from '../../../../components/box/box';
 import { localization } from '../../../../localization/localization';
 import { ws_format_asset } from '../../../../utils/ws_format_asset';
+import icons from '../../../../assets/svg/icons';
 
 import './assets.css';
 
@@ -66,9 +67,20 @@ export class ContractAssets {
 
         this.list_element.replaceChildren();
 
-        balances.forEach((balance, i) => {
-            const asset = assets[i];
-            this.add_item(asset, balance);
-        });
+        if (balances.length === 0) {
+            const empty_element = document.createElement(`div`);
+            empty_element.classList.add(`xe-contract-assets-empty`);
+            empty_element.innerHTML = `
+                ${icons.empty_box()}
+                <div>${localization.get_text(`No balance for this contract`)}</div>
+                <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no balance yet`)}</div>
+            `;
+            this.list_element.appendChild(empty_element);
+        } else {
+            balances.forEach((balance, i) => {
+                const asset = assets[i];
+                this.add_item(asset, balance);
+            });
+        }
     }
 }

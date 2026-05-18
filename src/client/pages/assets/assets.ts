@@ -75,7 +75,7 @@ export class AssetsPage extends Page {
 
     async load_assets() {
         this.table.body_element.replaceChildren();
-        this.table.set_loading(10);
+        this.table.set_loading(this.pagination.page_size);
 
         const xelis_node = XelisNode.instance();
 

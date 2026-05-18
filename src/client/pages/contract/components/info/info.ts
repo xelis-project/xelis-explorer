@@ -10,6 +10,7 @@ import './info.css';
 export class ContractInfo {
     container: Container;
 
+    warning_element: HTMLDivElement;
     constant_json_viewer_box: JsonViewerBox;
     chunks_json_viewer_box: JsonViewerBox;
     hook_ids_box: Box;
@@ -19,11 +20,16 @@ export class ContractInfo {
         this.container = new Container();
         this.container.element.classList.add(`xe-contract-info`);
 
+        this.warning_element = document.createElement('div');
+        this.warning_element.classList.add(`warning-banner`);
+
         const title_element = document.createElement(`div`);
         title_element.innerHTML = localization.get_text(`CONTRACT`);
+        title_element.classList.add(`xe-contract-info-title`);
         this.container.element.appendChild(title_element);
 
         this.hash_element = document.createElement(`div`);
+        this.hash_element.classList.add(`xe-contract-info-hash`);
         this.container.element.appendChild(this.hash_element);
 
         const constants_title_element = document.createElement(`div`);
@@ -60,10 +66,18 @@ export class ContractInfo {
         this.hash_element.innerHTML = `<a href="/tx/${contract_hash}">${contract_hash}</a></div>`;
 
         const { data } = result;
-        if (data.module) {
+        if (data?.module) {
+            this.warning_element.remove();
             this.constant_json_viewer_box.set_data(data.module.constants);
             this.chunks_json_viewer_box.set_data(data.module.chunks);
             this.hook_ids_box.element.innerHTML = JSON.stringify(data.module.hook_chunk_ids || [], null, 2);
+        } else {
+            this.warning_element.innerHTML = localization.get_text('This contract module has been deleted or failed its deploy');
+            this.container.element.insertBefore(this.warning_element, this.container.element.firstChild);
+
+            this.constant_json_viewer_box.set_data(null);
+            this.chunks_json_viewer_box.set_data(null);
+            this.hook_ids_box.element.innerHTML = ``;
         }
     }
 }

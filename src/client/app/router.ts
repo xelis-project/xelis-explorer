@@ -10,6 +10,7 @@ import { ContractPage } from "../pages/contract/contract";
 import { ContractsPage } from "../pages/contracts/contracts";
 import { DAGPage } from "../pages/dag/dag";
 import { DashboardPage } from "../pages/dashboard/dashboards";
+import { DownloadAppPage } from "../pages/donwload_app/download_app";
 import { KnownAccountsPage } from "../pages/known_accounts/known_accounts";
 import { MempoolPage } from "../pages/mempool/mempool";
 import { NetworkUpgradesPage } from "../pages/network_upgrades/network_upgrades";
@@ -39,7 +40,8 @@ export const pages = [
     AssetPage,
     AssetsPage,
     SettingsPage,
-    NetworkUpgradesPage
+    NetworkUpgradesPage,
+    DownloadAppPage
 ];
 
 export const match_route = (url: URL): typeof Page => {

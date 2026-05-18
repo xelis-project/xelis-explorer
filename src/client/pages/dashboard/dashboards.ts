@@ -301,9 +301,11 @@ export class DashboardPage extends Page {
     }
 
     async load_blocks_txs() {
-        const blocks = this.page_data.blocks;
+        let blocks = this.page_data.blocks;
         if (!blocks) return;
 
+        // filter side block out (they might contain a duplicated tx)
+        blocks = blocks.filter(b => b.block_type !== BlockType.Side);
         await fetch_blocks_txs(blocks);
 
         const txs_blocks: TxBlock[] = [];

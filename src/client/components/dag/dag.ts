@@ -318,12 +318,13 @@ export class DAG {
         const tip_lines_to_delete = this.tip_line_group.children.filter((tip_line_mesh) => {
             const block_target_height = tip_line_mesh.userData.block_target_height;
             return block_target_height === target_height;
-        });
+        }) as THREE.Line<THREE.BufferGeometry, THREE.LineBasicMaterial>[];
 
         tip_lines_to_delete.forEach((tip_line) => {
             this.tip_mesh_hashes.delete(tip_line.userData.hash);
             this.tip_line_group.remove(tip_line);
-            this.dispose_group(tip_line as THREE.Group);
+            tip_line.geometry.dispose();
+            tip_line.material.dispose();
         });
     }
 
@@ -883,18 +884,13 @@ export class DAG {
     // there are some objects that needs to be dipose() manually like BufferGeometry, etc...
     dispose_group(group: THREE.Group) {
         group.children.forEach(child => {
-            if (child instanceof THREE.Group) {
-                this.dispose_group(child);
-            } else if (child instanceof Text) {
-                (child as any).dispose();
-            } else if (child instanceof THREE.Mesh) {
-                if (child.geometry) {
-                    child.geometry.dispose();
-                }
-
-                if (child.material) {
-                    child.material.dispose();
-                }
+            const obj = child as any;
+            if (obj instanceof THREE.Group) {
+                this.dispose_group(obj);
+            } else {
+                obj.geometry.dispose();
+                obj.material.dispose();
+                if (obj.dispose) obj.dispose();
             }
         });
     }
