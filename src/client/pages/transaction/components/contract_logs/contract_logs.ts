@@ -183,7 +183,7 @@ export class TransactionContractLogs {
                             <tr>
                             <tr>
                                 <td>${localization.get_text(`KIND`)}</td>
-                                <td>${scheduled_execution.kind}</td>
+                                <td>${JSON.stringify(scheduled_execution.kind)}</td>
                             <tr>
                         </table>
                     `;
