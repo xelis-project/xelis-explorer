@@ -486,9 +486,9 @@ export class DAG {
         this.height_control.set_height(height);
         this.height_control.set_max_height(max_height);
 
-        const heigth_count = Math.round(this.max_display_height / 2);
-        const start_height = Math.max(0, height - heigth_count);
-        const end_height = Math.min(max_height, height + heigth_count);
+        const height_count = Math.round(this.max_display_height / 2);
+        const start_height = Math.max(0, height - height_count);
+        const end_height = Math.min(max_height, height + height_count);
 
         this.load_height = Math.max(0, Math.min(max_height, height));
 
