@@ -262,6 +262,7 @@ export class SettingsPage extends Page {
     }
 
     unload(): void {
+        super.unload();
         this.master.unload();
     }
 }
