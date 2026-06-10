@@ -648,31 +648,36 @@ export class DAG {
     intercept_block() {
         const box_meshes = this.block_group.getObjectsByProperty(`name`, `box_mesh`) as THREE.Mesh[];
         const intersects = this.raycaster.intersectObjects<THREE.Mesh>(box_meshes);
+        
         if (intersects.length > 0) {
-            if (!this.hovered_block_box_mesh) {
-                const intersection = intersects[0];
-                const box_mesh = intersection.object as THREE.Mesh;
-
-                if (this.highlighted_block_box_mesh === box_mesh) {
-                    return;
+            const box_mesh = intersects[0].object as THREE.Mesh;
+            
+            if (this.hovered_block_box_mesh !== box_mesh) {  // Only update if different
+                // Clear previous hover
+                if (this.hovered_block_box_mesh) {
+                    this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(`#606060`));
+                    const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
+                    mat.uniforms.enable_outline.value = false;
                 }
-
-                const mat = box_mesh.material as THREE.ShaderMaterial;
-                mat.uniforms.outline_color.value = new THREE.Color(`white`);
-                mat.uniforms.enable_outline.value = true;
-                // block_mesh.scale.set(0.95, 0.95, 0.95);
-                if (box_mesh.parent) {
-                    this.set_tip_lines_color(box_mesh, new THREE.Color(`white`));
+                
+                // Set new hover
+                if (this.highlighted_block_box_mesh !== box_mesh) {
+                    const mat = box_mesh.material as THREE.ShaderMaterial;
+                    mat.uniforms.outline_color.value = new THREE.Color(`white`);
+                    mat.uniforms.enable_outline.value = true;
+                    if (box_mesh.parent) {
+                        this.set_tip_lines_color(box_mesh, new THREE.Color(`white`));
+                    }
                 }
-
                 this.hovered_block_box_mesh = box_mesh;
             }
         } else if (this.hovered_block_box_mesh) {
-            this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(`#606060`));
-
-            //this.hovered_block_mesh.scale.set(1, 1, 1);
-            const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
-            mat.uniforms.enable_outline.value = false;
+            // Clear hover
+            if (this.hovered_block_box_mesh !== this.highlighted_block_box_mesh) {
+                this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(`#606060`));
+                const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
+                mat.uniforms.enable_outline.value = false;
+            }
             this.hovered_block_box_mesh = undefined;
         }
     }
