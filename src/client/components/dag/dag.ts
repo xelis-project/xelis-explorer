@@ -146,10 +146,6 @@ export class DAG {
         this.element.addEventListener(`pointermove`, this.on_pointer_move);
         this.element.addEventListener(`click`, this.on_click);
 
-        window.addEventListener(`keypress`, () => {
-            this.animate_block_appear(this.block_group.children[this.block_group.children.length - 1] as any);
-        });
-
         this.height_control = new HeightControl();
         this.height_control.add_listener(`new_height`, (height) => {
             if (height !== undefined) {
@@ -399,6 +395,7 @@ export class DAG {
         this.set_live(false); // clear listener and set live flag to false
         this.stop_animation_loop();
         this.dispose_objects();
+        window.removeEventListener('resize', this.on_resize);
     }
 
     listen_node_events() {
