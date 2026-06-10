@@ -15,7 +15,8 @@
     overflow: auto;
     opacity: 0;
     visibility: hidden;
-    box-shadow: 0 0 100px 30px #0f0f0f;
+    box-shadow: 0 0 40px 10px #0f0f0f;
+    border: thin solid #0a967c26;
 }
 
 .xe-dag-block-details>div {
