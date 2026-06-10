@@ -68,6 +68,7 @@ export class DAG {
     block_spacing = 6;
     max_display_height = 100;
     animation_loop_active = false;
+    load_timeout?: number;
 
     constructor() {
         this.element = document.createElement(`div`);
@@ -147,9 +148,9 @@ export class DAG {
         this.element.addEventListener(`click`, this.on_click);
 
         this.height_control = new HeightControl();
-        this.height_control.add_listener(`new_height`, (height) => {
+        this.height_control.add_listener(`new_height`, async (height) => {
             if (height !== undefined) {
-                this.load_blocks(height);
+                await this.load_blocks_timeout(height);
                 this.set_live(false);
             }
         });
@@ -160,11 +161,15 @@ export class DAG {
         });
 
         this.height_control.prev_height_element.addEventListener(`click`, async () => {
-            await this.load_blocks(this.load_height - 10);
+            this.load_height -= 10;
+            this.height_control.set_height(this.load_height);
+            this.load_blocks_timeout(this.load_height);
         });
 
         this.height_control.next_height_element.addEventListener(`click`, async () => {
-            await this.load_blocks(this.load_height + 10);
+            this.load_height += 10;
+            this.height_control.set_height(this.load_height);
+            this.load_blocks_timeout(this.load_height);
         });
 
         this.height_control.lock_cam_element.addEventListener(`click`, () => {
@@ -482,6 +487,13 @@ export class DAG {
 
         this.hovered_block_box_mesh = undefined;
         this.highlighted_block_box_mesh = undefined;
+    }
+
+    load_blocks_timeout(height: number) {
+        window.clearTimeout(this.load_timeout);
+        this.load_timeout = window.setTimeout(() => {
+            this.load_blocks(height);
+        }, 500);
     }
 
     async load_blocks(height: number) {
