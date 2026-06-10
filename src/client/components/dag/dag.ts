@@ -349,16 +349,20 @@ export class DAG {
     async set_live(live: boolean) {
         if (this.is_live === live) return;
 
-        this.is_live = live;
-
         if (live) {
             // Start listening for new_block events immediately, even before loading the primary block fetch.
             // If we listen after we could miss some blocks and create gaps in the DAG display.
             this.listen_node_events();
 
-            const node = XelisNode.instance();
-            const current_height = await node.rpc.getHeight();
-            await this.load_blocks(current_height);
+            try {
+                const node = XelisNode.instance();
+                const current_height = await node.rpc.getHeight();
+                await this.load_blocks(current_height);
+                this.is_live = true;
+            } catch (err) {
+                this.clear_node_events();
+                throw err
+            }
 
             if (this.lock_block_height) {
                 this.move_to_height(this.lock_block_height, true);
@@ -373,6 +377,7 @@ export class DAG {
             this.height_control.live_btn_element.classList.remove(`active`);
             this.height_control.next_height_element.style.removeProperty(`display`);
             this.height_control.prev_height_element.style.removeProperty(`display`);
+            this.is_live = false;
         }
 
         this.start_animation_loop();
