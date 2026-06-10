@@ -54,6 +54,10 @@
     translate: 0 -4%;
 }
 
+.xe-dag-height-control-inputs button:active {
+  background-color: #02FFCF;
+}
+
 
 .xe-dag-height-control-btn-prev svg {
     rotate: 90deg;
