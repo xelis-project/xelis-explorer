@@ -471,6 +471,12 @@ export class DAG {
 
         this.block_mesh_hashes.clear();
         this.blocks_by_height.clear();
+
+        this.hovered_block_box_mesh = undefined;
+        this.highlighted_block_box_mesh = undefined;
+        this.target_height_line.remove();
+        this.stable_height_line.remove();
+        this.height_control.clear_listeners();
     }
 
     async load_blocks(height: number) {
