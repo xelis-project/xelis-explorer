@@ -260,4 +260,8 @@ export class SettingsPage extends Page {
         super.load(parent);
         this.set_window_title(localization.get_text(`Settings`));
     }
+
+    unload(): void {
+        this.master.unload();
+    }
 }

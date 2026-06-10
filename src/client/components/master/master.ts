@@ -48,4 +48,8 @@ export class Master {
         this.content.classList.add(`xe-master-content`);
         this.layout.appendChild(this.content);
     }
+
+    unload() {
+        this.header.unload();
+    }
 }

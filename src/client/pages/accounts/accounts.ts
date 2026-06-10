@@ -116,5 +116,6 @@ export class AccountsPage extends Page {
 
     unload() {
         super.unload();
+        this.master.unload();
     }
 }

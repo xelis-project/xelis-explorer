@@ -229,6 +229,7 @@ export class AccountPage extends Page {
 
     unload() {
         super.unload();
+        this.master.unload();
         this.clear_node_events();
     }
 }

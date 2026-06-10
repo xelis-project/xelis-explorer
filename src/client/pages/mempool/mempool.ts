@@ -177,5 +177,6 @@ export class MempoolPage extends Page {
         this.clear_node_events();
         window.clearInterval(this.update_interval_1000_id);
         window.clearInterval(this.update_interval_100_id);
+        this.master.unload();
     }
 }

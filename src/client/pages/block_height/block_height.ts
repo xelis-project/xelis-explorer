@@ -157,5 +157,6 @@ export class BlockHeightPage extends Page {
     unload() {
         super.unload();
         window.clearInterval(this.update_interval_1000_id);
+        this.master.unload();
     }
 }

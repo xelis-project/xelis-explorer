@@ -160,5 +160,6 @@ export class KnownAccountsPage extends Page {
 
     unload() {
         super.unload();
+        this.master.unload();
     }
 }

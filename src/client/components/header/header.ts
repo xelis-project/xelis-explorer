@@ -39,6 +39,7 @@ export const get_menu_links = () => {
 export class Header {
     element: HTMLDivElement;
     links_element: HTMLDivElement;
+    mobile_menu_button: HTMLButtonElement;
 
     constructor() {
         this.element = document.createElement(`div`);
@@ -58,30 +59,19 @@ export class Header {
         text.innerHTML = localization.get_text(`Track and verify transactions on the XELIS network.`);
         left_element.appendChild(text);
 
-        const mobile_menu_button = document.createElement(`button`);
-        mobile_menu_button.classList.add(`xe-header-mobile-menu-button`);
-        mobile_menu_button.innerHTML = `${icons.menu()}`;
-        this.element.appendChild(mobile_menu_button);
+        this.mobile_menu_button = document.createElement(`button`);
+        this.mobile_menu_button.classList.add(`xe-header-mobile-menu-button`);
+        this.mobile_menu_button.innerHTML = `${icons.menu()}`;
+        this.element.appendChild(this.mobile_menu_button);
 
-        mobile_menu_button.addEventListener(`click`, async () => {
+        this.mobile_menu_button.addEventListener(`click`, async () => {
             this.links_element.classList.add(`open`);
         });
 
         this.links_element = document.createElement(`div`);
         this.links_element.classList.add(`xe-header-links`);
 
-        window.addEventListener(`click`, async (e) => {
-            const target = e.target as HTMLElement;
-
-            if (!this.links_element.classList.contains(`open`)) return;
-            if (mobile_menu_button.contains(target)) return;
-
-            //if (!this.links_element.contains(target)) {
-            this.links_element.classList.remove(`open`);
-            this.links_element.classList.add(`close`);
-            setTimeout(() => this.links_element.classList.remove(`close`), 250);
-            //}
-        });
+        window.addEventListener(`click`, this.on_mobile_menu_outside_click);
 
         this.element.appendChild(this.links_element);
 
@@ -96,12 +86,10 @@ export class Header {
         });
 
         const app = App.instance();
-        app.events.add_listener("page_load", () => {
-            this.highlight_menu_link();
-        });
+        app.events.add_listener("page_load", this.highlight_menu_link);
     }
 
-    highlight_menu_link() {
+    highlight_menu_link = () => {
         const anchors = this.links_element.querySelectorAll(`a`);
         for (let i = 0; i < anchors.length; i++) {
             const link = this.links_element.children[i] as HTMLAnchorElement;
@@ -113,5 +101,22 @@ export class Header {
                 link.classList.add(`active`);
             }
         }
+    }
+
+    on_mobile_menu_outside_click = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+
+        if (!this.links_element.classList.contains(`open`)) return;
+        if (this.mobile_menu_button.contains(target)) return;
+
+        //if (!this.links_element.contains(target)) {
+        this.links_element.classList.remove(`open`);
+        this.links_element.classList.add(`close`);
+        setTimeout(() => this.links_element.classList.remove(`close`), 250);
+        //}
+    }
+
+    unload() {
+        window.removeEventListener(`click`, this.on_mobile_menu_outside_click);
     }
 }

@@ -53,4 +53,9 @@ export class NotFoundPage extends Page {
         super.load(parent);
         this.set_window_title(localization.get_text(`Page Not Found`));
     }
+
+    unload(): void {
+        super.unload();
+        this.master.unload();
+    }
 }

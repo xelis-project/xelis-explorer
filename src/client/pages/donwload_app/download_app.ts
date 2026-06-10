@@ -41,4 +41,9 @@ export class DownloadAppPage extends Page {
         super.load(parent);
         this.set_window_title(localization.get_text(`Download App`));
     }
+
+    unload(): void {
+        super.unload();
+        this.master.unload();
+    }
 }

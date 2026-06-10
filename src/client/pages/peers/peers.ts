@@ -156,5 +156,6 @@ export class PeersPage extends Page {
         this.peers_chart.nodes_by_country.unload();
         this.peers_chart.nodes_by_version.unload();
         window.clearInterval(this.update_interval_5000_id);
+        this.master.unload();
     }
 }

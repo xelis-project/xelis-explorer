@@ -252,5 +252,6 @@ export class BlockPage extends Page {
         this.block_graph.dag.unload();
         this.block_txs.tx_data_hover.hide();
         window.clearInterval(this.update_interval_1000_id);
+        this.master.unload();
     }
 }

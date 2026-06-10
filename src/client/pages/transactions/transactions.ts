@@ -180,5 +180,6 @@ export class TransactionsPage extends Page {
         super.unload();
         this.clear_node_events();
         window.clearInterval(this.update_interval_1000_id);
+        this.master.unload();
     }
 }

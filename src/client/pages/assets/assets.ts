@@ -112,5 +112,6 @@ export class AssetsPage extends Page {
 
     unload() {
         super.unload();
+        this.master.unload();
     }
 }

@@ -377,5 +377,6 @@ export class DashboardPage extends Page {
         this.dashboard_chart_section_2.pools.unload();
 
         this.dashboard_dag.unload();
+        this.master.unload();
     }
 }

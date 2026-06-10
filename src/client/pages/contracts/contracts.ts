@@ -118,5 +118,6 @@ export class ContractsPage extends Page {
 
     unload() {
         super.unload();
+        this.master.unload();
     }
 }

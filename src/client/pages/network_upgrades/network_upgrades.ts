@@ -107,5 +107,6 @@ export class NetworkUpgradesPage extends Page {
 		super.unload();
 		window.clearInterval(this.update_interval_1000_id);
 		this.clear_node_events();
+		this.master.unload();
 	}
 }
