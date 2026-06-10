@@ -44,22 +44,28 @@ export class CollapsedMenu {
             this.links_element.appendChild(link);
         });
 
-        window.addEventListener(`click`, async (e) => {
-            const target = e.target as HTMLElement;
-
-            if (!this.links_element.classList.contains(`open`)) return;
-            if (this.toggle_element.contains(target)) return;
-
-            //if (!this.links_element.contains(target)) {
-            this.links_element.classList.remove(`open`);
-            this.links_element.classList.add(`close`);
-            setTimeout(() => this.links_element.classList.remove(`close`), 250);
-            //}
-        });
+        window.addEventListener(`click`, this.on_mobile_menu_outside_click);
     }
 
     set_position(position: CollapsedMenuPosition) {
         if (position === `left`) this.element.classList.add(`left`);
         else this.element.classList.remove(`left`);
+    }
+
+    on_mobile_menu_outside_click = async (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+
+        if (!this.links_element.classList.contains(`open`)) return;
+        if (this.toggle_element.contains(target)) return;
+
+        //if (!this.links_element.contains(target)) {
+        this.links_element.classList.remove(`open`);
+        this.links_element.classList.add(`close`);
+        setTimeout(() => this.links_element.classList.remove(`close`), 250);
+        //}
+    }
+
+    unload() {
+        window.removeEventListener(`click`, this.on_mobile_menu_outside_click);
     }
 }
