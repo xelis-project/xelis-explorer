@@ -400,6 +400,9 @@ export class DAG {
         this.set_live(false); // clear listener and set live flag to false
         this.stop_animation_loop();
         this.dispose_objects();
+        this.target_height_line.remove();
+        this.stable_height_line.remove();
+        this.height_control.clear_listeners();
         window.removeEventListener('resize', this.on_resize);
     }
 
@@ -479,9 +482,6 @@ export class DAG {
 
         this.hovered_block_box_mesh = undefined;
         this.highlighted_block_box_mesh = undefined;
-        this.target_height_line.remove();
-        this.stable_height_line.remove();
-        this.height_control.clear_listeners();
     }
 
     async load_blocks(height: number) {
@@ -648,10 +648,10 @@ export class DAG {
     intercept_block() {
         const box_meshes = this.block_group.getObjectsByProperty(`name`, `box_mesh`) as THREE.Mesh[];
         const intersects = this.raycaster.intersectObjects<THREE.Mesh>(box_meshes);
-        
+
         if (intersects.length > 0) {
             const box_mesh = intersects[0].object as THREE.Mesh;
-            
+
             if (this.hovered_block_box_mesh !== box_mesh) {  // Only update if different
                 // Clear previous hover
                 if (this.hovered_block_box_mesh) {
@@ -659,7 +659,7 @@ export class DAG {
                     const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
                     mat.uniforms.enable_outline.value = false;
                 }
-                
+
                 // Set new hover
                 if (this.highlighted_block_box_mesh !== box_mesh) {
                     const mat = box_mesh.material as THREE.ShaderMaterial;
