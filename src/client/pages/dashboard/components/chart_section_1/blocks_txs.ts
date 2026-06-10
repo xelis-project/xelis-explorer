@@ -119,5 +119,6 @@ export class DashboardBlocksTxs {
 
     unload() {
         window.removeEventListener(`resize`, () => this.on_resize());
+        if (this.chart) this.chart.node.remove();
     }
 }
