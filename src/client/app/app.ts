@@ -7,7 +7,7 @@ import { NodeStatus } from "../components/node_status/node_status";
 import { JsonViewer } from "../components/json_viewer/json_viewer";
 import { Notification } from "../components/notification/notification";
 
-import "reset-css";
+import "reset-css/reset.css";
 import "urlpattern-polyfill"; // URLPattern is a new web API we use polyfill for now
 import 'flag-icons/css/flag-icons.css';
 
