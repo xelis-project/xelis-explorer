@@ -114,7 +114,6 @@ export class HeightControl extends EventEmitter<HeightControlEventMap> {
     set_height(height: number) {
         this.height_slider.updateOptions({
             start: height,
-            range: { min: 0, max: height }
         }, false);
         this.height_input_element.value = `${height}`;
     }
