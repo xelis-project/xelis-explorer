@@ -595,11 +595,9 @@ export class DAG {
     }
 
     add_block_to_height(block: Block) {
-        const heigh_blocks = this.blocks_by_height.get(block.height);
-        if (heigh_blocks) {
-            this.blocks_by_height.set(block.height, [...heigh_blocks, block]);
-        } else {
-            this.blocks_by_height.set(block.height, [block]);
+        const height_blocks = this.blocks_by_height.get(block.height) || [];
+        if (!height_blocks.find(b => b.hash === block.hash)) {
+            this.blocks_by_height.set(block.height, [...height_blocks, block]);
         }
     }
 
