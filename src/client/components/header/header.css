@@ -90,7 +90,7 @@
 .xe-header-link-dropdown {
     position: absolute;
     right: 0;
-    top: calc(100% + .6rem);
+    top: calc(100% + .45rem);
     z-index: 50;
     display: flex;
     gap: .5rem;
@@ -105,7 +105,16 @@
     opacity: 0;
     pointer-events: none;
     translate: 0 -.6rem;
-    transition: opacity .16s ease, translate .16s ease;
+    transition: opacity .1s ease, translate .1s ease;
+}
+
+.xe-header-link-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -.7rem;
+    height: .7rem;
 }
 
 .xe-header-link-category[open]>.xe-header-link-dropdown,
@@ -225,6 +234,10 @@
         display: none;
         background: rgba(255, 255, 255, 0.045);
         box-shadow: none;
+    }
+
+    .xe-header-link-dropdown::before {
+        display: none;
     }
 
     .xe-header-link-category[open]>.xe-header-link-dropdown {

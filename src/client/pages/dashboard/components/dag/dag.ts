@@ -21,7 +21,7 @@ export class DashboardDAG {
         this.container.element.appendChild(this.dag.element);
     }
 
-    on_resize() {
+    on_resize = () => {
         // this code below is intended to properly resize the dag
         this.container.element.removeChild(this.dag.element);
         this.dag.update_size();
@@ -30,7 +30,7 @@ export class DashboardDAG {
     }
 
     async load() {
-        window.addEventListener(`resize`, () => this.on_resize());
+        window.addEventListener(`resize`, this.on_resize);
         this.on_resize();
 
         this.dag.overlay_loading.set_loading(true);
@@ -39,7 +39,7 @@ export class DashboardDAG {
     }
 
     unload() {
-        window.removeEventListener(`resize`, () => this.on_resize());
+        window.removeEventListener(`resize`, this.on_resize);
         this.dag.unload();
     }
 }

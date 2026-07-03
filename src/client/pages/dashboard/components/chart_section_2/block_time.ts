@@ -117,18 +117,18 @@ export class DashboardBlockTime {
         this.update_chart();
     }
 
-    on_resize() {
+    on_resize = () => {
         this.create_chart();
         this.update_chart();
     }
 
     load() {
-        window.addEventListener(`resize`, () => this.on_resize());
+        window.addEventListener(`resize`, this.on_resize);
         this.on_resize();
     }
 
     unload() {
-        window.removeEventListener(`resize`, () => this.on_resize());
+        window.removeEventListener(`resize`, this.on_resize);
         if (this.chart) this.chart.node.remove();
     }
 }

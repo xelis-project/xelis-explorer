@@ -17,6 +17,9 @@ import { localization } from '../../localization/localization';
 
 import './dag.css';
 
+const DAG_TIP_LINE_COLOR = `#24403d`;
+const DAG_HIGHLIGHT_COLOR = `#f5f7fb`;
+
 const three_lib_for_camera = {
     Vector2: THREE.Vector2,
     Vector3: THREE.Vector3,
@@ -72,6 +75,7 @@ export class DAG {
 
     constructor() {
         this.element = document.createElement(`div`);
+        this.element.classList.add(`xe-dag-viewer`);
 
         this.load_height = 0;
         this.lock_camera_to_current_height = true;
@@ -90,12 +94,14 @@ export class DAG {
         this.clock = new THREE.Clock();
         this.scene = new THREE.Scene();
         this.canvas = document.createElement(`canvas`);
-        this.scene.background = new THREE.Color('#151515');
+        this.scene.background = null;
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
+            alpha: true,
             canvas: this.canvas
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setClearColor(0x000000, 0);
 
         this.raycaster = new THREE.Raycaster();
         this.pointer = new THREE.Vector2();
@@ -122,7 +128,7 @@ export class DAG {
         });
 
         // size1, size2, color, distance, axes = 'xzy'
-        const grid = new InfiniteGridHelper(1, 5, new THREE.Color('black'), 50, 'xzy');
+        const grid = new InfiniteGridHelper(1, 5, new THREE.Color(`#0c3a34`), 50, 'xzy');
         grid.rotation.x = -Math.PI / 2;
         grid.position.z = -4;
         this.scene.add(grid);
@@ -130,7 +136,7 @@ export class DAG {
         this.target_height_line = this.create_target_line(new THREE.Color(`#2cffcf`));
         this.scene.add(this.target_height_line);
 
-        this.stable_height_line = this.create_target_line(new THREE.Color(`green`));
+        this.stable_height_line = this.create_target_line(new THREE.Color(`#f5d95f`));
         this.scene.add(this.stable_height_line);
 
         this.tip_line_group = new THREE.Group();
@@ -641,7 +647,7 @@ export class DAG {
         if (this.highlighted_block_box_mesh) {
             const mat = this.highlighted_block_box_mesh.material as THREE.ShaderMaterial;
             mat.uniforms.enable_outline.value = false;
-            this.set_tip_lines_color(this.highlighted_block_box_mesh, new THREE.Color(`#606060`));
+            this.set_tip_lines_color(this.highlighted_block_box_mesh, new THREE.Color(DAG_TIP_LINE_COLOR));
         }
 
         const block_mesh = this.block_mesh_hashes.get(block.hash);
@@ -650,9 +656,9 @@ export class DAG {
             if (box_mesh) {
                 this.highlighted_block_box_mesh = box_mesh;
                 const mat = box_mesh.material as THREE.ShaderMaterial;
-                mat.uniforms.outline_color.value = new THREE.Color(`white`);
+                mat.uniforms.outline_color.value = new THREE.Color(DAG_HIGHLIGHT_COLOR);
                 mat.uniforms.enable_outline.value = true;
-                this.set_tip_lines_color(box_mesh, new THREE.Color(`white`));
+                this.set_tip_lines_color(box_mesh, new THREE.Color(DAG_HIGHLIGHT_COLOR));
             }
         }
     }
@@ -667,7 +673,7 @@ export class DAG {
             if (this.hovered_block_box_mesh !== box_mesh) {  // Only update if different
                 // Clear previous hover
                 if (this.hovered_block_box_mesh) {
-                    this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(`#606060`));
+                    this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(DAG_TIP_LINE_COLOR));
                     const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
                     mat.uniforms.enable_outline.value = false;
                 }
@@ -675,10 +681,10 @@ export class DAG {
                 // Set new hover
                 if (this.highlighted_block_box_mesh !== box_mesh) {
                     const mat = box_mesh.material as THREE.ShaderMaterial;
-                    mat.uniforms.outline_color.value = new THREE.Color(`white`);
+                    mat.uniforms.outline_color.value = new THREE.Color(DAG_HIGHLIGHT_COLOR);
                     mat.uniforms.enable_outline.value = true;
                     if (box_mesh.parent) {
-                        this.set_tip_lines_color(box_mesh, new THREE.Color(`white`));
+                        this.set_tip_lines_color(box_mesh, new THREE.Color(DAG_HIGHLIGHT_COLOR));
                     }
                 }
                 this.hovered_block_box_mesh = box_mesh;
@@ -686,7 +692,7 @@ export class DAG {
         } else if (this.hovered_block_box_mesh) {
             // Clear hover
             if (this.hovered_block_box_mesh !== this.highlighted_block_box_mesh) {
-                this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(`#606060`));
+                this.set_tip_lines_color(this.hovered_block_box_mesh, new THREE.Color(DAG_TIP_LINE_COLOR));
                 const mat = this.hovered_block_box_mesh.material as THREE.ShaderMaterial;
                 mat.uniforms.enable_outline.value = false;
             }
@@ -708,7 +714,7 @@ export class DAG {
     }
 
     create_tip_line_mesh(block_mesh: THREE.Group, block_target_mesh: THREE.Group, hash: string) {
-        const mat = new THREE.LineBasicMaterial({ color: new THREE.Color(`#606060`) });
+        const mat = new THREE.LineBasicMaterial({ color: new THREE.Color(DAG_TIP_LINE_COLOR) });
 
         const points = [
             block_mesh.position,
@@ -770,15 +776,16 @@ export class DAG {
         text.text = height.toLocaleString();
         text.fontSize = .8;
         text.position.set(0, .65, -1);
-        text.color = `white`;
+        text.color = `#f5f7fb`;
         text.anchorX = `center`;
 
         const back_width = this.get_width_text(text.text) / 10;
         // back
         const back_geo = new RoundedBoxGeometry(back_width, 1.25, 1, 10, 1);
         const back_mat = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(`#111`),
+            color: new THREE.Color(`#071416`),
             transparent: true,
+            opacity: .92,
             side: THREE.DoubleSide
         });
         const back_mesh = new THREE.Mesh(back_geo, back_mat);
@@ -885,7 +892,7 @@ export class DAG {
             const text = new Text();
             text.text = first_letter;
             text.fontSize = 1.5;
-            text.color = `black`;
+            text.color = `#041414`;
             text.anchorX = `center`;
             text.position.set(0, 1.1, -1);
             block_mesh.add(text);

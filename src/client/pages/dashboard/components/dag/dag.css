@@ -16,9 +16,14 @@
 }
 
 .xe-dashboard-dag-dag {
-    height: 25rem;
+    height: var(--xe-dashboard-dag-view-height);
     position: relative;
     overflow: hidden;
     border-radius: var(--xe-radius);
     border: 1px solid var(--xe-border-soft);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 24px rgba(2, 255, 207, 0.08);
+}
+
+.xe-dashboard-dag-dag .xe-dag-height-control {
+    display: none;
 }

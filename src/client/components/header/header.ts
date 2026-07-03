@@ -134,6 +134,7 @@ export class Header {
             const summary = document.createElement(`summary`);
             summary.innerHTML = `${group.icon}<span>${group.text}</span>`;
             category.appendChild(summary);
+            this.bind_desktop_category_dropdown(category, summary);
 
             const dropdown = document.createElement(`div`);
             dropdown.classList.add(`xe-header-link-dropdown`);
@@ -153,6 +154,63 @@ export class Header {
             settings_link.classList.add(`xe-header-settings-link`);
             this.links_element.appendChild(settings_link);
         }
+    }
+
+    bind_desktop_category_dropdown(category: HTMLDetailsElement, summary: HTMLElement) {
+        let close_timeout: number | undefined;
+
+        const clear_close_timeout = () => {
+            if (close_timeout === undefined) return;
+
+            window.clearTimeout(close_timeout);
+            close_timeout = undefined;
+        };
+
+        const open_on_desktop = () => {
+            if (this.is_mobile_nav()) return;
+
+            clear_close_timeout();
+            this.close_other_desktop_categories(category);
+            category.open = true;
+        };
+
+        const close_on_desktop = () => {
+            if (this.is_mobile_nav()) return;
+
+            category.open = false;
+        };
+
+        const schedule_close_on_desktop = () => {
+            if (this.is_mobile_nav()) return;
+
+            clear_close_timeout();
+            close_timeout = window.setTimeout(close_on_desktop, 95);
+        };
+
+        category.addEventListener(`mouseenter`, open_on_desktop);
+        category.addEventListener(`mouseleave`, schedule_close_on_desktop);
+        category.addEventListener(`focusin`, open_on_desktop);
+        category.addEventListener(`focusout`, (e) => {
+            const next_target = e.relatedTarget as Node | null;
+            if (!next_target || !category.contains(next_target)) schedule_close_on_desktop();
+        });
+
+        summary.addEventListener(`click`, (e) => {
+            if (this.is_mobile_nav()) return;
+            e.preventDefault();
+            open_on_desktop();
+        });
+    }
+
+    close_other_desktop_categories(current_category: HTMLDetailsElement) {
+        this.links_element.querySelectorAll(`.xe-header-link-category`).forEach((category) => {
+            if (category === current_category) return;
+            (category as HTMLDetailsElement).open = false;
+        });
+    }
+
+    is_mobile_nav() {
+        return window.matchMedia(`(max-width: 900px)`).matches;
     }
 
     create_menu_link(href: string, link_def: LinkDef) {

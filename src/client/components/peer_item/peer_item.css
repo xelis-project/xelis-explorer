@@ -3,6 +3,7 @@
     gap: 1rem;
     flex-direction: row;
     justify-content: space-between;
+    flex: 0 0 auto;
     min-height: 8rem;
     transition: scale .25s, background-color .25s, border-color .25s;
 }

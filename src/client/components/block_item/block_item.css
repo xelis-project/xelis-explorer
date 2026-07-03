@@ -3,7 +3,8 @@
     gap: 1rem;
     flex-direction: row;
     justify-content: space-between;
-    min-height: 6rem;
+    flex: 0 0 auto;
+    min-height: 7.4rem;
     transition: scale .25s, background-color .25s, border-color .25s;
 }
 
@@ -19,6 +20,16 @@
     gap: 1rem;
     flex-direction: column;
     justify-content: space-between;
+    min-width: 0;
+}
+
+.xe-block-item>:nth-child(1) {
+    flex: 1 1 auto;
+}
+
+.xe-block-item>:nth-child(2) {
+    flex: 0 0 auto;
+    text-align: right;
 }
 
 .xe-block-item>:nth-child(1)>div {
@@ -39,6 +50,18 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
+    min-width: 0;
+}
+
+.xe-block-item-miner>canvas {
+    flex: 0 0 auto;
+}
+
+.xe-block-item-miner>div {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .xe-block-item-type {

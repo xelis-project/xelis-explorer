@@ -10,6 +10,14 @@ export class Select extends EventEmitter<SelectEventMap> {
     element: HTMLElement;
     btn_element: HTMLElement;
     list_element: HTMLElement;
+    on_document_click = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (!this.list_element.classList.contains(`open`)) return;
+
+        if (!this.element.contains(target)) {
+            this.close();
+        }
+    };
 
     constructor() {
         super();
@@ -26,17 +34,6 @@ export class Select extends EventEmitter<SelectEventMap> {
         this.list_element = document.createElement(`div`);
         this.list_element.classList.add(`xe-select-list`, `scrollbar-1`, `scrollbar-1-right`);
         this.element.appendChild(this.list_element);
-
-        document.addEventListener(`click`, (e) => {
-            const target = e.target as HTMLElement;
-            if (!this.list_element.classList.contains(`open`)) {
-                return;
-            }
-
-            if (!this.element.contains(target)) {
-                this.close();
-            }
-        });
     }
 
     toggle() {
@@ -49,10 +46,12 @@ export class Select extends EventEmitter<SelectEventMap> {
 
     open() {
         this.list_element.classList.add(`open`);
+        document.addEventListener(`click`, this.on_document_click);
     }
 
     close() {
         this.list_element.classList.remove(`open`);
+        document.removeEventListener(`click`, this.on_document_click);
     }
 
     set_value(html: string) {
@@ -71,6 +70,7 @@ export class Select extends EventEmitter<SelectEventMap> {
     }
 
     clear() {
+        this.close();
         this.list_element.replaceChildren();
     }
 }

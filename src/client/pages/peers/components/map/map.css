@@ -1,5 +1,5 @@
 .xe-peers-map {
-    height: 25rem;
+    height: var(--xe-peers-map-height);
     border-radius: var(--xe-radius);
     border: 1px solid var(--xe-border-soft);
     animation: xe-peers-map-animation .5s;

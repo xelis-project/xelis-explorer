@@ -2,16 +2,21 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    overflow-y: scroll;
-    height: 55rem;
-    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: var(--xe-dashboard-dag-panel-height);
+    overflow: hidden;
     animation: xe-dashboard-txs-appear-animation .65s;
 }
 
-.xe-dashboard-txs>:nth-child(2) {
+.xe-dashboard-txs-list {
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: .4rem .8rem .4rem 0;
 }
 
 @keyframes xe-dashboard-txs-appear-animation {
@@ -27,7 +32,8 @@
 .xe-dashboard-txs-list-empty {
     display: flex;
     width: 100%;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     align-items: center;
     justify-content: center;
     flex-direction: column;

@@ -17,7 +17,7 @@ export class PeersList {
     constructor() {
         this.container = new Container();
         this.peer_items = [];
-        this.container.element.classList.add(`xe-peers-list`, `scrollbar-1`, `scrollbar-1-right`);
+        this.container.element.classList.add(`xe-peers-list`);
 
         const title_container = document.createElement(`div`);
         this.container.element.appendChild(title_container);
@@ -30,6 +30,7 @@ export class PeersList {
         title_container.appendChild(this.element_count);
 
         this.element_content = document.createElement(`div`);
+        this.element_content.classList.add(`xe-peers-list-content`, `scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.element_content);
     }
 

@@ -2,16 +2,21 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    overflow-y: scroll;
     animation: xe-dashboard-blocks-appear-animation .7s;
     height: 55rem;
-    overflow-x: hidden;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.xe-dashboard-blocks>:nth-child(2) {
+.xe-dashboard-blocks-list {
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: .4rem .8rem .4rem 0;
 }
 
 @keyframes xe-dashboard-blocks-appear-animation {

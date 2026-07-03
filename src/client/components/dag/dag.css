@@ -1,4 +1,28 @@
-.xe-dag {}
+.xe-dag-viewer {
+    position: relative;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 72% 16%, rgba(2, 255, 207, 0.12), transparent 24rem),
+        radial-gradient(circle at 18% 72%, rgba(245, 217, 95, 0.055), transparent 26rem),
+        linear-gradient(180deg, rgba(2, 7, 8, 0.98) 0%, rgba(5, 14, 15, 0.98) 52%, rgba(2, 7, 8, 0.98) 100%);
+}
+
+.xe-dag-viewer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        linear-gradient(90deg, rgba(2, 255, 207, 0.2), transparent 38%, rgba(245, 217, 95, 0.08) 100%) top left / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(2, 255, 207, 0.055), transparent 36%);
+    pointer-events: none;
+}
+
+.xe-dag-viewer>canvas {
+    position: relative;
+    z-index: 1;
+    display: block;
+}
 
 .xe-dag-load-flash {
     animation: xe-dag-load-flash-anim .5s alternate infinite;
