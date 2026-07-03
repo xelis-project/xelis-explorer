@@ -45,15 +45,15 @@
 
 .xe-account-info-container-2>div>:nth-child(1) {
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-account-info-container-2>div>:nth-child(2) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-account-info-container-2>div>:nth-child(3) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-account-info-addr {

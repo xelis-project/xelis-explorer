@@ -28,7 +28,7 @@
 
 .xe-peers-info>div>:nth-child(1) {
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-peers-info>div>:nth-child(2) {

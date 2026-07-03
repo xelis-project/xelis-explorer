@@ -87,14 +87,14 @@
 }
 
 .xe-storage-history-modal-title {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 0;
     opacity: 0.95;
 }
 
 .xe-storage-history-modal-key {
-    font-size: 0.85rem;
+    font-size: 1.3rem;
     opacity: 0.7;
     margin-bottom: 0;
 }
@@ -110,7 +110,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.8rem;
+    font-size: 1.3rem;
 }
 
 .xe-storage-history-modal-nav {
@@ -131,7 +131,7 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 0.375rem;
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 1.3rem;
     font-weight: 500;
     transition: all 0.2s;
 }
@@ -151,7 +151,7 @@
 }
 
 .xe-storage-history-modal-nav-indicator {
-    font-size: 0.85rem;
+    font-size: 1.3rem;
     opacity: 0.8;
     min-width: 80px;
     text-align: center;
@@ -194,7 +194,7 @@
 }
 
 .xe-storage-history-modal-topoheight {
-    font-size: 0.75rem;
+    font-size: 1.3rem;
     opacity: 0.7;
     padding: 0.375rem 0.5rem;
     background-color: rgba(255, 255, 255, 0.05);
@@ -210,7 +210,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    font-size: 0.85rem;
+    font-size: 1.3rem;
 }
 
 .xe-storage-history-modal-loading::before {
@@ -234,7 +234,7 @@
     padding: 1.5rem;
     opacity: 0.8;
     color: #ff6b6b;
-    font-size: 0.85rem;
+    font-size: 1.3rem;
 }
 
 .xe-storage-history-modal-value json-viewer {
@@ -251,7 +251,7 @@
     }
 
     .xe-storage-history-modal-title {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-storage-history-modal-nav {

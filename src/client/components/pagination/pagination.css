@@ -16,7 +16,7 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--xe-radius);
     color: var(--xe-white);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
     transition: translate .15s, border-color .15s, background .15s, box-shadow .15s;
@@ -51,7 +51,7 @@
     border: 1px solid var(--xe-border-soft);
     padding: .55rem .85rem;
     border-radius: var(--xe-radius);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: bold;
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.035);

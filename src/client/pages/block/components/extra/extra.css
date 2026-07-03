@@ -29,12 +29,12 @@
 }
 
 .xe-block-extra-container-1>div>:nth-child(1) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: var(--xe-muted);
 }
 
 .xe-block-extra-container-1>div>:nth-child(2) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-block-extra-container-2 {
@@ -55,6 +55,6 @@
 }
 
 .xe-block-extra-container-2>div>:nth-child(1) {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
 }

@@ -110,7 +110,7 @@
     padding: .5rem .75rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--xe-radius);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     backdrop-filter: blur(10px);
 }
 

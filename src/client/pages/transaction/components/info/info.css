@@ -47,13 +47,13 @@
     display: flex;
     gap: .5rem;
     flex-direction: column;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     flex: 1;
 }
 
 .xe-transaction-info-fees>:nth-child(1) {
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-transaction-info-fees>:nth-child(2) {
@@ -72,24 +72,24 @@
 }
 
 .xe-transaction-info-fees>:nth-child(2)>div>:nth-child(1) {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
 }
 
 .xe-transaction-info-fees>:nth-child(2)>div>:nth-child(2) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-transaction-info-size {
     display: flex;
     gap: .25rem;
     flex-direction: column;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-transaction-info-size>:nth-child(1) {
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-transaction-info-hash {
@@ -97,10 +97,10 @@
     gap: .25rem;
     flex-direction: column;
     word-break: break-all;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-transaction-info-hash>:nth-child(1) {
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }

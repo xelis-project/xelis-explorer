@@ -69,29 +69,29 @@
     gap: .5rem;
     flex-direction: row;
     color: var(--xe-muted);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 .xe-tx-item-hash {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: var(--xe-accent);
 }
 
 .xe-tx-item-age {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-tx-item-size {
     color: var(--xe-muted);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 .xe-tx-item-height {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-tx-item-fee {
     color: var(--xe-muted);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }

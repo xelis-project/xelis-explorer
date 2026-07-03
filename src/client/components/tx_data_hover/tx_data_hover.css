@@ -11,7 +11,7 @@
     height: 15rem;
     border: 1px solid var(--xe-border-soft);
     border-radius: var(--xe-radius);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     display: flex;
     gap: .5rem;
     flex-direction: column;

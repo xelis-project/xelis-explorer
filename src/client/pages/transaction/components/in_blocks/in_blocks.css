@@ -46,7 +46,7 @@
 
 .xe-transaction-in-blocks-legend.executed>:nth-child(2) {
     color: var(--xe-accent);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
 }
 
 .xe-transaction-in-blocks-legend.failed>:nth-child(1) {
@@ -58,6 +58,6 @@
 
 .xe-transaction-in-blocks-legend.failed>:nth-child(2) {
     color: #d51f1f;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: bold;
 }

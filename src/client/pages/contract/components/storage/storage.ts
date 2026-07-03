@@ -479,7 +479,7 @@ export class ContractStorageEntries {
                 empty_element.innerHTML = `
                     ${icons.book()}
                     <div>${localization.get_text(`No storage entries found`)}</div>
-                    <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no storage entries yet`)}</div>
+                    <div style="font-size: 1.3rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no storage entries yet`)}</div>
                 `;
                 this.list_element.appendChild(empty_element);
                 this.set_loading(false);
@@ -508,7 +508,7 @@ export class ContractStorageEntries {
             error_element.innerHTML = `
                 ${icons.error()}
                 <div>${localization.get_text(`Unable to load storage entries`)}</div>
-                <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem;">${error_message}</div>
+                <div style="font-size: 1.3rem; opacity: 0.7; margin-top: 0.5rem;">${error_message}</div>
             `;
             this.list_element.appendChild(error_element);
             this.set_loading(false);
@@ -523,4 +523,3 @@ export class ContractStorageEntries {
         await this.load_entries(contract_hash, this.current_page);
     }
 }
-

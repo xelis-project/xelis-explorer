@@ -51,7 +51,7 @@
     padding: .5rem .75rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--xe-radius);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     backdrop-filter: blur(10px);
 }
 
@@ -216,7 +216,7 @@
         justify-content: center;
         padding: .75rem;
         border-radius: var(--xe-radius);
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         background: rgba(6, 12, 15, 0.92);
         text-align: center;
     }
@@ -285,7 +285,7 @@
 .xe-header-text {
     max-width: 26rem;
     color: var(--xe-muted);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 @media screen and (max-width: 900px) {

@@ -37,7 +37,7 @@
 }
 
 .xe-contract-storage-page-size-label {
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     opacity: 0.7;
 }
 
@@ -47,7 +47,7 @@
     border-radius: 0.375rem;
     color: rgba(255, 255, 255, 0.95);
     padding: 0.375rem 1.5rem 0.375rem 0.625rem;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     cursor: pointer;
     transition: all 0.2s;
     outline: none;
@@ -73,7 +73,7 @@
 
 /* Info */
 .xe-contract-storage-info {
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     opacity: 0.7;
     padding: 0;
 }
@@ -122,7 +122,7 @@
 
 .xe-contract-storage-key {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     opacity: 0.95;
     flex: 1;
     min-width: 0;
@@ -144,7 +144,7 @@
 
 .xe-contract-storage-value {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     line-height: 1.4;
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 100%);
     padding: 0.375rem 0.5rem;
@@ -238,7 +238,7 @@
 
 .xe-contract-storage-address-link {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     color: rgba(99, 179, 237, 1);
     text-decoration: none;
     transition: all 0.2s;
@@ -334,7 +334,7 @@
 
 .xe-contract-storage-page-indicator {
     color: var(--xe-muted);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     padding: .55rem .85rem;
     font-weight: 700;
     min-width: 7rem;
@@ -354,7 +354,7 @@
     padding: 2rem 1.5rem;
     text-align: center;
     opacity: 0.8;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
 }
 
 .xe-contract-storage-empty svg {
@@ -372,7 +372,7 @@
     padding: 2rem 1.5rem;
     text-align: center;
     opacity: 0.8;
-    font-size: 0.875rem;
+    font-size: 1.3rem;
 }
 
 .xe-contract-storage-error svg {
@@ -418,7 +418,7 @@
         left: 0.25rem;
         color: rgba(255, 255, 255, 0.5);
         font-weight: 500;
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     /* Increase font sizes for mobile readability */
@@ -429,28 +429,28 @@
     .xe-contract-storage-page-size-label,
     .xe-contract-storage-page-size-selector,
     .xe-contract-storage-info {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-key {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-value {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-address-link {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-page-indicator {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-empty,
     .xe-contract-storage-error {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
 
     .xe-contract-storage-history-btn {

@@ -51,7 +51,7 @@
     bottom: 0;
     left: 50%;
     translate: -50% 0%;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
     padding: .4rem 0;
     width: 3rem;
@@ -80,13 +80,13 @@
 }
 
 .xe-block-info-type> :nth-child(2)>:nth-child(1) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-block-info-type> :nth-child(2)>:nth-child(2) {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .xe-block-info-age {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }

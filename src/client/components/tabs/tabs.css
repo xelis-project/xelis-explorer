@@ -15,7 +15,7 @@
     border-radius: var(--xe-radius);
     color: var(--xe-white);
     cursor: pointer;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.045);
 }

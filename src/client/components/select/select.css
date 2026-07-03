@@ -28,7 +28,7 @@
     border: 1px solid rgba(255, 255, 255, 0.14);
     color: var(--xe-accent);
     padding: .5rem 1rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     cursor: pointer;
     border-radius: var(--xe-radius);
     transition: .25s translate;
