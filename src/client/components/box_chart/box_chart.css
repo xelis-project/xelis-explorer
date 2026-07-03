@@ -5,7 +5,7 @@
 }
 
 .xe-box-chart > :nth-child(1) {
-    font-size: .8rem;
+    font-size: 1.3rem;
 }
 
 .xe-box-chart > :nth-child(2) {
@@ -16,7 +16,7 @@
 }
 
 .xe-box-chart-value {
-    color: #02FFCF;
+    color: var(--xe-accent);
     font-weight: bold;
     font-size: 2rem;
 }

@@ -9,7 +9,7 @@
 .xe-transaction-deploy-contract>:nth-child(7),
 .xe-transaction-deploy-contract>:nth-child(9),
 .xe-transaction-deploy-contract>:nth-child(11) {
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 .xe-transaction-deploy-contract>:nth-child(12) {

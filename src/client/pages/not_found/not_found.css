@@ -2,11 +2,13 @@
 
 .xe-not-found-back-404 {
     font-size: 25rem;
+    font-family: var(--xe-font-heading);
     font-weight: bold;
     position: absolute;
-    opacity: .05;
+    color: var(--xe-accent);
+    opacity: .06;
     z-index: -1;
-    filter: blur(5px);
+    filter: blur(4px);
     animation: xe-not-found-404-animation .6s ease-in-out;
 }
 
@@ -28,33 +30,44 @@
 
 .xe-not-found-container {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     padding: 5rem 0;
 }
 
-.xe-not-found-container img {
-    max-width: 20rem;
-    animation: xe-not-found-mascot-animation .6s ease-in-out;
+.xe-not-found-signal {
+    width: 13rem;
+    height: 13rem;
+    color: var(--xe-accent);
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--xe-border-strong);
+    border-radius: var(--xe-radius);
+    background: linear-gradient(165deg, rgba(2, 255, 207, 0.08), rgba(245, 217, 95, 0.05));
+    box-shadow: var(--xe-glow);
+    animation: xe-not-found-signal-animation .6s ease-in-out;
 }
 
-@keyframes xe-not-found-mascot-animation {
+.xe-not-found-signal svg {
+    width: 7rem;
+    height: 7rem;
+}
+
+@keyframes xe-not-found-signal-animation {
     0% {
-        scale: .5;
+        scale: .86;
+        opacity: 0;
     }
 
     50% {
-        scale: 1.1;
-    }
-
-    75% {
-        scale: 0.9;
+        scale: 1.03;
     }
 
     100% {
         scale: 1;
+        opacity: 1;
     }
 }
 
@@ -67,7 +80,9 @@
 
 .xe-not-found-container>:nth-child(2)> :nth-child(1) {
     font-size: 2.6rem;
+    font-family: var(--xe-font-heading);
     font-weight: bold;
+    color: var(--xe-white);
     animation: xe-not-found-title-animation .5s;
 }
 
@@ -83,7 +98,7 @@
 
 .xe-not-found-container>:nth-child(2)> :nth-child(2) {
     font-size: 1.4rem;
-    color: #afafaf;
+    color: var(--xe-muted);
     animation: xe-not-found-title-animation .7s;
 }
 

@@ -1,9 +1,11 @@
 .xe-collapse-box {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 1rem;
+    background: var(--xe-card-bg);
+    border: 1px solid var(--xe-border-soft);
+    border-radius: var(--xe-radius);
     text-decoration: none;
-    color: white;
+    color: var(--xe-white);
     position: relative;
+    overflow: hidden;
 }
 
 .xe-collapse-box >:nth-child(1) {
@@ -30,9 +32,8 @@
 
 .xe-collapse-box>:nth-child(2) {
     padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.035);
+    border-top: 1px solid var(--xe-border-soft);
 
 }
 

@@ -4,8 +4,7 @@
     left: 0;
     right: 0;
     padding: 3rem 2rem 4rem 2rem;
-    background-color: rgba(0, 0, 0, 0.1);
-    background: linear-gradient(rgba(0, 0, 0, 0), rgb(15, 15, 15));
+    background: linear-gradient(rgba(2, 7, 8, 0), rgba(6, 12, 15, 0.92));
     user-select: none;
 }
 
@@ -22,19 +21,19 @@
 .xe-dag-height-control-inputs input {
     max-width: 5rem;
     text-align: right;
-    border-radius: .5rem;
-    border: none;
+    border-radius: var(--xe-radius);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     padding: .5rem .6rem;
-    background-color: rgb(15, 15, 15);
-    color: white;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
 }
 
 .xe-dag-height-control-inputs button {
-    background-color: rgb(15, 15, 15);
-    color: white;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
     padding: .5rem .75rem;
-    border: none;
-    border-radius: .5rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--xe-radius);
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -42,7 +41,7 @@
     flex-direction: row;
     align-items: center;
     transition: translate .15s;
-    font-family: 'Jura';
+    font-family: var(--xe-font-body);
 }
 
 .xe-dag-height-control-inputs button svg {
@@ -55,7 +54,10 @@
 }
 
 .xe-dag-height-control-inputs button:active {
-  background-color: #02FFCF;
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
+    color: var(--xe-white);
+    border-color: var(--xe-border-strong);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
 }
 
 
@@ -72,7 +74,7 @@
     border-radius: 100%;
     width: .5rem;
     height: .5rem;
-    background-color: white;
+    background-color: var(--xe-white);
 }
 
 .xe-dag-height-control-btn-live.active {
@@ -81,8 +83,9 @@
 
 @keyframes xe-dag-height-control-btn-live-animation {
     100% {
-        background-color: #02FFCF;
-        color: #161616;
+        background-color: rgba(2, 255, 207, 0.18);
+        color: var(--xe-white);
+        border-color: var(--xe-border-strong);
     }
 }
 
@@ -92,6 +95,6 @@
 
 @keyframes xe-dag-height-control-dot-live-animation {
     100% {
-        background-color: #161616;
+        background-color: #041414;
     }
 }

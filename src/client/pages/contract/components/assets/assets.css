@@ -44,8 +44,8 @@
 }
 
 .xe-contract-assets-list>div>:nth-child(1)>:nth-child(1) {
-    font-size: 1.1rem;
-    color: #afafaf;
+    font-size: 1.3rem;
+    color: var(--xe-muted);
 }
 
 .xe-contract-assets-list>.xe-contract-assets-empty {
@@ -67,10 +67,10 @@
 }
 
 .xe-contract-assets-list>div>:nth-child(1)>:nth-child(2) {
-    font-size: .9rem;
-    color: #afafaf;
+    font-size: 1.4rem;
+    color: var(--xe-muted);
 }
 
 .xe-contract-assets-list>div>:nth-child(2) {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }

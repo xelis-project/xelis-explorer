@@ -117,7 +117,7 @@
  * Giving the connect element a border radius causes issues with using transform: scale
  */
 .dag-slider-target {
-    background: rgba(2, 255, 209, 0.1);
+    background: rgba(2, 255, 207, 0.1);
     border-radius: .25rem;
 }
 
@@ -140,8 +140,8 @@
 }
 
 .dag-slider-handle {
-    border-radius: .25rem;
-    background: #02FFCF;
+    border-radius: var(--xe-radius);
+    background: var(--xe-accent);
     cursor: default;
 }
 
@@ -306,9 +306,10 @@
 .dag-slider-tooltip {
     display: block;
     position: absolute;
-    border-radius: .5rem;
-    background: rgb(15, 15, 15);
-    color: white;
+    border-radius: var(--xe-radius);
+    background: rgba(6, 12, 15, 0.94);
+    color: var(--xe-white);
+    border: 1px solid var(--xe-border-soft);
     padding: .5rem .75rem;
     text-align: center;
     white-space: nowrap;

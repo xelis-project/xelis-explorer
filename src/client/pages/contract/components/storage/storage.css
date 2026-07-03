@@ -260,7 +260,7 @@
 
 /* History Button */
 .xe-contract-storage-history-btn {
-    background-color: #2CFFCF;
+    background-color: var(--xe-accent);
     border: none;
     opacity: .4;
     border-radius: 0.5rem;

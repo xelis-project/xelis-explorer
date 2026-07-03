@@ -32,8 +32,8 @@
 }
 
 .xe-asset-owner-item>:nth-child(1) {
-	font-size: .9rem;
-	color: #afafaf;
+	font-size: 1.4rem;
+	color: var(--xe-muted);
 }
 
 .xe-asset-owner-item>:nth-child(2) {
@@ -42,5 +42,5 @@
 }
 
 .xe-asset-owner-msg {
-	color: #afafaf;
+	color: var(--xe-muted);
 }

@@ -13,11 +13,12 @@
     padding: .6rem .7rem;
     cursor: pointer;
     border-radius: 100%;
-    border: none;
-    color: white;
+    border: 1px solid var(--xe-border-soft);
+    color: var(--xe-white);
     opacity: .7;
-    background-color: rgb(15, 15, 15);
+    background: rgba(6, 12, 15, 0.82);
     transition: translate .15s, opacity .15s;
+    backdrop-filter: blur(10px);
 }
 
 .xe-dag-back:hover {

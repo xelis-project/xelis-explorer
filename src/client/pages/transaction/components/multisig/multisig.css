@@ -7,7 +7,7 @@
 
 .xe-transaction-multisig>:nth-child(2),
 .xe-transaction-multisig>:nth-child(4) {
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 .xe-transaction-multisig>:nth-child(3) {

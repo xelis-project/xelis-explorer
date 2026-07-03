@@ -1,6 +1,6 @@
 .xe-header {
     display: flex;
-    gap: 1rem;
+    gap: 1.6rem;
     flex-direction: row;
     align-items: start;
     animation: xe-header-appear-animation .75s;
@@ -28,15 +28,15 @@
     align-items: end;
     flex-wrap: wrap;
     justify-content: end;
-    max-width: 60rem;
+    max-width: 88rem;
 }
 
 .xe-header-links>* {
-    color: white;
+    color: var(--xe-white);
     text-decoration: none;
     text-transform: uppercase;
     font-weight: bold;
-    font-family: Jura;
+    font-family: var(--xe-font-body);
     opacity: 1;
     display: flex;
     gap: .5rem;
@@ -45,42 +45,48 @@
     border: none;
     cursor: pointer;
 
-    background-color: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.045);
     padding: .5rem .75rem;
-    border-radius: 1rem;
-    font-size: .8rem;
-    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--xe-radius);
+    font-size: 1.3rem;
+    backdrop-filter: blur(10px);
 }
 
 .xe-header-links>* svg {
-    width: 1rem;
-    height: 1rem;
-    background-color: #02FFCF;
-    color: black;
+    width: 1.3rem;
+    height: 1.3rem;
+    background: rgba(2, 255, 207, 0.14);
+    color: var(--xe-accent);
     padding: .25rem;
-    border-radius: .5rem;
+    border-radius: var(--xe-radius);
 }
 
 .xe-header-links>*.active {
-    background-color: #02FFCF;
-    color: black;
+    color: var(--xe-white);
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
+    border-color: var(--xe-border-strong);
+    box-shadow: var(--xe-glow);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
 }
 
 .xe-header-links>*.active svg {
-    background-color: rgb(20, 20, 20);
-    color: white;
+    background: var(--xe-accent);
+    color: #041414;
 }
 
 .xe-header-links>*:hover {
-    color: black;
+    color: var(--xe-white);
     translate: 0 -3%;
-    background-color: #02FFCF;
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
     opacity: 1;
+    border-color: var(--xe-border-strong);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
 }
 
 .xe-header-links>*:hover svg {
-    background-color: rgb(20, 20, 20);
-    color: white;
+    background: var(--xe-accent);
+    color: #041414;
 }
 
 @media screen and (max-width: 900px) {
@@ -91,7 +97,7 @@
 
     .xe-header-links {
         position: fixed;
-        background: linear-gradient(to right, transparent, 60%, black);
+        background: linear-gradient(90deg, transparent, rgba(2, 7, 8, 0.98) 42%);
         top: 0;
         right: 0;
         bottom: 0;
@@ -101,7 +107,7 @@
         padding: 1rem;
         z-index: 999;
         translate: 100% 0;
-        width: 25rem;
+        width: min(32rem, 86vw);
         opacity: 0;
         justify-content: start;
         align-items: end;
@@ -109,9 +115,9 @@
 
     .xe-header-links>* {
         padding: .75rem;
-        border-radius: 1rem;
-        font-size: 1.1rem;
-        background-color: rgba(0, 0, 0, 1);
+        border-radius: var(--xe-radius);
+        font-size: 1.4rem;
+        background: rgba(6, 12, 15, 0.92);
     }
 
     .xe-header-links>*:hover {
@@ -152,8 +158,9 @@
 }
 
 .xe-header-text {
-    max-width: 15rem;
-    color: #afafaf;
+    max-width: 26rem;
+    color: var(--xe-muted);
+    font-size: 1.4rem;
 }
 
 @media screen and (max-width: 900px) {
@@ -168,21 +175,29 @@
     flex-direction: row;
     align-items: center;
     font-weight: bold;
+    font-family: var(--xe-font-heading);
+    font-size: 1.8rem;
     word-break: keep-all;
+    color: var(--xe-white);
 }
 
 .xe-header-logo svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 2rem;
+    height: 2rem;
+    color: var(--xe-accent);
+    filter: drop-shadow(0 0 12px rgba(2, 255, 207, 0.18));
 }
 
 .xe-header-mobile-menu-button {
-    background: none;
-    color: rgb(255, 255, 255);
-    border: none;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--xe-radius);
+    padding: .4rem;
     cursor: pointer;
     transition: translate .15s;
     display: none;
+    backdrop-filter: blur(10px);
 }
 
 .xe-header-mobile-menu-button:hover {
@@ -190,8 +205,8 @@
 }
 
 .xe-header-mobile-menu-button svg {
-    width: 2rem;
-    height: 2rem;
+    width: 2.4rem;
+    height: 2.4rem;
 }
 
 @media screen and (max-width: 900px) {

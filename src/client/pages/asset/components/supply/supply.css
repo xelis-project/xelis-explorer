@@ -28,13 +28,13 @@
 .xe-supply-progress-bar {
 	width: 100%;
 	background-color: rgba(0, 0, 0, 0.2);
-	border-radius: .5rem;
+	border-radius: var(--xe-radius);
 	height: 2rem;
 }
 
 .xe-supply-progress-bar>:nth-child(1) {
 	background-color: rgba(44, 255, 206, 1);
-	border-radius: .5rem;
+	border-radius: var(--xe-radius);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -42,12 +42,12 @@
 	box-sizing: border-box;
 	color: black;
 	font-weight: bold;
-	font-size: 1.1rem;
+	font-size: 1.3rem;
 	height: 100%;
 }
 
 .xe-supply-progress-bar>:nth-child(1)>:nth-child(1) {
-	background: #2cffcf;
-	border-radius: .5rem;
+	background: var(--xe-accent);
+	border-radius: var(--xe-radius);
 	padding: .2rem;
 }

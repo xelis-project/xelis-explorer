@@ -1,21 +1,23 @@
 .xe-tx-data-hover {
     position: fixed;
-    background: #151515;
+    background: rgba(6, 12, 15, 0.9);
     padding: 1rem;
     translate: -50% 0;
     transition: translate .25s;
     word-break: break-all;
     z-index: 1;
-    box-shadow: 0 0 50px 5px #0f0f0f;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.36), 0 0 24px rgba(2, 255, 207, 0.12);
     width: 15rem;
     height: 15rem;
-    border-radius: .5rem;
-    font-size: .8rem;
+    border: 1px solid var(--xe-border-soft);
+    border-radius: var(--xe-radius);
+    font-size: 1.3rem;
     display: flex;
     gap: .5rem;
     flex-direction: column;
     overflow: auto;
     visibility: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .xe-tx-data-hover>div {

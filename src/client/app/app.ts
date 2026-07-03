@@ -11,9 +11,10 @@ import "reset-css/reset.css";
 import "urlpattern-polyfill"; // URLPattern is a new web API we use polyfill for now
 import 'flag-icons/css/flag-icons.css';
 
+import '../vars.css';
+import './fonts.css';
 import './app.css';
 import './scrollbars.css';
-import './fonts.css';
 
 interface AppEventMap {
     page_load: void;

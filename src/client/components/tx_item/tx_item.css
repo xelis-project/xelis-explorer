@@ -4,13 +4,14 @@
     flex-direction: row;
     justify-content: space-between;
     min-height: 6rem;
-    transition: scale .25s, background-color .25s;
+    transition: scale .25s, background-color .25s, border-color .25s;
 }
 
 .xe-tx-item:hover {
     cursor: pointer;
     scale: .98;
-    background-color: rgba(2, 255, 209, 0.07);
+    background-color: rgba(2, 255, 207, 0.07);
+    border-color: var(--xe-border-strong);
 }
 
 .xe-tx-item>div {
@@ -44,29 +45,30 @@
     display: flex;
     gap: .5rem;
     flex-direction: row;
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.2rem;
 }
 
 .xe-tx-item-hash {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: bold;
+    color: var(--xe-accent);
 }
 
 .xe-tx-item-age {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
 }
 
 .xe-tx-item-size {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.2rem;
 }
 
 .xe-tx-item-height {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
 }
 
 .xe-tx-item-fee {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.2rem;
 }

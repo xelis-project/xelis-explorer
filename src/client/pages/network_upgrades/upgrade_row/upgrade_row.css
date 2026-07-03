@@ -1,6 +1,6 @@
 .xe-network-upgrade-guess {
 	opacity: .2;
-	color: #2CFFCF;
+	color: var(--xe-accent);
 	animation: xe-network-upgrade-guess-animation 1s infinite alternate;
 }
 

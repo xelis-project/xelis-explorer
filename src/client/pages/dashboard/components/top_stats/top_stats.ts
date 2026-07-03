@@ -127,11 +127,6 @@ export class DashboardTopStats {
         this.box_5.element.appendChild(this.item_assets_count.element);
         this.item_accounts_count = new StatsItem(localization.get_text(`ACCOUNTS`));
         this.box_5.element.appendChild(this.item_accounts_count.element);
-
-        const img = document.createElement(`img`);
-        img.classList.add(`xe-dashboard-top-stats-img`);
-        img.src = '/images/xelis_stats.jpg';
-        this.container.element.appendChild(img);
     }
 
     map_number(x: number, n: number): string {

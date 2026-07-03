@@ -10,7 +10,7 @@
 
 .xe-known-accounts-table>:first-child {
     font-size: 1.3rem;
-    color: #02FFCF;
+    color: var(--xe-accent);
 }
 
 @keyframes xe-known-accounts-table-appear-animation {

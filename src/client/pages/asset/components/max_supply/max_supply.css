@@ -32,8 +32,8 @@
 }
 
 .xe-asset-max-supply-item>:nth-child(1) {
-	font-size: .9rem;
-	color: #afafaf;
+	font-size: 1.4rem;
+	color: var(--xe-muted);
 }
 
 .xe-asset-max-supply-item>:nth-child(2) {
@@ -41,5 +41,5 @@
 }
 
 .xe-asset-max-supply-msg {
-	color: #afafaf;
+	color: var(--xe-muted);
 }

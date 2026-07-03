@@ -1,7 +1,9 @@
 .xe-peers-map {
     height: 25rem;
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
+    border: 1px solid var(--xe-border-soft);
     animation: xe-peers-map-animation .5s;
+    overflow: hidden;
 }
 
 @keyframes xe-peers-map-animation {

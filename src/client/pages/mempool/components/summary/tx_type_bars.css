@@ -14,8 +14,8 @@
 .xe-mempool-tx-type-bars-bar {
     width: 100%;
     height: 1.5rem;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: .5rem;
+    background-color: rgba(2, 7, 8, 0.58);
+    border-radius: var(--xe-radius);
     overflow: hidden;
     position: relative;
 }
@@ -24,6 +24,6 @@
     position: absolute;
     height: 100%;
     width: 0;
-    background-color: #156358;
+    background: linear-gradient(90deg, var(--xe-accent-dark), var(--xe-accent));
     transition: 1s width;
 }

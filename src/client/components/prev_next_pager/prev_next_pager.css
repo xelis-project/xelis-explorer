@@ -12,18 +12,18 @@
     align-items: center;
     justify-content: center;
     padding: 0.5em 0.75em;
-    border: none;
-    border-radius: .5rem;
-    color: white;
-    font-size: .9rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--xe-radius);
+    color: var(--xe-white);
+    font-size: 1.3rem;
     min-width: 2rem;
     height: 2rem;
     cursor: pointer;
     transition: translate 0.15s;
-    background-color: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(10px);
     font-weight: bold;
-    font-family: Jura;
+    font-family: var(--xe-font-body);
     display: flex;
     gap: .5rem;
     flex-direction: row;
@@ -44,4 +44,6 @@
 
 .xe-prev-next-pager button:hover {
     translate: 0 4%;
+    color: var(--xe-accent);
+    border-color: var(--xe-border-strong);
 }

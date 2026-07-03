@@ -1,24 +1,61 @@
 html {
-    background-color: black;
+    font-size: 62.5%;
+    background-color: var(--xe-bg-primary);
 }
 
 html,
 body {
-    font-family: Jura;
-    color: white;
-    font-size: calc(10px + 0.5vw);
+    min-height: 100%;
 }
 
 body {
+    color: var(--xe-white);
+    font-family: var(--xe-font-body);
+    font-size: 1.8rem;
+    line-height: 1.45;
     overflow-x: hidden;
     overflow-y: scroll;
+    background:
+        radial-gradient(circle at 72% 8%, rgba(2, 255, 207, 0.12), transparent 32rem),
+        radial-gradient(circle at 12% 20%, rgba(245, 217, 95, 0.055), transparent 34rem),
+        linear-gradient(180deg, rgba(2, 7, 8, 1) 0%, rgba(5, 14, 15, 1) 42%, rgba(2, 7, 8, 1) 100%);
+    background-attachment: fixed;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--xe-font-heading);
+    letter-spacing: 0;
 }
 
 a {
-    color: #F4D35E;
+    color: var(--xe-gold);
     transition: opacity .25s;
 }
 
 a:hover {
     opacity: .7;
+}
+
+.section-kicker {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--xe-accent);
+}
+
+.section-subtitle {
+    max-width: 72rem;
+    color: rgba(245, 247, 251, 0.72);
+    font-size: 1.8rem;
+    line-height: 1.55;
 }

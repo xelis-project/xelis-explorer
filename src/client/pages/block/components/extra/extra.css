@@ -29,8 +29,8 @@
 }
 
 .xe-block-extra-container-1>div>:nth-child(1) {
-    font-size: .9rem;
-    color: #afafaf;
+    font-size: 1.4rem;
+    color: var(--xe-muted);
 }
 
 .xe-block-extra-container-1>div>:nth-child(2) {
@@ -55,6 +55,6 @@
 }
 
 .xe-block-extra-container-2>div>:nth-child(1) {
-    font-size: .8rem;
-    color: #afafaf;
+    font-size: 1.3rem;
+    color: var(--xe-muted);
 }

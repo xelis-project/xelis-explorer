@@ -18,7 +18,7 @@
 .xe-mempool-info-timer {
     font-weight: light;
     font-size: 1.5rem;
-    color: #02FFCF;
+    color: var(--xe-accent);
 }
 
 .xe-mempool-info>:nth-child(2) {
@@ -34,8 +34,8 @@
 }
 
 .xe-mempool-info-item>:nth-child(1) {
-    font-size: .9rem;
-    color: #afafaf;
+    font-size: 1.4rem;
+    color: var(--xe-muted);
 }
 
 .xe-mempool-info-item>:nth-child(2) {

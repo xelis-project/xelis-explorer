@@ -32,11 +32,12 @@
 
 .xe-settings-item>:nth-child(1)>:nth-child(1) {
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
+    color: var(--xe-white);
 }
 
 .xe-settings-item>:nth-child(1)>:nth-child(2) {
-    color: #afafaf;
+    color: var(--xe-muted);
     max-width: 30rem;
 }
 

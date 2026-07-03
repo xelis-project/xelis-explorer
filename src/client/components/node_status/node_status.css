@@ -4,7 +4,7 @@
     position: fixed;
     width: 100%;
     z-index: 1000;
-    background: linear-gradient(rgb(56, 11, 7) 15%, rgba(0, 0, 0, 0));
+    background: linear-gradient(rgba(56, 11, 7, 0.92) 15%, rgba(2, 7, 8, 0));
     height: 15rem;
     translate: 0 -100%;
     animation: xe-node-status-reconnect-animation .5s forwards;
@@ -34,11 +34,11 @@
 }
 
 .xe-node-status-reconnect-btn {
-    border: none;
-    background-color: rgb(0, 0, 0);
-    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
     padding: .5rem .65rem;
-    border-radius: .5rem;
+    border-radius: var(--xe-radius);
     cursor: pointer;
     font-weight: bold;
     transition: translate .15s;
@@ -46,15 +46,17 @@
     gap: .5rem;
     align-items: center;
     text-decoration: none;
-    font-size: .8rem;
-    font-family: 'Jura';
+    font-size: 1.4rem;
+    font-family: var(--xe-font-body);
     user-select: none;
 }
 
 .xe-node-status-reconnect-btn:hover {
     translate: 3% 0;
-    background-color: #02FFCF;
-    color: black;
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
+    color: var(--xe-white);
+    border-color: var(--xe-border-strong);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
 }
 
 .xe-node-status-reconnect-btn svg {
@@ -70,7 +72,7 @@
     border: none;
     rotate: 180deg;
     cursor: pointer;
-    color: white;
+    color: var(--xe-white);
     transition: translate .25s;
 }
 

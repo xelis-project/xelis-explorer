@@ -21,17 +21,17 @@
 .xe-settings-line {
     height: .05rem;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
+    background-color: var(--xe-border-soft);
+    border-radius: var(--xe-radius);
 }
 
 .xe-settings-btn {
-    background: rgba(15, 239, 196, 0.08);
-    border: none;
-    color: #02FFCF;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--xe-accent);
     padding: .5rem 1rem;
     cursor: pointer;
-    border-radius: .5rem;
+    border-radius: var(--xe-radius);
     transition: .25s translate;
     display: flex;
     gap: .5rem;
@@ -41,6 +41,7 @@
 
 .xe-settings-btn:hover {
     translate: -3% 0;
+    border-color: var(--xe-border-strong);
 }
 
 .xe-settings-btn svg {
@@ -49,17 +50,18 @@
 }
 
 .xe-settings-text {
-    background: rgba(15, 239, 196, 0.08);
-    border: none;
-    border-radius: .5rem;
-    color: #afafaf;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--xe-radius);
+    color: var(--xe-white);
     outline: none;
     padding: .5rem 1rem;
-    font-size: 1rem;
+    font-size: 1.3rem;
 }
 
 .xe-settings-text:focus {
-    outline: .15rem solid #2CFFCF;
+    outline: .15rem solid rgba(2, 255, 207, 0.42);
+    border-color: var(--xe-border-strong);
 }
 
 .xe-settings-text:-webkit-autofill,
@@ -70,7 +72,7 @@
     -webkit-text-fill-color: #ffffff;
     caret-color: white;
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, .2);
+    box-shadow: inset 0 0 20px 20px rgba(6, 12, 15, .72);
 }
 
 .xe-settings-item-input {

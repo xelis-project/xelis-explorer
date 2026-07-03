@@ -1,15 +1,17 @@
 .xe-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 .5em;
+    border-spacing: 0 .6em;
 }
 
 .xe-table thead tr th {
     font-weight: bold;
     padding: .5rem;
-    color: #afafaf;
+    color: var(--xe-muted);
     text-align: left;
     white-space: nowrap;
+    font-size: 1.3rem;
+    text-transform: uppercase;
 }
 
 .xe-table tbody tr td {
@@ -18,46 +20,46 @@
 }
 
 .xe-table tbody tr td>div {
-    padding: .75rem .5rem;
+    padding: .85rem .65rem;
 }
 
 .xe-table tbody tr td>a {
-    padding: .75rem .5rem;
+    padding: .85rem .65rem;
     text-decoration: none;
     display: block;
-    color: white;
+    color: var(--xe-white);
 }
 
 .xe-table tbody tr td>a:visited {
-    color: rgb(160, 160, 160);
+    color: rgba(245, 247, 251, 0.72);
 }
 
 .xe-table-empty {
-    background-color: rgba(2, 255, 209, 0.1);
+    background-color: rgba(2, 255, 207, 0.08);
     cursor: inherit;
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 .xe-table-clickable tbody tr:hover td {
-    background-color: rgba(2, 255, 209, 0.1);
+    background-color: rgba(2, 255, 207, 0.09);
     cursor: pointer;
 }
 
 .xe-table-clickable td:first-child,
 .xe-table-empty td:first-child {
-    border-top-left-radius: .5rem;
-    border-bottom-left-radius: .5rem;
+    border-top-left-radius: var(--xe-radius);
+    border-bottom-left-radius: var(--xe-radius);
 }
 
 .xe-table-clickable td:last-child,
 .xe-table-empty td:first-child {
-    border-top-right-radius: .5rem;
-    border-bottom-right-radius: .5rem;
+    border-top-right-radius: var(--xe-radius);
+    border-bottom-right-radius: var(--xe-radius);
 }
 
 .xe-table-loading>td {
     height: 2.5rem;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(2, 255, 207, 0.08);
     animation: xe-table-loading-animation .5s infinite alternate;
 }
 

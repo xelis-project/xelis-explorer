@@ -5,7 +5,7 @@
 }
 
 .xe-transaction-invoke-contract>:nth-child(3)>div>:nth-child(1) {
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 .xe-transaction-invoke-contract>:nth-child(3)>div>:nth-child(2) {
@@ -15,7 +15,7 @@
 
 .xe-transaction-invoke-contract>:nth-child(4),
 .xe-transaction-invoke-contract>:nth-child(6) {
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 

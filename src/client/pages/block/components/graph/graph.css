@@ -32,12 +32,13 @@
 }
 
 .xe-block-graph-container-2>div>:nth-child(1) {
-    color: #afafaf;
+    color: var(--xe-muted);
 }
 
 .xe-block-graph-dag {
     height: 29rem;
     position: relative;
     overflow: hidden;
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
+    border: 1px solid var(--xe-border-soft);
 }

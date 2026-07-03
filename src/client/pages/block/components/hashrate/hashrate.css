@@ -25,8 +25,8 @@
 }
 
 .xe-block-hashrate>div>:nth-child(1) {
-    font-size: .9rem;
-    color: #afafaf;
+    font-size: 1.4rem;
+    color: var(--xe-muted);
 }
 
 .xe-block-hashrate>div>:nth-child(2) {
