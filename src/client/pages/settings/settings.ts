@@ -12,6 +12,7 @@ import DaemonRPC from '@xelis/sdk/daemon/rpc';
 import DaemonWS from '@xelis/sdk/daemon/websocket';
 import icons from "../../assets/svg/icons";
 import packageJSON from '../../../../package.json';
+import { isTauri } from '@tauri-apps/api/core';
 
 import './settings.css';
 
@@ -246,6 +247,21 @@ export class SettingsPage extends Page {
         menu_type_item.input_element.appendChild(menu_type_select.element);
 
         append_line();
+
+        if (!isTauri()) {
+            const download_app_item = new SettingsItem();
+            download_app_item.title_element.innerHTML = localization.get_text(`DOWNLOAD APP`);
+            download_app_item.description_element.innerHTML = localization.get_text(`Get the standalone desktop application.`);
+            container.element.appendChild(download_app_item.element);
+
+            const download_app_link = document.createElement(`a`);
+            download_app_link.classList.add(`xe-settings-btn`);
+            download_app_link.href = `/download-app`;
+            download_app_link.innerHTML = `${icons.download_window()}${localization.get_text(`OPEN DOWNLOAD PAGE`)}`;
+            download_app_item.input_element.appendChild(download_app_link);
+
+            append_line();
+        }
 
         // display explorer app version
 

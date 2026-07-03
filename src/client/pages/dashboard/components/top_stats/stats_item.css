@@ -2,10 +2,13 @@
     display: flex;
     gap: .25rem;
     flex-direction: column;
+    min-width: 0;
 }
 
 .xe-dashboard-top-stats-item> :nth-child(1) {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 1.2rem;
     font-weight: 100;
     color: var(--xe-muted);
@@ -14,6 +17,8 @@
 
 .xe-dashboard-top-stats-item> :nth-child(2) {
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 1.7rem;
     font-weight: bold;
     color: var(--xe-accent);

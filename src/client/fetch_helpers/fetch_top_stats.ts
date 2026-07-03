@@ -1,8 +1,12 @@
 import { DiskSize, GetInfoResult, P2PStatusResult, RPCMethod } from "@xelis/sdk/daemon/types";
 import { XelisNode } from "../app/xelis_node";
 
+export type TopStatsInfo = GetInfoResult & {
+    stable_topoheight: number;
+};
+
 export interface TopStatsData {
-    info: GetInfoResult;
+    info: TopStatsInfo;
     size: DiskSize;
     p2p_status: P2PStatusResult;
     account_count: number;
@@ -31,7 +35,7 @@ export const fetch_top_stats = async (node: XelisNode) => {
 
         switch (i) {
             case 0:
-                top_stats.info = result as GetInfoResult;
+                top_stats.info = result as TopStatsInfo;
                 break;
             case 1:
                 top_stats.size = result as DiskSize;

@@ -37,6 +37,9 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 .xe-settings-btn:hover {

@@ -8,10 +8,9 @@ import { StatsItem } from './stats_item';
 import { format_diff } from '../../../../utils/format_diff';
 import { format_hashrate } from '../../../../utils/format_hashrate';
 import prettyMilliseconds from 'pretty-ms';
-import { GetInfoResult } from '@xelis/sdk/daemon/types';
 import prettyBytes from 'pretty-bytes';
 import { localization } from '../../../../localization/localization';
-import { TopStatsData } from '../../../../fetch_helpers/fetch_top_stats';
+import { TopStatsData, TopStatsInfo } from '../../../../fetch_helpers/fetch_top_stats';
 
 import './top_stats.css';
 
@@ -31,6 +30,7 @@ export class DashboardTopStats {
 
     box_2: Box;
     item_topoheight: StatsItem;
+    item_stable_topoheight: StatsItem;
     item_height: StatsItem;
     item_stableheight: StatsItem;
 
@@ -43,6 +43,7 @@ export class DashboardTopStats {
     item_mempool: StatsItem;
     item_peers: StatsItem;
     item_db_size: StatsItem;
+    item_version: StatsItem;
 
     box_5: Box;
     item_contracts_count: StatsItem;
@@ -81,8 +82,6 @@ export class DashboardTopStats {
         this.box_1.element.appendChild(this.item_circ_supply.element);
         this.item_mined = new StatsItem(localization.get_text(`MINED`));
         this.box_1.element.appendChild(this.item_mined.element);
-        this.item_block_reward = new StatsItem(localization.get_text(`BLOCK REWARD`));
-        this.box_1.element.appendChild(this.item_block_reward.element);
         this.item_daily_emission = new StatsItem(localization.get_text(`DAILY EMISSION`));
         this.box_1.element.appendChild(this.item_daily_emission.element);
 
@@ -93,7 +92,9 @@ export class DashboardTopStats {
         this.box_2.element.appendChild(this.item_topoheight.element);
         this.item_height = new StatsItem(localization.get_text(`HEIGHT`));
         this.box_2.element.appendChild(this.item_height.element);
-        this.item_stableheight = new StatsItem(`STABLEHEIGHT`);
+        this.item_stable_topoheight = new StatsItem(localization.get_text(`STABLE TOPOHEIGHT`));
+        this.box_2.element.appendChild(this.item_stable_topoheight.element);
+        this.item_stableheight = new StatsItem(localization.get_text(`STABLE HEIGHT`));
         this.box_2.element.appendChild(this.item_stableheight.element);
 
         this.box_3 = new Box();
@@ -103,6 +104,8 @@ export class DashboardTopStats {
         this.box_3.element.appendChild(this.item_diff.element);
         this.item_hashrate = new StatsItem(localization.get_text(`HASHRATE`));
         this.box_3.element.appendChild(this.item_hashrate.element);
+        this.item_block_reward = new StatsItem(localization.get_text(`BLOCK REWARD`));
+        this.box_3.element.appendChild(this.item_block_reward.element);
         this.item_avg_time = new StatsItem(localization.get_text(`BLOCK TIME`));
         this.box_3.element.appendChild(this.item_avg_time.element);
 
@@ -115,6 +118,8 @@ export class DashboardTopStats {
         this.box_4.element.appendChild(this.item_peers.element);
         this.item_db_size = new StatsItem(localization.get_text(`DB SIZE`));
         this.box_4.element.appendChild(this.item_db_size.element);
+        this.item_version = new StatsItem(localization.get_text(`VERSION`));
+        this.box_4.element.appendChild(this.item_version.element);
 
         this.box_5 = new Box();
         box_container.appendChild(this.box_5.element);
@@ -176,11 +181,15 @@ export class DashboardTopStats {
     }
 
     set_block_reward(block_reward: number) {
-        this.item_block_reward.element_value.innerHTML = format_xel(block_reward, true, undefined);
+        this.item_block_reward.element_value.innerHTML = format_xel(block_reward, true, undefined, { maximumFractionDigits: 5 });
     }
 
     set_topoheight(topoheight: number) {
         this.item_topoheight.element_value.innerHTML = `${topoheight.toLocaleString()}`;
+    }
+
+    set_stable_topoheight(stable_topoheight: number) {
+        this.item_stable_topoheight.element_value.innerHTML = `${stable_topoheight.toLocaleString()}`;
     }
 
     set_height(height: number) {
@@ -215,7 +224,11 @@ export class DashboardTopStats {
         this.item_db_size.element_value.innerHTML = `${prettyBytes(size_in_bytes)}`;
     }
 
-    set_info(info: GetInfoResult) {
+    set_version(version: string) {
+        this.item_version.element_value.innerHTML = version.split(`-`)[0];
+    }
+
+    set_info(info: TopStatsInfo) {
         this.set_max_supply(info.maximum_supply);
         this.set_circ_supply(info.circulating_supply);
         this.set_mined(info.circulating_supply, info.maximum_supply);
@@ -223,6 +236,7 @@ export class DashboardTopStats {
         this.set_daily_emission(info.block_reward, info.block_time_target);
 
         this.set_topoheight(info.topoheight);
+        this.set_stable_topoheight(info.stable_topoheight);
         this.set_height(info.height);
         this.set_stableheight(info.stableheight);
 
@@ -231,6 +245,7 @@ export class DashboardTopStats {
         this.set_avg_time(info.average_block_time);
 
         this.set_mempool(info.mempool_size);
+        this.set_version(info.version);
     }
 
     last_update_timestamp?: number;
