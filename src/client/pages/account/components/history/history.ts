@@ -148,10 +148,10 @@ export class AccountHistory {
             outgoing_flow: outgoing,
             maximum_topoheight: max_topo,
         });
-        this.table.body_element.replaceChildren();
+        this.table.clear();
 
         if (history.length === 0) {
-            this.table.set_empty(localization.get_text(`No history. Check whether any filtering options are applied.`));
+            this.table.add_empty_row().set_empty(localization.get_text(`No history. Check whether any filtering options are applied.`));
         }
 
         history.sort((a, b) => a.block_timestamp - b.block_timestamp);
@@ -160,7 +160,7 @@ export class AccountHistory {
             history_row.set(item);
             this.history_rows.push(history_row);
 
-            this.table.prepend_row(history_row.element);
+            this.table.prepend_row(history_row);
         });
 
         const first_item = history[history.length - 1];

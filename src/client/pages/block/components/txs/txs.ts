@@ -13,6 +13,7 @@ export class BlockTxs {
     table: Table;
     tx_data_hover: TxDataHover;
 
+    tx_rows: TxRow[] = [];
     tx_data_hover_timeout?: number;
 
     constructor() {
@@ -39,7 +40,7 @@ export class BlockTxs {
     async load(block: Block) {
         await fetch_block_txs(block);
 
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         if (block.transactions && block.transactions.length > 0) {
             block.transactions.forEach((tx) => {
                 const tx_row = new TxRow();
@@ -61,10 +62,17 @@ export class BlockTxs {
                     }
                 });
 
-                this.table.prepend_row(tx_row.element);
+                this.table.prepend_row(tx_row);
+                this.tx_rows.push(tx_row);
             });
         } else {
-            this.table.set_empty(localization.get_text(`No transactions`));
+            this.table.add_empty_row().set_empty(localization.get_text(`No transactions`));
         }
+    }
+
+    unload() {
+        window.clearInterval(this.tx_data_hover_timeout);
+        this.tx_rows.forEach(row => row.unload());
+        this.tx_rows = [];
     }
 }

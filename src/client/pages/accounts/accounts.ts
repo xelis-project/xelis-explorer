@@ -75,7 +75,7 @@ export class AccountsPage extends Page {
     }
 
     async load_accounts() {
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         this.table.set_loading(this.pagination.page_size);
 
         const xelis_node = XelisNode.instance();
@@ -89,7 +89,7 @@ export class AccountsPage extends Page {
         const addresses = await xelis_node.rpc.getAccounts({ skip, maximum });
         const accounts = await fetch_accounts(addresses);
 
-        this.table.body_element.replaceChildren();
+        this.table.clear();
 
         if (accounts.length > 0) {
             accounts.forEach((account_data) => {
@@ -101,10 +101,10 @@ export class AccountsPage extends Page {
                     registration_topo: account_data.registration_topo,
                 });
                 row.set_link(`/account/${account_data.addr}`);
-                this.table.prepend_row(row.element);
+                this.table.prepend_row(row);
             });
         } else {
-            this.table.set_empty(localization.get_text(`No addresses`));
+            this.table.add_empty_row().set_empty(localization.get_text(`No addresses`));
         }
     }
 

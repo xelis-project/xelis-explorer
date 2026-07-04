@@ -140,15 +140,15 @@ export class BlockHeightPage extends Page {
         if (blocks.length > 0) {
             this.set_element(this.master.element);
 
-            this.table.body_element.replaceChildren();
+            this.table.clear();
             blocks.forEach((block) => {
                 const block_row = new BlockRow();
                 block_row.set(block);
                 this.block_rows.push(block_row);
-                this.table.prepend_row(block_row.element);
+                this.table.prepend_row(block_row);
             });
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.table.add_empty_row().set_empty(localization.get_text(`No blocks`));
         }
 
         this.update_interval_1000_id = window.setInterval(this.update_interval_1000, 1000);

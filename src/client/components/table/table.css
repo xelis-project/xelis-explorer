@@ -55,9 +55,9 @@
     border-bottom-right-radius: .5rem;
 }
 
-.xe-table-loading>td {
+.xe-table-loading td {
     height: 2.5rem;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.5);
     animation: xe-table-loading-animation .5s infinite alternate;
 }
 

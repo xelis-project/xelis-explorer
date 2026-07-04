@@ -97,4 +97,10 @@ export class TxRow extends Row {
     set_age(timestamp: number) {
         this.value_cells[7].innerHTML = prettyMilliseconds(Date.now() - timestamp, { colonNotation: true, secondsDecimalDigits: 0 });
     }
+
+    unload(): void {
+        this.block = undefined;
+        this.tx = undefined;
+        super.unload();
+    }
 }

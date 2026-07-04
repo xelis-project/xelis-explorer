@@ -72,7 +72,7 @@ export class ContractsPage extends Page {
     }
 
     async load_contracts() {
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         this.table.set_loading(10);
 
         const xelis_node = XelisNode.instance();
@@ -100,13 +100,13 @@ export class ContractsPage extends Page {
             });
         }
 
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         contract_rows.forEach((row) => {
-            this.table.prepend_row(row.element);
+            this.table.prepend_row(row);
         });
 
-        if (this.table.body_element.children.length === 0) {
-            this.table.set_empty(localization.get_text(`No contracts`));
+        if (this.table.rows.length === 0) {
+            this.table.add_empty_row().set_empty(localization.get_text(`No contracts`));
         }
     }
 

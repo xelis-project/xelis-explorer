@@ -124,16 +124,16 @@ export class KnownAccountsPage extends Page {
                 });
             });
         }
-        table.body_element.replaceChildren();
+        table.clear();
 
         if (accounts.length > 0) {
             accounts.forEach((account_data) => {
                 const row = new AccountRow();
                 row.set(account_data);
-                table.prepend_row(row.element);
+                table.prepend_row(row);
             });
         } else {
-            table.set_empty(localization.get_text(`No addresses`));
+            table.add_empty_row().set_empty(localization.get_text(`No addresses`));
         }
     }
 

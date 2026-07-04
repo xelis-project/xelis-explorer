@@ -95,4 +95,9 @@ export class BlockRow extends Row {
     set_age(timestamp: number) {
         this.value_cells[9].innerHTML = prettyMilliseconds(Date.now() - timestamp, { colonNotation: true, secondsDecimalDigits: 0 });
     }
+
+    unload(): void {
+        this.data = undefined;
+        super.unload();
+    }
 }

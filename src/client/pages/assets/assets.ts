@@ -74,7 +74,7 @@ export class AssetsPage extends Page {
     }
 
     async load_assets() {
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         this.table.set_loading(this.pagination.page_size);
 
         const xelis_node = XelisNode.instance();
@@ -94,13 +94,13 @@ export class AssetsPage extends Page {
             asset_rows.push(asset_row);
         }
 
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         asset_rows.forEach((row) => {
-            this.table.prepend_row(row.element);
+            this.table.prepend_row(row);
         });
 
-        if (this.table.body_element.children.length === 0) {
-            this.table.set_empty(localization.get_text(`No assets`));
+        if (this.table.rows.length === 0) {
+            this.table.add_empty_row().set_empty(localization.get_text(`No assets`));
         }
     }
 

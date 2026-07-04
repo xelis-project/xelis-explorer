@@ -32,14 +32,6 @@ export class Row {
         });
     }
 
-    set_loading(loading: boolean) {
-        if (loading) {
-            this.element.classList.add(`xe-block-tx-row-loading`);
-        } else {
-            this.element.classList.remove(`xe-blocks-tx-row-loading`);
-        }
-    }
-
     async animate_prepend() {
         const { animate, utils } = await import("animejs");
         animate(this.element, {
@@ -67,5 +59,17 @@ export class Row {
             ease: eases.linear,
             onComplete: utils.cleanInlineStyles
         });
+    }
+
+    set_empty(text: string) {
+        const td = this.value_cells[0];
+        if (td) td.innerHTML = `<div>${text}</div>`;
+    }
+
+    unload() {
+        this.element.remove();
+        this.cells = [];
+        this.value_cells = [];
+        this.element = null as any;
     }
 }

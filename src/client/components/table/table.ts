@@ -1,9 +1,11 @@
 import './table.css';
+import { Row } from '../../components/table/row';
 
 export class Table {
     element: HTMLTableElement;
     head_element: HTMLTableSectionElement;
-    body_element: HTMLTableSectionElement
+    body_element: HTMLTableSectionElement;
+    rows: Row[] = [];
 
     constructor() {
         this.element = document.createElement(`table`);
@@ -27,33 +29,38 @@ export class Table {
         });
     }
 
-    prepend_row(row: HTMLTableRowElement) {
-        this.body_element.insertBefore(row, this.body_element.firstChild);
+    prepend_row(row: Row) {
+        this.body_element.insertBefore(row.element, this.body_element.firstChild);
+        this.rows.unshift(row);
     }
 
     set_loading(count: number) {
+        this.element.classList.add(`xe-table-loading`);
         for (let i = 0; i < count; i++) {
-            const empty_row = this.add_empty_row();
-            empty_row.classList.add(`xe-table-loading`);
+            this.add_empty_row();
         }
+    }
+
+    clear() {
+        this.rows.forEach(r => r.unload());
+        this.rows = [];
+        this.body_element.replaceChildren();
+        this.element.classList.remove(`xe-table-loading`);
     }
 
     add_empty_row() {
         const headers = this.head_element.querySelectorAll(`tr th`);
-        const row = document.createElement(`tr`);
-        const cell = document.createElement(`td`);
-        cell.colSpan = headers.length;
-        row.appendChild(cell);
-        this.body_element.appendChild(row);
+        const row = new Row(1);
+        row.element.cells[0].colSpan = headers.length;
+        this.body_element.appendChild(row.element);
+        this.rows.push(row);
         return row;
     }
 
     set_empty(text: string) {
         this.body_element.replaceChildren();
         const empty_row = this.add_empty_row();
-        empty_row.classList.add(`xe-table-empty`);
-        const td = empty_row.querySelector(`td`);
-        if (td) td.innerHTML = `<div>${text}</div>`;
+        empty_row.set_empty(text);
     }
 
     set_clickable() {
@@ -61,7 +68,7 @@ export class Table {
     }
 
     remove_last() {
-        const last_child = this.body_element.lastChild;
-        if (last_child) last_child.remove();
+        const last_row = this.rows.pop();
+        if (last_row) last_row.unload();
     }
 }

@@ -94,7 +94,7 @@ export class BlocksPage extends Page {
 
             const block_row = new BlockRow();
             block_row.set(new_block, info.block_time_target);
-            this.table.prepend_row(block_row.element);
+            this.table.prepend_row(block_row);
             this.block_rows.unshift(block_row);
             this.block_rows.pop();
             block_row.animate_prepend();
@@ -184,7 +184,6 @@ export class BlocksPage extends Page {
         this.prev_next_pager.pager_min = 0;
 
         this.table.set_loading(20);
-        this.table.body_element.replaceChildren();
 
         const node = XelisNode.instance();
         const end_topo = this.prev_next_pager.get_next();
@@ -192,18 +191,22 @@ export class BlocksPage extends Page {
             end_height: end_topo,
             start_height: end_topo - 20
         });
-        this.table.body_element.replaceChildren();
+        this.table.clear();
 
         blocks.forEach((block) => {
             const block_row = new BlockRow();
             block_row.set(block, info.block_time_target);
-            this.table.prepend_row(block_row.element);
+            this.table.prepend_row(block_row);
             this.block_rows.push(block_row);
         });
 
-        this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
-        this.prev_next_pager.pager_next = blocks[0].height - 1;
-        this.prev_next_pager.render();
+        if (this.table.rows.length === 0) {
+            this.table.add_empty_row().set_empty(localization.get_text(`No blocks`));
+        } else {
+            this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
+            this.prev_next_pager.pager_next = blocks[0].height - 1;
+            this.prev_next_pager.render();
+        }
     }
 
     async load(parent: HTMLElement) {
@@ -219,16 +222,6 @@ export class BlocksPage extends Page {
         this.page_data.info = info;
 
         await this.load_blocks();
-        /*
-        const blocks = await fetch_blocks(info.height, 100);
-
-        this.table.body_element.replaceChildren();
-        blocks.forEach((block) => {
-            const block_row = new BlockRow();
-            block_row.set(block, info.block_time_target);
-            this.table.prepend_row(block_row.element);
-            this.block_rows.push(block_row);
-        });*/
         this.update_interval_1000_id = window.setInterval(this.update_interval_1000, 1000);
     }
 

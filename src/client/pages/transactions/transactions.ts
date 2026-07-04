@@ -88,7 +88,7 @@ export class TransactionsPage extends Page {
 
             const new_tx_row = new TxRow();
             new_tx_row.set(block, transaction);
-            this.table.prepend_row(new_tx_row.element);
+            this.table.prepend_row(new_tx_row);
             new_tx_row.animate_prepend();
 
             if (this.prev_next_pager.pager_max && this.prev_next_pager.pager_next &&
@@ -103,7 +103,7 @@ export class TransactionsPage extends Page {
                     const tx_row = this.tx_rows[i];
                     if (tx_row.block && tx_row.block.height < this.prev_next_pager.pager_next) {
                         this.tx_rows.splice(i, 1);
-                        tx_row.element.remove();
+                        tx_row.unload();
                     }
                 }
             }
@@ -128,7 +128,7 @@ export class TransactionsPage extends Page {
         const { info } = this.page_data;
         if (!info) return;
 
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         this.table.set_loading(20);
 
         this.prev_next_pager.pager_max = info.height;
@@ -141,24 +141,25 @@ export class TransactionsPage extends Page {
         await fetch_blocks_txs(blocks);
 
         this.tx_rows = [];
-        this.table.body_element.replaceChildren();
+        this.table.clear();
         blocks.forEach((block) => {
             if (block.transactions) {
                 block.transactions.forEach((tx) => {
                     const tx_row = new TxRow();
                     tx_row.set(block, tx as TransactionResponse);
-                    this.table.prepend_row(tx_row.element);
+                    this.table.prepend_row(tx_row);
                     this.tx_rows.push(tx_row);
                 });
             }
         });
 
-        this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
-        this.prev_next_pager.pager_next = blocks[0].height - 1;
-        this.prev_next_pager.render();
-
-        if (this.table.body_element.children.length === 0) {
-            this.table.set_empty(localization.get_text(`No transactions from {} to {}.`, [end_height.toLocaleString(), this.prev_next_pager.pager_next.toLocaleString()]));
+        if (this.table.rows.length === 0) {
+            const text = localization.get_text(`No transactions from {} to {}.`, [end_height.toLocaleString(), (this.prev_next_pager.pager_next || 0).toLocaleString()]);
+            this.table.add_empty_row().set_empty(text);
+        } else {
+            this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
+            this.prev_next_pager.pager_next = blocks[0].height - 1;
+            this.prev_next_pager.render();
         }
     }
 

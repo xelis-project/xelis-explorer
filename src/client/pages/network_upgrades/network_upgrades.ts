@@ -79,14 +79,14 @@ export class NetworkUpgradesPage extends Page {
 		super.load(parent);
 		this.set_window_title(localization.get_text(`Network Upgrades`));
 
-		this.table.body_element.replaceChildren();
+		this.table.clear();
 		this.table.set_loading(5);
 
 		const node = XelisNode.instance();
 		const hard_forks = await node.rpc.getHardForks();
 		const top_block = await node.rpc.getTopBlock();
 
-		this.table.body_element.replaceChildren();
+		this.table.clear();
 
 		this.last_hard_fork = hard_forks[hard_forks.length - 1];
 		if (top_block.height < this.last_hard_fork.height) {
@@ -98,7 +98,7 @@ export class NetworkUpgradesPage extends Page {
 		hard_forks.forEach(hard_fork => {
 			const upgrade_row = new UpgradeRow();
 			upgrade_row.set(hard_fork, top_block);
-			this.table.prepend_row(upgrade_row.element);
+			this.table.prepend_row(upgrade_row);
 		});
 
 	}

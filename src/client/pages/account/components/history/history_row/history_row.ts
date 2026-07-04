@@ -133,4 +133,9 @@ export class HistoryRow extends Row {
 
         this.value_cells[5].innerHTML = prettyMilliseconds(time_ago, { colonNotation: true, secondsDecimalDigits: 0 });
     }
+
+    unload(): void {
+        this.data = undefined;
+        super.unload();
+    }
 }
