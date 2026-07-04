@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { BoxChart } from '../../../../components/box_chart/box_chart';
 import { Block, BlockType } from '@xelis/sdk/daemon/types';
 import { localization } from '../../../../localization/localization';
+import { chart_colors, create_chart_value_color, hide_svg_chart_tooltip, show_svg_chart_tooltip } from '../../../../utils/chart_tooltip';
 
 export class MempoolChartBlocksTxs {
     box_chart: BoxChart;
@@ -50,7 +51,7 @@ export class MempoolChartBlocksTxs {
             });
 
         let data = filtered_blocks
-            .map((b, i) => ({ x: filtered_blocks.length - i, y: b.txs_hashes.length }))
+            .map((b, i) => ({ x: filtered_blocks.length - i, height: b.height, y: b.txs_hashes.length }))
             .sort((a, b) => b.x - a.x);
 
         const x_scale = d3
@@ -66,12 +67,22 @@ export class MempoolChartBlocksTxs {
 
         const min_data = data.reduce((a, b) => (a.y < b.y ? a : b), data[0] ? data[0] : { x: 0, y: 0 });
         const max_data = data.reduce((a, b) => (a.y > b.y ? a : b), data[0] ? data[0] : { x: 0, y: 0 });
-        const color = d3.scaleLinear<string>()
-            .domain([min_data.y, max_data.y])
-            .range(d3.quantize(t => d3.interpolateRgb(`#02ffcf`, `#ff00aa`)(t * 0.7), 2));
+        const color = create_chart_value_color(min_data.y, max_data.y);
 
         const height = this.chart.height;
         this.chart.node
+            .selectAll(".chart-guide")
+            .data(y_scale.ticks(3))
+            .join("line")
+            .attr("class", "chart-guide")
+            .attr("x1", 0)
+            .attr("x2", this.chart.width)
+            .attr("y1", d => y_scale(d))
+            .attr("y2", d => y_scale(d))
+            .attr("stroke", "rgba(245, 247, 251, 0.08)")
+            .attr("stroke-width", 1);
+
+        const bars = this.chart.node
             .selectAll(".bar")
             .data(data)
             .join("rect")
@@ -81,7 +92,38 @@ export class MempoolChartBlocksTxs {
             .attr("rx", 3)
             .attr("width", x_scale.bandwidth())
             .attr("height", (d) => height - y_scale(d.y))
-            .attr("fill", d => color(d.y));
+            .attr("fill", d => color(d.y))
+            .attr("opacity", .92)
+            .style("cursor", "crosshair");
+
+        bars
+            .on("pointermove", (event, d) => {
+                if (!this.chart) return;
+
+                const x = x_scale(d.x)! + x_scale.bandwidth() / 2;
+                const y = y_scale(d.y);
+                d3.select(event.currentTarget as SVGRectElement)
+                    .attr("stroke", chart_colors.gold)
+                    .attr("stroke-width", 2)
+                    .attr("opacity", 1);
+
+                show_svg_chart_tooltip(
+                    this.chart.node,
+                    this.chart.width,
+                    this.chart.height,
+                    x,
+                    y,
+                    [`HEIGHT ${d.height.toLocaleString()}`, `${d.y.toLocaleString()} TXS`],
+                    chart_colors.gold,
+                );
+            })
+            .on("pointerleave", (event) => {
+                d3.select(event.currentTarget as SVGRectElement)
+                    .attr("stroke", null)
+                    .attr("stroke-width", null)
+                    .attr("opacity", .92);
+                if (this.chart) hide_svg_chart_tooltip(this.chart.node);
+            });
 
         this.chart.node
             .selectAll(`.tx-count`)
@@ -93,10 +135,10 @@ export class MempoolChartBlocksTxs {
                     .text(d => {
                         return d.y.toLocaleString(undefined, { notation: `compact`, compactDisplay: `short` });
                     })
-                    .style('font-size', '.8rem')
+                    .style('font-size', '1.3rem')
                     .style("text-anchor", "middle")
                     .style('font-weight', `bold`)
-                    .style('fill', 'white'),
+                    .style('fill', 'rgba(245, 247, 251, 0.78)'),
                 update => update
                     .attr('transform', d => `translate(${x_scale(d.x)! + x_scale.bandwidth() / 2}, ${y_scale(d.y) - 5})`)
                     .text(d => {
