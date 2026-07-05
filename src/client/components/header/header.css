@@ -283,7 +283,6 @@
 }
 
 .xe-header-text {
-    max-width: 26rem;
     color: var(--xe-muted);
     font-size: 1.5rem;
 }
