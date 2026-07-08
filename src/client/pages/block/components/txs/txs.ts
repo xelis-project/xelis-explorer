@@ -48,7 +48,7 @@ export class BlockTxs {
 
                 tx_row.element.addEventListener(`mouseenter`, (e) => {
                     if (this.tx_data_hover.visible) return;
-                    window.clearInterval(this.tx_data_hover_timeout);
+                    window.clearTimeout(this.tx_data_hover_timeout);
                     this.tx_data_hover_timeout = window.setTimeout(() => {
                         this.tx_data_hover.set_pos(e.pageX + 300, e.pageY - (this.tx_data_hover.element.clientHeight / 2));
                         this.tx_data_hover.show(tx.data);
@@ -56,7 +56,7 @@ export class BlockTxs {
                 });
 
                 tx_row.element.addEventListener(`mouseleave`, (e) => {
-                    window.clearInterval(this.tx_data_hover_timeout);
+                    window.clearTimeout(this.tx_data_hover_timeout);
                     if (!this.tx_data_hover.element.contains(e.relatedTarget as Node)) {
                         this.tx_data_hover.hide();
                     }

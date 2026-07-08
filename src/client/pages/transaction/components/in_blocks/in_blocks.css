@@ -41,12 +41,12 @@
     width: .5rem;
     height: .5rem;
     border-radius: 100%;
-    border: .2rem solid #02ffcf;
+    border: .2rem solid var(--xe-accent);
 }
 
 .xe-transaction-in-blocks-legend.executed>:nth-child(2) {
-    color: #02FFCF;
-    font-size: .8rem;
+    color: var(--xe-accent);
+    font-size: 1.4rem;
 }
 
 .xe-transaction-in-blocks-legend.failed>:nth-child(1) {
@@ -58,6 +58,6 @@
 
 .xe-transaction-in-blocks-legend.failed>:nth-child(2) {
     color: #d51f1f;
-    font-size: .8rem;
+    font-size: 1.4rem;
     font-weight: bold;
 }

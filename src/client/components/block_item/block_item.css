@@ -3,14 +3,16 @@
     gap: 1rem;
     flex-direction: row;
     justify-content: space-between;
-    min-height: 6rem;
-    transition: scale .25s, background-color .25s;
+    flex: 0 0 auto;
+    min-height: 7.4rem;
+    transition: scale .25s, background-color .25s, border-color .25s;
 }
 
 .xe-block-item:hover {
     cursor: pointer;
     scale: .98;
-    background-color: rgba(2, 255, 209, 0.07);
+    background-color: rgba(2, 255, 207, 0.07);
+    border-color: var(--xe-border-strong);
 }
 
 .xe-block-item>div {
@@ -18,6 +20,16 @@
     gap: 1rem;
     flex-direction: column;
     justify-content: space-between;
+    min-width: 0;
+}
+
+.xe-block-item>:nth-child(1) {
+    flex: 1 1 auto;
+}
+
+.xe-block-item>:nth-child(2) {
+    flex: 0 0 auto;
+    text-align: right;
 }
 
 .xe-block-item>:nth-child(1)>div {
@@ -38,6 +50,18 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
+    min-width: 0;
+}
+
+.xe-block-item-miner>canvas {
+    flex: 0 0 auto;
+}
+
+.xe-block-item-miner>div {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .xe-block-item-type {
@@ -45,29 +69,30 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
-    font-size: .9rem;
+    font-size: 1.3rem;
 }
 
 .xe-block-item-reward {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.3rem;
 }
 
 .xe-block-item-size {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.3rem;
 }
 
 .xe-block-item-height {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     font-weight: bold;
+    color: var(--xe-accent);
 }
 
 .xe-block-item-age {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
 }
 
 .xe-block-item-txs {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.3rem;
 }

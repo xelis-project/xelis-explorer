@@ -27,8 +27,8 @@
 }
 
 .xe-peers-info>div>:nth-child(1) {
-    color: #afafaf;
-    font-size: .7rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }
 
 .xe-peers-info>div>:nth-child(2) {

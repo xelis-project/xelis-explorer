@@ -1,9 +1,12 @@
-.xe-peers {}
+.xe-peers {
+    --xe-peers-map-height: clamp(32rem, 28vw, 46rem);
+}
 
 .xe-peers-container-1 {
     display: flex;
     gap: 1rem;
     flex-direction: row;
+    align-items: stretch;
 }
 
 @media screen and (max-width: 900px) {
@@ -12,16 +15,25 @@
     }
 }
 
-.xe-peers-container-1>:nth-child(1) {
+.xe-peers-main-column {
     flex: 2;
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
 }
 
-.xe-peers-container-1>:nth-child(2) {
+.xe-peers-side-column {
     flex: 1;
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+@media screen and (max-width: 900px) {
+    .xe-peers-side-column {
+        overflow: visible;
+    }
 }

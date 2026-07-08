@@ -15,17 +15,17 @@
 
 .xe-dashboard-search form>:nth-child(1) {
     padding-right: 3rem;
-    outline: .2rem solid rgba(44, 255, 206, 0.5);
+    outline: .2rem solid rgba(2, 255, 207, 0.35);
     font-weight: bold;
 }
 
 .xe-dashboard-search form>:nth-child(2) {
     border: none;
-    color: white;
+    color: var(--xe-white);
     rotate: 90deg;
     cursor: pointer;
     background: none;
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
     height: 100%;
     position: absolute;
     top: 0;
@@ -34,7 +34,7 @@
 }
 
 .xe-dashboard-search form>:nth-child(2):hover {
-    color: #0CFFCF;
+    color: var(--xe-accent);
     translate: -3% 0;
 }
 

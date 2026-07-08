@@ -1,7 +1,24 @@
 .xe-container {
-    background-color: rgba(255, 255, 255, 0.02);
-    padding: 1rem;
-    border-radius: 1rem;
-    border: .1rem solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
+    position: relative;
+    padding: 1.4rem;
+    border: 1px solid var(--xe-border-soft);
+    border-radius: var(--xe-radius);
+    background: var(--xe-panel-bg);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+}
+
+.xe-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(2, 255, 207, 0.4), transparent 35%, rgba(245, 217, 95, 0.14) 100%) top left / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(2, 255, 207, 0.045), transparent 42%);
+    pointer-events: none;
+}
+
+.xe-container>* {
+    position: relative;
 }

@@ -1,27 +1,30 @@
 .xe-master {
     position: relative;
     min-height: 100vh;
-    background-size: 2rem 2rem;
-    background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) .1rem, rgba(255, 255, 255, 0.04) .1rem),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) .1rem, rgba(255, 255, 255, 0.04) .1rem);
 }
 
 .xe-master-layout {
-    max-width: 80rem;
+    max-width: 150rem;
     width: 100%;
     margin: 0 auto;
     display: flex;
-    gap: 2rem;
+    gap: 2.4rem;
     flex-direction: column;
-    padding: 2rem;
+    padding: 2rem 1.6rem;
     box-sizing: border-box;
     position: relative;
 }
 
 .xe-master-content {
     display: flex;
-    gap: 1rem;
+    gap: 1.4rem;
     flex-direction: column;
     width: 100%;
+}
+
+@media screen and (max-width: 900px) {
+    .xe-master-layout {
+        padding: 1rem;
+        gap: 1.6rem;
+    }
 }

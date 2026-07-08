@@ -15,14 +15,16 @@ export class DashboardTxs {
 
     constructor() {
         this.container = new Container();
-        this.container.element.classList.add(`xe-dashboard-txs`, `scrollbar-1`, `scrollbar-1-right`);
+        this.container.element.classList.add(`xe-dashboard-txs`);
         this.tx_items = [];
 
         this.element_title = document.createElement(`div`);
+        this.element_title.classList.add(`xe-dashboard-txs-title`);
         this.element_title.innerHTML = localization.get_text(`TRANSACTIONS`);
         this.container.element.appendChild(this.element_title);
 
         this.element_content = document.createElement(`div`);
+        this.element_content.classList.add(`xe-dashboard-txs-list`, `scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.element_content);
 
         this.empty_element = document.createElement(`div`);

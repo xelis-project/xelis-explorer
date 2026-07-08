@@ -2,9 +2,10 @@
     position: fixed;
     top: 0;
     height: .5rem;
-    background-color: #02FFCF;
+    background: linear-gradient(90deg, var(--xe-accent), var(--xe-accent-soft));
     display: none;
     z-index: 1;
+    box-shadow: var(--xe-glow);
 }
 
 .xe-top-loading-bar-animate {

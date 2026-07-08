@@ -4,37 +4,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: black;
+    color: #041414;
     font-weight: bold;
     user-select: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .xe-block-type-box::after {
-    display: block;
-    content: '';
-    position: absolute;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    filter: blur(5px);
-    height: 100%;
-    rotate: 45deg;
-    scale: 1 1.5;
-    translate: 25% 25%;
-    border-radius: 100%;
+    display: none;
 }
 
 .xe-block-type-box-sync {
-    background-color: #A3C293; /* Soft sage green */
+    background-color: var(--xe-accent);
 }
 
 .xe-block-type-box-orphaned {
-    background-color: #E07A5F; /* Muted coral/red */
+    color: var(--xe-white);
+    background-color: #b84d5a;
 }
 
 .xe-block-type-box-side {
-    background-color: #6A8DAD; /* Dusty blue */
+    background-color: var(--xe-accent-soft);
 }
 
 .xe-block-type-box-normal {
-    background-color: #F4D35E; /* Buttery yellow */
+    background-color: var(--xe-gold);
 }

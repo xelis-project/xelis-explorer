@@ -1,5 +1,4 @@
 .xe-background {
-    background-color: black;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -7,56 +6,5 @@
     right: 0;
     z-index: -1;
     overflow: hidden;
-}
-
-.xe-background-ellipse-1 {
-    width: 50rem;
-    height: 50rem;
-    background-color: #02FFCF;
-    filter: blur(100px);
-    opacity: .07;
-    border-radius: 100%;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: -100% 25%;
-}
-
-.xe-background-ellipse-2 {
-    width: 70rem;
-    height: 70rem;
-    background-color: #02FFCF;
-    filter: blur(100px);
-    opacity: .03;
-    border-radius: 100%;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: -25% 80%;
-}
-
-.xe-background-ellipse-3 {
-    width: 40rem;
-    height: 60rem;
-    background-color: #02FFCF;
-    filter: blur(100px);
-    opacity: .1;
-    border-radius: 100%;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: 0 -50%;
-}
-
-.xe-background-ellipse-4 {}
-
-.xe-background-circuit {
-    scale: 2 2.5;
-    rotate: 90deg;
-    position: absolute;
-    top: 0;
-    right: 0;
-    translate:5% 0;
-    opacity: 0.5;
-    filter: blur(0.5px);
+    pointer-events: none;
 }

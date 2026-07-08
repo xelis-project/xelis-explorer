@@ -3,7 +3,7 @@
     display: flex;
     list-style: none;
     align-items: center;
-    gap: 0.5rem;
+    gap: .6rem;
     flex-wrap: wrap;
 }
 
@@ -11,27 +11,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5em 0.75em;
-    border: none;
-    border-radius: .5rem;
-    color: white;
-    font-size: .9rem;
-    min-width: 2rem;
-    height: 2rem;
+    min-height: 3.2rem;
+    padding: .45rem .95rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--xe-radius);
+    color: var(--xe-white);
+    font-size: 1.4rem;
+    line-height: 1;
     cursor: pointer;
-    transition: translate 0.15s;
-    background-color: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
+    transition: translate .15s, color .15s, border-color .15s, background .15s, box-shadow .15s;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.045), rgba(2, 255, 207, 0.035));
+    backdrop-filter: blur(10px);
     font-weight: bold;
-    font-family: Jura;
-    display: flex;
+    font-family: var(--xe-font-body);
     gap: .5rem;
     flex-direction: row;
 }
 
 .xe-prev-next-pager button svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--xe-accent);
 }
 
 .xe-prev-next-pager .prev svg {
@@ -43,5 +43,20 @@
 }
 
 .xe-prev-next-pager button:hover {
-    translate: 0 4%;
+    translate: 0 -2px;
+    color: var(--xe-accent);
+    border-color: var(--xe-border-strong);
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.14), rgba(127, 255, 231, 0.07));
+    box-shadow: 0 0 18px rgba(2, 255, 207, 0.1);
+}
+
+.xe-prev-next-pager>div {
+    color: var(--xe-muted);
+    border: 1px solid var(--xe-border-soft);
+    border-radius: var(--xe-radius);
+    padding: .55rem .85rem;
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(10px);
+    font-size: 1.4rem;
+    font-weight: bold;
 }

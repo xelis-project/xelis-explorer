@@ -5,11 +5,12 @@
 }
 
 .xe-download-app-title {
-    font-size: 2rem;
-    max-width: 30rem;
+    font-family: var(--xe-font-heading);
+    font-size: 2.6rem;
+    max-width: 48rem;
     text-align: center;
     margin-top: 1rem;
-    color: white;
+    color: var(--xe-white);
     animation: xe-download-app-title-appear 1s;
 }
 
@@ -25,15 +26,15 @@
 
 .xe-download-app-btn {
     padding: 1rem 1.5rem;
-    background-color: #2CFFCF;
-    border-radius: 1rem;
-    border: none;
+    background: linear-gradient(135deg, var(--xe-accent) 0%, var(--xe-accent-soft) 100%);
+    border-radius: var(--xe-radius);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     font-size: 1.5rem;
-    font-family: "Jura";
+    font-family: var(--xe-font-body);
     margin-top: 2rem;
     cursor: pointer;
     text-decoration: none;
-    color: black;
+    color: #041414;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -59,13 +60,13 @@
 .xe-download-app-btn:hover {
     translate: 0 -5%;
     opacity: 1;
-    box-shadow: 0 0 30px black;
+    box-shadow: var(--xe-glow);
 }
 
 .xe-download-app-btn svg {
     width: 2rem;
     height: 2rem;
-    color: black;
+    color: #041414;
 }
 
 .xe-download-app-images {
@@ -77,10 +78,12 @@
 }
 
 .xe-download-app-images img {
-    border-radius: .5rem;
+    border-radius: var(--xe-radius);
     position: absolute;
     width: 70vw;
     max-width: 40rem;
+    border: 1px solid var(--xe-border-soft);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
 }
 
 .xe-download-app-images>:nth-child(1) {

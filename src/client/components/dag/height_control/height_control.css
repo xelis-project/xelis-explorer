@@ -3,59 +3,94 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 3rem 2rem 4rem 2rem;
-    background-color: rgba(0, 0, 0, 0.1);
-    background: linear-gradient(rgba(0, 0, 0, 0), rgb(15, 15, 15));
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1rem 1.2rem 4rem;
+    border-top: 1px solid rgba(2, 255, 207, 0.12);
+    background:
+        linear-gradient(180deg, rgba(2, 7, 8, 0), rgba(6, 12, 15, 0.94) 32%, rgba(2, 7, 8, 0.98) 100%);
+    backdrop-filter: blur(12px);
     user-select: none;
 }
 
 .xe-dag-height-control-inputs {
-    position: absolute;
-    right: 2rem;
-    top: 0.5rem;
     display: flex;
-    gap: 1rem;
+    gap: .6rem;
     flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.xe-dag-height-control>.dag-slider-target {
+    width: calc(100% - 4rem);
+    margin: 0 2rem;
+}
+
+.xe-dag-height-control-inputs label {
+    color: var(--xe-muted);
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .xe-dag-height-control-inputs input {
-    max-width: 5rem;
+    width: 8rem;
+    min-height: 2.9rem;
     text-align: right;
-    border-radius: .5rem;
-    border: none;
-    padding: .5rem .6rem;
-    background-color: rgb(15, 15, 15);
-    color: white;
+    border-radius: var(--xe-radius);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: .35rem .7rem;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
+    font-size: 1.3rem;
+    box-sizing: border-box;
 }
 
 .xe-dag-height-control-inputs button {
-    background-color: rgb(15, 15, 15);
-    color: white;
-    padding: .5rem .75rem;
-    border: none;
-    border-radius: .5rem;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.045), rgba(2, 255, 207, 0.035));
+    color: var(--xe-white);
+    min-width: 3.2rem;
+    min-height: 3rem;
+    padding: .4rem .75rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--xe-radius);
     font-weight: bold;
     cursor: pointer;
     display: flex;
-    gap: .5rem;
+    gap: .35rem;
     flex-direction: row;
     align-items: center;
-    transition: translate .15s;
-    font-family: 'Jura';
+    justify-content: center;
+    white-space: nowrap;
+    transition: translate .15s, border-color .15s, background .15s, box-shadow .15s;
+    font-family: var(--xe-font-body);
+    font-size: 1.3rem;
+    line-height: 1;
 }
 
 .xe-dag-height-control-inputs button svg {
     width: 1rem;
     height: 1rem;
+    color: var(--xe-accent);
 }
 
 .xe-dag-height-control-inputs button:hover {
-    translate: 0 -4%;
+    translate: 0 -2px;
+    border-color: var(--xe-border-strong);
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.14), rgba(127, 255, 231, 0.07));
+    box-shadow: 0 0 18px rgba(2, 255, 207, 0.12);
 }
 
 .xe-dag-height-control-inputs button:active {
-  background-color: #02FFCF;
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
+    color: var(--xe-white);
+    border-color: var(--xe-border-strong);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
 }
 
 
@@ -70,9 +105,9 @@
 .xe-dag-height-control-btn-live::before {
     content: "";
     border-radius: 100%;
-    width: .5rem;
-    height: .5rem;
-    background-color: white;
+    width: .42rem;
+    height: .42rem;
+    background-color: var(--xe-white);
 }
 
 .xe-dag-height-control-btn-live.active {
@@ -81,8 +116,9 @@
 
 @keyframes xe-dag-height-control-btn-live-animation {
     100% {
-        background-color: #02FFCF;
-        color: #161616;
+        background-color: rgba(2, 255, 207, 0.18);
+        color: var(--xe-white);
+        border-color: var(--xe-border-strong);
     }
 }
 
@@ -92,6 +128,29 @@
 
 @keyframes xe-dag-height-control-dot-live-animation {
     100% {
-        background-color: #161616;
+        background-color: #041414;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .xe-dag-height-control {
+        padding: .9rem .8rem 4rem;
+    }
+
+    .xe-dag-height-control-inputs {
+        justify-content: center;
+    }
+
+    .xe-dag-height-control-inputs button {
+        flex: 1 1 7.8rem;
+    }
+
+    .xe-dag-height-control-inputs input {
+        flex: 1 1 8rem;
+    }
+
+    .xe-dag-height-control>.dag-slider-target {
+        width: calc(100% - 2.4rem);
+        margin: 0 1.2rem;
     }
 }

@@ -1,3 +1,19 @@
 :root {
-
+    --xe-white: #f5f7fb;
+    --xe-accent: #02ffcf;
+    --xe-accent-soft: #7fffe7;
+    --xe-accent-dark: #00342a;
+    --xe-gold: #f5d95f;
+    --xe-bg-primary: #020708;
+    --xe-bg-surface: #0a1114;
+    --xe-bg-card: rgba(6, 12, 15, 0.7);
+    --xe-muted: #c1d5d4;
+    --xe-border-soft: rgba(255, 255, 255, 0.08);
+    --xe-border-strong: rgba(2, 255, 207, 0.35);
+    --xe-glow: 0 0 40px rgba(2, 255, 207, 0.18);
+    --xe-radius: 0.8rem;
+    --xe-panel-bg: linear-gradient(150deg, rgba(10, 17, 20, 0.58), rgba(6, 12, 15, 0.82));
+    --xe-card-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.025), rgba(2, 255, 207, 0.04));
+    --xe-font-body: "Jura", sans-serif;
+    --xe-font-heading: "Helios Bold", "Jura", sans-serif;
 }

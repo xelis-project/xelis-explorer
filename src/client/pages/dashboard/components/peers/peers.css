@@ -16,6 +16,7 @@
 }
 
 .xe-dashboard-peers-map {
-    height: 25rem;
-    border-radius: 1rem;
+    height: clamp(30rem, 22vw, 38rem);
+    border-radius: var(--xe-radius);
+    border: 1px solid var(--xe-border-soft);
 }

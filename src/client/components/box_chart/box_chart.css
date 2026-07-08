@@ -1,11 +1,15 @@
 .xe-box-chart {
     display: flex;
-    gap: .5rem;
+    gap: .7rem;
     flex-direction: column;
+    overflow: visible;
 }
 
-.xe-box-chart > :nth-child(1) {
-    font-size: .8rem;
+.xe-box-chart-title {
+    color: var(--xe-muted);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .xe-box-chart > :nth-child(2) {
@@ -16,11 +20,23 @@
 }
 
 .xe-box-chart-value {
-    color: #02FFCF;
+    color: var(--xe-accent);
     font-weight: bold;
     font-size: 2rem;
+    text-shadow: 0 0 16px rgba(2, 255, 207, 0.18);
 }
 
 .xe-box-chart-content {
     margin-top: 1rem;
+    position: relative;
+}
+
+.xe-box-chart-content svg {
+    display: block;
+    overflow: visible;
+}
+
+.xe-box-chart-content .bar,
+.xe-box-chart-content path {
+    transition: opacity .15s ease, stroke .15s ease, stroke-width .15s ease, filter .15s ease;
 }

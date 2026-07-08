@@ -13,7 +13,7 @@
     position: relative;
     height: 1.5rem;
     width: 1.5rem;
-    background: rgba(2, 255, 209, 0.1);
+    background: rgba(2, 255, 207, 0.1);
     border-radius: .25rem;
 }
 
@@ -27,11 +27,11 @@
 }
 
 .xe-checkbox-container:hover .xe-checkbox-checkmark {
-    background: rgba(2, 255, 209, .5);
+    background: rgba(2, 255, 207, .5);
 }
 
 .xe-checkbox-container input:checked~.xe-checkbox-checkmark {
-    background: rgba(2, 255, 209, 1);
+    background: rgba(2, 255, 207, 1);
 }
 
 .xe-checkbox-checkmark {
@@ -42,7 +42,7 @@
     height: 60%;
     width: 60%;
     cursor: pointer;
-    background: rgba(2, 255, 209, 0.1);
+    background: rgba(2, 255, 207, 0.1);
     pointer-events: none;
     transition: all .25s;
     border-radius: .25rem;

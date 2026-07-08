@@ -3,25 +3,29 @@
 .xe-tabs-bar {
     display: flex;
     gap: 1rem;
-    border-bottom: 1rem solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--xe-border-soft);
     margin-bottom: 1rem;
-    border-top-right-radius: .5rem;
-    border-bottom-right-radius: .5rem;
+    border-radius: var(--xe-radius);
+    overflow-x: auto;
 }
 
 .xe-tabs-bar button {
     padding: .75rem 1rem;
-    border: none;
-    border-bottom: none;
-    border-top-left-radius: .5rem;
-    border-top-right-radius: .5rem;
-    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--xe-radius);
+    color: var(--xe-white);
     cursor: pointer;
-    font-size: 1rem;
-    backdrop-filter: blur(5px);
-    background-color: rgba(0, 0, 0, 0.2);
+    font-size: 1.4rem;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.045);
 }
 
-.xe-tabs-bar button.active {}
+.xe-tabs-bar button.active {
+    color: var(--xe-white);
+    background: linear-gradient(135deg, rgba(2, 255, 207, 0.18), rgba(127, 255, 231, 0.08));
+    border-color: var(--xe-border-strong);
+    box-shadow: var(--xe-glow);
+    text-shadow: 0 0 14px rgba(2, 255, 207, 0.22);
+}
 
 .xe-tabs-content {}

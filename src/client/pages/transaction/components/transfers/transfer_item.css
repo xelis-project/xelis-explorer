@@ -33,8 +33,8 @@
 }
 
 .xe-transaction-transfer-item-asset>:nth-child(2) {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }
 
 .xe-transaction-transfer-item-commitment {
@@ -45,8 +45,8 @@
 }
 
 .xe-transaction-transfer-item-commitment>:nth-child(1) {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }
 
 .xe-transaction-transfer-item-extra-data {
@@ -56,6 +56,6 @@
 }
 
 .xe-transaction-transfer-item-extra-data>:nth-child(2) {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }

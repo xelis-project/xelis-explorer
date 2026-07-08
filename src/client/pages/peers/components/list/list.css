@@ -1,9 +1,8 @@
 .xe-peers-list {
-    overflow-y: visible;
-    overflow-x: hidden;
     display: flex;
-    height: 100%;
-    max-height: 45rem;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
     gap: 1rem;
     flex-direction: column;
     animation: xe-peers-list-animation .65s;
@@ -16,10 +15,15 @@
     justify-content: space-between;
 }
 
-.xe-peers-list>:nth-child(2) {
+.xe-peers-list-content {
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: .4rem .8rem .4rem 0;
 }
 
 @keyframes xe-peers-list-animation {

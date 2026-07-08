@@ -3,10 +3,12 @@ import { BoxChart } from '../../../../components/box_chart/box_chart';
 import { Block, BlockType, GetInfoResult } from '@xelis/sdk/daemon/types';
 import { format_hashrate } from '../../../../utils/format_hashrate';
 import { localization } from '../../../../localization/localization';
+import { chart_colors, hide_svg_chart_tooltip, show_svg_chart_tooltip } from '../../../../utils/chart_tooltip';
 
 interface DataPoint {
     x: number;
     y: number;
+    version?: number;
     text?: { x: number; y: number; }
     text_rect?: DOMRect;
 }
@@ -62,16 +64,22 @@ export class DashboardHashRate {
                 return b.block_type === BlockType.Normal || b.block_type === BlockType.Sync;
             })
             .map((block) => {
-                return { x: block.height, y: parseInt(block.difficulty) };
-            }).slice(0, 100) as DataPoint[];
+                return { x: block.height, y: parseInt(block.difficulty), version: block.version };
+            })
+            .slice(0, 100)
+            .sort((a, b) => a.x - b.x) as DataPoint[];
         if (data.length === 0) return;
 
         const x_scale = d3.scaleLinear()
             .domain(d3.extent(data, d => d.x) as [number, number])
             .range([0, this.chart.width]);
 
+        const min_y = d3.min(data, d => d.y)!;
+        const max_y = d3.max(data, d => d.y)!;
+        const y_padding = min_y === max_y ? Math.max(1, min_y * 0.05) : 0;
+
         const y_scale = d3.scaleLinear()
-            .domain([d3.min(data, d => d.y)!, d3.max(data, d => d.y)!])
+            .domain([min_y - y_padding, max_y + y_padding])
             .nice()
             .range([this.chart.height, 0]);
 
@@ -80,88 +88,86 @@ export class DashboardHashRate {
             .y(d => y_scale(d.y))
             .curve(d3.curveMonotoneX);
 
-        const min_data = data.reduce((a, b) => (a.y < b.y ? a : b), data[0] ? data[0] : { x: 0, y: 0 });
-        const max_data = data.reduce((a, b) => (a.y > b.y ? a : b), data[0] ? data[0] : { x: 0, y: 0 });
+        const area = d3.area<DataPoint>()
+            .x(d => x_scale(d.x))
+            .y0(this.chart.height)
+            .y1(d => y_scale(d.y))
+            .curve(d3.curveMonotoneX);
+
         const avg_y = d3.mean(data, d => d.y) as number;
 
 
         this.chart.node.selectAll(".grad-defs").remove();
 
-        const gradient = this.chart.node
+        const defs = this.chart.node
             .append("defs")
-            .attr("class", "grad-defs")
+            .attr("class", "grad-defs");
+
+        const gradient = defs
             .append("linearGradient")
-            .attr("id", "grad_y")
+            .attr("id", "xe-hashrate-line-grad")
             .attr("gradientUnits", "userSpaceOnUse")
             .attr("x1", 0)
-            .attr("x2", 0)
-            .attr("y1", y_scale(min_data.y))
-            .attr("y2", y_scale(max_data.y));
+            .attr("x2", this.chart.width)
+            .attr("y1", 0)
+            .attr("y2", 0);
 
         gradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", "#02ffcf");
+            .attr("stop-color", chart_colors.mint);
 
         gradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "#ff00aa");
+            .attr("stop-color", chart_colors.gold);
 
-        const path = this.chart.node
-            .selectAll(`path`)
+        const area_gradient = defs
+            .append("linearGradient")
+            .attr("id", "xe-hashrate-area-grad")
+            .attr("gradientUnits", "userSpaceOnUse")
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .attr("y1", 0)
+            .attr("y2", this.chart.height);
+
+        area_gradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", chart_colors.mint)
+            .attr("stop-opacity", .18);
+
+        area_gradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", chart_colors.mint_dark)
+            .attr("stop-opacity", 0);
+
+        this.chart.node
+            .selectAll(".chart-guide")
+            .data(y_scale.ticks(4))
+            .join("line")
+            .attr("class", "chart-guide")
+            .attr("x1", 0)
+            .attr("x2", this.chart.width)
+            .attr("y1", d => y_scale(d))
+            .attr("y2", d => y_scale(d))
+            .attr("stroke", "rgba(245, 247, 251, 0.08)")
+            .attr("stroke-width", 1);
+
+        this.chart.node
+            .selectAll<SVGPathElement, DataPoint[]>(".hashrate-area")
             .data([data])
-            .attr('d', (d) => line(d))
+            .join("path")
+            .attr("class", "hashrate-area")
+            .attr("fill", `url(#xe-hashrate-area-grad)`)
+            .attr("d", (d) => area(d));
 
-        path.enter()
-            .append('path')
-            .attr('fill', `none`)
-            .style('stroke-width', 5)
-            .attr('stroke', `url(#grad_y)`)
+        this.chart.node
+            .selectAll<SVGPathElement, DataPoint[]>(".hashrate-line")
+            .data([data])
+            .join("path")
+            .attr("class", "hashrate-line")
+            .attr("fill", `none`)
+            .style("stroke-width", 4)
+            .attr("stroke", `url(#xe-hashrate-line-grad)`)
             .attr('d', (d) => line(d));
-
-        path.exit().remove();
-
-        const add_tooltip = (prefix: string, text: string, x: number, y: number) => {
-            if (!this.chart) return;
-
-            this.chart.node
-                .selectAll(`.${prefix}-tooltip`)
-                .remove();
-
-            const tooltip = this.chart.node
-                .selectAll(`.${prefix}-tooltip`)
-                .data([null])
-                .enter()
-                .append(`g`)
-                .attr(`class`, `${prefix}-tooltip`);
-
-            const text_tooltip = tooltip
-                .append(`text`)
-                .attr("text-anchor", "middle")
-                .style("font-size", "1rem")
-                .style("font-weight", "bold")
-                .style("fill", "black")
-                .text(text);
-
-            const text_node = text_tooltip.node();
-            if (text_node) {
-                const text_box = text_node.getBBox();
-                const rect_margin = { top: 3, left: 10, bottom: 2, right: 10 };
-                const rect_width = text_box.width + rect_margin.left + rect_margin.right;
-                const rect_height = text_box.height + rect_margin.top + rect_margin.bottom;
-
-                tooltip.insert(`rect`, ":first-child")
-                    .attr("x", -rect_width / 2)
-                    .attr("y", -rect_height / 2 - rect_margin.top - rect_margin.bottom)
-                    .attr("width", d => rect_width)
-                    .attr("height", d => rect_height)
-                    .style("backdrop-filter", "blur(10px)")
-                    .style('fill', 'rgba(2, 255, 209, 1)');
-
-                const clamp_x = Math.max(text_box.width / 2, Math.min(this.chart.width - text_box.width / 2, x));
-                const clamp_y = Math.max(text_box.height / 2, Math.min(this.chart.height - text_box.height / 2, y));
-                tooltip.attr("transform", `translate(${clamp_x}, ${clamp_y})`);
-            }
-        }
 
         // Avg line
         this.chart.node
@@ -173,15 +179,48 @@ export class DashboardHashRate {
             .attr("x2", "100%")
             .attr("y1", y_scale(avg_y))
             .attr("y2", y_scale(avg_y))
-            .attr("stroke", "#2CFFCF")
-            .attr("stroke-width", 3)
-            .attr("opacity", "1")
+            .attr("stroke", chart_colors.mint_soft)
+            .attr("stroke-width", 2)
+            .attr("opacity", ".9")
             .attr("stroke-dasharray", "6 4");
 
-        // TODO: use block version for format_hashrate
-        add_tooltip("avg", `AVG ${format_hashrate(avg_y, min_data.x)}`, this.chart.width / 2, y_scale(avg_y));
-        add_tooltip("min", `MIN ${format_hashrate(min_data.y, min_data.x)}`, x_scale(min_data.x), y_scale(min_data.y));
-        add_tooltip("max", `MAX ${format_hashrate(max_data.y, max_data.x)}`, x_scale(max_data.x), y_scale(max_data.y));
+        const bisect = d3.bisector<DataPoint, number>(d => d.x).center;
+
+        this.chart.node
+            .selectAll<SVGRectElement, null>(".hover-layer")
+            .data([null])
+            .join("rect")
+            .attr("class", "hover-layer")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", this.chart.width)
+            .attr("height", this.chart.height)
+            .attr("fill", "transparent")
+            .style("cursor", "crosshair")
+            .on("pointermove", (event) => {
+                if (!this.chart || !this.info) return;
+
+                const [mouse_x] = d3.pointer(event, this.chart.node.node());
+                const x_value = x_scale.invert(mouse_x);
+                const index = Math.max(0, Math.min(data.length - 1, bisect(data, x_value)));
+                const point = data[index];
+                const x = x_scale(point.x);
+                const y = y_scale(point.y);
+                const version = point.version ?? this.info.block_version;
+
+                show_svg_chart_tooltip(
+                    this.chart.node,
+                    this.chart.width,
+                    this.chart.height,
+                    x,
+                    y,
+                    [`HEIGHT ${point.x.toLocaleString()}`, format_hashrate(point.y, version)],
+                    chart_colors.gold,
+                );
+            })
+            .on("pointerleave", () => {
+                if (this.chart) hide_svg_chart_tooltip(this.chart.node);
+            });
     }
 
     set(info: GetInfoResult, blocks: Block[]) {
@@ -192,18 +231,18 @@ export class DashboardHashRate {
         this.update_chart();
     }
 
-    on_resize() {
+    on_resize = () => {
         this.create_chart();
         this.update_chart();
     }
 
     load() {
-        window.addEventListener(`resize`, () => this.on_resize());
+        window.addEventListener(`resize`, this.on_resize);
         this.on_resize();
     }
 
     unload() {
-        window.removeEventListener(`resize`, () => this.on_resize());
+        window.removeEventListener(`resize`, this.on_resize);
         if (this.chart) this.chart.node.remove();
     }
 }

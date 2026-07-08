@@ -9,8 +9,8 @@
 }
 
 .xe-known-accounts-table>:first-child {
-    font-size: 1.3rem;
-    color: #02FFCF;
+    font-size: 1.4rem;
+    color: var(--xe-accent);
 }
 
 @keyframes xe-known-accounts-table-appear-animation {

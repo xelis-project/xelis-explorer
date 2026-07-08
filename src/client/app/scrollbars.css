@@ -6,43 +6,43 @@
 
 /* Style the track (the background of the scrollbar) */
 .scrollbar-1::-webkit-scrollbar-track {
-    background: rgba(2, 255, 209, 0.1);
+    background: rgba(2, 255, 207, 0.08);
 }
 
 /* Style the thumb (the draggable part of the scrollbar) */
 .scrollbar-1::-webkit-scrollbar-thumb {
-    background: rgba(2, 255, 209, .5);
+    background: rgba(2, 255, 207, .45);
 }
 
 /* Style the thumb on hover */
 .scrollbar-1::-webkit-scrollbar-thumb:hover {
-    background-color: #02FFCF;
+    background-color: var(--xe-accent);
 }
 
 .scrollbar-1-right::-webkit-scrollbar-track {
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-top-right-radius: var(--xe-radius);
+    border-bottom-right-radius: var(--xe-radius);
 }
 
 .scrollbar-1-right::-webkit-scrollbar-thumb {
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-top-right-radius: var(--xe-radius);
+    border-bottom-right-radius: var(--xe-radius);
 }
 
 .scrollbar-1-bottom::-webkit-scrollbar-track {
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-bottom-left-radius: var(--xe-radius);
+    border-bottom-right-radius: var(--xe-radius);
 }
 
 .scrollbar-1-bottom::-webkit-scrollbar-thumb {
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-bottom-left-radius: var(--xe-radius);
+    border-bottom-right-radius: var(--xe-radius);
 }
 
 .scrollbar-1-rounded::-webkit-scrollbar-thumb {
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
 }
 
 .scrollbar-1-rounded::-webkit-scrollbar-track {
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
 }

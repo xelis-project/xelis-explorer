@@ -30,13 +30,13 @@
     display: flex;
     gap: .25rem;
     flex-direction: column;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     flex: 1;
 }
 
 .xe-transaction-extra-container-1>div>:nth-child(1) {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }
 
 .xe-transaction-extra-container-2 {
@@ -54,6 +54,6 @@
 }
 
 .xe-transaction-extra-container-2>div>:nth-child(1) {
-    color: #afafaf;
-    font-size: .9rem;
+    color: var(--xe-muted);
+    font-size: 1.5rem;
 }

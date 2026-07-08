@@ -4,6 +4,7 @@ import { Master } from "../../components/master/master";
 import { localization } from "../../localization/localization";
 import { ServerApp } from "../../../server";
 import { Context } from "hono";
+import { svg_xelis_logo } from "../../assets/svg/xelis";
 
 import './not_found.css';
 
@@ -33,9 +34,10 @@ export class NotFoundPage extends Page {
         container.classList.add(`xe-not-found-container`);
         this.master.content.appendChild(container);
 
-        const xelis_mascot = document.createElement(`img`);
-        xelis_mascot.src = `/images/xelite_confused.png`;
-        container.appendChild(xelis_mascot);
+        const signal_mark = document.createElement(`div`);
+        signal_mark.classList.add(`xe-not-found-signal`);
+        signal_mark.innerHTML = svg_xelis_logo();
+        container.appendChild(signal_mark);
 
         const sub_container = document.createElement(`div`);
         container.appendChild(sub_container);

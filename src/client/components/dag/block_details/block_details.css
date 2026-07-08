@@ -2,21 +2,22 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
-    background: #151515;
+    z-index: 4;
+    background: rgba(6, 12, 15, 0.9);
     width: 15rem;
     height: 15rem;
-    border-radius: .5rem;
+    border-radius: var(--xe-radius);
     padding: 1rem;
-    font-size: .8rem;
+    font-size: 1.4rem;
     display: flex;
     gap: .5rem;
     flex-direction: column;
     overflow: auto;
     opacity: 0;
     visibility: hidden;
-    box-shadow: 0 0 40px 10px #0f0f0f;
-    border: thin solid #0a967c26;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.36), 0 0 24px rgba(2, 255, 207, 0.12);
+    border: 1px solid var(--xe-border-soft);
+    backdrop-filter: blur(10px);
 }
 
 .xe-dag-block-details>div {

@@ -73,7 +73,7 @@ export class ContractAssets {
             empty_element.innerHTML = `
                 ${icons.empty_box()}
                 <div>${localization.get_text(`No balance for this contract`)}</div>
-                <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no balance yet`)}</div>
+                <div style="font-size: 1.3rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no balance yet`)}</div>
             `;
             this.list_element.appendChild(empty_element);
         } else {

@@ -14,7 +14,7 @@
     font-weight: bold;
     transition: translate .25s;
     translate: 100% 0 0;
-    border-radius: 1rem;
+    border-radius: var(--xe-radius);
     display: flex;
     gap: .5rem;
     flex-direction: row;
@@ -28,24 +28,24 @@
 
 .xe-notification-item.error {
     box-shadow: 0 0 100px rgba(255, 2, 44, 0.3);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(6, 12, 15, 0.82);
     backdrop-filter: blur(10px);
     border: .15rem solid rgba(255, 2, 57, 0.5);
-    color: white;
+    color: var(--xe-white);
 }
 
 .xe-notification-item.success {
-    box-shadow: 0 0 100px rgba(2, 255, 209, 0.3);
-    background: rgba(0, 0, 0, 0.5);
+    box-shadow: var(--xe-glow);
+    background: rgba(6, 12, 15, 0.82);
     backdrop-filter: blur(10px);
-    border: .15rem solid rgba(2, 255, 209, 0.5);
-    color: white;
+    border: .15rem solid rgba(2, 255, 207, 0.5);
+    color: var(--xe-white);
 }
 
 .xe-notification-close {
     border: none;
     background: none;
-    color: white;
+    color: var(--xe-white);
     cursor: pointer;
     transition: translate .25s, opacity .25s;
     opacity: .5;

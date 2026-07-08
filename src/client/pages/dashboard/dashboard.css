@@ -1,4 +1,7 @@
-.xe-dashboard {}
+.xe-dashboard {
+    --xe-dashboard-dag-view-height: clamp(26rem, 24vw, 34rem);
+    --xe-dashboard-dag-panel-height: calc(var(--xe-dashboard-dag-view-height) + 6rem);
+}
 
 .xe-dashboard-container {}
 
@@ -6,6 +9,7 @@
     display: flex;
     gap: 1rem;
     flex-direction: row;
+    align-items: stretch;
 }
 
 @media screen and (max-width: 900px) {
@@ -19,6 +23,7 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
 }
 
 .xe-dashboard-container-1>:nth-child(2) {
@@ -26,4 +31,5 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
 }

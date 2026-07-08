@@ -33,11 +33,6 @@ export class NextUpgrade {
 
 		this.countdown = new Countdown();
 		this.container.element.appendChild(this.countdown.element);
-
-		const img = document.createElement(`img`);
-		img.classList.add(`xe-next-upgrade-img`);
-		img.src = `/images/xelis_mainframe.jpg`;
-		this.container.element.appendChild(img);
 	}
 
 	set(hard_fork: HardFork, top_block: Block) {

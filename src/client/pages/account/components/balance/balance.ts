@@ -15,10 +15,6 @@ export class AccountBalance {
         bg.classList.add(`xe-account-balance-bg`);
         this.container.element.appendChild(bg);
 
-        const mascot = document.createElement(`img`);
-        mascot.src = `/images/xelite_content.png`;
-        bg.appendChild(mascot);
-
         const icon = document.createElement(`div`);
         icon.innerHTML = icons.question_mark_shield();
         bg.appendChild(icon);

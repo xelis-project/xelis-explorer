@@ -30,6 +30,9 @@ export class PeersPage extends Page {
     peers_search: PeersSearch;
     peers_list: PeersList;
     peer_count: number;
+    left_column: HTMLDivElement;
+    right_column: HTMLDivElement;
+    column_resize_observer?: ResizeObserver;
 
     constructor() {
         super();
@@ -42,26 +45,59 @@ export class PeersPage extends Page {
         container_1.classList.add(`xe-peers-container-1`);
         this.master.content.appendChild(container_1);
 
-        const sub_container_1 = document.createElement(`div`);
-        container_1.appendChild(sub_container_1);
+        this.left_column = document.createElement(`div`);
+        this.left_column.classList.add(`xe-peers-main-column`);
+        container_1.appendChild(this.left_column);
 
         this.peers_map = new PeersMap();
-        sub_container_1.appendChild(this.peers_map.container.element);
+        this.left_column.appendChild(this.peers_map.container.element);
 
         this.peers_chart = new PeersChart();
-        sub_container_1.appendChild(this.peers_chart.container.element);
+        this.left_column.appendChild(this.peers_chart.container.element);
 
-        const sub_container_2 = document.createElement(`div`);
-        container_1.appendChild(sub_container_2);
+        this.right_column = document.createElement(`div`);
+        this.right_column.classList.add(`xe-peers-side-column`);
+        container_1.appendChild(this.right_column);
 
         this.peers_info = new PeersInfo();
-        sub_container_2.appendChild(this.peers_info.container.element);
+        this.right_column.appendChild(this.peers_info.container.element);
 
         this.peers_search = new PeersSearch();
-        sub_container_2.appendChild(this.peers_search.container.element);
+        this.right_column.appendChild(this.peers_search.container.element);
 
         this.peers_list = new PeersList();
-        sub_container_2.appendChild(this.peers_list.container.element);
+        this.right_column.appendChild(this.peers_list.container.element);
+    }
+
+    sync_column_heights = () => {
+        const is_mobile_layout = window.matchMedia(`(max-width: 900px)`).matches;
+        if (is_mobile_layout) {
+            this.right_column.style.height = ``;
+            this.right_column.style.maxHeight = ``;
+            return;
+        }
+
+        const left_height = this.left_column.getBoundingClientRect().height;
+        if (left_height <= 0) return;
+
+        this.right_column.style.height = `${left_height}px`;
+        this.right_column.style.maxHeight = `${left_height}px`;
+    }
+
+    start_column_height_sync() {
+        this.stop_column_height_sync();
+        this.column_resize_observer = new ResizeObserver(this.sync_column_heights);
+        this.column_resize_observer.observe(this.left_column);
+        window.addEventListener(`resize`, this.sync_column_heights);
+        this.sync_column_heights();
+    }
+
+    stop_column_height_sync() {
+        this.column_resize_observer?.disconnect();
+        this.column_resize_observer = undefined;
+        window.removeEventListener(`resize`, this.sync_column_heights);
+        this.right_column.style.height = ``;
+        this.right_column.style.maxHeight = ``;
     }
 
     // we use interval updated instead of websocket peer state change events otherwise it's too much
@@ -121,6 +157,7 @@ export class PeersPage extends Page {
         this.peers_chart.nodes_by_height.load();
         this.peers_chart.nodes_by_country.load();
         this.peers_chart.nodes_by_version.load();
+        this.start_column_height_sync();
 
         const node = XelisNode.instance();
 
@@ -146,12 +183,14 @@ export class PeersPage extends Page {
         this.peers_chart.nodes_by_version.set(peers);
         this.peers_chart.nodes_by_height.set(peers);
         this.peers_chart.nodes_by_country.set(peers_locations);
+        this.sync_column_heights();
 
         this.update_interval_5000_id = window.setInterval(this.update_interval_5000, 5000);
     }
 
     unload() {
         super.unload();
+        this.stop_column_height_sync();
         this.peers_chart.nodes_by_height.unload();
         this.peers_chart.nodes_by_country.unload();
         this.peers_chart.nodes_by_version.unload();

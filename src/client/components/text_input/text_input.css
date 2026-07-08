@@ -1,16 +1,22 @@
 .xe-text-input {
-    background-color: rgba(0, 0, 0, .2);
-    color: #afafaf;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--xe-white);
     padding: 1rem;
     width: 100%;
     box-sizing: border-box;
-    border: none;
-    border-radius: 1rem;
-    font-size: .9rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--xe-radius);
+    font-size: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.xe-text-input::placeholder {
+    color: rgba(155, 179, 178, 0.72);
 }
 
 .xe-text-input:focus {
-    outline: .2rem solid #2CFFCF !important;
+    outline: .2rem solid rgba(2, 255, 207, 0.42) !important;
+    border-color: var(--xe-border-strong);
 }
 
 .xe-text-input:-webkit-autofill,
@@ -21,5 +27,5 @@
     -webkit-text-fill-color: #ffffff;
     caret-color: white;
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, .2);
+    box-shadow: inset 0 0 20px 20px rgba(6, 12, 15, .72);
 }
