@@ -410,11 +410,17 @@ export class DAG {
         this.block_details.hide();
         this.set_live(false); // clear listener and set live flag to false
         this.stop_animation_loop();
+        window.clearTimeout(this.load_timeout);
         this.dispose_objects();
         this.target_height_line.remove();
         this.stable_height_line.remove();
         this.height_control.clear_listeners();
         window.removeEventListener('resize', this.on_resize);
+        this.element.removeEventListener(`pointermove`, this.on_pointer_move);
+        this.element.removeEventListener(`click`, this.on_click);
+        this.controls.dispose();
+        this.renderer.dispose();
+        this.renderer.domElement.remove();
     }
 
     listen_node_events() {
