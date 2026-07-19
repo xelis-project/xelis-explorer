@@ -94,9 +94,6 @@ export class DashboardHashRate {
             .y1(d => y_scale(d.y))
             .curve(d3.curveMonotoneX);
 
-        const avg_y = d3.mean(data, d => d.y) as number;
-
-
         this.chart.node.selectAll(".grad-defs").remove();
 
         const defs = this.chart.node
@@ -168,21 +165,6 @@ export class DashboardHashRate {
             .style("stroke-width", 4)
             .attr("stroke", `url(#xe-hashrate-line-grad)`)
             .attr('d', (d) => line(d));
-
-        // Avg line
-        this.chart.node
-            .selectAll(".avg-line")
-            .data([avg_y])
-            .join("line")
-            .attr("class", "avg-line")
-            .attr("x1", 0)
-            .attr("x2", "100%")
-            .attr("y1", y_scale(avg_y))
-            .attr("y2", y_scale(avg_y))
-            .attr("stroke", chart_colors.mint_soft)
-            .attr("stroke-width", 2)
-            .attr("opacity", ".9")
-            .attr("stroke-dasharray", "6 4");
 
         const bisect = d3.bisector<DataPoint, number>(d => d.x).center;
 
