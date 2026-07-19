@@ -27,6 +27,7 @@ export default {
     "TRANSACTIONS": "TRANSACTIONS",
     "ACCOUNTS": "ACCOUNTS",
     "CONTRACTS": "CONTRACTS",
+    "REGISTRY": "REGISTRY",
     "MEMPOOL": "MEMPOOL",
     "DAG": "DAG",
     "PEERS": "PEERS",

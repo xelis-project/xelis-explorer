@@ -27,6 +27,7 @@ export default {
     "TRANSACTIONS": "TRANSAKSI",
     "ACCOUNTS": "AKUN",
     "CONTRACTS": "KONTRAK",
+    "REGISTRY": "REGISTRI",
     "MEMPOOL": "MEMPOOL",
     "DAG": "DAG",
     "PEERS": "PEERS",
