@@ -62,7 +62,7 @@ export class ContractsPage extends Page {
         this.pagination = new Pagination();
         this.pagination.current_page = 1;
         this.pagination.sibling_count = 2;
-        this.pagination.page_size = 6;
+        this.pagination.page_size = 20;
 
         this.pagination.add_listener(`page_change`, (page) => {
             this.load_contracts();
