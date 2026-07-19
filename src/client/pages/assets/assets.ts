@@ -13,6 +13,8 @@ import { Pagination } from "../../components/pagination/pagination";
 
 import './assets.css';
 
+const default_assets_page_size = 20;
+
 export class AssetsPage extends Page {
     static pathname = "/assets";
 
@@ -64,7 +66,7 @@ export class AssetsPage extends Page {
         this.pagination = new Pagination();
         this.pagination.current_page = 1;
         this.pagination.sibling_count = 2;
-        this.pagination.page_size = 6;
+        this.pagination.page_size = default_assets_page_size;
 
         this.pagination.add_listener(`page_change`, (page) => {
             this.load_assets();

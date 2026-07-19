@@ -62,7 +62,6 @@ export class ContractAssets {
             contract: contract_hash
         });
 
-        // todo 20 assets limit
         const balances = await fetch_contract_balances(contract_hash, assets);
 
         this.list_element.replaceChildren();

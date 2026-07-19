@@ -9,19 +9,18 @@ export interface ContractInfo {
     block: Block;
 }
 
+const contract_balances_request_size = 20;
+
 export const fetch_contract_balances = async (contract: string, assets: string[]) => {
     const node = XelisNode.instance();
 
-    if (assets.length > 20) {
-        throw "limit of 20 contracts";
-    }
-
     const balances = [] as GetContractBalanceResult[];
 
-    {
+    for (let i = 0; i < assets.length; i += contract_balances_request_size) {
+        const assets_chunk = assets.slice(i, i + contract_balances_request_size);
         const requests = [] as RPCRequest[];
 
-        assets.forEach((asset) => {
+        assets_chunk.forEach((asset) => {
             requests.push({
                 method: DaemonRPCMethod.GetContractBalance,
                 params: {
@@ -32,15 +31,14 @@ export const fetch_contract_balances = async (contract: string, assets: string[]
         });
 
         const res = await node.rpc.batchRequest(requests);
-        res.forEach((result, i) => {
+        res.forEach((result, j) => {
             if (result instanceof Error) {
                 throw result;
             }
 
-            balances[i] = result as GetContractBalanceResult;
+            balances[i + j] = result as GetContractBalanceResult;
         });
     }
-
 
     return balances;
 }

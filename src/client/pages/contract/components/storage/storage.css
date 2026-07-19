@@ -88,7 +88,7 @@
 /* Storage Item */
 .xe-contract-storage-item {
     display: grid;
-    grid-template-columns: 150px 1fr auto;
+    grid-template-columns: 220px 1fr auto;
     gap: 0.75rem;
     align-items: center;
     transition: all 0.2s ease;
@@ -111,7 +111,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.2s;
     width: 100%;
-    max-width: 150px;
+    max-width: 220px;
     box-sizing: border-box;
 }
 

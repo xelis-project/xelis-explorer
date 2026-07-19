@@ -1,25 +1,42 @@
 .xe-contract {
-    display: flex;
+    display: grid;
     gap: 1rem;
-    flex-direction: row;
+    grid-template-columns: minmax(0, 1.5fr) minmax(24rem, 1fr);
+    align-items: stretch;
 }
 
-.xe-contract>:nth-child(1) {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-    flex: 1;
+.xe-contract-info {
+    grid-column: 1;
+    grid-row: 1;
+    max-height: 60vh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
-.xe-contract>:nth-child(2) {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-    flex: 1.5;
+.xe-contract-assets {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    max-height: 60vh;
+    min-height: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.xe-contract-storage {
+    grid-column: 1 / -1;
+    grid-row: 2;
 }
 
 @media (max-width: 900px) {
     .xe-contract {
+        display: flex;
         flex-direction: column;
+    }
+
+    .xe-contract-assets {
+        align-self: auto;
     }
 }

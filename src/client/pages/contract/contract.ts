@@ -76,20 +76,14 @@ export class ContractPage extends Page {
         this.master.content.classList.add(`xe-contract`);
         this.element.appendChild(this.master.element);
 
-        const sub_container_1 = document.createElement(`div`);
-        this.master.content.appendChild(sub_container_1);
-
         this.contract_info = new ContractInfo();
-        sub_container_1.appendChild(this.contract_info.container.element);
-
-        const sub_container_2 = document.createElement(`div`);
-        this.master.content.appendChild(sub_container_2);
+        this.master.content.appendChild(this.contract_info.container.element);
 
         this.contract_assets = new ContractAssets();
-        sub_container_2.appendChild(this.contract_assets.container.element);
+        this.master.content.appendChild(this.contract_assets.container.element);
 
         this.contract_storage_entries = new ContractStorageEntries();
-        sub_container_2.appendChild(this.contract_storage_entries.container.element);
+        this.master.content.appendChild(this.contract_storage_entries.container.element);
     }
 
     async load_contract() {
