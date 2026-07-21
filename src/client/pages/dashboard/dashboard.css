@@ -1,6 +1,7 @@
 .xe-dashboard {
     --xe-dashboard-dag-view-height: clamp(26rem, 24vw, 34rem);
     --xe-dashboard-dag-panel-height: calc(var(--xe-dashboard-dag-view-height) + 6rem);
+    --xe-dashboard-side-panel-height: 80rem;
 }
 
 .xe-dashboard-container-1 {
@@ -33,6 +34,16 @@
 }
 
 .xe-dashboard-container-1>:nth-child(2)>:is(.xe-dashboard-blocks, .xe-dashboard-txs) {
-    flex: 1 1 0;
     min-height: 0;
+    overflow: hidden;
+}
+
+.xe-dashboard-container-1>:nth-child(2)>.xe-dashboard-blocks {
+    flex: 0 0 var(--xe-dashboard-side-panel-height);
+    max-height: var(--xe-dashboard-side-panel-height);
+}
+
+.xe-dashboard-container-1>:nth-child(2)>.xe-dashboard-txs {
+    flex: 1 1 var(--xe-dashboard-side-panel-height);
+    min-height: var(--xe-dashboard-side-panel-height);
 }

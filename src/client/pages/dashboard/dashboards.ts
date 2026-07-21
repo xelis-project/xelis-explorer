@@ -295,8 +295,8 @@ export class DashboardPage extends Page {
         this.page_data.blocks = blocks;
         this.dashboard_chart_section_1.blocks_txs.set(blocks);
         this.dashboard_chart_section_2.hashrate.set(info, blocks);
-        this.dashboard_chart_section_2.block_time.set(info, blocks);
         this.dashboard_chart_section_2.pools.set(blocks);
+        this.dashboard_chart_section_2.block_time.set(info, blocks);
         this.dashboard_blocks.set(blocks);
     }
 

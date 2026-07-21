@@ -23,10 +23,11 @@
     display: flex;
     gap: 1rem;
     flex-direction: row;
+    align-items: stretch;
     min-height: 10rem;
 }
 
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 900px) {
     .xe-dashboard-chart-section-2>:nth-child(2) {
         flex-direction: column;
     }
@@ -34,4 +35,14 @@
 
 .xe-dashboard-chart-section-2>:nth-child(2)>div {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.xe-dashboard-chart-section-2>:nth-child(2)>div>.xe-box-chart-content {
+    flex: 1;
+    min-height: 22rem;
 }

@@ -14,9 +14,14 @@ export class DashboardPools {
     box_chart: BoxChart;
     miners: Record<string, number>;
     chart?: {
+        svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
         node: d3.Selection<SVGGElement, unknown, null, undefined>;
         width: number;
         height: number;
+        origin_x: number;
+        origin_y: number;
+        radius: number;
+        legend_below: boolean;
     }
 
     constructor() {
@@ -33,24 +38,30 @@ export class DashboardPools {
         this.box_chart.element_content.replaceChildren();
 
         const rect = this.box_chart.element_content.getBoundingClientRect();
-        const width = 400 //rect.width;
-        const height = 200;
+        const width = Math.max(rect.width, 1);
+        const legend_below = width < 430;
+        const radius = legend_below ? Math.min(92, width / 3) : 100;
+        const height = legend_below ? radius * 2 + 16 : 200;
+        const origin_x = legend_below ? width / 2 : radius;
+        const origin_y = legend_below ? radius + 8 : height / 2;
 
-        const node = d3
+        const svg = d3
             .select(this.box_chart.element_content)
             .append('svg')
             .attr('width', `100%`)
-            .attr('height', height)
-            .append('g')
-            .attr('transform', `translate(100, ${height / 2})`);
+            .attr('height', height);
 
-        this.chart = { node, width, height };
+        const node = svg
+            .append('g')
+            .attr('transform', `translate(${origin_x}, ${origin_y})`);
+
+        this.chart = { svg, node, width, height, origin_x, origin_y, radius, legend_below };
     }
 
     update_chart() {
         if (!this.chart) return;
 
-        const radius = Math.min(this.chart.width, this.chart.height) / 2;
+        const radius = this.chart.radius;
         const donutInnerOffset = 25;
 
         let data = Object.keys(this.miners).map((miner, i) => {
@@ -86,7 +97,8 @@ export class DashboardPools {
             .merge(arcs as any)
             .attr('stroke', 'rgba(2, 7, 8, 0.72)')
             .attr('stroke-width', 2)
-            .style('cursor', 'crosshair');
+            .style('cursor', 'crosshair')
+            .style('touch-action', 'manipulation');
 
         arc_paths
             .transition()
@@ -95,38 +107,48 @@ export class DashboardPools {
             .attr('d', arc_generator);
 
         const total = d3.sum(data, d => d.value);
-        const tooltip_bounds = {
-            min_x: -this.chart.width / 2,
-            max_x: this.chart.width / 2,
-            min_y: -this.chart.height / 2,
-            max_y: this.chart.height / 2,
+        let tooltip_bounds = {
+            min_x: -this.chart.origin_x,
+            max_x: this.chart.width - this.chart.origin_x,
+            min_y: -this.chart.origin_y,
+            max_y: this.chart.height - this.chart.origin_y,
+        };
+
+        const show_tooltip = (event: PointerEvent, d: d3.PieArcDatum<DataItem>) => {
+            if (!this.chart) return;
+
+            const [x, y] = arc_generator.centroid(d);
+            const share = total > 0 ? (d.data.value / total) * 100 : 0;
+            const accent = color(d.data.label);
+
+            d3.select(event.currentTarget as SVGPathElement)
+                .attr("stroke", chart_colors.gold)
+                .attr("stroke-width", 3);
+
+            show_svg_chart_tooltip(
+                this.chart.node,
+                this.chart.width,
+                this.chart.height,
+                x,
+                y,
+                [d.data.label, `${d.data.value.toLocaleString()} blocks`, `${share.toFixed(1)}% share`],
+                accent,
+                false,
+                tooltip_bounds,
+            );
         };
 
         arc_paths
             .on("pointermove", (event, d) => {
-                if (!this.chart) return;
-
-                const [x, y] = arc_generator.centroid(d);
-                const share = total > 0 ? (d.data.value / total) * 100 : 0;
-                const accent = color(d.data.label);
-
-                d3.select(event.currentTarget as SVGPathElement)
-                    .attr("stroke", chart_colors.gold)
-                    .attr("stroke-width", 3);
-
-                show_svg_chart_tooltip(
-                    this.chart.node,
-                    this.chart.width,
-                    this.chart.height,
-                    x,
-                    y,
-                    [d.data.label, `${d.data.value.toLocaleString()} blocks`, `${share.toFixed(1)}% share`],
-                    accent,
-                    false,
-                    tooltip_bounds,
-                );
+                show_tooltip(event, d);
+            })
+            .on("pointerdown", (event, d) => {
+                event.preventDefault();
+                show_tooltip(event, d);
             })
             .on("pointerleave", (event) => {
+                if ((event as PointerEvent).pointerType === "touch") return;
+
                 d3.select(event.currentTarget as SVGPathElement)
                     .attr("stroke", "rgba(2, 7, 8, 0.72)")
                     .attr("stroke-width", 2);
@@ -140,6 +162,34 @@ export class DashboardPools {
             .selectAll(`.legend`)
             .remove();
 
+        const legend_rows = data.map((d) => `${d.label} (${d.value})`);
+        const estimated_legend_width = legend_rows.reduce((max, row) => {
+            return Math.max(max, legend_radius * 2 + 8 + (row.length * 7.5));
+        }, 0);
+        const show_legend = this.chart.legend_below
+            ? estimated_legend_width <= this.chart.width
+            : radius * 2 + 20 + estimated_legend_width <= this.chart.width;
+
+        if (!show_legend) {
+            this.chart.height = this.chart.legend_below ? radius * 2 + 16 : 200;
+            this.chart.svg.attr("height", this.chart.height);
+            tooltip_bounds = {
+                ...tooltip_bounds,
+                max_y: this.chart.height - this.chart.origin_y,
+            };
+            return;
+        }
+
+        if (this.chart.legend_below) {
+            const legend_height = data.length * (legend_radius + legend_spacing);
+            this.chart.height = radius * 2 + 52 + legend_height;
+            this.chart.svg.attr("height", this.chart.height);
+            tooltip_bounds = {
+                ...tooltip_bounds,
+                max_y: this.chart.height - this.chart.origin_y,
+            };
+        }
+
         const legend = this.chart.node
             .selectAll('.legend')
             .data(data)
@@ -147,10 +197,10 @@ export class DashboardPools {
             .append('g')
             .attr('class', 'legend')
             .attr('transform', (d, i) => {
-                var height = legend_radius + legend_spacing;
-                var offset = height * color.domain().length / 2;
-                var x = 120;
-                var y = (i * height) - offset;
+                const height = legend_radius + legend_spacing;
+                const offset = this.chart!.legend_below ? 0 : height * color.domain().length / 2;
+                const x = this.chart!.legend_below ? 0 : radius + 20;
+                const y = this.chart!.legend_below ? radius + 36 + (i * height) : (i * height) - offset;
                 return `translate(${x}, ${y})`;
             });
 
@@ -167,6 +217,18 @@ export class DashboardPools {
             .style("font-family", "var(--xe-font-body)")
             .style("font-size", "1.3rem")
             .text((d) => `${d.label} (${d.value})`);
+
+        if (this.chart.legend_below) {
+            legend.each(function () {
+                const row = d3.select(this);
+                const text = row.select("text");
+                const text_width = (text.node() as SVGTextElement | null)?.getBBox().width || 0;
+                const row_width = legend_radius * 2 + 8 + text_width;
+                row.select("circle")
+                    .attr("cx", -row_width / 2 + legend_radius);
+                text.attr("x", -row_width / 2 + (legend_radius * 2) + 8);
+            });
+        }
     }
 
     set(blocks: Block[]) {

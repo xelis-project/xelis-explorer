@@ -12,6 +12,9 @@ interface DataPoint {
 
 export class DashboardBlockTime {
     box_chart: BoxChart;
+    resize_observer?: ResizeObserver;
+    last_content_width = 0;
+    last_content_height = 0;
     chart?: {
         node: d3.Selection<SVGGElement, unknown, null, undefined>;
         width: number;
@@ -35,13 +38,16 @@ export class DashboardBlockTime {
 
         const margin = { top: 10, right: 0, bottom: 10, left: 30 };
         const rect = this.box_chart.element_content.getBoundingClientRect();
-        const width = rect.width - margin.left - margin.right;
-        const height = 220 - margin.top - margin.bottom;
+        const width = Math.max(rect.width - margin.left - margin.right, 1);
+        const content_height = Math.max(rect.height, 220);
+        const height = content_height - margin.top - margin.bottom;
+        this.last_content_width = Math.round(rect.width);
+        this.last_content_height = Math.round(rect.height);
 
         const node = d3
             .select(this.box_chart.element_content)
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
+            .attr("width", `100%`)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -171,6 +177,7 @@ export class DashboardBlockTime {
         this.info = info;
         this.blocks = blocks;
         this.set_avg_time(info.average_block_time);
+        this.create_chart();
         this.update_chart();
     }
 
@@ -181,11 +188,23 @@ export class DashboardBlockTime {
 
     load() {
         window.addEventListener(`resize`, this.on_resize);
+        this.resize_observer = new ResizeObserver((entries) => {
+            const rect = entries[0]?.contentRect;
+            if (!rect) return;
+
+            const width = Math.round(rect.width);
+            const height = Math.round(rect.height);
+            if (width === this.last_content_width && height === this.last_content_height) return;
+
+            this.on_resize();
+        });
+        this.resize_observer.observe(this.box_chart.element_content);
         this.on_resize();
     }
 
     unload() {
         window.removeEventListener(`resize`, this.on_resize);
+        this.resize_observer?.disconnect();
         if (this.chart) this.chart.node.remove();
     }
 }
