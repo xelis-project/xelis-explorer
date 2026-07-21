@@ -3,6 +3,7 @@ import { Container } from '../../../../components/container/container';
 import { BlockItem } from '../../../../components/block_item/block_item';
 import { Box } from '../../../../components/box/box';
 import { localization } from '../../../../localization/localization';
+import { update_scrollbar_padding } from '../../../../utils/update_scrollbar_padding';
 
 import './in_blocks.css';
 
@@ -14,6 +15,7 @@ export class TransactionInBlocks {
 
     block_items: BlockItem[];
     blocks_element: HTMLDivElement;
+    remove_scrollbar_padding_listener: () => void;
 
     constructor() {
         this.block_items = [];
@@ -31,7 +33,10 @@ export class TransactionInBlocks {
         container_1.appendChild(this.legend_element);
 
         this.blocks_element = document.createElement(`div`);
+        this.blocks_element.classList.add(`scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.blocks_element);
+
+        this.remove_scrollbar_padding_listener = update_scrollbar_padding(this.blocks_element);
     }
 
     set_loading(loading: boolean) {

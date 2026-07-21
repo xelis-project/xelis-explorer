@@ -1,9 +1,12 @@
-.xe-transaction {}
+.xe-transaction {
+    --xe-transaction-inner-max-height: calc(100vh - 13rem);
+}
 
 .xe-transaction-container-1 {
     display: flex;
     gap: 1rem;
     flex-direction: row;
+    align-items: stretch;
 }
 
 @media screen and (max-width: 900px) {
@@ -17,6 +20,9 @@
     gap: 1rem;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 .xe-transaction-sub-container-2 {
@@ -24,7 +30,16 @@
     gap: 1rem;
     flex-direction: column;
     flex: 1;
+    max-height: var(--xe-transaction-inner-max-height);
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
     animation: xe-transaction-sub-container-2-appear-animation .65s;
+}
+
+.xe-transaction-sub-container-2>:only-child {
+    flex: 0 1 auto;
+    min-height: 0;
 }
 
 @keyframes xe-transaction-sub-container-2-appear-animation {

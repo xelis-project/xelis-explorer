@@ -2,13 +2,17 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    max-height: 40rem;
-    overflow: auto;
-    height: 100%;
+    max-height: var(--xe-transaction-inner-max-height);
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .xe-transaction-transfers>:nth-child(2) {
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: auto;
 }

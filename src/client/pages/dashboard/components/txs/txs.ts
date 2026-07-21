@@ -2,6 +2,7 @@ import { localization } from '../../../../localization/localization';
 import icons from '../../../../assets/svg/icons';
 import { Container } from '../../../../components/container/container';
 import { TxBlock, TxItem } from '../../../../components/tx_item/tx_item';
+import { update_scrollbar_padding } from '../../../../utils/update_scrollbar_padding';
 
 import './txs.css';
 
@@ -12,6 +13,7 @@ export class DashboardTxs {
     element_title: HTMLDivElement;
     element_content: HTMLDivElement;
     empty_element: HTMLDivElement;
+    remove_scrollbar_padding_listener: () => void;
 
     constructor() {
         this.container = new Container();
@@ -26,6 +28,8 @@ export class DashboardTxs {
         this.element_content = document.createElement(`div`);
         this.element_content.classList.add(`xe-dashboard-txs-list`, `scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.element_content);
+
+        this.remove_scrollbar_padding_listener = update_scrollbar_padding(this.element_content);
 
         this.empty_element = document.createElement(`div`);
         this.empty_element.classList.add(`xe-dashboard-txs-list-empty`);

@@ -2,6 +2,9 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
     animation: xe-transaction-in-blocks-appear-animation .65s;
 }
 
@@ -28,6 +31,11 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    max-height: calc((7.4rem * 5) + (1rem * 4));
+    min-height: 0;
+    flex: 0 0 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .xe-transaction-in-blocks-legend {

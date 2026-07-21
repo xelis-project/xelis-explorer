@@ -2,6 +2,7 @@ import { Block } from "@xelis/sdk/daemon/types";
 import { Container } from "../../../../components/container/container";
 import { BlockItem } from "../../../../components/block_item/block_item";
 import { localization } from "../../../../localization/localization";
+import { update_scrollbar_padding } from "../../../../utils/update_scrollbar_padding";
 
 import "./blocks.css";
 
@@ -11,6 +12,7 @@ export class DashboardBlocks {
 
     element_title: HTMLDivElement;
     element_content: HTMLDivElement;
+    remove_scrollbar_padding_listener: () => void;
 
     constructor() {
         this.container = new Container();
@@ -25,6 +27,8 @@ export class DashboardBlocks {
         this.element_content = document.createElement(`div`);
         this.element_content.classList.add(`xe-dashboard-blocks-list`, `scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.element_content);
+
+        this.remove_scrollbar_padding_listener = update_scrollbar_padding(this.element_content);
     }
 
     set(blocks: Block[]) {

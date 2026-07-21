@@ -63,8 +63,8 @@ export class TransactionTransferItem {
         const asset = assets[asset_hash];
 
         this.asset_element.innerHTML = `
-            <div>${format_hash(asset_hash)}${asset ? ` (${asset.ticker})` : ``}</div>
             <div>ASSET</div>
+            <div>${format_hash(asset_hash)}${asset ? ` (${asset.ticker})` : ``}</div>
         `;
     }
 
@@ -72,8 +72,8 @@ export class TransactionTransferItem {
         const extra_data_size = (extra_data || []).length;
         const hex_extra_data = (extra_data || []).map((v) => (v as number).toString(16)).join(``);
         this.extra_data.innerHTML = `
-            <div>${extra_data ? `(${prettyBytes(extra_data_size)}) ${hex_extra_data.slice(0, 20)}...` : `--`}</div>
             <div>EXTRA DATA</div>
+            <div>${extra_data ? `(${prettyBytes(extra_data_size)}) ${hex_extra_data.slice(0, 20)}...` : `--`}</div>
         `;
     }
 

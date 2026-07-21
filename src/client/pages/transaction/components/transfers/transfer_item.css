@@ -2,6 +2,7 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-width: 0;
 }
 
 .xe-transaction-transfer-item>:nth-child(1) {
@@ -9,6 +10,7 @@
     gap: 1rem;
     flex-direction: row;
     justify-content: space-between;
+    min-width: 0;
 }
 
 .xe-transaction-transfer-item>:nth-child(2) {
@@ -16,6 +18,7 @@
     gap: 1rem;
     flex-direction: row;
     justify-content: space-between;
+    min-width: 0;
 }
 
 .xe-transaction-transfer-item-recipient {
@@ -23,6 +26,14 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
+    min-width: 0;
+}
+
+.xe-transaction-transfer-item-recipient>div {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .xe-transaction-transfer-item-asset {
@@ -30,9 +41,10 @@
     gap: .25rem;
     flex-direction: column;
     text-align: right;
+    min-width: 0;
 }
 
-.xe-transaction-transfer-item-asset>:nth-child(2) {
+.xe-transaction-transfer-item-asset>:nth-child(1) {
     color: var(--xe-muted);
     font-size: 1.5rem;
 }
@@ -42,6 +54,8 @@
     gap: .25rem;
     flex-direction: column;
     text-align: right;
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .xe-transaction-transfer-item-commitment>:nth-child(1) {
@@ -53,9 +67,20 @@
     display: flex;
     gap: .25rem;
     flex-direction: column;
+    min-width: 0;
+    flex: 1 1 0;
 }
 
-.xe-transaction-transfer-item-extra-data>:nth-child(2) {
+.xe-transaction-transfer-item-extra-data>:nth-child(1) {
     color: var(--xe-muted);
     font-size: 1.5rem;
+}
+
+.xe-transaction-transfer-item-asset>:nth-child(2),
+.xe-transaction-transfer-item-extra-data>:nth-child(2),
+.xe-transaction-transfer-item-commitment>:nth-child(2) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
