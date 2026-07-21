@@ -22,7 +22,7 @@
     flex: 1;
     min-height: 0;
     box-sizing: border-box;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .xe-transaction-sub-container-2 {
