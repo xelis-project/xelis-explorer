@@ -22,25 +22,31 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .xe-account-info-icon {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 100%;
     padding: 1rem;
+    flex: 0 0 auto;
 }
 
 .xe-account-info-container-2 {
     display: flex;
     gap: 2rem;
     flex-direction: row;
-    min-width: 30rem;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .xe-account-info-container-2>div {
     display: flex;
     gap: .25rem;
     flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .xe-account-info-container-2>div>:nth-child(1) {
@@ -58,10 +64,82 @@
 
 .xe-account-info-addr {
     font-size: 1.5rem;
-    max-width: 30rem;
+    width: 100%;
     word-break: break-all;
 }
 
 .xe-account-info-qr {
     border-radius: var(--xe-radius);
+    flex: 0 0 auto;
+}
+
+@media screen and (max-width: 900px) {
+    .xe-account-info {
+        gap: 1.4rem;
+        padding: 1.4rem;
+    }
+
+    .xe-account-info-icon canvas {
+        width: 5.4rem;
+        height: 5.4rem;
+    }
+
+    .xe-account-info-qr {
+        width: 11rem !important;
+        height: 11rem !important;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .xe-account-info {
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+    }
+
+    .xe-account-info-container-1 {
+        order: 2;
+        width: 100%;
+        text-align: center;
+    }
+
+    .xe-account-info-icon {
+        order: 1;
+        padding: .65rem;
+    }
+
+    .xe-account-info-container-2 {
+        gap: 1rem;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .xe-account-info-container-2>div {
+        align-items: center;
+        text-align: center;
+    }
+
+    .xe-account-info-icon canvas {
+        width: 3.8rem;
+        height: 3.8rem;
+    }
+
+    .xe-account-info-qr {
+        order: 3;
+        width: 13rem !important;
+        height: 13rem !important;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    .xe-account-info {
+        padding: 1rem;
+    }
+
+    .xe-account-info-addr,
+    .xe-account-info-container-2>div>:nth-child(1),
+    .xe-account-info-container-2>div>:nth-child(2),
+    .xe-account-info-container-2>div>:nth-child(3) {
+        font-size: 1.35rem;
+    }
 }
