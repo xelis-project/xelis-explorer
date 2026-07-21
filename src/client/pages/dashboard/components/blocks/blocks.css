@@ -3,9 +3,6 @@
     gap: 1rem;
     flex-direction: column;
     animation: xe-dashboard-blocks-appear-animation .7s;
-    height: 55rem;
-    min-height: 0;
-    overflow: hidden;
 }
 
 .xe-dashboard-blocks-list {

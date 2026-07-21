@@ -2,9 +2,6 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    flex: 1 1 auto;
-    min-height: var(--xe-dashboard-dag-panel-height);
-    overflow: hidden;
     animation: xe-dashboard-txs-appear-animation .65s;
 }
 

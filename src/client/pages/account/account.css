@@ -1,18 +1,29 @@
-.xe-account {}
-
 .xe-account-container-1 {
     display: flex;
     gap: 1rem;
     flex-direction: row;
+    align-items: stretch;
 }
 
-.xe-account-container-1 >:nth-child(2) {
+.xe-account-container-1>:nth-child(1) {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.xe-account-container-1>:nth-child(2) {
+    flex: 0 1 26rem;
+    max-width: 30rem;
     min-height: 12rem;
 }
 
 @media screen and (max-width: 1200px) {
     .xe-account-container-1 {
         flex-direction: column;
+    }
+
+    .xe-account-container-1>:nth-child(2) {
+        flex-basis: 12rem;
+        max-width: none;
     }
 }
 

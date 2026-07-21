@@ -2,7 +2,6 @@
     position: relative;
     overflow: hidden;
     padding: 0;
-    flex: 1;
     animation: xe-account-balance-appear-animation 0.7s;
 }
 

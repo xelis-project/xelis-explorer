@@ -3,8 +3,6 @@
     --xe-dashboard-dag-panel-height: calc(var(--xe-dashboard-dag-view-height) + 6rem);
 }
 
-.xe-dashboard-container {}
-
 .xe-dashboard-container-1 {
     display: flex;
     gap: 1rem;
@@ -31,5 +29,10 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    min-height: 0;
+}
+
+.xe-dashboard-container-1>:nth-child(2)>:is(.xe-dashboard-blocks, .xe-dashboard-txs) {
+    flex: 1 1 0;
     min-height: 0;
 }
