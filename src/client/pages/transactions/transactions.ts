@@ -153,12 +153,18 @@ export class TransactionsPage extends Page {
             }
         });
 
-        if (this.table.rows.length === 0) {
-            const text = localization.get_text(`No transactions from {} to {}.`, [end_height.toLocaleString(), (this.prev_next_pager.pager_next || 0).toLocaleString()]);
-            this.table.add_empty_row().set_empty(text);
-        } else {
+        // Keep the pager range in sync even when every fetched block is empty.
+        // Otherwise the empty-state message falls back to 0 for the end height.
+        if (blocks.length > 0) {
             this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
             this.prev_next_pager.pager_next = blocks[0].height - 1;
+        }
+
+        if (this.table.rows.length === 0) {
+            const next_height = this.prev_next_pager.pager_next ?? 0;
+            const text = localization.get_text(`No transactions from {} to {}.`, [end_height.toLocaleString(), next_height.toLocaleString()]);
+            this.table.add_empty_row().set_empty(text);
+        } else {
             this.prev_next_pager.render();
         }
     }
