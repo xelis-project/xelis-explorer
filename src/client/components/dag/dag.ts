@@ -71,6 +71,8 @@ export class DAG {
     block_spacing = 6;
     max_display_height = 100;
     animation_loop_active = false;
+    destroyed = false;
+    load_generation = 0;
     load_timeout?: number;
 
     constructor() {
@@ -358,9 +360,12 @@ export class DAG {
     }
 
     async set_live(live: boolean) {
+        if (this.destroyed && !live) return;
         if (this.is_live === live) return;
 
         if (live) {
+            this.destroyed = false;
+            const generation = ++this.load_generation;
             // Start listening for new_block events immediately, even before loading the primary block fetch.
             // If we listen after we could miss some blocks and create gaps in the DAG display.
             this.listen_node_events();
@@ -368,10 +373,13 @@ export class DAG {
             try {
                 const node = XelisNode.instance();
                 const current_height = await node.rpc.getHeight();
-                await this.load_blocks(current_height);
+                await this.load_blocks(current_height, generation);
+                if (this.destroyed || generation !== this.load_generation) return;
                 this.is_live = true;
             } catch (err) {
-                this.clear_node_events();
+                if (generation === this.load_generation) {
+                    this.clear_node_events();
+                }
                 throw err
             }
 
@@ -407,20 +415,14 @@ export class DAG {
     }
 
     unload() {
+        this.destroyed = true;
+        this.load_generation++;
         this.block_details.hide();
-        this.set_live(false); // clear listener and set live flag to false
+        this.clear_node_events();
+        this.is_live = false;
         this.stop_animation_loop();
         window.clearTimeout(this.load_timeout);
         this.dispose_objects();
-        this.target_height_line.remove();
-        this.stable_height_line.remove();
-        this.height_control.clear_listeners();
-        window.removeEventListener('resize', this.on_resize);
-        this.element.removeEventListener(`pointermove`, this.on_pointer_move);
-        this.element.removeEventListener(`click`, this.on_click);
-        this.controls.dispose();
-        this.renderer.dispose();
-        this.renderer.domElement.remove();
     }
 
     listen_node_events() {
@@ -508,7 +510,8 @@ export class DAG {
         }, 500);
     }
 
-    async load_blocks(height: number) {
+    async load_blocks(height: number, generation = this.load_generation) {
+        if (this.destroyed || generation !== this.load_generation) return;
         this.canvas.classList.add(`xe-dag-load-flash`);
         this.load_height = height;
         this.stable_height_line.visible = false;
@@ -518,6 +521,7 @@ export class DAG {
         const node = XelisNode.instance();
 
         const max_height = await node.rpc.getHeight();
+        if (this.destroyed || generation !== this.load_generation) return;
         this.height_control.set_height(height);
         this.height_control.set_max_height(max_height);
 
@@ -545,6 +549,7 @@ export class DAG {
         }
 
         const res = await node.rpc.batchRequest(requests);
+        if (this.destroyed || generation !== this.load_generation) return;
 
         this.controls.normalizeRotations().reset(true);
         let blocks = [] as Block[];
@@ -592,6 +597,7 @@ export class DAG {
         this.canvas.classList.remove(`xe-dag-load-flash`);
 
         const stable_height = await node.ws.methods.getStableHeight();
+        if (this.destroyed || generation !== this.load_generation) return;
         this.move_stable_height_line(stable_height);
 
         this.start_animation_loop();

@@ -13,6 +13,7 @@ export class PeersChartNodesByVersion {
     box_chart: BoxChart;
     chart?: {
         node: d3.Selection<SVGGElement, unknown, null, undefined>;
+        legend: d3.Selection<SVGSVGElement, unknown, null, undefined>;
         width: number;
         height: number;
     };
@@ -29,16 +30,27 @@ export class PeersChartNodesByVersion {
 
         const width = 150;
         const height = 150;
+        this.box_chart.element_content.classList.add(`xe-peers-version-chart-content`);
 
         const node = d3
             .select(this.box_chart.element_content)
             .append('svg')
-            .attr('width', `100%`)
+            .attr('width', width)
             .attr('height', height)
             .append('g')
             .attr('transform', `translate(${width / 2}, ${height / 2})`);
 
-        this.chart = { node, width, height };
+        const legend_container = document.createElement(`div`);
+        legend_container.classList.add(`xe-peers-version-legend`, `scrollbar-1`, `scrollbar-1-right`);
+        this.box_chart.element_content.appendChild(legend_container);
+
+        const legend = d3
+            .select(legend_container)
+            .append('svg')
+            .attr('width', `100%`)
+            .attr('height', height);
+
+        this.chart = { node, legend, width, height };
     }
 
     update_chart() {
@@ -53,11 +65,11 @@ export class PeersChartNodesByVersion {
             }
         });
 
-        let data = Object.keys(peers_version).map((key) => {
+        const all_data = Object.keys(peers_version).map((key) => {
             return { label: key, value: peers_version[key] };
         });
 
-        data = data.sort((a, b) => b.value - a.value).slice(0, 5);
+        const data = all_data.sort((a, b) => b.value - a.value);
 
         const radius = Math.min(this.chart.width, this.chart.height) / 2;
         const donutInnerOffset = 35;
@@ -153,37 +165,37 @@ export class PeersChartNodesByVersion {
         const legend_radius = 8;
         const legend_spacing = 15;
 
-        this.chart.node
+        this.chart.legend
+            .attr('height', Math.max(this.chart.height, data.length * (legend_radius + legend_spacing)))
             .selectAll(`.legend`)
             .remove();
 
-        const legend = this.chart.node
+        const legend = this.chart.legend
             .selectAll('.legend')
-            .data(color.domain())
+            .data(data)
             .enter()
             .append('g')
             .attr('class', 'legend')
             .attr('transform', (d, i) => {
                 var height = legend_radius + legend_spacing;
-                var offset = height * color.domain().length / 2;
-                var x = 100;
-                var y = (i * height) - offset;
+                var x = legend_radius;
+                var y = (i * height) + legend_radius;
                 return `translate(${x}, ${y})`;
             });
 
         legend
             .append('circle')
             .attr('r', legend_radius)
-            .style('fill', color);
+            .style('fill', d => color(d.label));
 
         legend
             .append('text')
             .attr('x', 5 + legend_radius)
             .attr('y', legend_radius / 2)
-            .style(`fill`, color)
+            .style(`fill`, d => color(d.label))
             .style("font-family", "var(--xe-font-body)")
             .style("font-size", "1.3rem")
-            .text((d) => `${d}`);
+            .text((d) => `${d.label} (${d.value.toLocaleString()})`);
     }
 
     set(peers: Peer[]) {

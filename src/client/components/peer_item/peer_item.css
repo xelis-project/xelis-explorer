@@ -31,22 +31,24 @@
     display: flex;
     gap: .5rem;
     flex-direction: row;
+    font-size: 1.5rem;
 }
 
 .xe-peer-item-pcount {
     margin-top: .25rem;
+    font-size: 1.5rem;
     color: var(--xe-muted);
 }
 
 .xe-peer-item-version {
     margin-top: .5rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
 }
 
 .xe-peer-item-tag {
     margin-top: .25rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
 }
 
@@ -63,10 +65,11 @@
 }
 
 .xe-peer-item>:nth-child(2)>div>:nth-child(1) {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--xe-muted);
 }
 
 .xe-peer-item>:nth-child(2)>div>:nth-child(2) {
     font-weight: bold;
+    font-size: 1.5rem;
 }

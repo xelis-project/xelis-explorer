@@ -4,19 +4,15 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-}
-
-@media screen and (max-width:650px) {
-    .xe-settings-item {
-        flex-direction: column;
-        align-items: start;
-    }
+    flex-wrap: wrap;
 }
 
 .xe-settings-item>:nth-child(1) {
     display: flex;
     gap: .5rem;
     flex-direction: column;
+    flex: 1 1 30rem;
+    min-width: 0;
     animation: xe-settings-item-1-animation .65s;
 }
 
@@ -38,10 +34,10 @@
 
 .xe-settings-item>:nth-child(1)>:nth-child(2) {
     color: var(--xe-muted);
-    max-width: 30rem;
 }
 
 .xe-settings-item>:nth-child(2) {
+    flex: 0 1 auto;
     animation: xe-settings-item-2-animation .8s;
 }
 

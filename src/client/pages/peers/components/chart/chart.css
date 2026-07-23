@@ -40,3 +40,25 @@
 .xe-peers-chart >:nth-child(2) {
     min-height: 10rem;
 }
+
+.xe-peers-version-chart-content {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.xe-peers-version-chart-content > svg {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 150px;
+}
+
+.xe-peers-version-legend {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}

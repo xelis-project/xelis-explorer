@@ -52,6 +52,7 @@ export class SettingsPage extends Page {
         container.element.appendChild(language_item.element);
 
         const language_select = new Select();
+        language_select.element.classList.add(`xe-settings-language-select`);
         get_supported_languages().forEach((lang) => {
             language_select.add_item(lang.key, `
                 <i class="fi fi-${lang.flag}"></i>

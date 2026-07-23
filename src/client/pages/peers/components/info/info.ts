@@ -8,6 +8,7 @@ import './info.css';
 export class PeersInfo {
     container: Container
 
+    total_element: HTMLDivElement;
     sync_element: HTMLDivElement;
     desync_element: HTMLDivElement;
     full_ledger_element: HTMLDivElement;
@@ -17,6 +18,8 @@ export class PeersInfo {
         this.container = new Container();
         this.container.element.classList.add(`xe-peers-info`);
 
+        this.total_element = document.createElement(`div`);
+        this.container.element.appendChild(this.total_element);
         this.sync_element = document.createElement(`div`);
         this.container.element.appendChild(this.sync_element);
         this.desync_element = document.createElement(`div`);
@@ -28,22 +31,20 @@ export class PeersInfo {
     }
 
     set_loading(loading: boolean) {
+        Box.content_loading(this.total_element, loading, `1rem`);
         Box.content_loading(this.sync_element, loading, `1rem`);
         Box.content_loading(this.desync_element, loading, `1rem`);
         Box.content_loading(this.full_ledger_element, loading, `1rem`);
         Box.content_loading(this.pruned_ledger_element, loading, `1rem`);
     }
 
-    set(peers: Peer[], height: number) {
-        let node_count = 0;
+    set(peers: Peer[], height: number, total_count: number) {
         let sync_count = 0;
         let desync_count = 0;
         let full_ledger_count = 0;
         let pruned_ledger_count = 0;
 
         peers.forEach((peer) => {
-            node_count++;
-
             if (peer.height === height) {
                 sync_count++;
             } else {
@@ -58,6 +59,7 @@ export class PeersInfo {
         });
 
         this.set_sync(sync_count);
+        this.set_total(total_count);
         this.set_desync(desync_count);
         this.set_full_ledger(full_ledger_count);
         this.set_pruned_ledger(pruned_ledger_count);
@@ -66,6 +68,13 @@ export class PeersInfo {
     set_sync(value: number) {
         this.sync_element.innerHTML = `
             <div>${localization.get_text(`SYNC`)}</div>
+            <div>${value}</div>
+        `;
+    }
+
+    set_total(value: number) {
+        this.total_element.innerHTML = `
+            <div>${localization.get_text(`TOTAL`)}</div>
             <div>${value}</div>
         `;
     }

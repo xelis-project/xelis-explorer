@@ -106,6 +106,7 @@ export class PeersPage extends Page {
         const node = XelisNode.instance();
         const info = await node.ws.methods.getInfo();
         const peers_result = await node.ws.methods.getPeers();
+        const p2p_status = await node.ws.methods.p2pStatus();
         const { peers } = peers_result;
 
         peers.forEach(peer => {
@@ -141,7 +142,7 @@ export class PeersPage extends Page {
             peers_locations = [...peers_locations, ...new_peers_locations];
         }
 
-        this.peers_info.set(peers, info.height);
+        this.peers_info.set(peers, info.height, p2p_status.peer_count);
         this.peers_list.set(peers_locations);
         this.peers_map.map.set(peers_locations);
 
@@ -168,6 +169,7 @@ export class PeersPage extends Page {
 
         const info = await node.rpc.getInfo();
         const peers_result = await node.rpc.getPeers();
+        const p2p_status = await node.rpc.p2pStatus();
         const { peers } = peers_result;
 
         this.peer_count = peers.length;
@@ -177,7 +179,7 @@ export class PeersPage extends Page {
         Box.boxes_loading(this.peers_chart.container.element, false);
         this.peers_info.set_loading(false);
 
-        this.peers_info.set(peers, info.height);
+        this.peers_info.set(peers, info.height, p2p_status.peer_count);
         this.peers_list.set(peers_locations);
 
         this.peers_chart.nodes_by_version.set(peers);
