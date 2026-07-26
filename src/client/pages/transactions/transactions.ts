@@ -49,7 +49,6 @@ export class TransactionsPage extends Page {
 
         this.table = new Table();
         this.table.set_clickable();
-        this.container_table.element.appendChild(this.table.element);
 
         const titles = [
             localization.get_text(`HEIGHT`),
@@ -66,6 +65,7 @@ export class TransactionsPage extends Page {
         this.prev_next_pager = new PrevNextPager();
         this.prev_next_pager.load_func = () => this.load_transactions();
         this.container_table.element.appendChild(this.prev_next_pager.element);
+        this.container_table.element.appendChild(this.table.element);
     }
 
     update_interval_1000_id?: number;
@@ -134,7 +134,7 @@ export class TransactionsPage extends Page {
         this.prev_next_pager.pager_max = info.height;
         this.prev_next_pager.pager_min = 0;
 
-        const end_height = this.prev_next_pager.get_next() || info.height;
+        const end_height = this.prev_next_pager.get_next() ?? info.height;
         let blocks = await fetch_blocks(end_height, 100);
         // filter side block out (they might contain a duplicated tx)
         blocks = blocks.filter(b => b.block_type !== BlockType.Side);
@@ -157,16 +157,17 @@ export class TransactionsPage extends Page {
         // Otherwise the empty-state message falls back to 0 for the end height.
         if (blocks.length > 0) {
             this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
-            this.prev_next_pager.pager_next = blocks[0].height - 1;
+            this.prev_next_pager.pager_next = Math.max(0, blocks[0].height - 1);
         }
 
         if (this.table.rows.length === 0) {
             const next_height = this.prev_next_pager.pager_next ?? 0;
             const text = localization.get_text(`No transactions from {} to {}.`, [end_height.toLocaleString(), next_height.toLocaleString()]);
             this.table.add_empty_row().set_empty(text);
-        } else {
-            this.prev_next_pager.render();
         }
+
+        this.prev_next_pager.render();
+        this.prev_next_pager.update_url(info.height);
     }
 
     async load(parent: HTMLElement) {
@@ -177,6 +178,7 @@ export class TransactionsPage extends Page {
 
         const info = await node.rpc.getInfo();
         this.page_data.info = info;
+        this.prev_next_pager.restore_from_url(info.height);
 
         await this.load_transactions();
 

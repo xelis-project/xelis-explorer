@@ -47,7 +47,6 @@ export class BlocksPage extends Page {
 
         this.table = new Table();
         this.table.set_clickable();
-        this.container_table.element.appendChild(this.table.element);
 
         const titles = [
             localization.get_text(`TOPOHEIGHT`),
@@ -66,6 +65,7 @@ export class BlocksPage extends Page {
         this.prev_next_pager = new PrevNextPager();
         this.prev_next_pager.load_func = () => this.load_blocks();
         this.container_table.element.appendChild(this.prev_next_pager.element);
+        this.container_table.element.appendChild(this.table.element);
     }
 
     update_interval_1000_id?: number;
@@ -186,10 +186,10 @@ export class BlocksPage extends Page {
         this.table.set_loading(20);
 
         const node = XelisNode.instance();
-        const end_topo = this.prev_next_pager.get_next();
+        const end_topo = this.prev_next_pager.get_next() ?? info.height;
         const blocks = await node.rpc.getBlocksRangeByHeight({
             end_height: end_topo,
-            start_height: end_topo - 20
+            start_height: Math.max(0, end_topo - 20)
         });
         this.table.clear();
 
@@ -202,11 +202,15 @@ export class BlocksPage extends Page {
 
         if (this.table.rows.length === 0) {
             this.table.add_empty_row().set_empty(localization.get_text(`No blocks`));
-        } else {
-            this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
-            this.prev_next_pager.pager_next = blocks[0].height - 1;
-            this.prev_next_pager.render();
         }
+
+        if (blocks.length > 0) {
+            this.prev_next_pager.pager_current = blocks[blocks.length - 1].height;
+            this.prev_next_pager.pager_next = Math.max(0, blocks[0].height - 1);
+        }
+
+        this.prev_next_pager.render();
+        this.prev_next_pager.update_url(info.height);
     }
 
     async load(parent: HTMLElement) {
@@ -220,6 +224,7 @@ export class BlocksPage extends Page {
 
         const info = await node.rpc.getInfo();
         this.page_data.info = info;
+        this.prev_next_pager.restore_from_url(info.height);
 
         await this.load_blocks();
         this.update_interval_1000_id = window.setInterval(this.update_interval_1000, 1000);

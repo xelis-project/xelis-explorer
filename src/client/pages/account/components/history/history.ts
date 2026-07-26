@@ -88,12 +88,12 @@ export class AccountHistory {
         this.table = new Table();
         this.table.element.classList.add();
         this.table.set_clickable();
-        table_container.appendChild(this.table.element);
         this.table.set_head_row(titles);
 
         this.prev_next_pager = new PrevNextPager();
         this.prev_next_pager.load_func = () => this.load_history();
-        this.container.element.appendChild(this.prev_next_pager.element);
+        table_container.appendChild(this.prev_next_pager.element);
+        table_container.appendChild(this.table.element);
     }
 
     set_filter_assets(assets: AssetWithData[]) {
@@ -119,6 +119,7 @@ export class AccountHistory {
         const first_topo = this.account_server_data.registration_topoheight;
         //this.prev_next_pager.pager_max = last_topo;
         this.prev_next_pager.pager_min = first_topo;
+        this.prev_next_pager.restore_from_url();
         await this.load_history();
     }
 
@@ -169,7 +170,8 @@ export class AccountHistory {
         }
 
         this.prev_next_pager.pager_current = first_item.topoheight;
-        this.prev_next_pager.pager_next = history[0].topoheight - 1;
+        this.prev_next_pager.pager_next = Math.max(0, history[0].topoheight - 1);
         this.prev_next_pager.render();
+        this.prev_next_pager.update_url();
     }
 }

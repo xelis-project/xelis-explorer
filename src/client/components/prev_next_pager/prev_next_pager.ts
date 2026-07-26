@@ -15,6 +15,7 @@ export class PrevNextPager {
 	pager_current?: number;
 	pager_next?: number;
 	load_func?: () => void;
+	url_param = `page`;
 
 	constructor() {
 		this.element = document.createElement(`div`);
@@ -33,7 +34,7 @@ export class PrevNextPager {
 		this.next_btn.classList.add(`next`);
 		this.next_btn.innerHTML = `NEXT` + icons.arrow();
 		this.next_btn.addEventListener(`click`, () => {
-			if (!this.pager_next) return;
+			if (this.pager_next === undefined) return;
 			this.pager_numbers.push(this.pager_next);
 			if (this.load_func) this.load_func();
 		});
@@ -45,14 +46,39 @@ export class PrevNextPager {
 		return this.pager_numbers[this.pager_numbers.length - 1];
 	}
 
+	restore_from_url(default_page?: number) {
+		const value = new URLSearchParams(window.location.search).get(this.url_param);
+		if (value === null) return;
+
+		const page = Number(value);
+		if (!Number.isInteger(page) || page < 0 || (default_page !== undefined && page >= default_page)) {
+			return;
+		}
+
+		this.pager_numbers = [page];
+	}
+
+	update_url(default_page?: number) {
+		const url = new URL(window.location.href);
+		const page = this.get_next();
+
+		if (page === undefined || page === default_page) {
+			url.searchParams.delete(this.url_param);
+		} else {
+			url.searchParams.set(this.url_param, page.toString());
+		}
+
+		window.history.replaceState(null, ``, url);
+	}
+
 	render() {
-		if (!this.pager_current || !this.pager_next) {
+		if (this.pager_current === undefined || this.pager_next === undefined) {
 			return;
 		}
 
 		this.element.replaceChildren();
 
-		if (this.pager_max !== undefined && this.pager_current < this.pager_max) {
+		if (this.pager_numbers.length > 0) {
 			this.element.appendChild(this.prev_btn);
 		}
 
