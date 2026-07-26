@@ -7,7 +7,7 @@ export interface ContractInfo {
     transaction: TransactionResponse;
     module: GetContractModuleResult;
     balance?: GetContractBalanceResult;
-    block: Block;
+    block?: Block;
 }
 
 export const fetch_contracts = async (contracts: string[]) => {
@@ -78,14 +78,18 @@ export const fetch_contracts = async (contracts: string[]) => {
             }
         });
 
-        const res = await node.rpc.batchRequest(requests);
-        res.forEach((result, i) => {
-            if (result instanceof Error) {
-                throw result;
-            }
+        if (requests.length > 0) {
+            const block_contracts = contracts_info.filter((info) => info.transaction.executed_in_block);
+            const res = await node.rpc.batchRequest(requests);
+            res.forEach((result, i) => {
+                // The request list only contains contracts with an executed
+                // block, so it cannot be indexed directly into contracts_info.
+                const contract_info = block_contracts[i];
+                if (!contract_info || result instanceof Error) return;
 
-            contracts_info[i].block = result as Block;
-        });
+                contract_info.block = result as Block;
+            });
+        }
     }
 
 

@@ -233,11 +233,13 @@ export class DashboardPage extends Page {
 
         if (new_peer) {
             const addr = parse_addr(new_peer.addr);
-            const res = await fetch_geo_location([addr.ip]);
-            const geo_location = res[addr.ip];
-
-            const peer_location = { peer: new_peer, geo_location } as PeerLocation;
-            this.dashboard_peers.peers_map.add_peer_marker(peer_location);
+            if (addr) {
+                const res = await fetch_geo_location([addr.ip]);
+                const geo_location = res[addr.ip];
+    
+                const peer_location = { peer: new_peer, geo_location } as PeerLocation;
+                this.dashboard_peers.peers_map.add_peer_marker(peer_location);
+            }
         }
     }
 

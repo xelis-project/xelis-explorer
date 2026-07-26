@@ -16,7 +16,7 @@ export class ContractRow extends Row {
         this.set_hash(transaction.hash);
         this.set_xel_balance(contract_info.balance ? contract_info.balance.data : 0);
         this.set_xel_balance_topo(contract_info.balance);
-        this.set_registered(contract_info.block.timestamp);
+        this.set_registered(contract_info.block?.timestamp);
 
         this.set_link(`/contract/${transaction.hash}`);
     }
@@ -33,7 +33,7 @@ export class ContractRow extends Row {
         this.value_cells[2].innerHTML = contract_balance ? contract_balance.topoheight.toLocaleString() : `--`;
     }
 
-    set_registered(timestamp: number) {
-        this.value_cells[3].innerHTML = new Date(timestamp).toLocaleString();
+    set_registered(timestamp?: number) {
+        this.value_cells[3].innerHTML = timestamp === undefined ? `--` : new Date(timestamp).toLocaleString();
     }
 }

@@ -58,10 +58,14 @@ export class PeersMap {
     async fetch_peers_locations(peers: Peer[]) {
         const peers_addr = peers.map(peer => {
             const addr = parse_addr(peer.addr);
+            if (!addr) {
+                return undefined;
+            }
+
             return { peer, addr };
         }).filter(p => p !== undefined);
 
-        const ips = peers_addr.map(p => p.addr.ip);
+        const ips = peers_addr.map(p => p.addr!.ip);
         let peers_locations: PeerLocation[] = [];
 
         const batch_size = 50;
@@ -69,7 +73,7 @@ export class PeersMap {
             const ips_to_fetch = ips.slice(i, i + batch_size);
             const geo_locations = await fetch_geo_location(ips_to_fetch);
             Object.keys(geo_locations).forEach((key) => {
-                const peer_addr = peers_addr.find(p => p.addr.ip === key);
+                const peer_addr = peers_addr.find(p => p.addr?.ip === key);
                 if (!peer_addr) return;
 
                 peers_locations.push({

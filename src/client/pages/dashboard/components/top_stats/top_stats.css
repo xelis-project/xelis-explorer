@@ -36,7 +36,8 @@
     display: grid;
     grid-template-columns: repeat(2, max-content);
     gap: 1.2rem;
-    justify-content: space-evenly;
+    padding: 1rem 2rem;
+    justify-content: space-between;
     align-content: start;
     min-width: 0;
 }
