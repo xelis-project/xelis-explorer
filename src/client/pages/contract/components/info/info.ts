@@ -78,20 +78,39 @@ export class ContractInfo {
             this.constants = data.module.constants;
             this.instructions = data.module.chunks;
             this.constants_container.element.replaceChildren();
-            append_json_viewer_boxes(this.constants_container.element, this.constants);
+            if (this.constants.length > 0) {
+                append_json_viewer_boxes(this.constants_container.element, this.constants);
+            } else {
+                this.append_empty_message(this.constants_container);
+            }
             this.instructions_container.element.replaceChildren();
-            append_json_viewer_boxes(this.instructions_container.element, this.instructions);
+            if (this.instructions.length > 0) {
+                append_json_viewer_boxes(this.instructions_container.element, this.instructions);
+            } else {
+                this.append_empty_message(this.instructions_container);
+            }
             this.hook_ids_box.element.innerHTML = JSON.stringify(data.module.hook_chunk_ids || [], null, 2);
+            if (!data.module.hook_chunk_ids?.length) {
+                this.hook_ids_box.element.innerHTML = localization.get_text(`None.`);
+            }
         } else {
             this.warning_element.innerHTML = localization.get_text('This contract module has been deleted or failed its deploy');
             this.container.element.insertBefore(this.warning_element, this.container.element.firstChild);
 
             this.constants_container.element.replaceChildren();
+            this.append_empty_message(this.constants_container);
             this.instructions_container.element.replaceChildren();
+            this.append_empty_message(this.instructions_container);
             this.constants = [];
             this.instructions = [];
-            this.hook_ids_box.element.innerHTML = ``;
+            this.hook_ids_box.element.innerHTML = localization.get_text(`None.`);
         }
+    }
+
+    private append_empty_message(container: Box) {
+        const message = document.createElement(`div`);
+        message.innerHTML = localization.get_text(`None.`);
+        container.element.appendChild(message);
     }
 
     private create_section_title(title: string, open_modal: () => void) {

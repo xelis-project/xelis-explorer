@@ -31,30 +31,46 @@ export class TransactionDeployContract {
         constants_title_element.innerHTML = localization.get_text(`CONSTANTS`);
         this.container.element.appendChild(constants_title_element);
 
-        const constant_json_viewer_box = new JsonViewerBox(deploy_contract.module.constants);
-        this.container.element.appendChild(constant_json_viewer_box.box.element);
+        if (deploy_contract.module.constants.length > 0) {
+            const constant_json_viewer_box = new JsonViewerBox(deploy_contract.module.constants);
+            this.container.element.appendChild(constant_json_viewer_box.box.element);
+        } else {
+            this.append_empty_message();
+        }
 
         const chunks_title_element = document.createElement(`div`);
         chunks_title_element.innerHTML = localization.get_text(`CHUNKS`);
         this.container.element.appendChild(chunks_title_element);
 
-        const chunks_json_viewer_box = new JsonViewerBox(deploy_contract.module.chunks);
-        this.container.element.appendChild(chunks_json_viewer_box.box.element);
+        if (deploy_contract.module.chunks.length > 0) {
+            const chunks_json_viewer_box = new JsonViewerBox(deploy_contract.module.chunks);
+            this.container.element.appendChild(chunks_json_viewer_box.box.element);
+        } else {
+            this.append_empty_message();
+        }
 
         const hook_ids_title_element = document.createElement(`div`);
         hook_ids_title_element.innerHTML = localization.get_text(`HOOK CHUNK IDS`);
         this.container.element.appendChild(hook_ids_title_element);
-        const hook_ids_box = new Box();
-        hook_ids_box.element.innerHTML = JSON.stringify(deploy_contract.module.hook_chunk_ids || [], null, 2);
-        this.container.element.appendChild(hook_ids_box.element);
+        if (deploy_contract.module.hook_chunk_ids?.length > 0) {
+            const hook_ids_box = new Box();
+            hook_ids_box.element.innerHTML = JSON.stringify(deploy_contract.module.hook_chunk_ids, null, 2);
+            this.container.element.appendChild(hook_ids_box.element);
+        } else {
+            this.append_empty_message();
+        }
 
         if (deploy_contract.invoke) {
             const deposits_title_element = document.createElement(`div`);
             deposits_title_element.innerHTML = localization.get_text(`DEPOSITS`);
             this.container.element.appendChild(deposits_title_element);
 
-            const deposits_box = new DepositsBox(deploy_contract.invoke.deposits);
-            this.container.element.appendChild(deposits_box.box.element);
+            if (Object.keys(deploy_contract.invoke.deposits).length > 0) {
+                const deposits_box = new DepositsBox(deploy_contract.invoke.deposits);
+                this.container.element.appendChild(deposits_box.box.element);
+            } else {
+                this.append_empty_message();
+            }
 
             const max_gas_title = document.createElement(`div`);
             max_gas_title.innerHTML = localization.get_text(`MAX GAS`);
@@ -64,5 +80,11 @@ export class TransactionDeployContract {
             max_gas_value.innerHTML = format_xel(deploy_contract.invoke.max_gas, true);
             this.container.element.appendChild(max_gas_value);
         }
+    }
+
+    private append_empty_message() {
+        const empty_box = new Box();
+        empty_box.element.innerHTML = localization.get_text(`None.`);
+        this.container.element.appendChild(empty_box.element);
     }
 }
