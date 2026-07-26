@@ -39,6 +39,11 @@
         "link": "https://www.mexc.com/",
         "type": "exchange"
     },
+    "xel:z677gw7u6eayct3w34ezg3zzm42sq90txrh5z9hh3ur5puctu4tqqam8akq": {
+        "name": "SafeTrade",
+        "link": "https://safetrade.com",
+        "type": "exchange"
+    },
     "xel:zeqtkurmcucg79tleqqhcv776sja2rss0ydxn2cy6a5xv9lauvyqq5h2lpk": {
         "name": "Biconomy",
         "link": "https://biconomy.com/",
