@@ -34,9 +34,9 @@
 
 .xe-dashboard-top-stats-container>div {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    grid-template-columns: repeat(2, max-content);
     gap: 1.2rem;
-    justify-content: stretch;
+    justify-content: space-evenly;
     align-content: start;
     min-width: 0;
 }
