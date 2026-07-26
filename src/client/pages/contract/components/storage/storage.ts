@@ -26,11 +26,10 @@ export class ContractStorageEntries {
     list_element: HTMLElement;
     pagination_element: HTMLElement;
     info_element: HTMLElement;
-    page_size_selector: HTMLSelectElement;
     history_modal: StorageHistoryModal;
 
     private contract_hash?: string;
-    private page_size = 10;
+    private page_size = 20;
     private current_page = 0;
     private has_next_page = false;
     private total_entries_shown = 0;
@@ -40,7 +39,7 @@ export class ContractStorageEntries {
         this.container = new Container();
         this.container.element.classList.add(`xe-contract-storage`);
 
-        // Header with title and page size selector
+        // Header with title
         const header_element = document.createElement(`div`);
         header_element.classList.add(`xe-contract-storage-header`);
         this.container.element.appendChild(header_element);
@@ -49,35 +48,6 @@ export class ContractStorageEntries {
         title_element.classList.add(`xe-contract-storage-title`);
         title_element.innerHTML = localization.get_text(`STORAGE ENTRIES`);
         header_element.appendChild(title_element);
-
-        const controls_element = document.createElement(`div`);
-        controls_element.classList.add(`xe-contract-storage-controls`);
-        header_element.appendChild(controls_element);
-
-        const page_size_label = document.createElement(`label`);
-        page_size_label.classList.add(`xe-contract-storage-page-size-label`);
-        page_size_label.innerHTML = localization.get_text(`Per page:`);
-        controls_element.appendChild(page_size_label);
-
-        this.page_size_selector = document.createElement(`select`);
-        this.page_size_selector.classList.add(`xe-contract-storage-page-size-selector`);
-        [10, 25, 50, 100].forEach(size => {
-            const option = document.createElement(`option`);
-            option.value = String(size);
-            option.textContent = String(size);
-            if (size === this.page_size) {
-                option.selected = true;
-            }
-            this.page_size_selector.appendChild(option);
-        });
-        this.page_size_selector.addEventListener(`change`, () => {
-            this.page_size = Number(this.page_size_selector.value);
-            this.current_page = 0;
-            if (this.contract_hash) {
-                this.load_entries(this.contract_hash, this.current_page);
-            }
-        });
-        controls_element.appendChild(this.page_size_selector);
 
         // Info element to show "Showing X-Y of Z entries"
         this.info_element = document.createElement(`div`);
