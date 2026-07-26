@@ -4,3 +4,37 @@
     overflow: auto;
     word-break: break-all;
 }
+
+.xe-json-viewer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 18rem;
+    overflow: auto;
+}
+
+.xe-json-viewer-container>.xe-json-viewer-box {
+    max-height: none;
+    overflow: visible;
+}
+
+.xe-json-viewer-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.xe-json-viewer-open-modal {
+    padding: 0.35rem 0.7rem;
+    color: var(--xe-white);
+    font-size: 1.1rem;
+    cursor: pointer;
+    background: var(--xe-card-bg);
+    border: 1px solid var(--xe-border-soft);
+    border-radius: var(--xe-radius);
+}
+
+.xe-json-viewer-open-modal:hover {
+    border-color: var(--xe-border-strong);
+}

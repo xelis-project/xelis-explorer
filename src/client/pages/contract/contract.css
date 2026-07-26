@@ -8,7 +8,6 @@
 .xe-contract-info {
     grid-column: 1;
     grid-row: 1;
-    max-height: 60vh;
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -19,7 +18,8 @@
     grid-column: 2;
     grid-row: 1;
     align-self: stretch;
-    max-height: 60vh;
+    height: 70vh;
+    max-height: 70vh;
     min-height: 0;
     overflow: hidden;
     box-sizing: border-box;

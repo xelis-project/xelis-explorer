@@ -13,6 +13,14 @@ import './assets.css';
 export class ContractAssets {
     container: Container;
     list_element: HTMLElement;
+    pagination_element: HTMLElement;
+    info_element: HTMLElement;
+
+    private contract_hash?: string;
+    private page_size = 20;
+    private current_page = 0;
+    private has_next_page = false;
+    private total_assets_shown = 0;
 
     constructor() {
         this.container = new Container();
@@ -25,6 +33,16 @@ export class ContractAssets {
         this.list_element = document.createElement(`div`);
         this.list_element.classList.add(`xe-contract-assets-list`, `scrollbar-1`, `scrollbar-1-right`);
         this.container.element.appendChild(this.list_element);
+
+        this.info_element = document.createElement(`div`);
+        this.info_element.classList.add(`xe-contract-assets-info`);
+        this.container.element.appendChild(this.info_element);
+
+        this.pagination_element = document.createElement(`div`);
+        this.pagination_element.classList.add(`xe-contract-assets-pagination`);
+        this.container.element.appendChild(this.pagination_element);
+
+        this.render_pagination();
     }
 
     async add_item(asset: string, balance: GetContractBalanceResult) {
@@ -52,34 +70,121 @@ export class ContractAssets {
 
     set_loading() {
         this.list_element.replaceChildren();
-        Box.list_loading(this.list_element, 5, `1rem`);
+        Box.list_loading(this.list_element, this.page_size, `1rem`);
+        Box.content_loading(this.pagination_element, true);
+    }
+
+    private render_pagination() {
+        this.pagination_element.replaceChildren();
+
+        const first_button = document.createElement(`button`);
+        first_button.classList.add(`xe-contract-assets-pagination-btn`);
+        first_button.innerHTML = icons.page_end();
+        first_button.title = localization.get_text(`First page`);
+        first_button.disabled = this.current_page === 0;
+        first_button.onclick = () => this.goto_page(0);
+        this.pagination_element.appendChild(first_button);
+
+        const previous_button = document.createElement(`button`);
+        previous_button.classList.add(`xe-contract-assets-pagination-btn`);
+        previous_button.innerHTML = icons.page_next();
+        previous_button.title = localization.get_text(`Previous page`);
+        previous_button.disabled = this.current_page === 0;
+        previous_button.onclick = () => this.goto_page(this.current_page - 1);
+        this.pagination_element.appendChild(previous_button);
+
+        const page_indicator = document.createElement(`div`);
+        page_indicator.classList.add(`xe-contract-assets-page-indicator`);
+        page_indicator.innerText = localization.get_text(`Page {}`, [(this.current_page + 1).toLocaleString()]);
+        this.pagination_element.appendChild(page_indicator);
+
+        const next_button = document.createElement(`button`);
+        next_button.classList.add(`xe-contract-assets-pagination-btn`);
+        next_button.innerHTML = icons.page_next();
+        next_button.style.rotate = `180deg`;
+        next_button.title = localization.get_text(`Next page`);
+        next_button.disabled = !this.has_next_page;
+        next_button.onclick = () => this.goto_page(this.current_page + 1);
+        this.pagination_element.appendChild(next_button);
+
+        if (this.total_assets_shown > 0) {
+            const start = this.current_page * this.page_size + 1;
+            const end = start + this.total_assets_shown - 1;
+            this.info_element.innerHTML = localization.get_text(`Showing {}-{} entries`, [
+                start.toLocaleString(),
+                end.toLocaleString()
+            ]);
+            if (this.has_next_page) {
+                this.info_element.innerHTML += ` ${localization.get_text(`(more available)`)}`;
+            }
+        } else {
+            this.info_element.innerHTML = ``;
+        }
+    }
+
+    private async goto_page(page: number) {
+        if (!this.contract_hash || page < 0) {
+            return;
+        }
+        this.current_page = page;
+        this.render_pagination();
+        await this.load_assets(this.contract_hash, page);
+    }
+
+    private async load_assets(contract_hash: string, page: number) {
+        const node = XelisNode.instance();
+        const skip = page * this.page_size;
+        const maximum = this.page_size;
+
+        this.list_element.replaceChildren();
+        this.set_loading();
+
+        try {
+            const assets = await node.rpc.getContractAssets({
+                contract: contract_hash,
+                skip,
+                maximum
+            });
+
+            const balances = await fetch_contract_balances(contract_hash, assets);
+
+            this.total_assets_shown = assets.length;
+            this.has_next_page = assets.length === maximum;
+            this.render_pagination();
+
+            this.list_element.replaceChildren();
+
+            if (balances.length === 0) {
+                const empty_element = document.createElement(`div`);
+                empty_element.classList.add(`xe-contract-assets-empty`);
+                empty_element.innerHTML = `
+                    ${icons.empty_box()}
+                    <div>${localization.get_text(`No balance for this contract`)}</div>
+                    <div style="font-size: 1.3rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no balance yet`)}</div>
+                `;
+                this.list_element.appendChild(empty_element);
+            } else {
+                for (let i = 0; i < balances.length; i++) {
+                    await this.add_item(assets[i], balances[i]);
+                }
+            }
+            Box.content_loading(this.pagination_element, false);
+        } catch (e) {
+            console.error(`Failed to load contract balances for ${contract_hash}:`, e);
+            this.list_element.replaceChildren();
+            this.total_assets_shown = 0;
+            this.has_next_page = false;
+            this.render_pagination();
+            Box.content_loading(this.pagination_element, false);
+        }
     }
 
     async load(contract_hash: string) {
-        const node = XelisNode.instance();
-
-        const assets = await node.rpc.getContractAssets({
-            contract: contract_hash
-        });
-
-        const balances = await fetch_contract_balances(contract_hash, assets);
-
-        this.list_element.replaceChildren();
-
-        if (balances.length === 0) {
-            const empty_element = document.createElement(`div`);
-            empty_element.classList.add(`xe-contract-assets-empty`);
-            empty_element.innerHTML = `
-                ${icons.empty_box()}
-                <div>${localization.get_text(`No balance for this contract`)}</div>
-                <div style="font-size: 1.3rem; opacity: 0.7; margin-top: 0.5rem;">${localization.get_text(`This contract has no balance yet`)}</div>
-            `;
-            this.list_element.appendChild(empty_element);
-        } else {
-            balances.forEach((balance, i) => {
-                const asset = assets[i];
-                this.add_item(asset, balance);
-            });
-        }
+        this.contract_hash = contract_hash;
+        this.current_page = 0;
+        this.has_next_page = false;
+        this.total_assets_shown = 0;
+        this.render_pagination();
+        await this.load_assets(contract_hash, this.current_page);
     }
 }

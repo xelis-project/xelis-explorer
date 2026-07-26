@@ -1,0 +1,102 @@
+.xe-json-viewer-list-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.xe-json-viewer-list-modal.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.xe-json-viewer-list-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+}
+
+.xe-json-viewer-list-modal-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 700px;
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 1rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    transform: translateY(-30px) scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.xe-json-viewer-list-modal.visible .xe-json-viewer-list-modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.xe-json-viewer-list-modal-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 1;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.xe-json-viewer-list-modal-actions button {
+    height: 2.25rem;
+    box-sizing: border-box;
+}
+
+.xe-json-viewer-list-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    color: #fff;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.375rem;
+}
+
+.xe-json-viewer-list-modal-expand,
+.xe-json-viewer-list-modal-minimize {
+    padding: 0.35rem 0.5rem;
+    min-width: 4.5rem;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.375rem;
+}
+
+.xe-json-viewer-list-modal-close svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.xe-json-viewer-list-modal-title {
+    padding-right: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.xe-json-viewer-list-modal-value {
+    min-height: 0;
+    overflow: auto;
+}
