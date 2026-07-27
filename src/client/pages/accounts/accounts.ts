@@ -65,13 +65,12 @@ export class AccountsPage extends Page {
         this.pagination = new Pagination();
         this.pagination.current_page = 1;
         this.pagination.sibling_count = 2;
-        this.pagination.page_size = 6;
+        this.pagination.page_size = 20;
+        this.container_table.element.insertBefore(this.pagination.element, this.table.element);
 
         this.pagination.add_listener(`page_change`, (page) => {
             this.load_accounts();
         });
-
-        this.master.content.appendChild(this.pagination.element);
     }
 
     async load_accounts() {

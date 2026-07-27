@@ -67,12 +67,11 @@ export class AssetsPage extends Page {
         this.pagination.current_page = 1;
         this.pagination.sibling_count = 2;
         this.pagination.page_size = default_assets_page_size;
+        this.container_table.element.insertBefore(this.pagination.element, this.table.element);
 
         this.pagination.add_listener(`page_change`, (page) => {
             this.load_assets();
         });
-
-        this.master.content.appendChild(this.pagination.element);
     }
 
     async load_assets() {

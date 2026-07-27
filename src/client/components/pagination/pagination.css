@@ -27,7 +27,6 @@
 }
 
 .xe-pagination button:hover {
-    translate: 0 -2px;
     border-color: var(--xe-border-strong);
     background: linear-gradient(135deg, rgba(2, 255, 207, 0.14), rgba(127, 255, 231, 0.07));
     box-shadow: 0 0 18px rgba(2, 255, 207, 0.1);
@@ -48,10 +47,15 @@
 }
 
 .xe-pagination-count {
+    display: flex;
+    align-items: center;
+    min-height: 3.2rem;
+    box-sizing: border-box;
     border: 1px solid var(--xe-border-soft);
-    padding: .55rem .85rem;
+    padding: .45rem .95rem;
     border-radius: var(--xe-radius);
     font-size: 1.4rem;
+    line-height: 1;
     font-weight: bold;
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.035);

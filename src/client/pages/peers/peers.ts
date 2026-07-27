@@ -164,7 +164,7 @@ export class PeersPage extends Page {
 
         this.peers_map.map.overlay_loading.set_loading(true);
         Box.boxes_loading(this.peers_chart.container.element, true);
-        Box.list_loading(this.peers_list.element_content, 20, `8rem`);
+        Box.list_loading(this.peers_list.element_content, 20, `12rem`);
         this.peers_info.set_loading(true);
 
         const info = await node.rpc.getInfo();

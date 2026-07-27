@@ -43,7 +43,6 @@
 }
 
 .xe-prev-next-pager button:hover {
-    translate: 0 -2px;
     color: var(--xe-accent);
     border-color: var(--xe-border-strong);
     background: linear-gradient(135deg, rgba(2, 255, 207, 0.14), rgba(127, 255, 231, 0.07));

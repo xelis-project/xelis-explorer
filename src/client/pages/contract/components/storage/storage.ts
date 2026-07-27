@@ -60,7 +60,7 @@ export class ContractStorageEntries {
 
         this.pagination_element = document.createElement(`div`);
         this.pagination_element.classList.add(`xe-contract-storage-pagination`);
-        this.container.element.appendChild(this.pagination_element);
+        this.container.element.insertBefore(this.pagination_element, this.list_element);
 
         this.history_modal = new StorageHistoryModal();
 

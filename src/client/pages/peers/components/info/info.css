@@ -23,6 +23,7 @@
     gap: .25rem;
     flex-direction: column;
     flex: 1;
+    min-height: 2rem;
     white-space: nowrap;
 }
 

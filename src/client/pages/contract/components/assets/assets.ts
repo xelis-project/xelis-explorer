@@ -40,7 +40,7 @@ export class ContractAssets {
 
         this.pagination_element = document.createElement(`div`);
         this.pagination_element.classList.add(`xe-contract-assets-pagination`);
-        this.container.element.appendChild(this.pagination_element);
+        this.container.element.insertBefore(this.pagination_element, this.list_element);
 
         this.render_pagination();
     }

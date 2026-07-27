@@ -14,6 +14,8 @@ export class PeersInfo {
     full_ledger_element: HTMLDivElement;
     pruned_ledger_element: HTMLDivElement;
 
+    private readonly item_min_height = `2rem`;
+
     constructor() {
         this.container = new Container();
         this.container.element.classList.add(`xe-peers-info`);
@@ -31,11 +33,11 @@ export class PeersInfo {
     }
 
     set_loading(loading: boolean) {
-        Box.content_loading(this.total_element, loading, `1rem`);
-        Box.content_loading(this.sync_element, loading, `1rem`);
-        Box.content_loading(this.desync_element, loading, `1rem`);
-        Box.content_loading(this.full_ledger_element, loading, `1rem`);
-        Box.content_loading(this.pruned_ledger_element, loading, `1rem`);
+        Box.content_loading(this.total_element, loading, this.item_min_height);
+        Box.content_loading(this.sync_element, loading, this.item_min_height);
+        Box.content_loading(this.desync_element, loading, this.item_min_height);
+        Box.content_loading(this.full_ledger_element, loading, this.item_min_height);
+        Box.content_loading(this.pruned_ledger_element, loading, this.item_min_height);
     }
 
     set(peers: Peer[], height: number, total_count: number) {
