@@ -79,4 +79,11 @@ export class DashboardTxs {
         }
         this.check_display_empty();
     }
+
+    unload() {
+        this.remove_scrollbar_padding_listener();
+        this.tx_items = [];
+        this.element_content.replaceChildren();
+        this.empty_element.remove();
+    }
 }

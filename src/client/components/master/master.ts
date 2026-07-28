@@ -51,5 +51,6 @@ export class Master {
 
     unload() {
         this.header.unload();
+        this.collapsed_menu.unload();
     }
 }

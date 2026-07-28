@@ -266,5 +266,6 @@ export class Header {
 
     unload() {
         window.removeEventListener(`click`, this.on_mobile_menu_outside_click);
+        App.instance().events.remove_listener("page_load", this.highlight_menu_link);
     }
 }

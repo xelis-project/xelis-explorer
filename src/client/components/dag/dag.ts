@@ -423,6 +423,13 @@ export class DAG {
         this.stop_animation_loop();
         window.clearTimeout(this.load_timeout);
         this.dispose_objects();
+        window.removeEventListener('resize', this.on_resize);
+        this.element.removeEventListener(`pointermove`, this.on_pointer_move);
+        this.element.removeEventListener(`click`, this.on_click);
+        this.height_control.unload();
+        this.controls.dispose();
+        this.renderer.dispose();
+        this.renderer.forceContextLoss();
     }
 
     listen_node_events() {
@@ -497,6 +504,8 @@ export class DAG {
         this.height_group.clear();
 
         this.block_mesh_hashes.clear();
+        this.tip_mesh_hashes.clear();
+        this.height_mesh_map.clear();
         this.blocks_by_height.clear();
 
         this.hovered_block_box_mesh = undefined;

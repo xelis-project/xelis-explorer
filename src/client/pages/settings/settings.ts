@@ -25,6 +25,7 @@ export class SettingsPage extends Page {
     }
 
     master: Master;
+    test_ws_daemon?: DaemonWS;
 
     constructor() {
         super();
@@ -151,17 +152,24 @@ export class SettingsPage extends Page {
             try {
                 const new_endpoint = ws_connection_input.value;
                 const daemon = new DaemonWS(new_endpoint);
+                this.test_ws_daemon?.socket.close();
+                this.test_ws_daemon = daemon;
                 daemon.socket.addEventListener(`open`, async () => {
-                    const info = await daemon.methods.getInfo();
-                    alert(localization.get_text(`Connection successful. Node {} - {}`, [info.network, info.version]));
-                    daemon.socket.close();
-
-                    settings.node_ws_connection = new_endpoint;
-                    settings.save();
-                });
+                    try {
+                        const info = await daemon.methods.getInfo();
+                        alert(localization.get_text(`Connection successful. Node {} - {}`, [info.network, info.version]));
+                        settings.node_ws_connection = new_endpoint;
+                        settings.save();
+                    } finally {
+                        daemon.socket.close();
+                        if (this.test_ws_daemon === daemon) this.test_ws_daemon = undefined;
+                    }
+                }, { once: true });
                 daemon.socket.addEventListener(`error`, (e) => {
                     alert(localization.get_text(`An error occurred while trying to connect.`));
-                });
+                    daemon.socket.close();
+                    if (this.test_ws_daemon === daemon) this.test_ws_daemon = undefined;
+                }, { once: true });
             } catch (e) {
                 alert(e);
             }
@@ -280,6 +288,8 @@ export class SettingsPage extends Page {
 
     unload(): void {
         super.unload();
+        this.test_ws_daemon?.socket.close();
+        this.test_ws_daemon = undefined;
         this.master.unload();
     }
 }

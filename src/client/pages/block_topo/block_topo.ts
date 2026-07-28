@@ -46,7 +46,7 @@ export class BlockTopoPage extends Page {
     block_page: BlockPage;
     constructor() {
         super();
-        this.block_page = BlockPage.instance();
+        this.block_page = new BlockPage();
         this.element = this.block_page.element;
     }
 
@@ -94,12 +94,14 @@ export class BlockTopoPage extends Page {
             this.block_page.set(block, info);
             this.block_page.set_dag(block, info);
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_element(new NotFoundPage().element);
         }
     }
 
     unload() {
         super.unload();
         this.block_page.clear_node_events();
+        this.block_page.block_graph.dag.unload();
+        this.block_page.master.unload();
     }
 }

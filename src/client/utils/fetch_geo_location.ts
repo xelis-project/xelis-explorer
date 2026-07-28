@@ -39,13 +39,13 @@ export interface GeoLocationData {
 
 // geoip.xelis.io max ips per fetch is 50
 
-export const fetch_geo_location = async (ips: string[]) => {
+export const fetch_geo_location = async (ips: string[], signal?: AbortSignal) => {
     if (ips.length > 50) {
         throw new Error("max 50 IPs per fetch");
     }
 
     ips.sort();
     const query = `?ips=${ips.join(`,`)}`;
-    const res = await fetch(`https://geoip.xelis.io${query}`);
+    const res = await fetch(`https://geoip.xelis.io${query}`, { signal });
     return await res.json<Record<string, GeoLocationData>>();
 }

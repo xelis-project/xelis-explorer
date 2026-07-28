@@ -3,7 +3,6 @@ import { XelisNode } from '../../app/xelis_node';
 import { localization } from '../../localization/localization';
 
 import './node_status.css';
-import { animate } from 'animejs';
 
 export class NodeStatus {
     element: HTMLDivElement;
@@ -45,13 +44,13 @@ export class NodeStatus {
         hide_button_element.title = localization.get_text(`Hide alert.`);
         hide_button_element.innerHTML = `${icons.caret_down()}`;
         hide_button_element.addEventListener(`click`, () => {
-            animate(reconnect_element, {
+            import('animejs').then(({ animate }) => animate(reconnect_element, {
                 translateY: [0, `-100%`],
                 duration: 500,
                 onComplete: () => {
                     reconnect_element.remove();
                 }
-            });
+            }));
         });
         reconnect_container.appendChild(hide_button_element);
 

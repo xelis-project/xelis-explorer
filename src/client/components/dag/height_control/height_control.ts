@@ -123,4 +123,9 @@ export class HeightControl extends EventEmitter<HeightControlEventMap> {
             range: { min: 0, max: max_height }
         }, false);
     }
+
+    unload() {
+        this.clear_listeners();
+        this.height_slider.destroy();
+    }
 }

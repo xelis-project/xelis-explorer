@@ -150,7 +150,7 @@ export class AssetPage extends Page {
             this.asset_max_supply.set(server_data.asset);
             this.asset_owner.set(server_data.asset);
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_page_element(new NotFoundPage());
         }
     }
 

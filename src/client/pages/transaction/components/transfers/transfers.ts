@@ -41,4 +41,9 @@ export class TransactionTransfers {
             this.append_transfer(transfer);
         });
     }
+
+    unload() {
+        this.remove_scrollbar_padding_listener();
+        this.transfers_element.replaceChildren();
+    }
 }

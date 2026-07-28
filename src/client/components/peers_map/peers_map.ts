@@ -27,6 +27,7 @@ export class PeersMap {
     map!: leaflet.Map;
     peer_markers: Map<string, PeerMarker>;
     peer_marker_keys: Map<string, string>;
+    destroyed = false;
 
     constructor() {
         this.element = document.createElement(`div`);
@@ -44,6 +45,7 @@ export class PeersMap {
 
     async setup_map() {
         const leaflet = await import("leaflet");
+        if (this.destroyed) return;
         this.map = leaflet.map(this.element).setView([20, 0], 2);
         this.map.setMinZoom(2);
         leaflet.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -55,7 +57,7 @@ export class PeersMap {
         this.peer_count_element.innerHTML = `${count.toLocaleString()}P`;
     }
 
-    async fetch_peers_locations(peers: Peer[]) {
+    async fetch_peers_locations(peers: Peer[], signal?: AbortSignal) {
         const peers_addr = peers.map(peer => {
             const addr = parse_addr(peer.addr);
             if (!addr) {
@@ -70,8 +72,16 @@ export class PeersMap {
 
         const batch_size = 50;
         for (let i = 0; i < ips.length; i += batch_size) {
+            if (signal?.aborted) return [];
             const ips_to_fetch = ips.slice(i, i + batch_size);
-            const geo_locations = await fetch_geo_location(ips_to_fetch);
+            let geo_locations: Record<string, GeoLocationData>;
+            try {
+                geo_locations = await fetch_geo_location(ips_to_fetch, signal);
+            } catch (error) {
+                if (signal?.aborted) return [];
+                throw error;
+            }
+            if (signal?.aborted) return [];
             Object.keys(geo_locations).forEach((key) => {
                 const peer_addr = peers_addr.find(p => p.addr?.ip === key);
                 if (!peer_addr) return;
@@ -191,5 +201,13 @@ export class PeersMap {
 
             this.peer_marker_keys.delete(peer_id);
         }
+    }
+
+    unload() {
+        this.destroyed = true;
+        this.peer_markers.forEach(({ marker }) => marker.remove());
+        this.peer_markers.clear();
+        this.peer_marker_keys.clear();
+        this.map?.remove();
     }
 }

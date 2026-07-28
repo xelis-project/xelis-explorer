@@ -138,7 +138,8 @@ export class PeersPage extends Page {
 
         // only fetch new peers
         if (new_peers.length > 0) {
-            const new_peers_locations = await this.peers_map.map.fetch_peers_locations(new_peers);
+            const new_peers_locations = await this.peers_map.map.fetch_peers_locations(new_peers, this.signal);
+            if (this.signal.aborted) return;
             peers_locations = [...peers_locations, ...new_peers_locations];
         }
 
@@ -173,7 +174,8 @@ export class PeersPage extends Page {
         const { peers } = peers_result;
 
         this.peer_count = peers.length;
-        const peers_locations = await this.peers_map.map.fetch_peers_locations(peers);
+        const peers_locations = await this.peers_map.map.fetch_peers_locations(peers, this.signal);
+        if (this.signal.aborted) return;
         await this.peers_map.map.set(peers_locations);
         this.peers_map.map.overlay_loading.set_loading(false);
         Box.boxes_loading(this.peers_chart.container.element, false);
@@ -197,6 +199,7 @@ export class PeersPage extends Page {
         this.peers_chart.nodes_by_country.unload();
         this.peers_chart.nodes_by_version.unload();
         window.clearInterval(this.update_interval_5000_id);
+        this.peers_map.map.unload();
         this.master.unload();
     }
 }

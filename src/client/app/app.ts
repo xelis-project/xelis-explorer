@@ -4,7 +4,6 @@ import { Singleton } from "../utils/singleton";
 import { EventEmitter } from "../utils/event_emitter";
 import { TopLoadingBar } from "../components/top_loading_bar/top_loading_bar";
 import { NodeStatus } from "../components/node_status/node_status";
-import { JsonViewer } from "../components/json_viewer/json_viewer";
 import { Notification } from "../components/notification/notification";
 
 import "reset-css/reset.css";
@@ -30,6 +29,7 @@ export class App extends Singleton {
     notification: Notification;
 
     load_page_timeout?: number;
+    navigation_generation = 0;
 
     constructor() {
         super();
@@ -49,7 +49,6 @@ export class App extends Singleton {
 
         this.load_page();
         this.register_events();
-        JsonViewer.initialize_import();
     }
 
     go_to(url: string) {
@@ -62,17 +61,26 @@ export class App extends Singleton {
     }
 
     load_page() {
+        const generation = ++this.navigation_generation;
         const switch_page = async () => {
+            // Release the current page before waiting for the next route chunk.
+            // This keeps the old page from holding resources during navigation.
+            this.current_page?.unload();
+            this.current_page = undefined;
+
             const url = new URL(window.location.href);
-            const page_type = match_route(url);
+            const page_type = await match_route(url);
+            if (generation !== this.navigation_generation) return;
 
-            if (this.current_page) this.current_page.unload();
-            this.current_page = page_type.instance();
+            const page = new page_type();
+            this.current_page = page;
 
-            if (this.current_page) {
-                this.top_loading_bar.start();
-                await this.current_page.load(this.root);
+            this.top_loading_bar.start();
+            await page.load(this.root);
+            if (generation !== this.navigation_generation) return;
+            if (this.current_page === page) {
                 this.top_loading_bar.end();
+                this.events.emit("page_load");
             }
         }
 
@@ -80,7 +88,6 @@ export class App extends Singleton {
         window.clearTimeout(this.load_page_timeout);
         this.load_page_timeout = window.setTimeout(() => {
             switch_page();
-            this.events.emit("page_load");
         }, 100);
     }
 

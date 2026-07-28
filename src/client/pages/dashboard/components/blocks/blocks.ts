@@ -53,4 +53,10 @@ export class DashboardBlocks {
         }
         return last_block_item;
     }
+
+    unload() {
+        this.remove_scrollbar_padding_listener();
+        this.block_items = [];
+        this.element_content.replaceChildren();
+    }
 }

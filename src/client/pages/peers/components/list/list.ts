@@ -2,6 +2,7 @@ import { PeerLocation } from "../../../../components/peers_map/peers_map";
 import { Container } from "../../../../components/container/container";
 import { PeerItem } from "../../../../components/peer_item/peer_item";
 import { PeersPage } from "../../peers";
+import { App } from "../../../../app/app";
 import { localization } from "../../../../localization/localization";
 
 import './list.css';
@@ -41,7 +42,7 @@ export class PeersList {
 
         if (geo_location.success) {
             peer_item.box.element.addEventListener(`click`, () => {
-                const { peers_map } = PeersPage.instance();
+                const { peers_map } = App.instance().current_page as PeersPage;
                 if (geo_location.success) {
                     peers_map.map.map.flyTo([geo_location.latitude, geo_location.longitude], 6);
                 }

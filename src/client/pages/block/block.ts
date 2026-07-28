@@ -242,7 +242,7 @@ export class BlockPage extends Page {
             this.set_dag(block, info);
             this.update_interval_1000_id = window.setInterval(this.update_interval_1000, 1000);
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_page_element(new NotFoundPage());
         }
     }
 

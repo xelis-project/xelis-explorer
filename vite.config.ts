@@ -29,22 +29,9 @@ export default defineConfig({
                     return 'assets/[name]-[hash][extname]';
                 },
                 manualChunks: (id) => {
-                    if (id.includes('three') || id.includes(`camera-controls`)) {
-                        return `three`;
-                    }
-
-                    if (id.includes(`animejs`)) {
-                        return `animejs`;
-                    }
-
-                    if (id.includes(`d3`)) {
-                        return `d3`;
-                    }
-
-                    if (id.includes('noto_sans_regular')) {
-                        return 'noto_sans_regular';
-                    }
-
+                    // Keep route-specific dependencies in their dynamic route
+                    // chunks. Forcing these libraries into named manual chunks
+                    // makes Vite preload them from the application entry.
                     return null;
                 }
             }

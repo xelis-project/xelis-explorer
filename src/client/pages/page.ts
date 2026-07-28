@@ -1,10 +1,15 @@
 import { Context } from "hono";
 import { ServerApp } from "../../server";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { Singleton } from "../utils/singleton";
 
-export class Page extends Singleton {
+export class Page {
     element: HTMLDivElement;
+    private child_pages: Page[] = [];
+    private abort_controller = new AbortController();
+
+    get signal() {
+        return this.abort_controller.signal;
+    }
 
     static pathname: string = "";
     static title: string = "";
@@ -46,7 +51,6 @@ export class Page extends Singleton {
     }
 
     constructor() {
-        super();
         this.element = document.createElement(`div`);
         this.element.classList.add(`xe-page`);
     }
@@ -60,7 +64,15 @@ export class Page extends Singleton {
     }
 
     unload() {
+        this.abort_controller.abort();
+        this.child_pages.forEach(page => page.unload());
+        this.child_pages = [];
         this.element.remove();
+    }
+
+    set_page_element(page: Page) {
+        this.child_pages.push(page);
+        this.set_element(page.element);
     }
 
     set_element(element: HTMLElement) {

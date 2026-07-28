@@ -223,7 +223,7 @@ export class AccountPage extends Page {
             await this.account_history.set(server_data, this.page_data.assets);
             this.listen_node_events();
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_page_element(new NotFoundPage());
         }
     }
 

@@ -77,4 +77,10 @@ export class TransactionInBlocks {
         });
         this.set_legend(executed_in_block);
     }
+
+    unload() {
+        this.remove_scrollbar_padding_listener();
+        this.block_items = [];
+        this.blocks_element.replaceChildren();
+    }
 }

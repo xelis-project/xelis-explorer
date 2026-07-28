@@ -13,7 +13,7 @@ export default (app: Hono<ServerApp>) => {
         let head = ``;
         let body = ``;
 
-        const page_type = match_route(new URL(c.req.url));
+        const page_type = await match_route(new URL(c.req.url));
 
         await page_type.handle_server(c);
 

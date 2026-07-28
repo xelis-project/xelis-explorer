@@ -100,6 +100,7 @@ export class TransactionPage extends Page {
     transaction_info: TransactionInfo;
     transaction_extra: TransactionExtra;
     transaction_in_blocks: TransactionInBlocks;
+    transaction_transfers?: TransactionTransfers;
     transaction_type_container: HTMLDivElement;
 
     constructor() {
@@ -211,10 +212,12 @@ export class TransactionPage extends Page {
         }
 
         this.transaction_type_container.replaceChildren();
+        this.transaction_transfers?.unload();
+        this.transaction_transfers = undefined;
         if (transaction.data.transfers) {
-            const transaction_transfers = new TransactionTransfers();
-            transaction_transfers.set(transaction.data.transfers);
-            this.transaction_type_container.appendChild(transaction_transfers.container.element);
+            this.transaction_transfers = new TransactionTransfers();
+            this.transaction_transfers.set(transaction.data.transfers);
+            this.transaction_type_container.appendChild(this.transaction_transfers.container.element);
         }
 
         if (transaction.data.burn) {
@@ -290,7 +293,7 @@ export class TransactionPage extends Page {
             this.set_page(transaction, in_blocks);
             this.update_interval_1000_id = window.setInterval(this.update_interval_1000, 1000);
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_page_element(new NotFoundPage());
         }
     }
 
@@ -298,6 +301,8 @@ export class TransactionPage extends Page {
         super.unload();
         this.clear_node_events();
         window.clearInterval(this.update_interval_1000_id);
+        this.transaction_in_blocks.unload();
+        this.transaction_transfers?.unload();
         this.master.unload();
     }
 }

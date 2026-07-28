@@ -1,54 +1,54 @@
-import { AccountPage } from "../pages/account/account";
-import { AccountsPage } from "../pages/accounts/accounts";
-import { AssetPage } from "../pages/asset/asset";
-import { AssetsPage } from "../pages/assets/assets";
-import { BlockPage } from "../pages/block/block";
-import { BlockHeightPage } from "../pages/block_height/block_height";
-import { BlockTopoPage } from "../pages/block_topo/block_topo";
-import { BlocksPage } from "../pages/blocks/blocks";
-import { ContractPage } from "../pages/contract/contract";
-import { ContractsPage } from "../pages/contracts/contracts";
-import { DAGPage } from "../pages/dag/dag";
-import { DashboardPage } from "../pages/dashboard/dashboards";
-import { DownloadAppPage } from "../pages/donwload_app/download_app";
-import { KnownAccountsPage } from "../pages/known_accounts/known_accounts";
-import { MempoolPage } from "../pages/mempool/mempool";
-import { NetworkUpgradesPage } from "../pages/network_upgrades/network_upgrades";
-import { NotFoundPage } from "../pages/not_found/not_found";
 import { Page } from "../pages/page";
-import { PeersPage } from "../pages/peers/peers";
-import { SettingsPage } from "../pages/settings/settings";
-import { TransactionPage } from "../pages/transaction/transaction";
-import { TransactionsPage } from "../pages/transactions/transactions";
 
-export const pages = [
-    DashboardPage,
-    BlockPage,
-    BlocksPage,
-    MempoolPage,
-    PeersPage,
-    DAGPage,
-    BlockTopoPage,
-    BlockHeightPage,
-    AccountPage,
-    KnownAccountsPage,
-    TransactionPage,
-    TransactionsPage,
-    AccountsPage,
-    ContractPage,
-    ContractsPage,
-    AssetPage,
-    AssetsPage,
-    SettingsPage,
-    NetworkUpgradesPage,
-    DownloadAppPage
+type PageConstructor = typeof Page;
+type PageModule = { [key: string]: PageConstructor };
+
+interface RouteDefinition {
+    pathname: string;
+    load: () => Promise<PageModule>;
+    export_name: string;
+}
+
+// Keep route matching small and dependency-free. Page implementations are loaded
+// only after a route has matched, so the initial client bundle contains no page
+// trees or page-specific libraries.
+const routes: RouteDefinition[] = [
+    { pathname: "/", load: () => import("../pages/dashboard/dashboards"), export_name: "DashboardPage" },
+    { pathname: "/block/:id", load: () => import("../pages/block/block"), export_name: "BlockPage" },
+    { pathname: "/blocks", load: () => import("../pages/blocks/blocks"), export_name: "BlocksPage" },
+    { pathname: "/mempool", load: () => import("../pages/mempool/mempool"), export_name: "MempoolPage" },
+    { pathname: "/peers", load: () => import("../pages/peers/peers"), export_name: "PeersPage" },
+    { pathname: "/dag", load: () => import("../pages/dag/dag"), export_name: "DAGPage" },
+    { pathname: "/topo/:id", load: () => import("../pages/block_topo/block_topo"), export_name: "BlockTopoPage" },
+    { pathname: "/height/:id", load: () => import("../pages/block_height/block_height"), export_name: "BlockHeightPage" },
+    { pathname: "/account/:id", load: () => import("../pages/account/account"), export_name: "AccountPage" },
+    { pathname: "/known-accounts", load: () => import("../pages/known_accounts/known_accounts"), export_name: "KnownAccountsPage" },
+    { pathname: "/tx/:id", load: () => import("../pages/transaction/transaction"), export_name: "TransactionPage" },
+    { pathname: "/transactions", load: () => import("../pages/transactions/transactions"), export_name: "TransactionsPage" },
+    { pathname: "/accounts", load: () => import("../pages/accounts/accounts"), export_name: "AccountsPage" },
+    { pathname: "/contract/:id", load: () => import("../pages/contract/contract"), export_name: "ContractPage" },
+    { pathname: "/contracts", load: () => import("../pages/contracts/contracts"), export_name: "ContractsPage" },
+    { pathname: "/asset/:id", load: () => import("../pages/asset/asset"), export_name: "AssetPage" },
+    { pathname: "/assets", load: () => import("../pages/assets/assets"), export_name: "AssetsPage" },
+    { pathname: "/settings", load: () => import("../pages/settings/settings"), export_name: "SettingsPage" },
+    { pathname: "/network-upgrades", load: () => import("../pages/network_upgrades/network_upgrades"), export_name: "NetworkUpgradesPage" },
+    { pathname: "/download-app", load: () => import("../pages/donwload_app/download_app"), export_name: "DownloadAppPage" },
 ];
 
-export const match_route = (url: URL): typeof Page => {
-    const page_type = pages.find(page => {
-        const pattern = page.get_pattern();
-        return pattern.test(url);
-    });
-    if (page_type) return page_type;
-    return NotFoundPage;
-}
+const not_found_route: RouteDefinition = {
+    pathname: "*",
+    load: () => import("../pages/not_found/not_found"),
+    export_name: "NotFoundPage",
+};
+
+const route_patterns = routes.map(route => ({
+    route,
+    pattern: new URLPattern({ pathname: route.pathname }),
+}));
+
+export const match_route = async (url: URL): Promise<PageConstructor> => {
+    const match = route_patterns.find(({ pattern }) => pattern.test(url));
+    const route = match?.route || not_found_route;
+    const module = await route.load();
+    return module[route.export_name];
+};

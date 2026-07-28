@@ -2,6 +2,7 @@ import { localization } from "../../../../localization/localization";
 import { Container } from "../../../../components/container/container";
 import { TextInput } from "../../../../components/text_input/text_input";
 import { PeersPage } from "../../peers";
+import { App } from "../../../../app/app";
 
 import './search.css';
 
@@ -39,7 +40,7 @@ export class PeersSearch {
 
     async search() {
         const value = this.text_input.element.value.toLowerCase();
-        const { peers_list } = PeersPage.instance();
+        const { peers_list } = App.instance().current_page as PeersPage;
 
         if (value.length > 0) {
             const filter_peer_ids = [] as string[];

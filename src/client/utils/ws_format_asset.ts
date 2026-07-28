@@ -5,6 +5,7 @@ import { reduce_text } from "./reduce_text";
 import DaemonWS from '@xelis/sdk/daemon/websocket';
 
 const asset_cache = new Map<string, AssetData>();
+const asset_cache_limit = 512;
 
 export const ws_format_asset = async (ws: DaemonWS, asset_hash: string, atomic_amount: number, locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) => {
     const format = (decimals: number, ticker?: string) => {
@@ -26,6 +27,10 @@ export const ws_format_asset = async (ws: DaemonWS, asset_hash: string, atomic_a
         try {
             asset_data = await ws.methods.getAsset({ asset: asset_hash });
             asset_cache.set(asset_hash, asset_data);
+            if (asset_cache.size > asset_cache_limit) {
+                const oldest = asset_cache.keys().next().value;
+                if (oldest) asset_cache.delete(oldest);
+            }
         } catch {
             // can't get data
         }

@@ -2,6 +2,7 @@ import { localization } from "../../../../localization/localization";
 import { Container } from "../../../../components/container/container";
 import { TextInput } from "../../../../components/text_input/text_input";
 import { MempoolPage } from "../../mempool";
+import { App } from "../../../../app/app";
 
 import './search.css';
 
@@ -39,7 +40,7 @@ export class MempoolSearch {
 
     async search() {
         const value = this.text_input.element.value;
-        const { mempool_txs_list } = MempoolPage.instance();
+        const { mempool_txs_list } = App.instance().current_page as MempoolPage;
 
         if (value.length > 0) {
             let filter_tx_hashes = [] as string[];

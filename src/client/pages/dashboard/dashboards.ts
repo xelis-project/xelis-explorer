@@ -234,7 +234,7 @@ export class DashboardPage extends Page {
         if (new_peer) {
             const addr = parse_addr(new_peer.addr);
             if (addr) {
-                const res = await fetch_geo_location([addr.ip]);
+                const res = await fetch_geo_location([addr.ip], this.signal);
                 const geo_location = res[addr.ip];
     
                 const peer_location = { peer: new_peer, geo_location } as PeerLocation;
@@ -327,7 +327,8 @@ export class DashboardPage extends Page {
         const node = XelisNode.instance();
         this.dashboard_peers.peers_map.overlay_loading.set_loading(true);
         const peers_result = await node.rpc.getPeers();
-        const peers_locations = await this.dashboard_peers.peers_map.fetch_peers_locations(peers_result.peers);
+        const peers_locations = await this.dashboard_peers.peers_map.fetch_peers_locations(peers_result.peers, this.signal);
+        if (this.signal.aborted) return;
         await this.dashboard_peers.peers_map.set(peers_locations);
         this.dashboard_peers.peers_map.overlay_loading.set_loading(false);
     }
@@ -354,7 +355,9 @@ export class DashboardPage extends Page {
         Box.boxes_loading(this.dashboard_chart_section_2.container.element, true);
 
         this.dashboard_dag.load();
-        this.load_peers();
+        this.load_peers().catch(err => {
+            if (!this.signal.aborted) console.error(err);
+        });
 
         await this.load_top_stats();
 
@@ -377,6 +380,8 @@ export class DashboardPage extends Page {
         this.dashboard_chart_section_2.block_time.unload();
         this.dashboard_chart_section_2.hashrate.unload();
         this.dashboard_chart_section_2.pools.unload();
+        this.dashboard_blocks.unload();
+        this.dashboard_txs.unload();
 
         this.dashboard_dag.unload();
         this.master.unload();

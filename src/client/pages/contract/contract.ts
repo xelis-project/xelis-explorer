@@ -131,7 +131,7 @@ export class ContractPage extends Page {
                 this.contract_storage_entries.show_history_for_param(storage_key_param, storage_key_topo_param);
             }
         } else {
-            this.set_element(NotFoundPage.instance().element);
+            this.set_page_element(new NotFoundPage());
         }
     }
 
