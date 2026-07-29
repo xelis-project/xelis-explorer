@@ -63,6 +63,14 @@
     animation: xe-table-loading-animation .5s infinite alternate;
 }
 
+.xe-table-block,
+.xe-table-miner {
+    display: flex;
+    gap: .5rem;
+    flex-direction: row;
+    align-items: center;
+}
+
 @keyframes xe-table-loading-animation {
     0% {
         opacity: 0;

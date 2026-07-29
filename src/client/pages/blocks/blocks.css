@@ -15,18 +15,3 @@
         translate: 0 0;
     }
 }
-
-
-.xe-blocks-table-block {
-    display: flex;
-    gap: .5rem;
-    flex-direction: row;
-    align-items: center;
-}
-
-.xe-blocks-table-miner {
-    display: flex;
-    gap: .5rem;
-    flex-direction: row;
-    align-items: center;
-}

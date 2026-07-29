@@ -202,7 +202,7 @@ export class DAGBlockDetails {
 
     set_miner(miner: string) {
         const container = document.createElement(`div`);
-        container.classList.add(`xe-blocks-table-miner`);
+        container.classList.add(`xe-table-miner`);
 
         const miner_icon = hashicon(miner, { size: 25 }) as HTMLCanvasElement;
         container.appendChild(miner_icon);

@@ -27,7 +27,7 @@ export class AccountRow extends Row {
 
     set_addr(addr: string) {
         const container = document.createElement(`div`);
-        container.classList.add(`xe-blocks-table-miner`);
+        container.classList.add(`xe-table-miner`);
 
         const signer_icon = hashicon(addr, { size: 25 }) as HTMLCanvasElement;
         container.appendChild(signer_icon);

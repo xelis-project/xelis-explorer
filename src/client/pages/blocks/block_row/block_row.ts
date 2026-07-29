@@ -43,7 +43,7 @@ export class BlockRow extends Row {
 
     set_type(type: BlockType) {
         const container = document.createElement(`div`);
-        container.classList.add(`xe-blocks-table-block`);
+        container.classList.add(`xe-table-block`);
 
         const block_box_type = new BlockTypeBox();
         block_box_type.set(1.5, type);
@@ -59,7 +59,7 @@ export class BlockRow extends Row {
 
     set_miner(miner: string) {
         const container = document.createElement(`div`);
-        container.classList.add(`xe-blocks-table-miner`);
+        container.classList.add(`xe-table-miner`);
 
         const miner_icon = hashicon(miner, { size: 25 }) as HTMLCanvasElement;
         container.appendChild(miner_icon);
