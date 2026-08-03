@@ -34,6 +34,11 @@
         "link": "https://www.coinex.com",
         "type": "exchange"
     },
+    "xel:lqd3m5dp0k6kryw9e73nhsx32rv72v70syyz07vnqrpjt3a5u9ksq56ugcd": {  
+        "name": "CoinEx - Hot Wallet",
+        "link": "https://www.coinex.com",
+        "type": "exchange"
+    },
     "xel:aee43hxxe8tzl0lrjq25dsj8rhvev2jseeyk6xydx9ltuj4fyezqqcmg5zq": {
         "name": "MEXC",
         "link": "https://www.mexc.com/",
