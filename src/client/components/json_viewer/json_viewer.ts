@@ -5,15 +5,15 @@ import './json_viewer.css';
 export class JsonViewer {
     element: JsonViewerElement;
 
-    static initialize_import() {
-        import("@alenaksu/json-viewer");
-    }
-
     constructor() {
         this.element = document.createElement(`json-viewer`);
     }
 
     set_data(data: any) {
-        this.element.data = data;
+        // Register the custom element before assigning its property. Keeping
+        // this lazy also avoids loading a browser-only widget during SSR.
+        void import('@alenaksu/json-viewer').then(() => {
+            this.element.data = data;
+        });
     }
 }

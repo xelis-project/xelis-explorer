@@ -84,7 +84,7 @@ export class TransactionInvokeContract {
         parameters_title_element.innerHTML = localization.get_text(`PARAMETERS`);
         this.container.element.appendChild(parameters_title_element);
 
-        if (invoke_contract.parameters.length > 0) {
+        if (invoke_contract.parameters) {
             const parameters_json_viewer_box = new JsonViewerBox(invoke_contract.parameters);
             this.container.element.appendChild(parameters_json_viewer_box.box.element);
         } else {
