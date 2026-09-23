@@ -38,6 +38,12 @@ export class TransactionContractLogs {
                             ${localization.get_text(`The contract execution was successful. Exit code: {}`, [`0`])}
                             </div>
                         `;
+                    } else if (exit_code === null) {
+                        collapse_box.content_element.innerHTML = `
+                            <div class="exit-code">
+                            ${localization.get_text(`No exit code was returned.`)}
+                            </div>
+                        `;
                     } else {
                         collapse_box.content_element.innerHTML = `
                             <div class="exit-code">
@@ -94,7 +100,6 @@ export class TransactionContractLogs {
                         </table>
                     `;
 
-                    collapse_box.content_element.innerHTML = ``;
                     collapse_box.set_collapse(true);
                     this.container.element.appendChild(collapse_box.element);
                 }
@@ -317,6 +322,25 @@ export class TransactionContractLogs {
                         </table>
                     `;
 
+                    collapse_box.set_collapse(true);
+                    this.container.element.appendChild(collapse_box.element);
+                }
+
+                if (contract_log.type === `event`) {
+                    const collapse_box = new CollapseBox();
+                    collapse_box.title_element.innerHTML = localization.get_text(`EVENT`);
+                    collapse_box.content_element.innerHTML = `
+                        <table>
+                            <tr>
+                                <td>${localization.get_text(`CONTRACT`)}</td>
+                                <td><a href="/tx/${contract_log.value.contract}">${format_hash(contract_log.value.contract)}</a></td>
+                            </tr>
+                            <tr>
+                                <td>${localization.get_text(`EVENT ID`)}</td>
+                                <td>${contract_log.value.event_id}</td>
+                            </tr>
+                        </table>
+                    `;
                     collapse_box.set_collapse(true);
                     this.container.element.appendChild(collapse_box.element);
                 }
