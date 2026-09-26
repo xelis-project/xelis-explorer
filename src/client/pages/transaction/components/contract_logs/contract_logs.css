@@ -1,7 +1,16 @@
+.xe-transaction-sub-container-2:has(> .xe-transaction-contract-logs) {
+    max-height: none;
+}
+
 .xe-transaction-contract-logs {
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    overflow-wrap: anywhere;
+}
+
+.xe-transaction-contract-logs > .xe-collapse-box {
+    flex-shrink: 0;
 }
 
 .xe-transaction-contract-logs table {
