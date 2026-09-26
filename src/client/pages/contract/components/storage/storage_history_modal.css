@@ -44,7 +44,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
     transform: translateY(-30px) scale(0.95);
     transition: transform 0.3s ease, opacity 0.3s ease;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .xe-storage-history-modal.visible .xe-storage-history-modal-content {
@@ -162,7 +162,7 @@
 }
 
 .xe-storage-history-modal-value {
-    flex: 1;
+    flex-shrink: 0;
     overflow: auto;
     min-height: 200px;
     max-height: 65vh;
@@ -261,4 +261,8 @@
     .xe-storage-history-modal-value {
         max-height: 55vh;
     }
+}
+
+.xe-storage-history-modal-value:has(json-viewer.xe-json-viewer-expanded) {
+    max-height: none;
 }

@@ -37,6 +37,10 @@
     animation: xe-transaction-sub-container-2-appear-animation .65s;
 }
 
+.xe-transaction-sub-container-2:has(json-viewer.xe-json-viewer-expanded) {
+    max-height: none;
+}
+
 .xe-transaction-sub-container-2>:only-child {
     flex: 0 1 auto;
     min-height: 0;

@@ -32,7 +32,7 @@
     max-width: 90vw;
     max-height: 90vh;
     padding: 1rem;
-    overflow: hidden;
+    overflow: auto;
     background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.5rem;
@@ -97,6 +97,11 @@
 }
 
 .xe-json-viewer-list-modal-value {
-    min-height: 0;
+    flex-shrink: 0;
+    max-height: 18rem;
     overflow: auto;
+}
+
+.xe-json-viewer-list-modal-value:has(json-viewer.xe-json-viewer-expanded) {
+    max-height: none;
 }

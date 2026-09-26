@@ -1,5 +1,6 @@
 .xe-json-viewer-box {
     padding: 0 1rem;
+    flex-shrink: 0;
     max-height: 12rem;
     overflow: auto;
     word-break: break-all;
@@ -9,6 +10,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    flex-shrink: 0;
     max-height: 18rem;
     overflow: auto;
 }
@@ -16,6 +18,11 @@
 .xe-json-viewer-container>.xe-json-viewer-box {
     max-height: none;
     overflow: visible;
+}
+
+.xe-json-viewer-box:has(json-viewer.xe-json-viewer-expanded),
+.xe-json-viewer-container:has(json-viewer.xe-json-viewer-expanded) {
+    max-height: none;
 }
 
 .xe-json-viewer-section-title {
