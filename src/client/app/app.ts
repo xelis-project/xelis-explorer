@@ -93,24 +93,19 @@ export class App extends Singleton {
     }
 
     on_click = (e: PointerEvent) => {
-        // intercept link click recursively
-        const check_parent_link = (element: HTMLElement) => {
-            if (element.parentElement) {
-                if (element instanceof HTMLAnchorElement) {
-                    const link = element as HTMLAnchorElement;
-                    if (link.target !== `_blank`) {
-                        e.preventDefault();
-                        this.go_to(element.href);
-                    }
-                } else {
-                    check_parent_link(element.parentElement);
-                }
-            }
-        }
+        // Leave modified clicks and other browsing contexts to the browser.
+        if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        if (!(e.target instanceof Element)) return;
 
-        if (e.target instanceof HTMLElement) {
-            check_parent_link(e.target);
-        }
+        const link = e.target.closest(`a[href]`);
+        if (!(link instanceof HTMLAnchorElement)) return;
+        if (link.hasAttribute(`download`) || (link.target && link.target.toLowerCase() !== `_self`)) return;
+
+        const url = new URL(link.href);
+        if (url.origin !== window.location.origin || ![`http:`, `https:`].includes(url.protocol)) return;
+
+        e.preventDefault();
+        this.go_to(url.href);
     }
 
     register_events() {
