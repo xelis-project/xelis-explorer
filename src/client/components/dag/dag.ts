@@ -577,16 +577,18 @@ export class DAG {
 
         this.blocks_by_height.forEach((height_blocks, block_height) => {
             height_blocks.forEach((block, y) => {
-                const block_mesh = this.create_block_mesh(block);
+                // Live events can add meshes while the initial fetch is pending.
+                const block_mesh = this.block_mesh_hashes.get(block.hash) || this.create_block_mesh(block);
                 const center_y = ((y * 5) - (height_blocks.length / 2 * 5)) + 2.5;
                 block_mesh.position.set((block_height - this.load_height) * this.block_spacing, center_y, 0);
                 this.block_group.add(block_mesh);
             });
 
-            const height_mesh = this.create_height_mesh(block_height);
+            const height_mesh = this.height_mesh_map.get(block_height) || this.create_height_mesh(block_height);
             const center_y = -(height_blocks.length / 2 * 5 + 2);
             height_mesh.position.set((block_height - this.load_height) * this.block_spacing, center_y, 0);
             this.height_group.add(height_mesh);
+            this.height_mesh_map.set(block_height, height_mesh);
         });
 
         this.block_group.children.forEach((block_mesh) => {
@@ -595,7 +597,10 @@ export class DAG {
                 const block_mesh_target = this.block_mesh_hashes.get(hash);
                 if (block_mesh_target) {
                     const tip_hash = this.create_tip_hash(block.hash, hash);
-                    const line_mesh = this.create_tip_line_mesh(block_mesh as THREE.Group, block_mesh_target, tip_hash);
+                    const line_mesh = this.tip_mesh_hashes.get(tip_hash) ||
+                        this.create_tip_line_mesh(block_mesh as THREE.Group, block_mesh_target, tip_hash);
+                    line_mesh.geometry.setFromPoints([block_mesh.position, block_mesh_target.position]);
+                    this.tip_mesh_hashes.set(tip_hash, line_mesh);
                     this.tip_line_group.add(line_mesh);
                 }
             });
