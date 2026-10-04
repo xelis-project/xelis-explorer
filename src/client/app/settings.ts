@@ -26,7 +26,7 @@ export class Settings extends Singleton {
         super();
 
         // language
-        this.language = validate_lang_key(Cookies.get(`language`));
+        this.language = validate_lang_key(Cookies.get(`language`) || document.documentElement.lang);
         localization.locale = this.language;
 
         // hash format
@@ -88,7 +88,7 @@ export class Settings extends Singleton {
             path: '/',
             sameSite: 'Strict',
             secure: true,
-            expires: 31536000
+            expires: 365
         });
 
         this.set_storage_item(`hash_format`, this.hash_format);

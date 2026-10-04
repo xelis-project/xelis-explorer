@@ -16,9 +16,8 @@ app.use(
         order: ["cookie", "header"], // detector type priority ordering - disable querystring
         supportedLanguages: get_supported_languages().map(x => x.key),
         fallbackLanguage: 'en',
-        cookieOptions: {
-            httpOnly: false
-        }
+        // Only an explicit settings change should write the language preference.
+        caches: []
     })
 );
 app.use(async (c, next) => {
