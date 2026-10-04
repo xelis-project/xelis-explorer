@@ -44,7 +44,8 @@ export class Page {
         if (key in window) {
             const server_data = window[key as any] as T;
             Reflect.deleteProperty(window, key); // remove data as it might be outdated when returning to page
-            return { server_data, consumed: true };
+            // A failed SSR fetch must not prevent the client from trying again.
+            return { server_data, consumed: server_data !== undefined && server_data !== null };
         }
 
         return { server_data: undefined, consumed: false };

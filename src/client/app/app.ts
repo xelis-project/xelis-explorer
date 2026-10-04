@@ -49,7 +49,12 @@ export class App extends Singleton {
     }
 
     go_to(url: string) {
-        window.history.pushState(null, ``, url);
+        const next_url = new URL(url, window.location.href);
+        // Match the server's trimTrailingSlash redirect before client routing.
+        if (next_url.pathname !== `/` && next_url.pathname.endsWith(`/`)) {
+            next_url.pathname = next_url.pathname.slice(0, -1);
+        }
+        window.history.pushState(null, ``, next_url.href);
         this.load_page();
     }
 
