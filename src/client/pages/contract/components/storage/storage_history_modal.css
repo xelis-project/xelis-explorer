@@ -46,7 +46,11 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
     transform: translateY(-30px) scale(0.95);
     transition: transform 0.3s ease, opacity 0.3s ease;
-    overflow: auto;
+    overflow: hidden;
+}
+
+.xe-storage-history-modal-content> :not(.xe-storage-history-modal-value) {
+    flex-shrink: 0;
 }
 
 .xe-storage-history-modal.visible .xe-storage-history-modal-content {
@@ -165,9 +169,9 @@
 }
 
 .xe-storage-history-modal-value {
-    flex-shrink: 0;
+    flex: 0 1 auto;
     overflow: auto;
-    min-height: 200px;
+    min-height: 0;
     max-height: 65vh;
     padding: 0.75rem;
     background-color: rgba(0, 0, 0, 0.4);

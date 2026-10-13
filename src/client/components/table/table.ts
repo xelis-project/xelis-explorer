@@ -18,6 +18,13 @@ export class Table {
         this.element.appendChild(this.body_element);
     }
 
+    create_scroll_container() {
+        const container = document.createElement(`div`);
+        container.classList.add(`xe-table-scroll`, `scrollbar-1`, `scrollbar-1-rounded`);
+        container.appendChild(this.element);
+        return container;
+    }
+
     set_head_row(titles: string[]) {
         this.head_element.replaceChildren();
         const row = document.createElement(`tr`);

@@ -50,7 +50,7 @@ export class AssetsPage extends Page {
 
         this.table = new Table();
         this.table.set_clickable();
-        this.container_table.element.appendChild(this.table.element);
+        this.container_table.element.appendChild(this.table.create_scroll_container());
 
         const titles = [
             localization.get_text(`HASH`),
@@ -67,7 +67,7 @@ export class AssetsPage extends Page {
         this.pagination.current_page = 1;
         this.pagination.sibling_count = 2;
         this.pagination.page_size = default_assets_page_size;
-        this.container_table.element.insertBefore(this.pagination.element, this.table.element);
+        this.container_table.element.insertBefore(this.pagination.element, this.container_table.element.firstChild);
 
         this.pagination.add_listener(`page_change`, (page) => {
             this.load_assets();

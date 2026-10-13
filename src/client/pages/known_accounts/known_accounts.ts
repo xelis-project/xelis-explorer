@@ -71,7 +71,7 @@ export class KnownAccountsPage extends Page {
 
         this.misc_table = new Table();
         this.misc_table.set_clickable();
-        this.misc_container_table.element.appendChild(this.misc_table.element);
+        this.misc_container_table.element.appendChild(this.misc_table.create_scroll_container());
         this.misc_table.set_head_row(titles);
 
         // exchange table
@@ -85,7 +85,7 @@ export class KnownAccountsPage extends Page {
 
         this.exchange_table = new Table();
         this.exchange_table.set_clickable();
-        this.exchange_container_table.element.appendChild(this.exchange_table.element);
+        this.exchange_container_table.element.appendChild(this.exchange_table.create_scroll_container());
         this.exchange_table.set_head_row(titles);
 
         // pool table
@@ -99,7 +99,7 @@ export class KnownAccountsPage extends Page {
 
         this.pool_table = new Table();
         this.pool_table.set_clickable();
-        this.pool_container_table.element.appendChild(this.pool_table.element);
+        this.pool_container_table.element.appendChild(this.pool_table.create_scroll_container());
         this.pool_table.set_head_row(titles);
     }
 

@@ -40,7 +40,7 @@ export class NetworkUpgradesPage extends Page {
 		this.master.content.appendChild(table_container.element);
 
 		this.table = new Table();
-		table_container.element.appendChild(this.table.element);
+		table_container.element.appendChild(this.table.create_scroll_container());
 
 		const titles = [
 			localization.get_text(`UPGRADE CHANGELOG`),

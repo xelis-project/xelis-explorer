@@ -80,7 +80,7 @@ export class BlockHeightPage extends Page {
 
         this.table = new Table();
         this.table.set_clickable();
-        this.container_table.element.appendChild(this.table.element);
+        this.container_table.element.appendChild(this.table.create_scroll_container());
 
         const titles = [
             localization.get_text(`HASH`),

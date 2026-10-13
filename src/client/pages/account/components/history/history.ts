@@ -81,10 +81,6 @@ export class AccountHistory {
             this.load_history();
         });
 
-        const table_container = document.createElement(`div`);
-        table_container.classList.add(`xe-account-history-table`, `scrollbar-1`, `scrollbar-1-rounded`)
-        this.container.element.appendChild(table_container);
-
         this.table = new Table();
         this.table.element.classList.add();
         this.table.set_clickable();
@@ -92,8 +88,11 @@ export class AccountHistory {
 
         this.prev_next_pager = new PrevNextPager();
         this.prev_next_pager.load_func = () => this.load_history();
-        table_container.appendChild(this.prev_next_pager.element);
-        table_container.appendChild(this.table.element);
+        this.container.element.appendChild(this.prev_next_pager.element);
+
+        const table_container = this.table.create_scroll_container();
+        table_container.classList.add(`xe-account-history-table`);
+        this.container.element.appendChild(table_container);
     }
 
     set_filter_assets(assets: AssetWithData[]) {

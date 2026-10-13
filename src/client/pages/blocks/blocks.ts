@@ -65,7 +65,7 @@ export class BlocksPage extends Page {
         this.prev_next_pager = new PrevNextPager();
         this.prev_next_pager.load_func = () => this.load_blocks();
         this.container_table.element.appendChild(this.prev_next_pager.element);
-        this.container_table.element.appendChild(this.table.element);
+        this.container_table.element.appendChild(this.table.create_scroll_container());
     }
 
     update_interval_1000_id?: number;
