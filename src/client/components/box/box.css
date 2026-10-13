@@ -1,4 +1,7 @@
 .xe-box {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     border: 1px solid var(--xe-border-soft);
     background: var(--xe-card-bg);
     padding: 1rem;

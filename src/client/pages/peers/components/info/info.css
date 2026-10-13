@@ -3,6 +3,7 @@
     gap: 1rem;
     justify-content: space-between;
     flex-direction: row;
+    flex-wrap: wrap;
     animation: xe-peers-info-animation .55s;
     padding: 2rem;
 }
@@ -22,9 +23,8 @@
     display: flex;
     gap: .25rem;
     flex-direction: column;
-    flex: 1;
+    flex: 1 1 12rem;
     min-height: 2rem;
-    white-space: nowrap;
 }
 
 .xe-peers-info>div>:nth-child(1) {

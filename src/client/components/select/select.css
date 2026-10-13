@@ -1,5 +1,7 @@
 .xe-select {
     position: relative;
+    min-width: 0;
+    max-width: 100%;
     user-select: none;
     display: inline-block;
 }
@@ -43,6 +45,9 @@
 }
 
 .xe-select .xe-select-list {
+    width: max-content;
+    max-width: 100%;
+    box-sizing: border-box;
     color: var(--xe-accent);
     font-size: 1.4rem;
     padding: .5rem 0;
@@ -77,7 +82,7 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .xe-select .xe-select-list>div:hover {

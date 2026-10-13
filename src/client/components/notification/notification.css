@@ -1,4 +1,5 @@
 .xe-notification {
+    left: 1rem;
     position: fixed;
     right: 1rem;
     top: 1rem;
@@ -19,7 +20,8 @@
     gap: .5rem;
     flex-direction: row;
     align-items: center;
-    max-width: 30rem;
+    max-width: min(30rem, 100%);
+    box-sizing: border-box;
 }
 
 .xe-notification-item.show {
@@ -43,6 +45,7 @@
 }
 
 .xe-notification-close {
+    flex-shrink: 0;
     border: none;
     background: none;
     color: var(--xe-white);

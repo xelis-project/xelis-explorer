@@ -34,6 +34,8 @@
 .xe-header-links>a,
 .xe-header-link-category>summary,
 .xe-header-link-dropdown>a {
+    max-width: 100%;
+    box-sizing: border-box;
     color: var(--xe-white);
     text-decoration: none;
     text-transform: uppercase;
@@ -203,6 +205,9 @@
         align-items: center;
         box-sizing: border-box;
         backdrop-filter: blur(18px);
+        flex-wrap: nowrap;
+        overflow-y: auto;
+        justify-content: safe center;
     }
 
     .xe-header-links>a,

@@ -22,6 +22,12 @@
     min-height: 20rem;
 }
 
+@media screen and (max-width: 650px) {
+    .xe-mempool-summary-container-1 {
+        flex-direction: column;
+    }
+}
+
 .xe-mempool-summary-container-1>:nth-child(1) {
     flex: 1;
 }

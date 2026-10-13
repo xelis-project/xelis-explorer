@@ -1,4 +1,5 @@
 .xe-countdown {
+    flex-wrap: wrap;
 	display: flex;
 	gap: 1rem;
 	flex-direction: row;

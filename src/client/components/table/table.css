@@ -9,7 +9,7 @@
     padding: .5rem;
     color: var(--xe-muted);
     text-align: left;
-    white-space: nowrap;
+    white-space: normal;
     font-size: 1.4rem;
     text-transform: uppercase;
 }

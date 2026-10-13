@@ -1,4 +1,7 @@
 .xe-collapse-box {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     background: var(--xe-card-bg);
     border: 1px solid var(--xe-border-soft);
     border-radius: var(--xe-radius);
@@ -19,6 +22,7 @@
 }
 
 .xe-collapse-box >:nth-child(1) svg {
+    flex-shrink: 0;
     width: 2rem;
     height: 1.5rem;
     rotate: 180deg;

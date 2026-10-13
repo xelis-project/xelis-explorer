@@ -37,6 +37,8 @@
 }
 
 .xe-settings-item>:nth-child(2) {
+    min-width: 0;
+    max-width: 100%;
     flex: 0 1 auto;
     animation: xe-settings-item-2-animation .8s;
 }

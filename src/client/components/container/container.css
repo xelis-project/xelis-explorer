@@ -1,4 +1,7 @@
 .xe-container {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     position: relative;
     padding: 1.4rem;
     border: 1px solid var(--xe-border-soft);

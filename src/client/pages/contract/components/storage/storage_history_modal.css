@@ -29,6 +29,8 @@
 }
 
 .xe-storage-history-modal-content {
+    box-sizing: border-box;
+    min-width: 0;
     position: relative;
     background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -87,6 +89,7 @@
 }
 
 .xe-storage-history-modal-title {
+    padding-right: 3rem;
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 0;

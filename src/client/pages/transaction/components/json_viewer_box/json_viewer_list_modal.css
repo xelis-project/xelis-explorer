@@ -23,6 +23,8 @@
 }
 
 .xe-json-viewer-list-modal-content {
+    box-sizing: border-box;
+    min-width: 0;
     position: relative;
     z-index: 1;
     display: flex;
@@ -46,17 +48,16 @@
 }
 
 .xe-json-viewer-list-modal-actions {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
+    align-self: flex-end;
     z-index: 1;
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
 }
 
 .xe-json-viewer-list-modal-actions button {
-    height: 2.25rem;
+    min-height: 2.25rem;
     box-sizing: border-box;
 }
 

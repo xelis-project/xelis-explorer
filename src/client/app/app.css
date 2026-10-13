@@ -13,6 +13,7 @@ body {
     font-family: var(--xe-font-body);
     font-size: 1.8rem;
     line-height: 1.45;
+    overflow-wrap: anywhere;
     overflow-x: hidden;
     overflow-y: scroll;
     background:
@@ -27,6 +28,18 @@ input,
 select,
 textarea {
     font: inherit;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    white-space: normal;
+}
+
+/* Allow nested flex and grid content to shrink before wrapping its text. */
+:where(.xe-master-content, .xe-header, .xe-notification) :where(div, section, article, a, button, summary) {
+    min-width: 0;
 }
 
 h1,
