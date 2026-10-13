@@ -6,7 +6,6 @@
 }
 
 .xe-dashboard-top-stats-item> :nth-child(1) {
-    overflow-wrap: anywhere;
     font-size: 1.3rem;
     font-weight: 100;
     color: var(--xe-muted);

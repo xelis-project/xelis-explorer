@@ -13,7 +13,6 @@ body {
     font-family: var(--xe-font-body);
     font-size: 1.8rem;
     line-height: 1.45;
-    overflow-wrap: anywhere;
     overflow-x: hidden;
     overflow-y: scroll;
     background:
